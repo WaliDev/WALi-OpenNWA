@@ -7,27 +7,10 @@ using namespace wali::xfa;
 #define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
 
 
-static Xfa::Word const words[] = {
-    Words().epsilon,
-    Words().a,
-    Words().aa,
-    Words().aaa,
-    Words().aaaa,
-    Words().a5,
-    Words().a6,
-    Words().a7,
-    Words().a8,
-    Words().b,
-    Words().bb,
-    Words().ab,
-    Words().ba
-};
-
-static const unsigned num_words = NUM_ELEMENTS(words);
 
 // WARNING: the order of the rows and columns in this table must be
 //          consistent with the order of 'words' and 'nwas' below.
-static bool expected_answers[][num_words] = {
+static bool expected_answers[][13] = {
     /*                     eps    a      aa     aaa    aaaa   a^5    a^6    a^7    a^8    b      bb     ab     ba */
     /* trivial {}     */ { false, false, false, false, false, false, false, false, false, false, false, false, false },
     /* accept empty   */ { true,  false, false, false, false, false, false, false, false, false, false, false, false },
@@ -70,8 +53,28 @@ namespace wali {
                 SingleSimpleTransEpsilon(zero, relations).xfa
             };
 
+            Xfa::Word const words[] = {
+                Words().epsilon,
+                Words().a,
+                Words().aa,
+                Words().aaa,
+                Words().aaaa,
+                Words().a5,
+                Words().a6,
+                Words().a7,
+                Words().a8,
+                Words().b,
+                Words().bb,
+                Words().ab,
+                Words().ba
+            };
+            
+
             const unsigned num_xfas = NUM_ELEMENTS(xfas);
             ASSERT_EQ(num_xfas, NUM_ELEMENTS(expected_answers));
+
+            const unsigned num_words = NUM_ELEMENTS(words);
+            ASSERT_EQ(num_words, NUM_ELEMENTS(expected_answers[0]));
             
             for (unsigned word = 0 ; word < num_words ; ++word) {
                 for (unsigned xfa = 0 ; xfa < num_xfas ; ++xfa) {

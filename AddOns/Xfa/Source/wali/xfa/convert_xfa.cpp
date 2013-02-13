@@ -82,15 +82,11 @@ namespace wali {
         }
 
         
-        void
-        register_vars(XfaAst const & ast,
-                      wali::domains::binrel::ProgramBddContext & voc,
+        std::vector<std::map<std::string, int> >
+        get_vars(XfaAst const & ast,
                       int fdd_size,
                       std::string const & prefix)
         {
-            static bool has_run = false;
-            assert(!has_run);
-
             StringSets sets;
             
             std::cerr << "Registering variables with size " << fdd_size << "\n";
@@ -107,9 +103,6 @@ namespace wali {
                     }
                     assert (act.action_type == "ctr2");
                     if (registered.find(var_name(act.operand_id, prefix)) == registered.end()) {
-                        if (has_run) {
-                            voc.addIntVar(var_name(act.operand_id, prefix), fdd_size);
-                        }
                         std::cerr << "    " << var_name(act.operand_id, prefix) << "\n";
                         registered.insert(var_name(act.operand_id, prefix));
                     }
@@ -133,19 +126,18 @@ namespace wali {
             std::cerr << "Here is the set of variables: " << sets.to_string();
 
 
-            if (!has_run) {
-                std::vector<std::map<std::string, int> > vars = disjoint_sets_to_var_order(sets, fdd_size);
-                vars.push_back(std::map<std::string, int>());
+            std::vector<std::map<std::string, int> > vars = disjoint_sets_to_var_order(sets, fdd_size);
+            vars.push_back(std::map<std::string, int>());
 
-                //voc.addIntVar("left_current_state", ast.states.size());
-                vars.back()["left_current_state"] = static_cast<int>(ast.states.size()) * 2;
-                std::cout << "Adding left_current_state with size " << vars.back()["left_current_state"];
-                
-                voc.setIntVars(vars);
-                //details::interleave_all_fdds();
-::details::print_bdd_variable_order(std::cout);
-                has_run = true;
-            }
+            //voc.addIntVar("left_current_state", ast.states.size());
+            vars.back()[prefix + "current_state"] = static_cast<int>(ast.states.size()) * 2;
+            std::cout << "Adding " << prefix << "current_state with size " << vars.back()[prefix + "current_state"];
+
+            return vars;
+            
+            //voc.setIntVars(vars);
+            //details::interleave_all_fdds();
+            //::details::print_bdd_variable_order(std::cout);
         }
 
         BinaryRelation
@@ -319,8 +311,6 @@ namespace wali {
                         int fdd_size,
                         std::string const & domain_var_name_prefix)
         {
-            register_vars(ast, voc, fdd_size, domain_var_name_prefix);
-
             using namespace wali::domains::binrel;
             BinaryRelation zero = new BinRel(&voc, voc.False());
             bdd ident = voc.Assume(voc.True(), voc.True());

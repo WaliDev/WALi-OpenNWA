@@ -24,11 +24,8 @@ namespace wali
     class SemElemSet : public SemElem
     {
     public:
-      enum KeepWhat {
-        KeepAllNonduplicates,
-        KeepMaximalElements,
-        KeepMinimalElements
-      };
+      typedef boost::function<std::pair<sem_elem_t, sem_elem_t>(sem_elem_t, sem_elem_t)>
+              SemElemSubsumptionComputer;
       
       //typedef boost::container::flat_set<sem_elem_t, SemElemRefPtrFastLessThan> ElementSet;
       //typedef std::set<sem_elem_t, SemElemRefPtrFastLessThan> ElementSet;
@@ -40,8 +37,8 @@ namespace wali
       /// Constructs a SemElemSet with the given base element, which is only
       /// used to get a handle on base_element->one(). The result is semiring
       /// 0.
-      SemElemSet(KeepWhat keep_what, sem_elem_t base_element);
-      SemElemSet(KeepWhat keep_what, sem_elem_t base_element, ElementSet const & elements);
+      SemElemSet(SemElemSubsumptionComputer keep_what, sem_elem_t base_element);
+      SemElemSet(SemElemSubsumptionComputer keep_what, sem_elem_t base_element, ElementSet const & elements);
       
       virtual sem_elem_t one() const;
       virtual sem_elem_t zero() const;
@@ -63,10 +60,14 @@ namespace wali
     private:
       sem_elem_t base_one;
       ElementSet elements;
-      KeepWhat keep_what;
+      SemElemSubsumptionComputer keep_what;
       size_t the_hash;
-    };
 
+    public:
+      static SemElemSubsumptionComputer const KeepAllNonduplicates;
+      static SemElemSubsumptionComputer const KeepMaximalElements;
+      static SemElemSubsumptionComputer const KeepMinimalElements;
+    };
 
   }
 }

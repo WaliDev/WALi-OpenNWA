@@ -1,5 +1,6 @@
 #include "wali/wfa/DeterminizeWeightGen.hpp"
 #include "wali/wfa/WFA.hpp"
+#include "wali/wfa/State.hpp"
 
 namespace wali
 {
@@ -45,7 +46,31 @@ namespace wali
       } // for each source state
 
       assert(total_weight != NULL);
+      return total_weight;
+    }
+
+
+    sem_elem_t
+    LiftCombineWeightGen::getAcceptWeight(WFA const & original_wfa,
+                                          WFA const & UNUSED_PARAMETER(determinized_wfa_so_far),
+                                          std::set<Key> const & cell) const
+    {
+      sem_elem_t total_weight = NULL;
       
+      for (std::set<Key>::const_iterator state = cell.begin();
+           state != cell.end(); ++state)
+      {
+        sem_elem_t orig_accept_weight = original_wfa.getState(*state)->acceptWeight();
+        sem_elem_t lifted = liftAcceptWeight(original_wfa, *state, orig_accept_weight);
+
+        if (total_weight == NULL) {
+          total_weight = lifted->zero();
+        }
+
+        total_weight = total_weight->combine(lifted);
+      }
+
+      assert(total_weight != NULL);
       return total_weight;
     }
     

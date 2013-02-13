@@ -13,84 +13,136 @@ namespace
 
 
   void
-  push_if_not_present(SemElemSet::ElementSet & set, sem_elem_t add_this)
+  push_if_not_present(SemElemSet::ElementSet & set, size_t & the_hash, sem_elem_t add_this)
   {
     if (!is_present(set, add_this)) {
+      the_hash ^= add_this->hash();
       set.insert(add_this);
       //set.push_back(add_this);
     }
   }
 
-
-  bool
-  new_less_than_existing(sem_elem_t new_, sem_elem_t existing)
+  std::pair<sem_elem_t, sem_elem_t>
+  dummy_keep_nonduplicates(sem_elem_t new_, sem_elem_t existing)
   {
-    return new_->underApproximates(existing);
+    std::abort();
   }
 
-  bool
-  existing_less_than_new(sem_elem_t new_, sem_elem_t existing)
+  std::pair<sem_elem_t, sem_elem_t>
+  keep_smaller(sem_elem_t new_, sem_elem_t existing)
   {
-    return existing->underApproximates(new_);
+    if (new_->underApproximates(existing)) {
+      // new_ < existing; keeping smaller; keeping new_
+      return std::pair<sem_elem_t, sem_elem_t>(new_, NULL);
+    }
+    else if (existing->underApproximates(new_)) {
+      // existing < new; keeping smaller; keeping existing
+      return std::pair<sem_elem_t, sem_elem_t>(existing, NULL);
+    }
+    else {
+      // no subsumption; keep both
+      return std::pair<sem_elem_t, sem_elem_t>(new_, existing);
+    }
   }
 
-  typedef bool(*SemElemCompare)(sem_elem_t, sem_elem_t);
+  std::pair<sem_elem_t, sem_elem_t>
+  keep_larger(sem_elem_t new_, sem_elem_t existing)
+  {
+    if (existing->underApproximates(new_)) {
+      // existing < new_; keeping larger; keeping new_
+      return std::pair<sem_elem_t, sem_elem_t>(new_, NULL);
+    }
+    else if (new_->underApproximates(existing)) {
+      // new_ < existing; keeping larger; keeping existing
+      return std::pair<sem_elem_t, sem_elem_t>(existing, NULL);
+    }
+    else {
+      // no subsumption; keep both
+      return std::pair<sem_elem_t, sem_elem_t>(new_, existing);
+    }
+  }
 
-  void
+
+  sem_elem_t
   remove_subsumed_elements(SemElemSet::ElementSet & set,
+                           size_t & the_hash,
                            sem_elem_t element,
-                           SemElemCompare new_subsumes_existing)
+                           SemElemSet::SemElemSubsumptionComputer keep_what)
   {
     SemElemSet::ElementSet::const_iterator iter = set.begin();
     while (iter != set.end()) {
-      if (new_subsumes_existing(element, *iter)) {
+      std::pair<sem_elem_t, sem_elem_t> keep_these = keep_what(element, *iter);
+      if (keep_these.second == NULL) {
         // set.erase(iter++) for std::map
+        the_hash ^= (*iter)->hash();
+        element = keep_these.first;
         iter = set.erase(iter);
       }
       else {
+        // These two assertions are to check that 'keep_what' returns either
+        // a single element which means that the existing one should be
+        // removed and the returned single element is carried forward and
+        // eventually inserted (this is the true case of this if statement),
+        // or (this case) it returns both the new and existing elements
+        // unchanged.
+        assert(keep_these.first == element || keep_these.second == element);
+        assert(keep_these.first == *iter || keep_these.second == *iter);
         ++iter;
       }
     }
+    return element;
   }
 
 
   void
   add_element_if_not_subsumed(SemElemSet::ElementSet & set,
+                              size_t & the_hash,
                               sem_elem_t element,
-                              SemElemCompare existing_subsumes_new)
+                              SemElemSet::SemElemSubsumptionComputer keep_what)
   {
     for(SemElemSet::ElementSet::const_iterator iter = set.begin();
         iter != set.end(); ++iter)
     {
-      if (existing_subsumes_new(*iter, element)) {
+      std::pair<sem_elem_t, sem_elem_t> keep_these = keep_what(element, *iter);
+      if (keep_these.second == NULL) {
+        // The existing element subsumes the new one. However, the existing
+        // element may need to incorporate information from the new element
+        // into it. The following is like *iter = keep_these.first, except
+        // that we can do it. :-)
+        if (*iter != keep_these.first) {
+          // 'tis OK to invalidate iter because we're just returning anyway :-)
+          the_hash ^= (*iter)->hash();
+          the_hash ^= keep_these.first->hash();
+          set.erase(iter);
+          set.insert(keep_these.first);
+        }
         return;
       }
+      // These two assertions are to check that 'keep_what' returns either a
+      // single element which means that the existing one should be removed
+      // and the returned single element is carried forward and eventually
+      // inserted (this is the true case of this if statement), or (this
+      // case) it returns both the new and existing elements unchanged.
+      assert(keep_these.first == element || keep_these.second == element);
+      assert(keep_these.first == *iter || keep_these.second == *iter);
     }
     set.insert(element);
   }
                               
     
   void
-  add_element_if_appropriate(SemElemSet::KeepWhat keep_what,
+  add_element_if_appropriate(SemElemSet::SemElemSubsumptionComputer keep_what,
                              SemElemSet::ElementSet & set,
+                             size_t & the_hash,
                              sem_elem_t add_this)
   {
-    switch(keep_what) {
-      case SemElemSet::KeepAllNonduplicates:
-        push_if_not_present(set, add_this);
-        break;
-
-      case SemElemSet::KeepMaximalElements:
-        // Should remove an element if new >= existing
-        remove_subsumed_elements(set, add_this, existing_less_than_new);
-        add_element_if_not_subsumed(set, add_this, existing_less_than_new);
-        break;
-
-      case SemElemSet::KeepMinimalElements:
-        // Opposite of the previous case
-        remove_subsumed_elements(set, add_this, new_less_than_existing);
-        add_element_if_not_subsumed(set, add_this, new_less_than_existing);
-        break;
+    if (keep_what == dummy_keep_nonduplicates) {
+      push_if_not_present(set, the_hash, add_this);
+    }
+    else {
+      // Should remove an element if new >= existing
+      add_this = remove_subsumed_elements(set, the_hash, add_this, keep_what);
+      add_element_if_not_subsumed(set, the_hash, add_this, keep_what);
     }
   }
 }
@@ -100,15 +152,20 @@ namespace wali
 {
   namespace domains
   {
+    SemElemSet::SemElemSubsumptionComputer const SemElemSet::KeepAllNonduplicates(dummy_keep_nonduplicates);
+    SemElemSet::SemElemSubsumptionComputer const SemElemSet::KeepMaximalElements(keep_larger);
+    SemElemSet::SemElemSubsumptionComputer const SemElemSet::KeepMinimalElements(keep_smaller);
 
-    SemElemSet::SemElemSet(KeepWhat keep, sem_elem_t base_element)
+    
+
+    SemElemSet::SemElemSet(SemElemSubsumptionComputer keep, sem_elem_t base_element)
       : base_one(base_element->one())
       , keep_what(keep)
       , the_hash(0)
     {}
 
 
-    SemElemSet::SemElemSet(KeepWhat keep, sem_elem_t base_element, ElementSet const & es)
+    SemElemSet::SemElemSet(SemElemSubsumptionComputer keep, sem_elem_t base_element, ElementSet const & es)
       : base_one(base_element->one())
       , keep_what(keep)
       , the_hash(0)
@@ -117,11 +174,10 @@ namespace wali
            element != es.end(); ++element)
       {
         size_t pre_size = this->elements.size();
-        add_element_if_appropriate(this->keep_what, this->elements, *element);
+        add_element_if_appropriate(this->keep_what, this->elements, this->the_hash, *element);
         if (pre_size != this->elements.size()) {
           // Added
           assert(this->elements.size() == pre_size + 1u);
-          the_hash ^= (*element)->hash();
         }
       }
     }
@@ -149,7 +205,7 @@ namespace wali
     {
       SemElemSet const * other = dynamic_cast<SemElemSet const *>(se);
       assert(other);
-      assert(this->keep_what == other->keep_what);
+      //assert(this->keep_what == other->keep_what);
       assert(this->base_one->equal(other->base_one));
 
       Ptr result = new SemElemSet(this->keep_what, this->base_one);
@@ -162,6 +218,7 @@ namespace wali
         {
           add_element_if_appropriate(this->keep_what,
                                      result->elements,
+                                     result->the_hash,
                                      (*this_element)->extend(*other_element));
         }
       }
@@ -175,15 +232,16 @@ namespace wali
     {
       SemElemSet const * other = dynamic_cast<SemElemSet const *>(se);
       assert(other);
-      assert(this->keep_what == other->keep_what);
+      //assert(this->keep_what == other->keep_what);
       assert(this->base_one->equal(other->base_one));
 
       Ptr result = new SemElemSet(this->keep_what, this->base_one, this->elements);
       for (ElementSet::const_iterator other_element = other->elements.begin();
            other_element != other->elements.end(); ++other_element)
       {
-        add_element_if_appropriate(this->keep_what, result->elements, *other_element);
+        add_element_if_appropriate(this->keep_what, result->elements, result->the_hash, *other_element);
       }
+
       return result;
     }
     
@@ -193,7 +251,7 @@ namespace wali
     {
       SemElemSet const * other = dynamic_cast<SemElemSet const *>(se);
       assert(other);
-      assert(this->keep_what == other->keep_what);
+      //assert(this->keep_what == other->keep_what);
       assert(this->base_one->equal(other->base_one)); // or return false? or what?
 
       if (this->elements.size() != other->elements.size()) {
@@ -224,6 +282,7 @@ namespace wali
           o << ", ";
         }
         (*element)->print(o);
+        first = false;
       }
       o << "}";
       return o;

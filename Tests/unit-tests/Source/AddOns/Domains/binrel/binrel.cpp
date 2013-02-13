@@ -1375,7 +1375,18 @@ namespace{
     bdd_fnload("dusty_bdd", c);
     bdd d = hist->Assign("a", hist->From("b"));
     ASSERT_EQ(c,d);
+  }
+  
+  TEST(wali$domains$binrel$$BinRel$$Assume, differentVocSizes)
+  {
+    ProgramBddContext p;
+    map< string, int> m;
+    m["a"] = 2;
+    m["b"] = 4;
+    p.setIntVars(m);
 
+    bdd b = p.Assume(p.From("a"), p.Const(0));
+    ASSERT_NE(b, bddfalse);
   }
 } //namespace
 

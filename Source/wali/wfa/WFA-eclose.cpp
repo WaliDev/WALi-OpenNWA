@@ -62,10 +62,13 @@ namespace
   class SemElemSetLifter : public wali::wfa::ConstTransFunctor
   {
     WFA & target;
+    wali::domains::SemElemSet::SemElemSubsumptionComputer const & computer;
     
   public:
-    SemElemSetLifter(WFA * output_to_here)
+    SemElemSetLifter(WFA * output_to_here,
+                     wali::domains::SemElemSet::SemElemSubsumptionComputer const & comp)
       : target(*output_to_here)
+      , computer(comp)
     {}
     
     virtual void operator()(wali::wfa::ITrans const * t) {
@@ -76,7 +79,7 @@ namespace
       target.addTrans(t->from(),
                       t->stack(),
                       t->to(),
-                      new wali::domains::SemElemSet(wali::domains::SemElemSet::KeepAllNonduplicates,
+                      new wali::domains::SemElemSet(computer,
                                                     t->weight(),
                                                     es));
     }
@@ -348,12 +351,12 @@ namespace wali
       //
       //               dummy
       //   p_state --------------> ((query_accept))
-      //        \  \                 -+
-      //         \  \ S             /
+      //        \  \               --+
+      //         \  \ S             /|
       //          \  \             /
       //           \  \           / source
-      //            \  \         /
-      //            -+ -+       /
+      //            \| \|        /
+      //           --+ -+       /
       //          (p_state, source)
       //
       // for each 'source' in 'sources' and lots of symbols 'S' -- which are
@@ -405,7 +408,10 @@ namespace wali
           
           // Now get the weight. That's the net weight from 'source' to
           // 'target', where 'target' is actually a state in 'this' WFA.
-          closures[source][target] = (*trans)->weight();
+          sem_elem_t weight = (*trans)->weight();
+          if (!weight->equal(weight->zero())) {
+            closures[source][target] = (*trans)->weight();
+          }
         }
       }
       
@@ -429,10 +435,16 @@ namespace wali
     WFA::AccessibleStateSetMap
     WFA::computeAllReachingWeights() const
     {
+      return computeAllReachingWeights(SemElemSet::KeepAllNonduplicates);
+    }
+
+    WFA::AccessibleStateSetMap
+    WFA::computeAllReachingWeights(SemElemSet::SemElemSubsumptionComputer computer) const
+    {
       // Lift weights to the sets
       WFA lifted;
-      sem_elem_t lifted_zero = new SemElemSet(SemElemSet::KeepAllNonduplicates, this->getSomeWeight()->zero());
-      SemElemSetLifter lifter(&lifted);
+      sem_elem_t lifted_zero = new SemElemSet(computer, this->getSomeWeight()->zero());
+      SemElemSetLifter lifter(&lifted, computer);
       for (std::set<Key>::const_iterator q = Q.begin(); q != Q.end(); ++q) {
         lifted.addState(*q, lifted_zero);
       }

@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "wali/domains/SemElemSet.hpp"
+#include "wali/SemElemPair.hpp"
 #include "wali/ShortestPathSemiring.hpp"
 
 namespace wali {
@@ -182,6 +183,30 @@ namespace wali {
             //EXPECT_EQ(all, answer_down->getElements()); // too strict: enforces order
         }
 
+
+        TEST(wali$domains$SemElemSet$$combine, combineSetsHash)
+        {
+            sem_elem_t ten = new ShortestPathSemiring(10);
+            sem_elem_t twenty = new ShortestPathSemiring(20);
+            sem_elem_t thirtyone = new ShortestPathSemiring(31);
+            SemElemSet::ElementSet es1, es2;
+            insert(es1, ten);
+            insert(es1, twenty);
+            insert(es2, thirtyone);
+            
+            SemElemSet s1(SemElemSet::KeepAllNonduplicates, ten, es1);
+            SemElemSet s2(SemElemSet::KeepAllNonduplicates, thirtyone, es2);
+
+            sem_elem_t answer = s1.combine(&s2);
+
+            // *technically* these are too strict.
+            EXPECT_NE(0u, s1.hash());
+            EXPECT_NE(0u, s2.hash());
+            EXPECT_NE(0u, answer->hash());
+            EXPECT_NE(s1.hash(), answer->hash());
+            EXPECT_NE(s2.hash(), answer->hash());
+        }
+        
 
         TEST(wali$domains$SemElemSet$$combine, combineWillNotDuplicateAnElementEvenIfTheyAreSeparateObjects)
         {
@@ -423,6 +448,8 @@ namespace wali {
                 SETS(set0), SETS(set1), SETS(set2), SETS(set3), SETS(set4), SETS(set5), SETS(set6), SETS(set7),
                 SETS(set8), SETS(set9), SETS(setA), SETS(setB), SETS(setC), SETS(setD), SETS(setE), SETS(setF);
 
+#undef SETS
+
 #define EXPECT_SET_REDUCES_TO(root, maximal, minimal) \
     EXPECT_TRUE(root##_keeping_min.equal(&minimal##_keeping_min)); \
     EXPECT_TRUE(root##_keeping_max.equal(&maximal##_keeping_max))
@@ -472,6 +499,155 @@ namespace wali {
             EXPECT_TRUE(set2_keeping_min.equal(should_be_set2_min1));
         }
 
+
+        /////////////////////////////////////////////////////////////////
+        // Test the weird keep-a-transformed-copy thing
+
+        // We will use a set of pairs of sets. The first component will act
+        // like keep-minimum, and the second component will take unions of
+        // things the first component says are subsumed.
+
+        std::pair<sem_elem_t, sem_elem_t>
+        merge(sem_elem_t left, sem_elem_t right)
+        {
+            SemElemPair
+                * left_down  = dynamic_cast<SemElemPair *>(left.get_ptr()),
+                * right_down = dynamic_cast<SemElemPair *>(right.get_ptr());
+
+            SemElemSet
+                * left_first    = dynamic_cast<SemElemSet *>(left_down ->get_first().get_ptr()),
+                * left_second   = dynamic_cast<SemElemSet *>(left_down ->get_second().get_ptr()),
+                * right_first   = dynamic_cast<SemElemSet *>(right_down->get_first().get_ptr()),
+                * right_second  = dynamic_cast<SemElemSet *>(right_down->get_second().get_ptr());
+            
+            bool
+                left_under_right = left_first->underApproximates(right_first),
+                right_under_left = right_first->underApproximates(left_first);
+
+            if (!left_under_right && !right_under_left) {
+                // Neither approximates the other. Return both.
+                return std::make_pair(left, right);
+            }
+            else if (left_under_right) {
+                // Keeping minimal, so keep left
+                SemElemPair * p = new SemElemPair(left_first, left_second->combine(right_second));
+                return std::make_pair(p, sem_elem_t());
+            }
+            else {
+                // Keeping minimal, so keep right
+                SemElemPair * p = new SemElemPair(right_first, left_second->combine(right_second));
+                return std::make_pair(p, sem_elem_t());
+            }
+        }
+
+
+
+        TEST(wali$domains$SemElemSet, useNotMaximalNotMinimalNotAllSubsumption)
+        {
+            // Easiest way I can think of to test this is to use SemElemSets
+            // as elements in the SemElemSets that I'm actually interested
+            // in. (The simpler domains, like ShortestPath, are totally
+            // ordered.)
+
+            // So here we set up the ROOT ELEMENTS
+            sem_elem_t
+                sp_two = new ShortestPathSemiring(2),
+                sp_six = new ShortestPathSemiring(6);
+
+            SemElemSet::ElementSet empty_set, two_set, six_set, two_six_set;;
+            insert(two_set, sp_two);
+            insert(six_set, sp_six);
+            insert(two_six_set, sp_two);
+            insert(two_six_set, sp_six);
+
+            // Here we set up the sets which are ELEMENTS OF EACH PAIR
+
+            sem_elem_t
+                elem   = new SemElemSet(SemElemSet::KeepAllNonduplicates, sp_two, empty_set),
+                elem2  = new SemElemSet(SemElemSet::KeepAllNonduplicates, sp_two, two_set),
+                elem6  = new SemElemSet(SemElemSet::KeepAllNonduplicates, sp_six, six_set),
+                elem26 = new SemElemSet(SemElemSet::KeepAllNonduplicates, sp_six, two_six_set);
+
+            ASSERT_FALSE(elem2->underApproximates(elem6));
+            ASSERT_FALSE(elem6->underApproximates(elem2));
+            ASSERT_TRUE(elem->underApproximates(elem2));
+            ASSERT_TRUE(elem2->underApproximates(elem26));
+
+            // Here we set up the element SETS
+
+            SemElemSet::ElementSet set1, set2, set4, set6;
+
+            //                                        //      Full set                    Keeping maximal            Keeping minimal
+            insert(set1, elem                      ); // { <>                  }        { <>       }   (set1)       { <>       } (set1)
+            insert(set2,       elem2               ); // {     <2>             }        { <2>      }   (set2)       { <2>      } (set2)
+            insert(set4,              elem6        ); // {          <6>        }        { <6>      }   (set4)       { <6>      } (set4)
+            insert(set6,       elem2, elem6        ); // {     <2>, <6>        }        { <2>, <6> }   (set6)       { <2>, <6> } (set6)
+
+            SemElemSet::SemElemSubsumptionComputer merge_fn(merge);
+
+#define SETS(name, setname) \
+            name = new SemElemSet(SemElemSet::KeepAllNonduplicates, elem->one(), setname)
+            
+            ref_ptr<SemElemSet>
+                SETS(empty, set1),
+                SETS(two, set2),
+                SETS(six, set4),
+                SETS(both, set6);
+
+#undef SETS
+
+            // Here we set up the PAIRS and singleton SETS OF THOSE PAIRS
+
+#define DEFINE_INPUT(first, second) \
+            ref_ptr<SemElemPair> first##_then_##second##_pair = new SemElemPair(first, second); \
+            SemElemSet::ElementSet first##_then_##second##_set;                          \
+            first##_then_##second##_set.insert(first##_then_##second##_pair);            \
+            ref_ptr<SemElemSet> first##_then_##second##_holder = new SemElemSet(merge, first##_then_##second##_pair->one(), first##_then_##second##_set); \
+            SemElemSet * first##_then_##second = first##_then_##second##_holder.get_ptr();
+            
+            DEFINE_INPUT(empty, empty);
+            DEFINE_INPUT(two, two);
+            DEFINE_INPUT(two, six);
+            DEFINE_INPUT(two, both);
+            DEFINE_INPUT(six, six);
+            DEFINE_INPUT(both, two);
+            DEFINE_INPUT(both, six);
+            DEFINE_INPUT(both, both);
+
+            SemElemSet::ElementSet two_pairs_two_and_six_set;
+            two_pairs_two_and_six_set.insert(two_then_two_pair);
+            two_pairs_two_and_six_set.insert(six_then_six_pair);
+            ref_ptr<SemElemSet> two_pairs_two_and_six = new SemElemSet(merge, empty_then_empty_pair->one(), two_pairs_two_and_six_set);
+
+            ASSERT_EQ(2u, two_pairs_two_and_six->getElements().size());
+
+#undef DEFINE_INPUT
+
+            // Phew. Now we can check that combines turn out the way we
+            // expect. In the following, by 2 I really mean {2}, and by 6 I
+            // really mean {6}. (These are elem2 and elem6 above.)
+
+            // <{},  {}>  + <{},    {}>     ==> <{},  {}>
+            EXPECT_TRUE(empty_then_empty -> combine(empty_then_empty) -> equal(empty_then_empty));
+            
+            // <{2}, {2}> + <{2},   {2}>    ==> <{2}, {2}>
+            EXPECT_TRUE(two_then_two -> combine(two_then_two) -> equal(two_then_two));
+
+            // <{2}, {2}> + <{2},   {6}>    ==> <{2}, {2,6}>
+            EXPECT_TRUE(two_then_two -> combine(two_then_six) -> equal(two_then_both));    //////////////////
+            
+            // <{2}, {2}> + <{6},   {6}>    ==> <{2}, {2}> and <{6}, {6}>
+            EXPECT_TRUE(two_then_two -> combine(six_then_six) -> equal(two_pairs_two_and_six));
+            
+            // <{2}, {2}> + <{2,6}, {2,6}>  ==> <{2}, {2, 6}>
+            EXPECT_TRUE(two_then_two -> combine(both_then_both) -> equal(two_then_both));
+            
+            // <{2,6}, {2}> + <{2,6}, {6}> ==> <{2,6}, {2,6}>
+            EXPECT_TRUE(both_then_two -> combine(both_then_six) -> equal(both_then_both)); ////////////
+            
+            // <{2,6}, {2,6}> + <{2,6}, {2,6}> ==> <{2,6}, {2,6}>
+            EXPECT_TRUE(both_then_both -> combine(both_then_both) -> equal(both_then_both));
+        }
         
     }
 }

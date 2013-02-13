@@ -193,6 +193,12 @@ namespace wali
         void addFinalState( Key key );
 
         /**
+         * Add parameter key to the set of final states, accepting with the
+         * given weight.
+         */
+        void addFinalState(Key key, sem_elem_t accept_weight);
+
+        /**
          * Return true if parameter key is a final state
          */
         bool isFinalState( Key key ) const;
@@ -640,6 +646,7 @@ namespace wali
         // This function is in WFA-eclose.cpp due to its similarity with the
         // Tarjar/FWPDS epsilon closure algorithm.
         AccessibleStateSetMap computeAllReachingWeights() const;
+        AccessibleStateSetMap computeAllReachingWeights(domains::SemElemSet::SemElemSubsumptionComputer) const;
 
         /// Creates (and returns) a new WFA which is the same as *this,
         /// except that it has no epsilon transitions.
@@ -760,6 +767,16 @@ namespace wali
         void toWpds(Key p_state,
                     wpds::WPDS * wpds,
                     boost::function<bool (ITrans const *)> trans_accept) const;
+
+
+        /// Returns the set of symbols that appear on a transition somewhere
+        /// in this WFA. Never includes epsilon.
+        ///
+        /// (Note that it is impossible to have an element of the alphabet
+        /// that does not appear as a transition due to this fact -- the
+        /// alphabet is never stored explicitly, and this function will
+        /// recompute it each time.)
+        std::set<Key> alphabet() const;
     };
 
   } // namespace wfa
