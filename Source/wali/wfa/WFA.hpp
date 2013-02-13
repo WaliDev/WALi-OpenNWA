@@ -184,11 +184,13 @@ namespace wali
 
         /**
          * Add parameter key to the set of final states
+         * The state must already have been added to the FA
          */
         void add_final_state( Key key );
 
         /**
          * Add parameter key to the set of final states
+         * The state must already have been added to the FA
          */
         void addFinalState( Key key );
 
