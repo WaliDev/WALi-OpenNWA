@@ -1386,25 +1386,30 @@ namespace wali {
         // This must be a return transition
         int nc;
         sem_elem_t wtCallRule = eHandler.get_dependency(n, nc);
-        sem_elem_tensor_t wt;
+        sem_elem_t wt;
         if(nc != -1) {
-          wt = boost::polymorphic_downcast<SemElemTensor*>(nodes[nc].gr->get_weight(nodes[nc].intra_nodeno).get_ptr());
-          if(isOutputAutomatonTensored && ! nodes[nc].gr->hasTensoredWeights)
-            wt = tensorSetUpFP(wt,boost::polymorphic_downcast<SemElemTensor*>(wt->one().get_ptr()));
-          if(! isOutputAutomatonTensored && nodes[nc].gr->hasTensoredWeights)
-            wt = wt->detensorTranspose();
+          wt = nodes[nc].gr->get_weight(nodes[nc].intra_nodeno);
+          sem_elem_tensor_t twt = dynamic_cast<SemElemTensor*>(wt.get_ptr());
+          if(twt != NULL){
+            if(isOutputAutomatonTensored && ! nodes[nc].gr->hasTensoredWeights)
+              wt = tensorSetUpFP(twt,boost::polymorphic_downcast<SemElemTensor*>(twt->one().get_ptr()));
+            if(! isOutputAutomatonTensored && nodes[nc].gr->hasTensoredWeights)
+              wt = twt->detensorTranspose();
+          }
         } else {
           // ESource
-          wt = boost::polymorphic_downcast<SemElemTensor*>(wtCallRule->one().get_ptr());
+          wt = wtCallRule->one();
         }
         return wt->extend(wtCallRule.get_ptr());
       }
-
-      sem_elem_tensor_t wt = boost::polymorphic_downcast<SemElemTensor*>(nodes[n].gr->get_weight(nodes[n].intra_nodeno).get_ptr());
-      if(isOutputAutomatonTensored && ! nodes[n].gr->hasTensoredWeights)
-        wt = tensorSetUpFP(wt,boost::polymorphic_downcast<SemElemTensor*>(wt->one().get_ptr()));
-      if(! isOutputAutomatonTensored && nodes[n].gr->hasTensoredWeights)
-        wt = wt->detensorTranspose();
+      sem_elem_t wt = nodes[n].gr->get_weight(nodes[n].intra_nodeno);
+      sem_elem_tensor_t twt = dynamic_cast<SemElemTensor*>(wt.get_ptr());
+      if(twt != NULL){
+        if(isOutputAutomatonTensored && ! nodes[n].gr->hasTensoredWeights)
+          wt = tensorSetUpFP(twt,boost::polymorphic_downcast<SemElemTensor*>(twt->one().get_ptr()));
+        if(! isOutputAutomatonTensored && nodes[n].gr->hasTensoredWeights)
+          wt = twt->detensorTranspose();
+      }
       return wt;
     }
 
