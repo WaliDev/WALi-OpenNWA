@@ -234,6 +234,22 @@ namespace wali
           unsigned numVars() const;
 #endif
 
+          /**
+           * Accessor functions for cached id and zero semiring elements.
+           * The cached copy is created at the time the
+           * vocabulary is set up. So it's safe to call these
+           * after that.
+           *
+           * Always use these to access any of these special elements. All
+           * semiring operations take care to not create duplicates.
+           **/
+          binrel_t getBaseOne() const;
+          binrel_t getBaseZero() const;
+          binrel_t getTensorOne() const;
+          binrel_t getTensorZero() const;
+          binrel_t getBaseTop() const;
+          binrel_t getTensorTop() const;
+
         protected:
           /**
            * More fine grained control when setting multiple int vars together. These together 
@@ -292,6 +308,8 @@ namespace wali
           binrel_t cachedBaseZero;
           binrel_t cachedTensorOne;
           binrel_t cachedTensorZero;
+          binrel_t cachedBaseTop;
+          binrel_t cachedTensorTop;
 #ifdef NWA_DETENSOR
           VocLevelArray tensorVocLevels;
           VocLevelArray baseLhsVocLevels;
