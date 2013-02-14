@@ -260,8 +260,10 @@ BddContext::BddContext(int bddMemSize, int cacheSize) :
 
   cachedBaseOne = NULL;
   cachedBaseZero = NULL;
+  cachedBaseTop = NULL;
   cachedTensorOne = NULL;
   cachedTensorZero = NULL;
+  cachedTensorTop = NULL;
 
 #ifdef BINREL_STATS
   numCompose = 0;
@@ -374,8 +376,10 @@ BddContext::~BddContext()
   //Delete cached BinRel objects.
   cachedBaseOne = NULL;
   cachedBaseZero = NULL;
+  cachedBaseTop = NULL;
   cachedTensorOne = NULL;
   cachedTensorZero = NULL;
+  cachedTensorTop = NULL;
 
   //Clear the bddinfo_t vector.
   this->clear();
@@ -872,8 +876,10 @@ void BddContext::setupCachedBdds()
   }
   cachedBaseOne = new BinRel(this, baseId, false);
   cachedBaseZero = new BinRel(this, bddfalse, false);
+  cachedBaseTop = new BinRel(this, bddtrue, false);
   cachedTensorOne = new BinRel(this, tensorId, true);
   cachedTensorZero = new BinRel(this, bddfalse, true);
+  cachedTensorTop = new BinRel(this, bddtrue, true);
 
   delete [] baseLhs;
   delete [] baseRhs;
@@ -884,6 +890,36 @@ void BddContext::setupCachedBdds()
   delete [] tensor2Lhs;
   delete [] tensor2Rhs;
   delete [] tensor2Extra;
+}
+
+binrel_t BddContext::getBaseOne() const
+{
+  return cachedBaseOne; 
+}
+
+binrel_t BddContext::getBaseZero() const
+{
+  return cachedBaseZero;
+}
+
+binrel_t BddContext::getTensorOne() const
+{
+  return cachedTensorOne;
+}
+
+binrel_t BddContext::getTensorZero() const
+{
+  return cachedTensorZero;
+}
+
+binrel_t BddContext::getBaseTop() const
+{
+  return cachedBaseTop;
+}
+
+binrel_t BddContext::getTensorTop() const
+{
+  return cachedTensorTop;
 }
 
 void BddContext::addIntVar(std::string name, unsigned size)
@@ -1015,8 +1051,10 @@ void BddContext::populateCache()
   }
   cachedBaseOne = new BinRel(this, baseId, false);
   cachedBaseZero = new BinRel(this, bddfalse, false);
+  cachedBaseTop = new BinRel(this, bddtrue, false);
   cachedTensorOne = new BinRel(this, tensorId, true);
   cachedTensorZero = new BinRel(this, bddfalse, true);
+  cachedTensorTop = new BinRel(this, bddtrue, true);
 
 #if (NWA_DETENSOR == 1)
   setupLevelArray();
