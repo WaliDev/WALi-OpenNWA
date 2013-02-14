@@ -114,11 +114,17 @@ namespace wali
     // Returns the vocabulary generated when parsing the program.
     wali::domains::binrel::BddContext * read_prog(wpds::WPDS * pds, const char * fname, bool dbg = false);
     prog * parse_prog(const char * fname);
-//    wpds::WPDS * wpds_from_prog(prog * pg);
-//    wpds::fwpds::FWPDS * fwpds_from_prog(prog * pg);
+
     // Dumps the program as a PDS into pds. pds must be preallocated.
-    // Returns the vocabulary gnerated when creating the pds.
+    // Returns the vocabulary generated when creating the pds.
     wali::domains::binrel::BddContext * pds_from_prog(wpds::WPDS * pds, prog * pg);
+    // Same, but generates MergeFns of type wali::domains::binrel::BinRelMeetMerge
+    wali::domains::binrel::BddContext * pds_from_prog_with_meet_merge(wpds::ewpds::EWPDS * pds, prog * pg);
+    // Same, but generates MergeFns of type wali::domains::binrel::BinRelTensorMerge
+    wali::domains::binrel::BddContext * pds_from_prog_with_tensor_merge(wpds::ewpds::EWPDS * pds, prog * pg);
+
+
+
     void print_prog_stats(prog * pg);
 
     // Must be called to fix fall-through returns *before* dumping PDS
