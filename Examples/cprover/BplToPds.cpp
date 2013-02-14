@@ -1008,26 +1008,30 @@ namespace wali
     BddContext * pds_from_prog(wpds::WPDS * pds, prog * pg)
     {
       assert(pg);
+      set_merge_type(wali::cprover::details::NO_MERGE);
       BddContext * con = dump_pds_from_prog(pds, pg);
       pds->printStatistics(cout);
       return con;
     }
-    /*
-       WPDS * wpds_from_prog(prog * pg)
-       {
-       assert(pg);
-       WPDS * pds = new WPDS;
-       dump_pds_from_prog(pds, pg);
-       return pds;
-       }
 
-       FWPDS * fwpds_from_prog(prog * pg)
-       {
-       FWPDS * pds = new FWPDS;
-       dump_pds_from_prog(pds, pg);
-       return pds;
-       }
-       */
+    BddContext * pds_from_prog_with_meet_merge(wpds::ewpds::EWPDS * pds, prog *pg)
+    {
+      assert(pg);
+      set_merge_type(wali::cprover::details::MEET_MERGE);
+      BddContext * con = dump_pds_from_prog(pds, pg);
+      pds->printStatistics(cout);
+      return con;
+    }
+
+    BddContext * pds_from_prog_with_tensor_merge(wpds::ewpds::EWPDS * pds, prog *pg)
+    {
+      assert(pg);
+      set_merge_type(wali::cprover::details::TENSOR_MERGE);
+      BddContext * con = dump_pds_from_prog(pds, pg);
+      pds->printStatistics(cout);
+      return con;
+    }
+
     void print_prog_stats(prog * pg)
     {
       assert(pg);
