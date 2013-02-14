@@ -44,50 +44,6 @@ namespace wali
     }
   }
 
-  sem_elem_tensor_t MergeFn::get_lin_coeff_w1(sem_elem_t w1, sem_elem_t w2)
-  {
-    assert(w1.is_valid() && w2.is_valid());
-
-    if(sr_data.is_empty()) {
-      return static_cast<SemElemTensor*>(w1->extend(w2).get_ptr());
-    }
-    else {
-      // Note: Although extend is associative, do not change the
-      // order of the following extends. This order is used by
-      // Moped's WALi extension. 
-      sem_elem_t ret = (w1->extend(sr_data->extend(w2)));
-
-      // w1->print(std::cout << "w1 = ") << "\n";
-      // sr_data->print(std::cout << "sr_data = ") << "\n";
-      // w2->print(std::cout << "w2 = ") << "\n";
-      // ret->print(std::cout << "ret = ") << "\n";
-
-      return static_cast<SemElemTensor*>(ret.get_ptr());
-    }
-  }
-
-  sem_elem_tensor_t MergeFn::get_lin_coeff_w2(sem_elem_t w1, sem_elem_t w2)
-  {
-    assert(w1.is_valid() && w2.is_valid());
-
-    if(sr_data.is_empty()) {
-      return static_cast<SemElemTensor*>(w1->extend(w2).get_ptr());
-    }
-    else {
-      // Note: Although extend is associative, do not change the
-      // order of the following extends. This order is used by
-      // Moped's WALi extension. 
-      sem_elem_t ret = (w1->extend(sr_data->extend(w2)));
-
-      // w1->print(std::cout << "w1 = ") << "\n";
-      // sr_data->print(std::cout << "sr_data = ") << "\n";
-      // w2->print(std::cout << "w2 = ") << "\n";
-      // ret->print(std::cout << "ret = ") << "\n";
-
-      return static_cast<SemElemTensor*>(ret.get_ptr());
-    }
-  }
-
   bool MergeFn::equal(merge_fn_t mf) {
     MergeFn *amf = dynamic_cast<MergeFn *>(mf.get_ptr());
     return (sr_data->equal(amf->sr_data));
