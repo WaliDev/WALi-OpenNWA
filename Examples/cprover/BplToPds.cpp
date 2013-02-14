@@ -3,11 +3,14 @@
 #include <string>
 #include <sstream>
 #include <map>
+#include "wali/domains/binrel/BinRelMergeFns.hpp"
 #include <boost/cast.hpp>
+#include "wali/wpds/ewpds/EWPDS.hpp"
 
 using namespace std;
 using namespace wali;
 using namespace wali::wpds;
+using namespace wali::wpds::ewpds;
 using namespace wali::wpds::fwpds;
 using namespace wali::domains::binrel;
 using namespace wali::cprover;
@@ -467,7 +470,7 @@ namespace wali
             maxReservedVals = pl->p->r > maxReservedVals ? pl->p->r : maxReservedVals;
 
             str_list const * al = pl->p->al;
-            int numArgs = 0;
+            unsigned numArgs = 0;
             while(al){
               ++numArgs;
               al = al->n;
@@ -770,11 +773,28 @@ namespace wali
         return getKey(ss.str());
       };
 
+      static wali::Key stk(proc const * p)
+      {
+        stringstream ss;
+        ss << p->f;
+        return getKey(ss.str());
+      }
+
+      // XXX: This is a very very bad way of choosing the merge function.
+      // There is a static global variable merge_type,
+      // dump_pds_from_stmt will look at this variables to decide what kind of
+      // merge function to dump.
+      typedef enum {NO_MERGE, MEET_MERGE, TENSOR_MERGE} MergeFn;
+      static MergeFn merge_type = NO_MERGE;
+      void set_merge_type(MergeFn m)
+      {
+        merge_type = m;
+      }
+
       void dump_pds_from_stmt(WPDS * pds, stmt * s, ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const
           stmt_ptr_proc_ptr_hash_map& call_to_callee, const char * f, stmt * ns)
       {
-        binrel_t temp = new BinRel(con, con->True());
-        binrel_t one = boost::polymorphic_downcast<BinRel*>(temp->one().get_ptr());
+        binrel_t one = con->getBaseOne();
         bdd b, b1;
         str_list * vl;
         expr_list * el;
@@ -799,14 +819,16 @@ namespace wali
             }
             break;
           case AST_RETURN:
-            b = bddtrue;
-            // havoc all local variables because there is no merge function yet.
-            for(ProgramBddContext::const_iterator cit = con->begin(); cit != con->end(); ++cit){
-              if(cit->first.size() > 0 && cit->first.at(0) == ':'){
-                string st = string(cit->first);
-                b = b & con->Assign(st, con->From(st));            
-              }
-            }
+            if(merge_type == NO_MERGE){
+              b = one->getBdd();
+              // havoc all local variables because there is no merge function.
+              stringstream ss;
+              ss << f << "::";
+              string str = ss.str();
+              for(ProgramBddContext::const_iterator cit = con->begin(); cit != con->end(); ++cit)
+                if(cit->first.find(str) != string::npos)
+                  b = b | con->Assign(cit->first, con->NonDet()); 
+            }else b = one->getBdd();
             pds->add_rule(stt(), stk(s), stt(), new BinRel(con, b));
             break;
           case AST_ASSIGN:
@@ -889,7 +911,34 @@ namespace wali
             assert(callee_iter != call_to_callee.end());
             assert(callee_iter->second->sl);
             assert(callee_iter->second->sl->s);
-            pds->add_rule(stt(), stk(s), stt(), stk(callee_iter->second->sl->s), stk(ns), one);
+            // Make a call rule to the callee.
+            // The stack symbol for callee is derived from the proc itself (not the first statement in the proc)
+            switch(merge_type){
+              case NO_MERGE:
+                pds->add_rule(stt(), stk(s), stt(), stk(callee_iter->second), stk(ns), one);
+                break;
+              case MEET_MERGE:
+              case TENSOR_MERGE:
+                {
+                  vector<string> lvars;
+                  stringstream ss;
+                  ss << s->f << "::";
+                  string str = ss.str();
+                  for(ProgramBddContext::const_iterator cit = con->begin(); cit != con->end(); ++cit)
+                    if(cit->first.find(str) != string::npos)
+                      lvars.push_back(cit->first);
+                  merge_fn_t merge;
+                  if(merge_type == MEET_MERGE)
+                    merge = new MeetMergeFn(con, lvars);
+                  else
+                    merge = new TensorMergeFn(con, lvars);
+                  boost::polymorphic_cast<EWPDS*>(pds)->add_rule(stt(), stk(s), stt(), stk(callee_iter->second), stk(ns), one, merge);
+                }
+                break;
+              default:
+                cerr << "Unknown merge_type\n";
+                assert(0);
+            }
             break;
         }
       }
@@ -908,6 +957,8 @@ namespace wali
 
       void dump_pds_from_proc(WPDS * pds, proc * p, ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const stmt_ptr_proc_ptr_hash_map& call_to_callee)
       {
+        // Create a lead-in edge from the proc itself to the first statment.
+        pds->add_rule(stt(), stk(p), stt(), stk(p->sl->s), con->getBaseOne());
         dump_pds_from_stmt_list(pds, p->sl, con, goto_to_targets, call_to_callee, p->f, NULL);
       }
 
@@ -928,7 +979,7 @@ namespace wali
       }
 
     } //namespace details
-  
+
     BddContext * read_prog(WPDS * pds, const char * fname, bool dbg)
     {
       FILE * fin;
@@ -962,21 +1013,21 @@ namespace wali
       return con;
     }
     /*
-    WPDS * wpds_from_prog(prog * pg)
-    {
-      assert(pg);
-      WPDS * pds = new WPDS;
-      dump_pds_from_prog(pds, pg);
-      return pds;
-    }
+       WPDS * wpds_from_prog(prog * pg)
+       {
+       assert(pg);
+       WPDS * pds = new WPDS;
+       dump_pds_from_prog(pds, pg);
+       return pds;
+       }
 
-    FWPDS * fwpds_from_prog(prog * pg)
-    {
-      FWPDS * pds = new FWPDS;
-      dump_pds_from_prog(pds, pg);
-      return pds;
-    }
-*/
+       FWPDS * fwpds_from_prog(prog * pg)
+       {
+       FWPDS * pds = new FWPDS;
+       dump_pds_from_prog(pds, pg);
+       return pds;
+       }
+       */
     void print_prog_stats(prog * pg)
     {
       assert(pg);
@@ -1039,7 +1090,7 @@ namespace wali
 
     void instrument_call_return(prog * pg)
     {
-        instrument_call_return_in_prog(pg);
+      instrument_call_return_in_prog(pg);
     }
 
     void make_void_returns_explicit(prog * pg)
@@ -1055,13 +1106,15 @@ namespace wali
       {
         if(strcmp(pl->p->f, f) == 0){
           assert(pl->p->sl);
-          return stk(pl->p->sl->s);
+          // Entry stack is derived from the proc itself
+          // (not the first statement in the proc)
+          return stk(pl->p);
         }
         pl = pl->n;
       }
       assert(0 && "[getEntryStk] Procedure not found");
     }
-    
+
     Key getPdsState() 
     {
       return stt();
