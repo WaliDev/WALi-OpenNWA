@@ -22,6 +22,7 @@
 #include "wali/Worklist.hpp"
 #include "wali/DefaultWorklist.hpp"
 //#include "wali/KeyOrderWorklist.hpp"
+#include <boost/cast.hpp>
 
 using namespace std;
 using namespace wali;
@@ -155,7 +156,7 @@ void NWPDS::prestarSetupPds()
 
     //erase rule from the WPDS
     erase_rule(p,y,p_prime,y_prime,y_prime_prime);
-    ERule * er = dynamic_cast<ERule*>(r.get_ptr()); //change to static_cast ? 
+    ERule * er = boost::polymorphic_downcast<ERule*>(r.get_ptr()); //change to static_cast ? 
     //<p,y> -> <p',y't''>
     add_rule(p,y,p_prime,y_prime,t_prime_prime,er->weight(),er->merge_fn());
     //<p,y> -> <p',t'y''>
@@ -244,7 +245,7 @@ void NWPDS::poststarSetupPds()
 
     //erase rule from the WPDS
     erase_rule(p,y,p_prime,y_prime,y_prime_prime);
-    ERule * er = dynamic_cast<ERule*>(r.get_ptr()); //change to static_cast ? 
+    ERule * er = boost::polymorphic_downcast<ERule*>(r.get_ptr()); //change to static_cast ? 
     //<p,t> -> <p',y'y''>
     add_rule(p,t,p_prime,y_prime,y_prime_prime,er->weight(),er->merge_fn());
     //<p,y> -> <p',t'y''>
@@ -295,7 +296,7 @@ void NWPDS::restorePds()
   for(std::vector<rule_t>::iterator it = savedRules.begin();
       it != savedRules.end();
       ++it){
-    ERule * er = dynamic_cast<ERule*>(it->get_ptr());
+    ERule * er = boost::polymorphic_downcast<ERule*>(it->get_ptr());
     add_rule(er->from_state(), er->from_stack(), er->to_state(),
         er->to_stack1(), er->to_stack2(), er->weight(), er->merge_fn());
   }
