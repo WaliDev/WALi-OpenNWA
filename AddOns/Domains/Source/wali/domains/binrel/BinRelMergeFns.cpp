@@ -4,7 +4,6 @@
 
 using namespace std;
 using namespace wali;
-using namespace wali::cprover;
 using namespace wali::domains;
 using namespace wali::domains::binrel;
 
@@ -123,11 +122,11 @@ sem_elem_t TensorMergeFn::apply_f(sem_elem_t w1, sem_elem_t w2)
   sem_elem_tensor_t b1 = boost::polymorphic_downcast<SemElemTensor*>(w1.get_ptr());
   sem_elem_tensor_t b2 = boost::polymorphic_downcast<SemElemTensor*>(w2.get_ptr());
 
-  sem_elem_tensor_t ret;
-  ret = boost::polymorphic_downcast<SemElemTensor*>(b2->extend(havocCalleeLocals.get_ptr()).get_ptr());
+  sem_elem_tensor_t ret = b2;
+  ret = boost::polymorphic_downcast<SemElemTensor*>(ret->extend(havocCalleeLocals.get_ptr()).get_ptr());
   ret = ret->tensor(id.get_ptr());
   ret = boost::polymorphic_downcast<SemElemTensor*>(idWithEqualLocals->extend(ret.get_ptr()).get_ptr());
   ret = ret->detensor();
-
+  ret = boost::polymorphic_downcast<SemElemTensor*>(b1->extend(ret.get_ptr()).get_ptr());
   return ret;
 }
