@@ -486,6 +486,9 @@ void NWPDS::cleanUpFa(wfa::WFA& output)
 
   RemoveOldTrans rot(old2NewStackMap,old2NewStateMap);
   output.for_each(rot);
+  // RemoveOldTrans will set the weight on a bunch of transitions to zero.
+  // Get rid of all those transitions from the FA.
+  output.prune();
 }
 
 void NWPDS::poststarSetupFixpoint(WFA const & input, WFA& fa)
