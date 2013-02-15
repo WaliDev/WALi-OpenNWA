@@ -194,7 +194,7 @@ void NWPDS::prestarSetupPds()
 void NWPDS::poststarSetupPds()
 {
   if(dbg){
-    *waliErr << "NWPDS::prestarSetupPds()\n";
+    *waliErr << "NWPDS::poststarSetupPds()\n";
     WpdsRules wr;
     this->for_each(wr);
     *waliErr << "Printing out rules before processing.\n";
