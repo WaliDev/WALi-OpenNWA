@@ -364,7 +364,6 @@ namespace goals {
   char * mainProc = NULL, * errLbl = NULL;
   string fname;
   prog * pg;
-  FWPDS * originalPds = NULL;
   BddContext * con = NULL;
 
   
@@ -436,12 +435,17 @@ namespace goals {
     return interfa.getState(interfa.getInitialState())->weight();
   }
 
-  void runNwpds(WFA& outfa)
+  void runNwpds(WFA& outfa, FWPDS * originalPds = NULL)
   { 
-    assert(originalPds && con && mainProc && errLbl);
     cout << "#################################################" << endl;
     cout << "[Newton Compare] Goal III: end-to-end NWPDS run" << endl;
-    FWPDS * npds = new FWPDS(*originalPds);
+    FWPDS * npds;
+    if(originalPds != NULL)
+      npds = new FWPDS(*originalPds);
+    else{
+      npds = new FWPDS();
+      con = pds_from_prog(npds, pg);
+    }
     wali::set_verify_fwpds(false);
     npds->useNewton(true);
 
@@ -468,12 +472,18 @@ namespace goals {
     delete npds;
   }
 
-  void runFwpds(WFA& outfa)
+  void runFwpds(WFA& outfa, FWPDS * originalPds = NULL)
   { 
-    assert(originalPds && con && mainProc && errLbl);
     cout << "#################################################" << endl;
     cout << "[Newton Compare] Goal IV: end-to-end FWPDS run" << endl;
-    FWPDS * fpds = new FWPDS(*originalPds);
+    FWPDS * fpds;
+    if(originalPds != NULL)
+      fpds = new FWPDS(*originalPds);
+    else{
+      fpds = new FWPDS();
+      con = pds_from_prog_with_tensor_merge(fpds, pg);
+    }
+
     wali::set_verify_fwpds(false);
     fpds->useNewton(false);
 
@@ -498,12 +508,17 @@ namespace goals {
     delete fpds;
   }
 
-  void runWpds(WFA& outfa)
+  void runWpds(WFA& outfa, WPDS * originalPds = NULL)
   { 
-    assert(originalPds && con && mainProc && errLbl);
     cout << "#################################################" << endl;
     cout << "[Newton Compare] Goal VI: end-to-end WPDS run" << endl;
-    WPDS * pds = new WPDS(*originalPds);
+    WPDS * pds;
+    if(originalPds != NULL)
+      pds = new WPDS(*originalPds);
+    else{
+      pds = new WPDS();
+      con = pds_from_prog(pds, pg);
+    }
 
 #if defined(BINREL_STATS)
     con->resetStats(); 
@@ -532,7 +547,7 @@ namespace goals {
     cout << "#################################################" << endl;
     cout << "[Newton Compare] Goal VI: end-to-end NewtonDirect run" << endl;
     NWPDS * npds = new NWPDS();
-    con = pds_from_prog(npds, pg);
+    con = pds_from_prog_with_tensor_merge(npds, pg);
 
 #if defined(BINREL_STATS)
     con->resetStats(); 
@@ -557,14 +572,16 @@ namespace goals {
 
   void compareWpdsNwpds()
   {    
-    assert(originalPds && con && mainProc && errLbl);
+    FWPDS * originalPds = new FWPDS();
+    con = pds_from_prog_with_tensor_merge(originalPds, pg);
+
     WFACompare fac("WPDS", "NWPDS");
     cout << "#################################################" << endl;
     cout << "[Newton Compare] Goal I: Check Correctness by comparing the result automaton: WPDS vs NWPDS" << endl;
     
     {
       WFA outfa;
-      runWpds(outfa);
+      runWpds(outfa, originalPds);
       outfa.for_each(fac);    
       if(dump){
         cout << "[Newton Compare] Dumping the result automaton for WPDS..." << endl;
@@ -578,7 +595,7 @@ namespace goals {
     }
     {
       WFA outfa;
-      runNwpds(outfa);
+      runNwpds(outfa, originalPds);
       outfa.for_each(fac);    
       if(dump){
         cout << "[Newton Compare] Dumping the result automaton for NWPDS..." << endl;
@@ -600,6 +617,7 @@ namespace goals {
           fadiff << "FA DIFF FOUND!!!" << std::endl;
       }
     }
+    delete originalPds;
   }
 }
 
@@ -707,21 +725,17 @@ int main(int argc, char ** argv)
   instrument_asserts(pg, errLbl);
   instrument_call_return(pg);
 
-  cout << "[Newton Compare] Obtaining PDS..." << endl;
-  if(goal != 5){
-    // Except when running NewtonDirect
-    originalPds = new FWPDS();
-    con = pds_from_prog(originalPds, pg);
-  }
   if(dump){
+    FWPDS * originalPds = new FWPDS();
+    con = pds_from_prog_with_meet_merge(originalPds, pg);
     cout << "[Newton Compare] Dumping PDS to pds.dot..." << endl;
     fstream pds_stream("pds.dot", fstream::out);
     RuleDotty rd(pds_stream);
     pds_stream << "digraph{" << endl;
     originalPds->for_each(rd);
     pds_stream << "}" << endl;
+    delete(originalPds);
   }
-
 
   //void * dump; 
   //pthread_create(&worker, NULL, &work,  NULL);
@@ -730,7 +744,6 @@ int main(int argc, char ** argv)
 
   bdd_printstat();
   // Clean Up.
-  delete originalPds;
   deep_erase_prog(&pg);
   return 0;
 }
