@@ -114,7 +114,8 @@ test_files = Split("""
     Source/AddOns/Domains/binrel/binrelmanager.cpp
     Source/AddOns/Domains/binrel/binrel.cpp
     Source/AddOns/Domains/binrel/nwa_detensor.cpp
-    """)
+    Source/AddOns/Domains/binrel/merge_fns.cpp
+""")
 
 cpp11_test_files = Split("""
     Source/AddOns/Xfa/wali/util/base64.cpp
