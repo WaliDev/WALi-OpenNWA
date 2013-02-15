@@ -383,6 +383,18 @@ namespace goals {
     }else{
       fpds->poststarIGR(fa,outfa);
     }
+    if(dump){
+      cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
+      fstream outfile("outfa.dot", fstream::out);
+      outfa.print_dot(outfile, true);
+      outfile.close();
+    }
+    if(dump){
+      cout << "[Newton Compare] Dumping the output automaton to outfa.txt" << endl;
+      fstream outfile("outfa.txt", fstream::out);
+      outfa.print(outfile);
+      outfile.close();
+    }
   }
   
   sem_elem_t computePathSummary(WPDS * pds, WFA& outfa)
@@ -456,7 +468,8 @@ namespace goals {
       fpds = new FWPDS(*originalPds);
     else{
       fpds = new FWPDS();
-      con = pds_from_prog_with_tensor_merge(fpds, pg);
+      //con = pds_from_prog_with_tensor_merge(fpds, pg);
+      con = pds_from_prog_with_meet_merge(fpds, pg);
     }
 
     wali::set_verify_fwpds(false);
@@ -521,8 +534,8 @@ namespace goals {
     assert(mainProc && errLbl);
     cout << "#################################################" << endl;
     cout << "[Newton Compare] Goal VI: end-to-end NewtonDirect run" << endl;
-    NWPDS * npds = new NWPDS();
-    con = pds_from_prog_with_tensor_merge(npds, pg);
+    NWPDS * npds = new NWPDS(dump);
+    con = pds_from_prog_with_meet_merge(npds, pg);
 
 #if defined(BINREL_STATS)
     con->resetStats(); 
@@ -548,7 +561,7 @@ namespace goals {
   void compareWpdsNwpds()
   {    
     FWPDS * originalPds = new FWPDS();
-    con = pds_from_prog_with_tensor_merge(originalPds, pg);
+    con = pds_from_prog_with_meet_merge(originalPds, pg);
 
     WFACompare fac("WPDS", "NWPDS");
     cout << "#################################################" << endl;
