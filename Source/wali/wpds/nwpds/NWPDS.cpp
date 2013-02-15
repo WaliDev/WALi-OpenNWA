@@ -23,6 +23,9 @@
 #include "wali/DefaultWorklist.hpp"
 //#include "wali/KeyOrderWorklist.hpp"
 #include <boost/cast.hpp>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 using namespace std;
 using namespace wali;
@@ -96,6 +99,7 @@ Key NWPDS::getOldKey(Key newKey)
   return stack2ConstMap[newKey];
 }
 
+#if 0
 /*
    replace each delta_2 rule <p,y> -> <p',y'y''>
    by two rules:
@@ -183,11 +187,15 @@ void NWPDS::prestarSetupPds()
       (*it).print(*waliErr) << std::endl;
   }
 }
+#endif
 
 /*
    replace each delta_2 rule <p,y> -> <p',y'y''>
    by two rules:
-     <p,t> -> <p',y'y''> and <p,y> -> <p't'y''>
+    - False call site, real call:
+     <p,t> -> <p',y'y''>
+    - Real call site, summary call:
+     <p,y> -> <p't'y''> and <p't'> -><p',.> (w = 0)
      here t and t' are new stack symbols that will hold on to the values of y,y' from last Newton 
      iteration during saturation.
 */
@@ -215,8 +223,11 @@ void NWPDS::poststarSetupPds()
       (*it).print(*waliErr) << std::endl;
   }
   stack2ConstMap.clear();
-  state2ConstMap.clear();
   savedRules.clear();
+  oldCallSite.clear();
+  oldFuncEntry.clear();
+  oldFuncEntryPair.clear();
+
   Delta2Rules dr;
   this->for_each(dr);
   for(std::vector<rule_t>::iterator it = dr.rules.begin();
@@ -228,7 +239,7 @@ void NWPDS::poststarSetupPds()
       r->print(*waliErr);
       *waliErr << endl;
     }
-    //backup the current rule
+    // backup the current rule
     savedRules.push_back(r);
 
     Key p = r->from_state();
@@ -243,19 +254,18 @@ void NWPDS::poststarSetupPds()
     Key t = getOldKey(y);
     Key t_prime = getOldKey(y_prime);
 
-    //erase rule from the WPDS
+    // update maps from new call site and entry function generated state to old ones
+    oldCallSite[y] = t;
+    oldFuncEntryPair[IntState(p_prime, y_prime)] = IntState(p_prime, t_prime);
+    // erase rule from the WPDS
     erase_rule(p,y,p_prime,y_prime,y_prime_prime);
     ERule * er = boost::polymorphic_downcast<ERule*>(r.get_ptr()); //change to static_cast ? 
     //<p,t> -> <p',y'y''>
     add_rule(p,t,p_prime,y_prime,y_prime_prime,er->weight(),er->merge_fn());
     //<p,y> -> <p',t'y''>
     add_rule(p,y,p_prime,t_prime,y_prime_prime,er->weight(),er->merge_fn());
-
-    //poststar will generate mid states for (p',t').
-    //We need to remember these to be able to clean the final WFA.
-    genStates.push_back(
-        std::pair<wali::Key, std::pair<wali::Key, wali::Key> > (p_prime,
-          std::pair<wali::Key,wali::Key>(y_prime,t_prime)));
+    //<p',t'> -> <p',.>
+    add_rule(p_prime,t_prime,p_prime,er->weight()->zero());
   }
   if(dbg){
     WpdsRules wr;
@@ -282,27 +292,32 @@ void NWPDS::poststarSetupPds()
 
 void NWPDS::restorePds()
 {
-  //erase all existing delta 2 rules
-  WpdsRules wr;
-  this->for_each(wr);
-  for(std::set<Rule>::iterator it = wr.pushRules.begin();
-      it != wr.pushRules.end();
-      ++it){
-    Rule r = *it;
-    erase_rule(r.from_state(), r.from_stack(), r.to_state(),
-        r.to_stack1(), r.to_stack2());
+  //erase all added rules
+  for(std::vector<rule_t>::iterator it = addedRules.begin(); it != addedRules.end(); ++it){
+    rule_t r = *it;
+    erase_rule(r->from_state(), r->from_stack(), r->to_state(), r->to_stack1(), r->to_stack2());
   }
+  // empty addedRules, so that we don't hold on to the references
+  addedRules.clear();
+
   //Now restore the original rules
-  for(std::vector<rule_t>::iterator it = savedRules.begin();
-      it != savedRules.end();
-      ++it){
+  for(std::vector<rule_t>::iterator it = savedRules.begin(); it != savedRules.end(); ++it){
     ERule * er = boost::polymorphic_downcast<ERule*>(it->get_ptr());
     add_rule(er->from_state(), er->from_stack(), er->to_state(),
         er->to_stack1(), er->to_stack2(), er->weight(), er->merge_fn());
   }
+  // Don't unnecessarrily hold on to references
+  savedRules.clear();
 }
 
-void NWPDS::updateFa(wfa::WFA& fa)
+/**
+ * Walk all transitions in the WFA that were changed in the last saturation phase.
+ * Two types of transitions need attention.
+ * Update fake call-site:
+ *   (1) For every transition <p,y,p'> where oldCallSite[y] == t, wt(<p,t,p'>) += wt(<p,y,p'>)
+ *   (2) For every transition <p,*,(p',y')> where oldFuncEntry[(p',y')] == (p',t'), wt(<p,*,(p',t')>) += wt(<p,*,(p'y')>)
+ **/
+void NWPDS::poststarUpdateFa(wfa::WFA& fa)
 {
   wali::wfa::ITrans *t;
   for(worklist_t::iterator it = newtonWl.begin();
@@ -310,104 +325,76 @@ void NWPDS::updateFa(wfa::WFA& fa)
       ++it){
     t = *it;
 
-    //DEBUGGING
-    //std::cout << ":" << t->from() << "-" << t->stack() << "->" << t->to() <<std::endl;
-
     if(dbg){
       *waliErr << "[UpdateFa]: " << std::endl << "Processing:" << std::endl;
       t->print(*waliErr) << std::endl;
     }
-    bool oldToUpdate = false;
-    wali::Key oldFrom, oldTo, oldStack;
-    Key2KeyMap::const_iterator fromIt, toIt, stackIt;
-    fromIt = toIt = state2ConstMap.end();
-    stackIt = stack2ConstMap.end();
-    //For a trans t, an old trans exists, if we find a match in the map stack2ConstMap
-    //for
-    // (a) The stack symbol, or
-    // (b) either of the states are intermideate states and we find a match for them
-    //stack symbol match -->
-    stackIt = stack2ConstMap.find(t->stack());
-    if(stackIt != stack2ConstMap.end()){
-      oldStack = stackIt->second;
-      oldToUpdate = true;
-    }else{
-      oldStack = t->stack();
-    }
-    //from state match -->
-    fromIt = state2ConstMap.find(t->from());
-    if(fromIt != state2ConstMap.end()){
-      oldFrom = fromIt->second;
-      oldToUpdate = true;
-    }else{
-      oldFrom = t->from();
-    }
-    //to state match -->
-    toIt = state2ConstMap.find(t->to());
-    Key2KeyMap::iterator match = state2StackMap.find(t->to());
-    if(toIt != state2ConstMap.end() && match != state2StackMap.end() && match->second == t->to()){
-      //to() is an intermideate state
-      oldTo = toIt->second;
-      oldToUpdate = true;
-    }else{
-      oldTo = t->to();
-    }
 
-    if(oldToUpdate){
-      if(dbg){
-        *waliErr << "Updating: [" 
-          << wali::key2str(oldFrom) << ", "
-          << wali::key2str(oldStack) << ", "
-          << wali::key2str(oldTo) << "]"<< std::endl;
-        wfa::Trans old;
-        fa.find(oldFrom, oldStack, oldTo, old);
-        if(old.weight() != NULL)
-          (old.weight())->print(*waliErr << "NEWTON_CONST_WT" << std::endl) 
-            << std::endl;
-        if(t->weight() != NULL)
-          (t->weight())->print(*waliErr << "NEWTON_VAR_WT" 
-              << std::endl) << std::endl;
-        if(t->weight() != NULL && old.weight() != NULL)
-          *waliErr << "The weights are the same (" 
-            << (t->weight()->equal(old.weight())) << ")" << std::endl;
-      }
-      //We want to track if anything was updated during the
-      //functor operation.
-      bool changed = false;
-      //{
-        wfa::Trans old;
-        bool found = fa.find(oldFrom, oldStack, oldTo, old);
-        wali::sem_elem_t newwt = t->weight();
-        wali::sem_elem_t oldwt = found? old.weight() : NULL;
-        if(newwt == NULL)
-          changed = false;
-        else if(oldwt == NULL)
-          changed = true;
-        else
-          changed = !(newwt->equal(oldwt));
-      //}
-      //Now actually do the update, changing the from/stack/to as needed.
-      if(changed){
-        wali::wfa::ITrans * oldt = NULL;
-        oldt = t->copy(oldFrom,oldStack,oldTo);
-        assert(oldt != NULL);
-        oldt = fa.insert(oldt);
-        if(fromIt == state2ConstMap.end()){
-          wali::Key f = oldt->from();
-          wali::Key s = oldt->stack();
-          Config * cfg = make_config(f,s); 
-          oldt->setConfig(cfg);
-          //Trans with generated from state do not go onto the worklist
-          worklist->put(oldt);
+    // Case 1: 
+    if(oldCallSite.find(t->stack()) != oldCallSite.end()){
+      Key oldStack = oldCallSite[t->stack()];
+      wfa::Trans old;
+      sem_elem_t oldWt, newWt;
+      bool found = fa.find(t->from(), oldStack, t->to(), old);
+      if(!found)
+        oldWt = t->weight()->zero();
+      else
+        oldWt = old.weight();
+      newWt = t->weight();
+      if(newWt != NULL && ! newWt->equal(oldWt)){
+        wali::wfa::ITrans * insertTrans;
+        // copy the current trans with old stack symbol
+        insertTrans = t->copy(t->from(), oldStack, t->to());
+        // Add it to the WFA
+        insertTrans = fa.insert(insertTrans);
+        Config * cfg = make_config(insertTrans->from(),insertTrans->stack());
+        insertTrans->setConfig(cfg);
+        // insert it into the worklist for next round. 
+        worklist->put(insertTrans);
+        if(dbg) {
+          insertTrans->print(*waliErr << "Updated fake call-site for ") << endl;
+          oldWt->print(*waliErr << "Existing weight on the constant edge: ") << endl;
+          newWt->print(*waliErr << "Replaced with: ") << endl;
         }
       }
     }
-  }
+
+    // Case 2:
+    if(oldFuncEntry.find(t->to()) != oldFuncEntry.end() && t->stack() == WALI_EPSILON){
+      Key oldTo = oldFuncEntry[t->to()];
+      wfa::Trans old;
+      sem_elem_t oldWt, newWt;
+      bool found = fa.find(t->from(), WALI_EPSILON, oldTo, old);
+      if(!found)
+        oldWt = t->weight()->zero();
+      else
+        oldWt = old.weight();
+      newWt = t->weight();
+      if(newWt != NULL && ! newWt->equal(oldWt)){
+        wali::wfa::ITrans * insertTrans;
+        // copy the current trans with old to state
+        insertTrans = t->copy(t->from(), WALI_EPSILON, oldTo);
+        // insert it in the WFA.
+        insertTrans = fa.insert(insertTrans);
+        Config * cfg = make_config(insertTrans->from(),insertTrans->stack());
+        insertTrans->setConfig(cfg);
+        // add it to the worklist for the next round
+        worklist->put(insertTrans);        
+        if(dbg) {
+          insertTrans->print(*waliErr << "Updated function summary for ") << endl;
+          oldWt->print(*waliErr << "Existing weight on the constant edge: ") << endl;
+          newWt->print(*waliErr << "Replaced with: ") << endl;
+        }
+      }
+    }
+  } 
   newtonWl.clear();
 }
 
-void NWPDS::prestar(wfa::WFA const & input, wfa::WFA & output)
+void NWPDS::prestar(wfa::WFA const &, wfa::WFA &)
 {
+  assert(0);
+#if 0
   int newtonSteps = 0;
   genStates.clear();
   savedRules.clear();
@@ -433,16 +420,17 @@ void NWPDS::prestar(wfa::WFA const & input, wfa::WFA & output)
   EWPDS::unlinkOutput(output);
   EWPDS::currentOutputWFA = 0;
   cleanUpFa(output);
+#endif
 }
 
 void NWPDS::poststar(wfa::WFA const & input, wfa::WFA & output)
 {
   int newtonSteps = 0;
-  genStates.clear();
   savedRules.clear();
   stack2ConstMap.clear();
-  state2ConstMap.clear();
-  state2StackMap.clear();
+  oldCallSite.clear();
+  oldFuncEntry.clear();
+  oldFuncEntryPair.clear();
 
   poststarSetupPds();
   poststarSetupFixpoint(input,output);
@@ -451,7 +439,14 @@ void NWPDS::poststar(wfa::WFA const & input, wfa::WFA & output)
   output.for_each(cinw);
   do{
     EWPDS::poststarComputeFixpoint(output);
-    updateFa(output);
+    poststarUpdateFa(output);
+    {
+      std::stringstream ss;
+      ss << "outfa_int_" << newtonSteps << ".dot";
+      fstream outfile(ss.str().c_str(), fstream::out);
+      output.print_dot(outfile, true);
+      outfile.close();
+    }
     newtonSteps++;
   }while(!worklist->empty());
   //if(dbg)
@@ -462,53 +457,39 @@ void NWPDS::poststar(wfa::WFA const & input, wfa::WFA & output)
   cleanUpFa(output);
 }
 
+// Invert the callSite and funcEntry maps and then
+// use RemoveOldTrans to set all relevant weights to 0.
+// Finally, prune to remove all 0 transitions.
 void NWPDS::cleanUpFa(wfa::WFA& output)
 {
   Key2KeyMap old2NewStackMap;
   Key2KeyMap old2NewStateMap;
-  for(Key2KeyMap::iterator iter = stack2ConstMap.begin();
-      iter != stack2ConstMap.end();
-      ++iter)
-    old2NewStackMap[iter->second] = iter->first;
-  for(Key2KeyMap::iterator iter = state2ConstMap.begin();
-      iter != state2ConstMap.end();
-      ++iter)
+  for(Key2KeyMap::iterator iter = oldCallSite.begin(); iter != oldCallSite.end(); ++iter)
+    old2NewStackMap[iter->second] = iter->first; 
+  for(Key2KeyMap::iterator iter = oldFuncEntry.begin(); iter != oldFuncEntry.end(); ++iter)
     old2NewStateMap[iter->second] = iter->first;
-
-  //DEBUGGING
-  //*waliErr << "oldStates: ";
-  //for(std::set<wali::Key>::iterator it = oldStates.begin();
-  //    it != oldStates.end();
-  //    ++it)
-  //  *waliErr << wali::key2str(*it) << " ";
-  //*waliErr << std::endl;
-  //DEBUGGING
-
   RemoveOldTrans rot(old2NewStackMap,old2NewStateMap);
   output.for_each(rot);
-  // RemoveOldTrans will set the weight on a bunch of transitions to zero.
-  // Get rid of all those transitions from the FA.
   output.prune();
 }
 
-void NWPDS::poststarSetupFixpoint(WFA const & input, WFA& fa)
+void NWPDS::poststarSetupFixpoint( WFA const & input, WFA& fa )
 {
-  EWPDS::poststarSetupFixpoint(input,fa);
-  for(GenStates::const_iterator it = genStates.begin();
-      it != genStates.end();
-      ++it){
-    wali::Key a = gen_state((*it).first,(*it).second.first);
-    wali::Key b =  gen_state((*it).first,(*it).second.second);
-    state2ConstMap[a] = b;
-    state2StackMap[a] = (*it).second.first;
-    //DEBUGGING
-    //*waliErr << "Added[state2ConstMap]" << wali::key2str(a) << " --> " << wali::key2str(b) << std::endl;
-  }
+  EWPDS::poststarSetupFixpoint(input, fa);
+  // gen_state can be used now. So create intermediate states from the store pairs
+  // oldFuncEntryPair maps pair(p,y') --> pair(p',t')
+  // convert this to to map between the corresponding keys.
+  for(State2StateMap::iterator it = oldFuncEntryPair.begin(); it != oldFuncEntryPair.end(); ++it)
+    oldFuncEntry[gen_state(it->first.first, it->first.second)] = gen_state(it->second.first, it->second.second);
+  // We don't need the pair map anymore
+  oldFuncEntryPair.clear();
 }
+
 
 void NWPDS::update(Key from, Key stack, Key to, sem_elem_t se, Config * cfg)
 {
 
+  cout << "addEtrans: " << addEtrans << endl;
   wali::wfa::ITrans *t;
   if(addEtrans) {
     t = currentOutputWFA->insert(new wali::wpds::ewpds::ETrans(from, stack, to,
@@ -519,6 +500,7 @@ void NWPDS::update(Key from, Key stack, Key to, sem_elem_t se, Config * cfg)
 
   t->setConfig(cfg);
   if (t->modified()) {
+    t->print(cout << "Modified: ") << endl;
     worklist->put( t );
     newtonWl.push_back( t );
   }
@@ -537,33 +519,12 @@ wali::wfa::ITrans* NWPDS::update_prime( Key from, wali::wfa::ITrans* call, rule_
         from, r->to_stack2(), call->to(),
         delta, wWithRule, er);
   wali::wfa::ITrans* t = currentOutputWFA->insert(tmp);
-  if(t->modified())
+  if(t->modified()){
+    t->print(cout << "Modified: ") << endl;
     newtonWl.push_back( t );
+  }
   return t;
 }
-
-#if 0
-void NWPDS::update(Key from, Key stack, Key to, sem_elem_t se, Config * cfg)
-{
-  EWPDS::update(from,stack,to,se,cfg);
-  wali::wfa::Trans t;
-  currentOutputWFA->find(from,stack,to,t);
-  if(t.modified()){
-    newtonWl->put(t);
-  }
-}
-
-wali::wfa::ITrans* NWPDS::update_prime(Key from, wfa::ITrans* call, rule_t r,  sem_elem_t delta, sem_elem_t wWithRule)
-{
-  wali::wfa::ITrans* ret = update_prime(from,call,r,delta,wWithRule);
-  wali::wfa::ITrans t;
-  currentOutputWFA->find(from,r->to_stack2(),call->to(),t);
-  if(t.modified()){
-    newtonWl->put(t);
-  }
-}
-#endif
-
 
 /////////////////////////////////////////////////////////////////
 // class Dela2Rules
