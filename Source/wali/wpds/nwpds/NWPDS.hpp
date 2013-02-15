@@ -21,6 +21,10 @@
 #include "wali/wfa/ITrans.hpp"
 // ::std
 #include <vector>
+// ::std::tr1
+#include <tr1/unordered_map>
+// ::std (for pair)
+#include <utility>
 
 namespace wali
 {
@@ -45,11 +49,24 @@ namespace wali
            * This keeps a map from the original Key to the Key_NEWTON_OLDVAL, generated within the
            * solver (call to poststar/prestar).
            **/
-          typedef std::map< wali::Key,wali::Key > Key2KeyMap;
+          typedef std::tr1::unordered_map< wali::Key,wali::Key > Key2KeyMap;
+          /**
+           * Newton Solver creates copies of some generated states  in the WFA,
+           * in order to store function summaries from the last Newton
+           * iteration.
+           * Ideally, we would like to store a map from generated states to summary generated states, but
+           * we can't create these states early enough.
+           **/
+          typedef std::pair< wali::Key, wali::Key > IntState;
+          struct IntStateHash{
+            std::size_t operator () (IntState const& s) const {
+              return (s.first << (sizeof(std::size_t)/2)) & s.second;
+            }
+          };
+          typedef std::tr1::unordered_map< IntState, IntState, IntStateHash> State2StateMap;
           /**
             Short name:
-          **/
-          //typedef wali::ref_ptr< wali::Worklist< wali::wfa::ITrans > > worklist_t;
+           **/
           typedef std::vector < wali::wfa::ITrans* > worklist_t;
 
         public:
@@ -85,7 +102,6 @@ namespace wali
           }
 
         protected:
-          virtual void poststarSetupFixpoint(wfa::WFA const & input, wfa::WFA& fa);
           virtual void update(
               Key from,
               Key stack,
@@ -99,47 +115,66 @@ namespace wali
               sem_elem_t delta, 
               sem_elem_t wWithRule );
 
-            /**
-             * Changes some rules of this PDS to actually solve the linearized prestar problem. 
-             **/
-            void prestarSetupPds();
-            /**
-             * Changes some rules of this PDS to actually solve the linearized poststar problem. 
-             **/
-            void poststarSetupPds();
-            /**
-             * After each linearized prestar/poststar, checks if the fa has
-             * changed, if yes, it updates the stored const values on the FA.
-             **/
-            void updateFa(wali::wfa::WFA& f);
-            /**
-             * Restores PDS to its former ruleset after prestar/poststar
-             **/
-            void restorePds();
-            /**
-             * Sets the weights on transitions in outfa that correspond to constants in the fix point calculation
-             * to zero
-             **/
-            void cleanUpFa(wali::wfa::WFA& fa);
+#if 0
+          /**
+           * Changes some rules of this PDS to actually solve the linearized prestar problem. 
+           **/
+          void prestarSetupPds();
+#endif
+          /**
+           * Changes some rules of this PDS to actually solve the linearized poststar problem. 
+           **/
+          void poststarSetupPds();
+          /**
+           * After each linearized prestar/poststar, checks if the fa has
+           * changed, if yes, it updates the stored const values on the FA.
+           **/
+          void poststarUpdateFa(wali::wfa::WFA& f);
+          /**
+           * Restores PDS to its former ruleset after prestar/poststar
+           **/
+          void restorePds();
+          /**
+           * Sets the weights on transitions in outfa that correspond to constants in the fix point calculation
+           * to zero
+           **/
+          void cleanUpFa(wali::wfa::WFA& fa);
 
-            /**
-             * Creates a map from new to old key if needed, and returns the old key for the new key.
-             **/
-            wali::Key getOldKey(wali::Key newKey);
+          /**
+           * Creates a map from new to old key if needed, and returns the old key for the new key.
+           **/
+          wali::Key getOldKey(wali::Key newKey);
 
+        protected:
+
+          /**
+           * @briend : calls EWPDS::poststarSetupFixpoint, and a little book-keeping for NWPDS.
+           **/
+          void poststarSetupFixpoint(wali::wfa::WFA const & input, wali::wfa::WFA& fa);
 
         private:
 
+          /**
+           * This map is used to make create unique stack symbols for newton
+           * constants for stack symbols at calls. 
+           **/
           Key2KeyMap stack2ConstMap;
-          Key2KeyMap state2ConstMap;
-          Key2KeyMap state2StackMap;
 
           /**
-           * Remember states generated for Newton Steps in the fa
-           * We need to clean these up when returning the fa
+           * Used by poststar to map stack symbols for call sites to the constant symbol for fake call.
+           * If there is a rule: <p,y> --> <p',y'y''>, replace by <p,t> --> <p',y'y''> 
+           * and oldCallSite[y] = t;
            **/
-          typedef std::vector< std::pair< wali::Key, std::pair<wali::Key, wali::Key> >  > GenStates;
-          GenStates genStates;
+          Key2KeyMap oldCallSite;
+
+          /**
+           * Used by poststar to map generated states for function entries to the constant symbol for summary calls
+           * If there is a rule: <p,t> --> <p',y'y''>, replace by <p,y> --> <p',t'y''> 
+           * and oldFuncEntry[(p',y')] = (p',t')
+           * We can't generate these wali::Key's early enough, so we temporarily store pairs.
+           **/
+          State2StateMap oldFuncEntryPair;
+          Key2KeyMap oldFuncEntry;
 
           /**
            * This worklist is used to remember what transitions were modified in one
@@ -153,6 +188,12 @@ namespace wali
            * This vector stores the rules that must be restored after we're done.
            **/
           std::vector<rule_t> savedRules;
+
+          /**
+           * The set of rules added by NWPDS.
+           * These must be reduced after the query to leave the PDS unchanged
+           **/
+          std::vector<rule_t> addedRules;
 
           /**
            * Facilitate printing by creating a NWPDS with dbg set to true.
