@@ -52,6 +52,8 @@ namespace wali {
                 std::map<std::string, int> vars;
                 vars["left"] = 2;
                 vars["right"] = 2;
+                vars["left_current_state"] = 4;
+                vars["right_current_state"] = 4;
                 return vars;
             }
         };

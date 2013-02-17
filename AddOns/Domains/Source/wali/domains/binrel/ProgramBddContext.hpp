@@ -9,6 +9,8 @@
 
 #include "buddy/fdd.h"
 
+#include "boost/serialization/access.hpp"
+
 #define BINREL_I_WANT_MINUS_TIMES_AND_DIV_EVEN_THOUGH_THEY_CAN_BE_EXPONENTIALLY_SLOW
 #define BINREL_ALWAYS_BUILD_SLOW_ADDER 0
 #define BINREL_ALLOW_BUILD_SLOW_ADDER 1
@@ -100,6 +102,43 @@ namespace wali
 
           // //////////////Generates a random bdd///////////////////////////////////////////
           bdd tGetRandomTransformer(bool isTensored = false, unsigned seed=0) const;
+
+        public:
+          // Very useful for testing. Just set variables in the bdd
+          // setPre("x") will return a bdd 
+          //      *
+          // x: 1/ \0
+          //    T   F
+          // unSet, and set(var,val) do what you'd expect.
+          // [uns/s]etPost do the same for post vocabularies. 
+          // No tensored plies are used.
+          bdd setPre(std::string var) const;
+          bdd unsetPre(std::string var) const;
+          bdd setPre(std::string var, unsigned val) const;
+          bdd setPost(std::string var) const;
+          bdd unsetPost(std::string var) const;
+          bdd setPost(std::string var, unsigned val) const;
+
+          // //////////////////////////////////////////////////
+          // Print out a trace of operations used to build a BddContext
+          // object. Later, use such a trace to magically recreate the 
+          // BddContext object.
+        //public:
+          void printHistory(std::ostream& o) const;
+          static ProgramBddContext * buildFromHistory(std::istream& in);
+        private:
+          typedef enum {SET_INT_VECT, SET_INT_MAP, ADD_INT, ADD_BOOL} CreationFunction;
+          typedef struct 
+          {
+            friend class boost::serialization::access;
+            CreationFunction cf;
+            std::vector< std::map<std::string, int> > arg;
+            template<class Archive>            
+            void serialize(Archive &ar, const unsigned int file_version);
+            std::ostream& print(std::ostream& o) const;
+          }CreationCall;
+          typedef std::vector< CreationCall > CreationHistory;
+          CreationHistory creationHistory;
 
         private:
           // This is the bdd index of the size info in each bdd

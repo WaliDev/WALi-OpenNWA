@@ -48,17 +48,23 @@ namespace wali {
 
         class IntraGraphEdge {
             public:
+              /**
+               * The context in which the regular expressions are to be generated.
+               * IntraGraphEdge does not own this. 
+               **/
+                RegExpDag * dag;         
+
                 int src, tgt;
                 sem_elem_t weight;
                 bool updatable;
                 int updatable_no;
                 functional_t exp;
                 reg_exp_t regexp;
-                IntraGraphEdge(int s, int t, sem_elem_t w, bool u, int uno = 0, functional_t e = NULL) : src(s), tgt(t), weight(w), updatable(u), updatable_no(uno), exp(e) {
+                IntraGraphEdge(RegExpDag * d, int s, int t, sem_elem_t w, bool u, int uno = 0, functional_t e = NULL) : dag(d), src(s), tgt(t), weight(w), updatable(u), updatable_no(uno), exp(e) {
                     if(updatable) 
-                        regexp = RegExp::updatable(uno, weight);
+                        regexp = dag->updatable(uno, weight);
                     else
-                        regexp = RegExp::constant(weight);
+                        regexp = dag->constant(weight);
                 }
                 void set(int s, int t, sem_elem_t w, bool u, int uno = 0, functional_t e = NULL) {
                     src = s;
@@ -68,12 +74,13 @@ namespace wali {
                     updatable_no = uno;
                     exp = e;
                     if(updatable) 
-                        regexp = RegExp::updatable(uno, weight);
+                        regexp = dag->updatable(uno, weight);
                     else
-                        regexp = RegExp::constant(weight);
+                        regexp = dag->constant(weight);
                 }
-                IntraGraphEdge() : src(-1), tgt(-1) { } // creates a fake edge
+                IntraGraphEdge(RegExpDag * d) : dag(d), src(-1), tgt(-1) { } // creates a fake edge
                 IntraGraphEdge(const IntraGraphEdge &e) {
+                    dag = e.dag;
                     src = e.src;
                     tgt = e.tgt;
                     weight = e.weight;
@@ -81,6 +88,16 @@ namespace wali {
                     updatable_no = e.updatable_no;
                     exp = e.exp;
                     regexp = e.regexp;
+                }
+
+                // This marks the currently held regexp as labelling an edge.
+                // Used by RegExpDag to collect the set of regexp nodes that label edges.
+                bool markLabel()
+                {
+                  if(regexp == NULL)
+                    return false;
+                  dag->markAsLabel(regexp);
+                  return true;
                 }
         };
 
@@ -98,6 +115,11 @@ namespace wali {
 
         class IntraGraphNode {
             public:
+              /**
+               * The context in which the regular expressions are to be generated.
+               * IntraGraphNode does not own this. 
+               **/
+                RegExpDag * dag;         
                 Transition trans;
                 int node_no; // Node number in the IntraGraph node array (-1 if not in the array)
                 node_type type;
@@ -111,9 +133,9 @@ namespace wali {
                 sem_elem_t weight;
                 std::set<int> dependentEdges; 
 
-                IntraGraphNode() : trans(0,0,0), node_no(-1), type(None), weight(NULL){ } // creates a fake node
-                IntraGraphNode(int nno, node_type ty = None) : trans(0,0,0), node_no(nno), type(ty), iscutset(false), visited(0), scc_number(0), weight(NULL) {}
-                IntraGraphNode(const IntraGraphNode &n) : trans(n.trans), node_no(n.node_no), type(n.type), outgoing(n.outgoing), incoming(n.incoming), 
+                IntraGraphNode(RegExpDag * d) : dag(d), trans(0,0,0), node_no(-1), type(None), weight(NULL){ } // creates a fake node
+                IntraGraphNode(RegExpDag * d, int nno, node_type ty = None) : dag(d), trans(0,0,0), node_no(nno), type(ty), iscutset(false), visited(0), scc_number(0), weight(NULL) {}
+                IntraGraphNode(const IntraGraphNode &n) : dag(n.dag), trans(n.trans), node_no(n.node_no), type(n.type), outgoing(n.outgoing), incoming(n.incoming), 
                 regexp(n.regexp), iscutset(n.iscutset), visited(n.visited), scc_number(n.scc_number), weight(n.weight) 
                 {
                   for(std::set<int>::const_iterator iter = n.dependentEdges.begin(); iter != n.dependentEdges.end(); ++iter)
@@ -131,6 +153,15 @@ namespace wali {
                 void addDependentEdge(int e)
                 {
                   dependentEdges.insert(e);
+                }
+                // This marks the currently held regexp as labelling a node.
+                // Used by RegExpDag to collect the set of regexp nodes that label nodes.
+                bool markLabel()
+                {
+                  if(regexp == NULL)
+                    return false;
+                  dag->markAsLabel(regexp);
+                  return true;
                 }
         };
 
@@ -154,6 +185,20 @@ namespace wali {
             friend class InterGraph;
             friend class SummaryGraph;
             private:
+
+            /**
+             * Under the mixed strategy of Newton method for saturation, 
+             * is this graph labelled with tensored weights?
+             **/
+            bool hasTensoredWeights;
+
+            /**
+             * The context in which all regular expressions are to be created.
+             * This is usually shared by all IntraGraphs. Allocation/Deallocation is
+             * the responsibility of InterGraph
+             **/
+            RegExpDag * dag;
+
             typedef ostream & (*PRINT_OP)(ostream &, int);
 
             vector<IntraGraphNode> nodes;
@@ -182,19 +227,50 @@ namespace wali {
 
             vector<int> updatable_edges;
             IntraGraphStats stats;
-            static sem_elem_t se;
-#ifdef STATIC_MEMORY
-            static int * intraGraphBuffer;
-            static set<int> *childrenBuffer;
-            static reg_exp_t *regBuffer;
-            static int intraGraphBufferSize;
-#endif
+            sem_elem_t se;
+
+            /**
+             * An IntraGraph can be created with a preallocated
+             * memory buffer to use for its operations.  
+             **/
+            struct SharedMemBuffer {
+              int * intraGraphBuffer;
+              set<int> *childrenBuffer;
+              reg_exp_t *regBuffer;
+              int intraGraphBufferSize;
+              SharedMemBuffer(int s)
+              {
+                intraGraphBuffer = new int[5*s];
+                childrenBuffer = new set<int>[s];
+                regBuffer = new reg_exp_t[s];
+                intraGraphBufferSize = s;
+              }
+              ~SharedMemBuffer()
+              {
+                delete [] intraGraphBuffer;
+                delete [] childrenBuffer;
+                delete [] regBuffer;
+                intraGraphBuffer = 0;
+                childrenBuffer = 0;
+                regBuffer = 0;
+                intraGraphBufferSize = 0;
+              }
+            };
+
+            SharedMemBuffer * memBuf;
+
             static ostream &defaultPrintOp(ostream &out, int a) {
                 out << a;
                 return out;
             }
             public:
-            IntraGraph(bool pre, sem_elem_t _se) :nodes(50), edges(50) {
+            IntraGraph(RegExpDag * d, bool pre, sem_elem_t _se, SharedMemBuffer * m = NULL) : 
+              hasTensoredWeights(false),
+              dag(d), 
+              nodes(50, IntraGraphNode(dag)),  
+              edges(50, IntraGraphEdge(dag)),
+              memBuf(m)
+            {
                 visited = false;
                 scc_number = 0;
                 bfs_number = 0;
@@ -211,6 +287,8 @@ namespace wali {
             ~IntraGraph() {
                 delete out_nodes_intra;
                 delete out_nodes_inter;
+                //It is not my responsibility to delete sharedMem. Whoever constructed it must delete it.
+                //delete sharedMem;
                 if(apsp != NULL) {
                     int i;
                     for(i=0;i<nnodes;i++)
@@ -226,25 +304,6 @@ namespace wali {
             int getSize() {
                 return nnodes;
             }
-#ifdef STATIC_MEMORY
-            static void addStaticBuffer(int s) {
-                intraGraphBuffer = new int[5*s];
-                childrenBuffer = new set<int>[s];
-                regBuffer = new reg_exp_t[s];
-                intraGraphBufferSize = s;
-            }
-            static void clearStaticBuffer() {
-                delete [] intraGraphBuffer;
-                delete [] childrenBuffer;
-                delete [] regBuffer;
-
-                intraGraphBuffer = 0;
-                childrenBuffer = 0;
-                regBuffer = 0;
-
-                intraGraphBufferSize = 0;
-            }
-#endif
             int makeNode(Transition t) {
                 create_node(t, nnodes);
                 return (nnodes-1); // nnodes gets incremented by create_node
@@ -282,8 +341,7 @@ namespace wali {
              * IntraGraph holds on to some static variables. 
              * These should be cleaned up when we're finished with the analysis.
              **/
-            static void cleanUp();
-            void saturate();
+            void saturate(unsigned& numRounds);
 
             sem_elem_t getWeight(int nno) const ;
             string toDot();
@@ -325,7 +383,8 @@ namespace wali {
 
             void solveRegSummarySolution();
             void preSolveRegSummarySolution();
-
+            
+            void markLabels();
         };
 
     } // namespace graph

@@ -10,19 +10,12 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <boost/cast.hpp>
 using namespace std;
 
 namespace wali {
 
   namespace graph {
-
-    sem_elem_t IntraGraph::se;
-#ifdef STATIC_MEMORY
-    int *IntraGraph::intraGraphBuffer = 0;
-    set<int> *IntraGraph::childrenBuffer = 0;
-    reg_exp_t *IntraGraph::regBuffer = 0;
-    int IntraGraph::intraGraphBufferSize = 0;
-#endif
 
 #define nodeno(a) (a.node_no)
 
@@ -32,7 +25,7 @@ namespace wali {
 
     void IntraGraph::create_node(Transition &t, int a) {
       int n = nodes.size();
-      if(n <= a) nodes.resize(2*a);
+      if(n <= a) nodes.resize(2*a, IntraGraphNode(dag));
       int i;
       for(i=nnodes;i<=a;i++) {
         nodes[i].set(i);
@@ -114,7 +107,7 @@ namespace wali {
     void IntraGraph::resetUpdatable() {
       vector<int>::iterator it;
       for(it = updatable_edges.begin(); it != updatable_edges.end(); it++) {
-        RegExp::update(edges[*it].updatable_no,se->zero());
+        dag->update(edges[*it].updatable_no,se->zero());
       }
     }
 
@@ -334,12 +327,12 @@ namespace wali {
       for(i=0;i<m+1;i++) {
         temp[i] = new reg_exp_t[n];
         for(j=0;j<n;j++) {
-          temp[i][j] = RegExp::constant(se->zero());
+          temp[i][j] = dag->constant(se->zero());
         }
       }
 
       // Solve for (s,_)
-      temp[m][0] = RegExp::constant(se->one());
+      temp[m][0] = dag->constant(se->one());
       list<int>::iterator it = ts.begin();
       for(;it != ts.end(); it++) {
         v = *it;
@@ -348,7 +341,7 @@ namespace wali {
         list<int>::iterator beg = cnodes[v].incoming.begin();
         list<int>::iterator end = cnodes[v].incoming.end();
         for(; beg != end; beg++) {
-          temp[m][v] = RegExp::combine(temp[m][v], RegExp::extend(temp[m][cedges[*beg].src], cedges[*beg].regexp));
+          temp[m][v] = dag->combine(temp[m][v], dag->extend(temp[m][cedges[*beg].src], cedges[*beg].regexp));
         }
       }
       // Solve for (ci,_)
@@ -359,7 +352,7 @@ namespace wali {
         while(*beg != *it2) {
           beg++;
         }
-        temp[i][*beg] = RegExp::constant(se->one());
+        temp[i][*beg] = dag->constant(se->one());
         beg++;
         for(; beg != end; beg++) {
           v = *beg;
@@ -368,7 +361,7 @@ namespace wali {
           list<int>::iterator beg2 = cnodes[v].incoming.begin();
           list<int>::iterator end2 = cnodes[v].incoming.end();
           for(; beg2 != end2; beg2++) {
-            temp[i][v] = RegExp::combine(temp[i][v], RegExp::extend(temp[i][cedges[*beg2].src], cedges[*beg2].regexp));
+            temp[i][v] = dag->combine(temp[i][v], dag->extend(temp[i][cedges[*beg2].src], cedges[*beg2].regexp));
           }
         }
       }
@@ -379,9 +372,9 @@ namespace wali {
         reg[i] = new reg_exp_t[m];
         for(j = 0; j < m; j++) {
           if(i==j) 
-            reg[i][j] = RegExp::constant(se->one());
+            reg[i][j] = dag->constant(se->one());
           else
-            reg[i][j] = RegExp::constant(se->zero());
+            reg[i][j] = dag->constant(se->zero());
         }
       }
       for(i = 0; i < m; i++) {
@@ -390,7 +383,7 @@ namespace wali {
           list<int>::iterator beg = cnodes[v].incoming.begin();
           list<int>::iterator end = cnodes[v].incoming.end();
           for(; beg != end; beg++) {
-            reg[i][j] = RegExp::combine(reg[i][j], RegExp::extend(temp[i][cedges[*beg].src], cedges[*beg].regexp));
+            reg[i][j] = dag->combine(reg[i][j], dag->extend(temp[i][cedges[*beg].src], cedges[*beg].regexp));
           }
         }
       }
@@ -398,7 +391,7 @@ namespace wali {
       for(k=0;k<m;k++) {
         for(i=0;i<m;i++) {
           for(j=0;j<m;j++) {
-            reg[i][j] = RegExp::combine(reg[i][j], RegExp::extend(reg[i][k], RegExp::extend(RegExp::star(reg[k][k]), reg[k][j])));
+            reg[i][j] = dag->combine(reg[i][j], dag->extend(reg[i][k], dag->extend(dag->star(reg[k][k]), reg[k][j])));
           }
         }
       }
@@ -406,7 +399,7 @@ namespace wali {
       for(i = 0; i < m; i++) {
         for(j = 0; j < n; j++) {
           for(k = 0; k < m; k++) {
-            temp[i][j] = RegExp::combine(temp[i][j], RegExp::extend(reg[i][k], temp[k][j]));
+            temp[i][j] = dag->combine(temp[i][j], dag->extend(reg[i][k], temp[k][j]));
           }
         }
       }
@@ -416,7 +409,7 @@ namespace wali {
         list<int>::iterator beg = cnodes[v].incoming.begin();
         list<int>::iterator end = cnodes[v].incoming.end();
         for(; beg != end; beg++) {
-          temp[m][v] = RegExp::combine(temp[m][v], RegExp::extend(temp[m][cedges[*beg].src], cedges[*beg].regexp));
+          temp[m][v] = dag->combine(temp[m][v], dag->extend(temp[m][cedges[*beg].src], cedges[*beg].regexp));
         }
         //temp[m][v]->print(cout) << "\n";
       }
@@ -427,7 +420,7 @@ namespace wali {
       }
       for(i = 0; i < n; i++) {
         for(j=0;j<m;j++) {
-          cnodes[i].regexp = RegExp::combine(cnodes[i].regexp, RegExp::extend(temp[m][cs[j]],temp[j][i]));
+          cnodes[i].regexp = dag->combine(cnodes[i].regexp, dag->extend(temp[m][cs[j]],temp[j][i]));
         }
       }
       // delete stuff
@@ -472,7 +465,7 @@ namespace wali {
       if(eno == -1) return false;
       if(edges[eno].updatable == false) return false;
       edges[eno].weight = se;
-      RegExp::update(edges[eno].updatable_no,se);
+      dag->update(edges[eno].updatable_no,se);
       return true;
     }
 
@@ -496,13 +489,13 @@ namespace wali {
         if(!edges[eno].updatable && updatable){
           //The original edge was not updatable, but the new is.
           int uno = 0;
-          uno = RegExp::getNextUpdatableNumber();
+          uno = dag->getNextUpdatableNumber();
           // Create updatable RegExp node
-          RegExp::updatable(uno,se);
+          dag->updatable(uno,se);
           // Convert the edge to an updatable edge
           edges[eno].updatable = true;
           edges[eno].updatable_no = uno;
-          edges[eno].regexp = RegExp::combine(edges[eno].regexp, RegExp::updatable(uno, se));
+          edges[eno].regexp = dag->combine(edges[eno].regexp, dag->updatable(uno, se));
           edges[eno].exp = exp;
           // Add this edge to the set of updatable edges
           updatable_edges.push_back(eno);
@@ -519,21 +512,21 @@ namespace wali {
           }
           edges[eno].exp = SemElemFunctional::combine(edges[eno].exp, exp);
         }else{
-          edges[eno].regexp = RegExp::combine(edges[eno].regexp, RegExp::constant(se));
+          edges[eno].regexp = dag->combine(edges[eno].regexp, dag->constant(se));
         }
       }else{
         // Create a new edge.
         int uno = 0;
         if(updatable){
-          uno = RegExp::getNextUpdatableNumber();
+          uno = dag->getNextUpdatableNumber();
           // Create updatable RegExp node
-          RegExp::updatable(uno,se);
+          dag->updatable(uno,se);
         }
-        IntraGraphEdge ed(s,t,se,updatable,uno,exp);
+        IntraGraphEdge ed(dag,s,t,se,updatable,uno,exp);
         if(edges.size() == (unsigned)nedges) {
-          edges.resize(2*nedges);
+          edges.resize(2*nedges, IntraGraphEdge(dag));
         }
-        edges[nedges] = ed; // .set(s,t,se,updatable,uno);
+        edges[nedges] = ed; // .set(dag, s,t,se,updatable,uno);
         nedges++;
         eno = nedges - 1;
         if(updatable) {
@@ -553,15 +546,15 @@ namespace wali {
 
       int uno = 0;
       if(updatable) {
-        uno = RegExp::getNextUpdatableNumber();
+        uno = dag->getNextUpdatableNumber();
         // create the updatable reg-exp-node
-        RegExp::updatable(uno, se);
+        dag->updatable(uno, se);
       }
-      IntraGraphEdge ed(s,t,se,updatable,uno,exp);
+      IntraGraphEdge ed(dag, s,t,se,updatable,uno,exp);
 
       if(eno != -1) { 
         // Edge existed before
-        edges[eno].regexp = RegExp::combine(edges[eno].regexp, ed.regexp);
+        edges[eno].regexp = dag->combine(edges[eno].regexp, ed.regexp);
         if(edges[eno].updatable && updatable) {
           cerr << "FWPDS: Warning, parallel updatable edges. Results may not be correct\n";
           print_trans(nodes[edges[eno].src].trans,std::cerr);
@@ -579,9 +572,9 @@ namespace wali {
 
       // Create new edge
       if(edges.size() == (unsigned)nedges) {
-        edges.resize(2*nedges);
+        edges.resize(2*nedges, IntraGraphEdge(dag));
       }
-      edges[nedges] = ed; // .set(s,t,se,updatable,uno);
+      edges[nedges] = ed; // .set(dag, s,t,se,updatable,uno);
       nedges++;
 
       int e = nedges - 1;
@@ -601,7 +594,7 @@ namespace wali {
 
       // Create new edge
       if(edges.size() == (unsigned)nedges) {
-        edges.resize(2*nedges);
+        edges.resize(2*nedges, IntraGraphEdge(dag));
       }
       edges[nedges].set(0,n,init_weight,false);
       nedges++;
@@ -668,17 +661,17 @@ namespace wali {
         // updates may repeat the same node (with weight / uno)
         if(it.uno == -1) {
           if(nodes[it.node].regexp.get_ptr() == NULL) {
-            nodes[it.node].regexp = RegExp::constant(it.wt);
+            nodes[it.node].regexp = dag->constant(it.wt);
           } else {
             int uno = nodes[it.node].regexp->updatableNumber();
-            RegExp::update(uno, it.wt);
+            dag->update(uno, it.wt);
           }
         } else {
           if(nodes[it.node].regexp.get_ptr() == NULL) {
-            nodes[it.node].regexp = RegExp::updatable(it.uno, se->zero());
+            nodes[it.node].regexp = dag->updatable(it.uno, se->zero());
           } else {
-            RegExp::update(it.uno, nodes[it.node].regexp->get_weight());
-            nodes[it.node].regexp = RegExp::updatable(it.uno, se->zero());
+            dag->update(it.uno, nodes[it.node].regexp->get_weight());
+            nodes[it.node].regexp = dag->updatable(it.uno, se->zero());
           }
         }
       }
@@ -686,7 +679,7 @@ namespace wali {
       // Initialize rest of regexps
       for(i=0;i<n;i++) {
         if(nodes[i].regexp.get_ptr() == NULL) {
-          nodes[i].regexp = RegExp::constant(se->zero());
+          nodes[i].regexp = dag->constant(se->zero());
         }
       }
     }
@@ -699,7 +692,7 @@ namespace wali {
     // path sequence (for paths going forwards).
     void IntraGraph::calculatePopWeights(int eps_trans_nno) {
       int i, n = nnodes;
-      RegExp::extendDirectionBackwards(running_prestar);
+      dag->extendDirectionBackwards(running_prestar);
 
       assert(n == (int)node_pop_weight.size());
       assert(out_nodes_intra->size() <= 1);
@@ -773,7 +766,7 @@ namespace wali {
 
     // Calculate the regexp to solve backward query
     void IntraGraph::preSolveRegSummarySolution() {
-      RegExp::extendDirectionBackwards(running_prestar);
+      dag->extendDirectionBackwards(running_prestar);
 
       int i, n = nnodes;
       list<update_t>::iterator beg, end;
@@ -790,9 +783,9 @@ namespace wali {
         PathSequence &ps = path_sequence[i];
 
         if(ps.src == ps.tgt) {
-          nodes[ps.src].regexp = RegExp::extend(RegExp::constant(ps.regexp->get_weight()), nodes[ps.tgt].regexp);
+          nodes[ps.src].regexp = dag->extend(dag->constant(ps.regexp->get_weight()), nodes[ps.tgt].regexp);
         } else {
-          nodes[ps.src].regexp = RegExp::combine(nodes[ps.src].regexp,RegExp::extend(RegExp::constant(ps.regexp->get_weight()), nodes[ps.tgt].regexp));
+          nodes[ps.src].regexp = dag->combine(nodes[ps.src].regexp,dag->extend(dag->constant(ps.regexp->get_weight()), nodes[ps.tgt].regexp));
         }
       }
 
@@ -816,7 +809,7 @@ namespace wali {
     // Create regexp that solve for weights on all nodes given
     // starting configuration as "updates"
     void IntraGraph::solveRegSummarySolution() {
-      RegExp::extendDirectionBackwards(running_prestar);
+      dag->extendDirectionBackwards(running_prestar);
 
       int i, n = nnodes;
       
@@ -831,9 +824,9 @@ namespace wali {
         EvaluatedPathSequence &ps = evaluated_path_sequence[i];
         
         if(ps.src == ps.tgt) {
-          nodes[ps.src].regexp = RegExp::extend(nodes[ps.src].regexp, RegExp::constant(ps.value));
+          nodes[ps.src].regexp = dag->extend(nodes[ps.src].regexp, dag->constant(ps.value));
         } else {
-          nodes[ps.tgt].regexp = RegExp::combine(nodes[ps.tgt].regexp, RegExp::extend(nodes[ps.src].regexp, RegExp::constant(ps.value)));
+          nodes[ps.tgt].regexp = dag->combine(nodes[ps.tgt].regexp, dag->extend(nodes[ps.src].regexp, dag->constant(ps.value)));
         }
       }
       
@@ -893,7 +886,7 @@ namespace wali {
 
 
     void IntraGraph::setupIntraSolution(bool UNUSED_PARAMETER(compress_regexp)) {
-      RegExp::extendDirectionBackwards(running_prestar);
+      dag->extendDirectionBackwards(running_prestar);
       vector<IntraGraphNode> cnodes;
       vector<IntraGraphEdge> cedges;
       map<int,int> orig_to_compress;
@@ -925,16 +918,12 @@ namespace wali {
 
 
       STAT(stats.ndom_sequence = path_sequence.size());
-      return;
-
 #elif REGEXP_METHOD==1
       // Dominator
       domRegExp(nodes, nnodes, edges, nedges, path_sequence);
       buildRegExp(path_sequence);
 
       STAT(stats.ndom_sequence = path_sequence.size());
-      return;
-
 #elif REGEXP_METHOD==2
 
       // Dominator version + regexp compression and huffman-height minimization
@@ -944,13 +933,11 @@ namespace wali {
       for(nit = out_nodes_intra->begin(); nit != out_nodes_intra->end(); nit++) {
         int nno = *nit;
         reg_exp_cache_t cache;
-        reg_exp_t temp = RegExp::compress(nodes[nno].regexp, cache);
+        reg_exp_t temp = dag->compress(nodes[nno].regexp, cache);
         cache.clear();
-        nodes[nno].regexp = RegExp::minimize_height(temp, cache);
+        nodes[nno].regexp = dag->minimize_height(temp, cache);
         cache.clear();
       }
-      return;
-
 #elif REGEXP_METHOD==3
 
       // Dominators with compression
@@ -963,8 +950,6 @@ namespace wali {
         int nno = *nit;
         nodes[nno].regexp = cnodes[orig_to_compress[nno]].regexp;
       }
-      return;
-
 #elif REGEXP_METHOD==4
 
       // Cutset version
@@ -982,15 +967,15 @@ namespace wali {
         int nno = *nit;
         nodes[nno].regexp = cnodes[orig_to_compress[nno]].regexp;
       }
-      return;
-
 #elif REGEXP_METHOD==6
 
       // O(n^3) method
       basicRegExp(compress_regexp);
-
 #endif // REGEXP_METHOD
 
+      // All edges now have regexp. 
+      // Tel RegExpDag what regexp are used as labels
+      markLabels();
     }
 
     sem_elem_t IntraGraph::extend(sem_elem_t w1, sem_elem_t w2) {
@@ -1004,9 +989,9 @@ namespace wali {
     void IntraGraph::buildRegExp(vector<PathSequence> &seq) {
       int i;
       for(i=0;i<nnodes;i++) {
-        nodes[i].regexp = RegExp::constant(se->zero());
+        nodes[i].regexp = dag->constant(se->zero());
       }
-      nodes[0].regexp = RegExp::constant(se->one());
+      nodes[0].regexp = dag->constant(se->one());
 
       for(i=0;i<(int)seq.size();i++) {
         PathSequence &ps = seq[i];
@@ -1015,9 +1000,9 @@ namespace wali {
           //ps.regexp->print(cout) << endl;
         }//DEBUGGING
         if(ps.src == ps.tgt) {
-          nodes[ps.src].regexp = RegExp::extend(nodes[ps.src].regexp, ps.regexp);
+          nodes[ps.src].regexp = dag->extend(nodes[ps.src].regexp, ps.regexp);
         } else {
-          nodes[ps.tgt].regexp = RegExp::combine(nodes[ps.tgt].regexp, RegExp::extend(nodes[ps.src].regexp, ps.regexp));
+          nodes[ps.tgt].regexp = dag->combine(nodes[ps.tgt].regexp, dag->extend(nodes[ps.src].regexp, ps.regexp));
         }
       }
     }
@@ -1033,11 +1018,11 @@ namespace wali {
       set<int> *children;
       reg_exp_t *reg;
 
-#ifdef STATIC_MEMORY
-      if(n < intraGraphBufferSize) {
-        buffer = intraGraphBuffer;
-        children = childrenBuffer;
-        reg = regBuffer;
+#ifdef INTRAGRAPH_SHARED_MEMORY
+      if(n < sharedMem->intraGraphBufferSize) {
+        buffer = sharedMem->intraGraphBuffer;
+        children = shared->MemchildrenBuffer;
+        reg = sharedMem->regBuffer;
 
         for(i=0;i<n;i++) {
           children[i].clear();
@@ -1076,7 +1061,7 @@ namespace wali {
 
       // Initialize
       for(i=0;i<n;i++) {
-        cnodes[i].regexp = RegExp::constant(se->one());
+        cnodes[i].regexp = dag->constant(se->one());
         ancestor[i] = -1;
       }
       vector<IntraGraphNode> sub_cnodes;
@@ -1129,7 +1114,7 @@ namespace wali {
             } else {
               vt = sub_node_number[v];
             }
-            sub_cedges.push_back(IntraGraphEdge(wt, vt, se->zero(), false));
+            sub_cedges.push_back(IntraGraphEdge(dag, wt, vt, se->zero(), false));
             et = sub_cedges.size() - 1;
             sub_cnodes[wt].outgoing.push_back(et);
             sub_cnodes[vt].incoming.push_back(et);
@@ -1143,15 +1128,15 @@ namespace wali {
         beg = children[u].begin();
         for(; beg != end; beg++) {
           v = *beg;
-          reg[v] = RegExp::constant(se->zero());
+          reg[v] = dag->constant(se->zero());
           list<int>::iterator ebeg = cnodes[v].incoming.begin();
           list<int>::iterator eend = cnodes[v].incoming.end();
           for(; ebeg != eend; ebeg++) {
             if(cedges[*ebeg].src != dom[v]) continue;
-            reg[v] = RegExp::combine(reg[v], cedges[*ebeg].regexp);
+            reg[v] = dag->combine(reg[v], cedges[*ebeg].regexp);
           }
           //if(tree[v] != -1) {
-          //  reg[v] = RegExp::combine(reg[v], cedges[tree[v]].regexp);
+          //  reg[v] = dag->combine(reg[v], cedges[tree[v]].regexp);
           //}
         }
         for(j = slength; j < (int)sequence.size(); j++) {
@@ -1161,9 +1146,9 @@ namespace wali {
           ps.tgt = node_number[ps.tgt]; // nodeno(sub_cnodes[ps.tgt].trans);
 
           if(ps.src == ps.tgt) {
-            reg[ps.src] = RegExp::extend(reg[ps.src], ps.regexp);
+            reg[ps.src] = dag->extend(reg[ps.src], ps.regexp);
           } else {
-            reg[ps.tgt] = RegExp::combine(reg[ps.tgt], RegExp::extend(reg[ps.src], ps.regexp));
+            reg[ps.tgt] = dag->combine(reg[ps.tgt], dag->extend(reg[ps.src], ps.regexp));
           }
         }
         // Update
@@ -1177,7 +1162,7 @@ namespace wali {
       // Finalize
 
       if(cnodes[0].incoming.size() != 0) {
-        reg_exp_t q = RegExp::constant(se->zero());
+        reg_exp_t q = dag->constant(se->zero());
         list<int>::iterator beg = cnodes[0].incoming.begin();
         list<int>::iterator end = cnodes[0].incoming.end();
 
@@ -1185,10 +1170,10 @@ namespace wali {
         for(; beg != end; beg++) {
           //if(*beg == tree[0])
           //  continue;
-          q = RegExp::combine(q, eval_and_sequence(cnodes, cedges, *beg, ancestor, sequence));
+          q = dag->combine(q, eval_and_sequence(cnodes, cedges, *beg, ancestor, sequence));
         }
       
-        q = RegExp::star(q);
+        q = dag->star(q);
         sequence.push_back(PathSequence(q, 0, 0));
       }
 
@@ -1212,7 +1197,7 @@ namespace wali {
       if(ancestor[h] != -1) {
         compress_and_sequence(cnodes, cedges, h, ancestor, sequence);
         sequence.push_back(PathSequence(cedges[e].regexp, h, t));
-        r = RegExp::extend(cnodes[h].regexp, r);
+        r = dag->extend(cnodes[h].regexp, r);
       }
       return r;
     }
@@ -1222,7 +1207,7 @@ namespace wali {
       if(ancestor[ancestor[h]] != -1) {
         compress_and_sequence(cnodes, cedges, ancestor[h], ancestor, sequence);
         sequence.push_back(PathSequence(cnodes[h].regexp, ancestor[h], h));
-        cnodes[h].regexp = RegExp::extend(cnodes[ancestor[h]].regexp, cnodes[h].regexp);
+        cnodes[h].regexp = dag->extend(cnodes[ancestor[h]].regexp, cnodes[h].regexp);
         ancestor[h] = ancestor[ancestor[h]];
       }
     }
@@ -1264,7 +1249,7 @@ namespace wali {
         inv_node_map[s][last-1] = i;
       }
       for(i=0;i<m;i++) {
-        //cedges[i].regexp = RegExp::updatable(i,se->zero());
+        //cedges[i].regexp = dag->updatable(i,se->zero());
         int s1 = cnodes[cedges[i].src].scc_number;
         int s2 = cnodes[cedges[i].tgt].scc_number;
         if(s1 != s2) {
@@ -1272,7 +1257,7 @@ namespace wali {
           connecting_edges[s1].push_back(i);
         } else {
           int ns = node_map[cedges[i].src], nt = node_map[cedges[i].tgt];
-          scc_edges[s1].push_back(IntraGraphEdge(ns,nt,se->zero(),false));
+          scc_edges[s1].push_back(IntraGraphEdge(dag, ns,nt,se->zero(),false));
           int last = scc_edges[s1].size();
           scc_edges[s1][last-1].regexp = cedges[i].regexp;
           scc_nodes[s1][ns].outgoing.push_back(last-1);
@@ -1372,7 +1357,7 @@ namespace wali {
       for(i=0;i<m;i++) {
         reg[i] = new reg_exp_t[n];
         for(j=0;j<n;j++) {
-          reg[i][j] = RegExp::constant(se->zero());
+          reg[i][j] = dag->constant(se->zero());
         }
       }
 
@@ -1383,7 +1368,7 @@ namespace wali {
         while(*beg != *it) {
           beg++;
         }
-        reg[i][*beg] = RegExp::constant(se->one());
+        reg[i][*beg] = dag->constant(se->one());
         beg++;
         for(; beg != end; beg++) {
           v = *beg;
@@ -1392,7 +1377,7 @@ namespace wali {
           list<int>::iterator beg2 = cnodes[v].incoming.begin();
           list<int>::iterator end2 = cnodes[v].incoming.end();
           for(; beg2 != end2; beg2++) {
-            reg[i][v] = RegExp::combine(reg[i][v], RegExp::extend(reg[i][cedges[*beg2].src], cedges[*beg2].regexp));
+            reg[i][v] = dag->combine(reg[i][v], dag->extend(reg[i][cedges[*beg2].src], cedges[*beg2].regexp));
           }
         }
       }
@@ -1406,11 +1391,11 @@ namespace wali {
             u = cedges[*beg].src;
             if(!cnodes[u].iscutset) {
               sequence.push_back(PathSequence(cedges[*beg].regexp, cedges[*beg].src, cedges[*beg].tgt));
-              reg[i][v] = RegExp::combine(reg[i][v], RegExp::extend(reg[i][cedges[*beg].src], cedges[*beg].regexp));
+              reg[i][v] = dag->combine(reg[i][v], dag->extend(reg[i][cedges[*beg].src], cedges[*beg].regexp));
 
             } else {
               if(u==cs[i])
-                reg[i][v] = RegExp::combine(reg[i][v], cedges[*beg].regexp);
+                reg[i][v] = dag->combine(reg[i][v], cedges[*beg].regexp);
             }
           }
         }
@@ -1418,15 +1403,15 @@ namespace wali {
       // Construct a path sequence for (ci,cj)
       for(i = 0; i < m; i++) {
         v = cs[i];
-        reg[i][v] = RegExp::star(reg[i][v]);
+        reg[i][v] = dag->star(reg[i][v]);
         for(j = i+1; j < m; j++) {
           u = cs[j];
           if(reg[j][v]->isZero()) continue;
-          reg[j][v] = RegExp::extend(reg[j][v],reg[i][v]);
+          reg[j][v] = dag->extend(reg[j][v],reg[i][v]);
           for(k = i+1; k < m; k++) {
             w = cs[k];
             if(reg[i][w]->isZero()) continue;
-            reg[j][w] = RegExp::combine(reg[j][w],RegExp::extend(reg[j][v],reg[i][w]));
+            reg[j][w] = dag->combine(reg[j][w],dag->extend(reg[j][v],reg[i][w]));
           }
         }
       }
@@ -1585,26 +1570,6 @@ namespace wali {
       }
     }
 
-    void IntraGraph::cleanUp()
-    {
-      IntraGraph::se = NULL;
-#ifdef STATIC_MEMORY
-      if(IntraGraph::intraGraphBuffer){
-        delete IntraGraph::intraGraphBuffer;
-        IntraGraph::intraGraphBuffer = 0;
-      }
-      if(IntraGraph::childrenBuffer){
-        delete [] IntraGraph::childreBuffer;
-        IntraGraph::childrenBuffer = 0;
-      }
-      if(IntraGraph::regBuffer){
-        delete [] IntraGraph::regBuffer;
-        IntraGraph::regBuffer = 0;
-      }
-      IntraGraph::intraGraphBufferSize = 0;
-#endif
-    }
-
     string IntraGraph::toDot()
     {
       std::stringstream ss;
@@ -1647,21 +1612,21 @@ namespace wali {
 #if defined(PPP_DBG) && PPP_DBG >= 0
     static unsigned saturateCount = 0;
 #endif
-    void IntraGraph::saturate()
+    void IntraGraph::saturate(unsigned& numRounds)
     {
 
       bool repeat = true;
+      numRounds = 0;
 #if defined(PPP_DBG) && PPP_DBG >= 0
-      unsigned round = 0;
       ++saturateCount;
 #endif
 
+      // Just once, set up the minimal dag that needs to be evaluated each time.
+      dag->computeMinimalRoots();
       while(repeat){
-#if defined(PPP_DBG) && PPP_DBG >= 0
-        ++round;
-#endif
+        ++numRounds;
         //First, evaluate the current regular expressions completely.
-        RegExp::evaluateRoots();
+        dag->evaluateRoots();
 
         //Now, obtain the set of nodes who's values have changed.
         std::vector<IntraGraphNode*> changedNodes;
@@ -1693,16 +1658,16 @@ namespace wali {
         }
         if(updateEdges.size() > 0){
           repeat  = true;
-          RegExp::update(updateEdges, weights);
+          dag->update(updateEdges, weights);
         }else repeat = false;
 #if defined(PPP_DBG) && PPP_DBG >= 1
           {
             stringstream ss;
-            ss << "newton_regexp_" << saturateCount << "_" << round << ".dot";
+            ss << "newton_regexp_" << saturateCount << "_" << numRounds << ".dot";
             string filename = ss.str();
             fstream foo;
             foo.open(filename.c_str(), fstream::out);
-            const reg_exp_hash_t& roots = RegExp::getRoots();
+            const reg_exp_hash_t& roots = dag->getRoots();
             foo << "digraph {\n";
             std::set<long> seen;
             for(reg_exp_hash_t::const_iterator iter = roots.begin();
@@ -1716,14 +1681,14 @@ namespace wali {
 #endif
 #if defined(PPP_DBG) && PPP_DBG >= 2
           cout << "Weights after saturateCount" << saturateCount << 
-            ", round " << round << "\n";
+            ", round " << numRounds << "\n";
           cout << "NODES \n";
           cout << "node0:\n";
           if(nodes[0].weight != NULL){
             nodes[0].weight->print(cout);
             cout << "\n";
             SemElemTensor * wt =
-              dynamic_cast<SemElemTensor*>(nodes[0].weight.get_ptr());
+              boost::polymorphic_downcast<SemElemTensor*>(nodes[0].weight.get_ptr());
             (wt->detensorTranspose())->print(cout);
           }
           else
@@ -1737,7 +1702,7 @@ namespace wali {
               nodes[i].weight->print(cout);
               cout << "\n";
               sem_elem_tensor_t wt =
-                dynamic_cast<SemElemTensor*>(nodes[i].weight.get_ptr());
+                boost::polymorphic_downcast<SemElemTensor*>(nodes[i].weight.get_ptr());
               wt = wt->detensorTranspose();
               wt->print(cout);
             }
@@ -1759,7 +1724,7 @@ namespace wali {
               edges[i].weight->print(cout);
               cout << "\n";
               sem_elem_tensor_t wt =
-                dynamic_cast<SemElemTensor*>(edges[i].weight.get_ptr());
+                boost::polymorphic_downcast<SemElemTensor*>(edges[i].weight.get_ptr());
               wt = wt->detensorTranspose();
               wt->print(cout);
             }
@@ -1771,5 +1736,10 @@ namespace wali {
       }
     }
 
+    void IntraGraph::markLabels()
+    {
+      for(int i=0; i < nnodes; ++i)
+        nodes[i].markLabel();
+    }
   } // namespace graph
 } // namespace wali

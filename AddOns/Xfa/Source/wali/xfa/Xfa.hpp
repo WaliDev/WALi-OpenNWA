@@ -216,9 +216,12 @@ namespace wali {
             /// is semi-state-deterministic.
             ///
             /// @see wali::wfa::WFA::semideterminize
-            wali::wfa::WFA
+            Xfa
             semideterminize() const {
-                return wfa_.semideterminize();
+                assert(false);
+                Xfa ret;
+                ret.wfa_ = wfa_.semideterminize();
+                return ret;
             }
 
 
@@ -238,13 +241,20 @@ namespace wali {
             Xfa
             intersect(Xfa const & other) const {
                 Xfa output;
+                //details::IntersectionWeightMaker maker;
+                this->wfa_.intersect(other.wfa_, output.wfa_);
+                return output;
+            }
+
+            Xfa
+            intersect_conjoin(Xfa const & other) const {
+                Xfa output;
                 details::IntersectionWeightMaker maker;
                 this->wfa_.intersect(maker, other.wfa_, output.wfa_);
                 return output;
             }
         };
-
-
+        
 
         /// Converts an NWA (from OpenNWA) into an Xfa. The NWA should only
         /// have internal transitions.
@@ -345,9 +355,21 @@ namespace wali {
                                           wali::Key symbol,
                                           wali::Key target,
                                           sem_elem_t orig_weight) const;
+
+            virtual
+            sem_elem_t
+            liftAcceptWeight(wali::wfa::WFA const & UNUSED_PARAMETER(original_wfa),
+                             wali::Key state,
+                             sem_elem_t original_accept_weight) const;
         };
 
         
+        extern
+        std::vector<std::map<std::string, int> >
+        get_vars(XfaAst const & ast,
+                 int fdd_size,
+                 std::string const & prefix);
+
         extern
         Xfa
         from_parser_ast(XfaAst const & ast,
@@ -389,6 +411,10 @@ namespace wali {
                                    ) CPP11_OVERRIDE;
         };
         
+        bool
+        language_contains(Xfa const & left, Xfa const & right,
+                          wali::domains::binrel::ProgramBddContext const & voc);
+
     }
 }
 

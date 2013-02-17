@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 #include <map>
+#include <boost/cast.hpp>
 
 using namespace std;
 using namespace wali;
@@ -293,6 +294,61 @@ namespace wali
           }
         }
 
+
+        // Forward declaration of static procedures to remove skip statements from the program.
+        static void remove_skip_in_prog(prog * pg);
+        static stmt_list * remove_skip_in_stmt_list(stmt_list * sl);
+
+        static void remove_skip_in_prog(prog * pg)
+        {
+          assert(pg && "remove_skip_in_prog");
+          proc_list * pl = pg->pl;
+          while(pl){
+            if(pl->p->sl){
+              pl->p->sl = remove_skip_in_stmt_list(pl->p->sl);
+              if(pl->p->sl == NULL){
+                // Don't empty a previously non-empty proc
+                pl->p->sl = make_stmt_list_item(make_skip_stmt());
+              }
+
+            }
+
+            pl = pl->n;
+          }
+        }
+
+        // Also rewrite tail for the whole stmt_list. That's easier, trust me.
+        static stmt_list * remove_skip_in_stmt_list(stmt_list *sl)
+        {
+          if(sl == NULL)
+            return NULL;
+          assert(sl && sl->s && "remove_skip_in_stmt_list");
+          if(sl->s->sl1){
+            sl->s->sl1 = remove_skip_in_stmt_list(sl->s->sl1);
+            if(sl->s->sl1 == NULL){
+              //Can't make it null, this will become an if statement w/o any stmt_list
+              sl->s->sl1 = make_stmt_list_item(make_skip_stmt());
+            }
+          }
+          if(sl->s->sl2)
+            sl->s->sl2 = remove_skip_in_stmt_list(sl->s->sl2);
+
+          stmt_list * cl = remove_skip_in_stmt_list(sl->n);
+          if(sl->s->op == AST_SKIP){
+            sl->n = NULL;
+            deep_erase_stmt_list(&sl);
+            return cl;
+          }else{
+            sl->n = cl;
+            if(cl == NULL)
+              sl->t = sl;
+            else
+              sl->t = cl->t;
+            return sl;
+          }
+        }
+
+
         // Forward declaration of static procedures having to do with instrumenting enforce conditions.
         // The semantics of the enforce is to assume that the given condition is true at every point in the
         // given procedure, i.e., we begin by assuming that the condition holds at entry, and then assume 
@@ -580,8 +636,8 @@ namespace wali
 
       BddContext * dump_pds_from_prog(wpds::WPDS * pds, prog * pg)
       {
-        //ProgramBddContext * con = new ProgramBddContext(20*MILLION, 20 * MILLION); 
-        ProgramBddContext * con = new ProgramBddContext(); 
+        ProgramBddContext * con = new ProgramBddContext(100*MILLION, 10*MILLION); 
+        //ProgramBddContext * con = new ProgramBddContext(); 
 
         map<string, int> vars;
 
@@ -718,7 +774,7 @@ namespace wali
           stmt_ptr_proc_ptr_hash_map& call_to_callee, const char * f, stmt * ns)
       {
         binrel_t temp = new BinRel(con, con->True());
-        binrel_t one = dynamic_cast<BinRel*>(temp->one().get_ptr());
+        binrel_t one = boost::polymorphic_downcast<BinRel*>(temp->one().get_ptr());
         bdd b, b1;
         str_list * vl;
         expr_list * el;
@@ -761,6 +817,15 @@ namespace wali
             while(vl || el){
               if(!vl || !el)
                 assert(0 && "[dump_pds_from_stmt] Assignment should have the same number of lhs/rhs");
+              // Special case added after correspondance with Tom Ball.
+              // Assignments of the type _ = <exp> are dummy assignments 
+              // that we don't care about.
+              if(strcmp(vl->v,"_") == 0){
+                cout << "Skipped assignment to dummy variable _" << endl;
+                vl = vl->n;
+                el = el->n;
+                continue;
+              }
               stringstream ss;
               ss << f << "::" << vl->v;
               if(con->find(ss.str()) != con->end()){
@@ -770,7 +835,11 @@ namespace wali
                 ss2 << "::" << vl->v;           
                 lhs = string(ss2.str());
               }
-              b = b & con->Assign(lhs, expr_as_bdd(el->e, con, f));
+              if(con->find(lhs) == con->end()){
+                cout << "Unknown variable: [" << vl->v << "]" << endl;
+                assert(0);
+              }
+              b = bdd_exist(b, fdd_ithset((*con)[lhs]->baseRhs)) & con->Assign(lhs, expr_as_bdd(el->e, con, f));
               vl = vl->n;
               el = el->n;
             }
@@ -889,6 +958,7 @@ namespace wali
     {
       assert(pg);
       BddContext * con = dump_pds_from_prog(pds, pg);
+      pds->printStatistics(cout);
       return con;
     }
     /*
@@ -949,6 +1019,12 @@ namespace wali
       fprintf(stdout, "#local vars: \t\t%u\n", vc);
       fprintf(stdout, "#total vars: \t\t\t%u\n", vc + gvc);
       fprintf(stdout, "\n");      
+    }
+
+    // May be called any time.
+    void remove_skip(prog * pg)
+    {
+      remove_skip_in_prog(pg);
     }
 
     void instrument_enforce(prog * pg)

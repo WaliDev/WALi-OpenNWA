@@ -1,3 +1,10 @@
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/string.hpp>
+#include <boost/serialization/base_object.hpp>
+
 #include "ProgramBddContext.hpp"
 
 #include "glog/logging.h"
@@ -240,6 +247,13 @@ void ProgramBddContext::setIntVars(const std::map<std::string, int>& inflatvars)
 {
   // copy inflatvars because we mess with it.
   std::map<std::string, int> flatvars = inflatvars;
+  
+  // Remember creation history
+  CreationCall cc;
+  cc.cf = SET_INT_MAP;
+  cc.arg.push_back(flatvars);
+  creationHistory.push_back(cc);
+  
   // Add extra variables at the end of the variables passed in.
   unsigned size = 0;
   for(std::map<std::string, int>::const_iterator ci = flatvars.begin(); ci != flatvars.end(); ++ci)
@@ -274,6 +288,13 @@ void ProgramBddContext::setIntVars(const std::map<std::string, int>& inflatvars)
 
 void ProgramBddContext::setIntVars(const std::vector<std::map<std::string, int> >& vars)
 {
+  //Remember Creation history
+  CreationCall cc;
+  cc.cf = SET_INT_VECT;
+  for(vector< map< string, int > >::const_iterator cit = vars.begin(); cit != vars.end(); ++cit)
+    cc.arg.push_back(*cit);
+  creationHistory.push_back(cc);
+
   createIntVars(vars);
   createExtraVars();
   BddContext::setupCachedBdds();
@@ -290,7 +311,8 @@ void ProgramBddContext::createExtraVars()
   maxSize = size;
 
   // Now create some buddy levels for scratchpad
-  int domains[7] = {size + 1, size, size, size, size, size, size};
+  int isize = (int) size;
+  int domains[7] = {isize + 1, isize, isize, isize, isize, isize, isize};
   int base = fdd_extdomain(domains,7);
 
   // Now create the corresponding bddinfo
@@ -337,11 +359,19 @@ void ProgramBddContext::setupCachedBdds()
 
 void ProgramBddContext::addIntVar(std::string name, unsigned siz)
 {
+  //Remember Creation history
+  CreationCall cc;
+  cc.cf = ADD_INT;
+  map< string, int > m;
+  m[name] = siz;
+  cc.arg.push_back(m);
+  creationHistory.push_back(cc);
+
   BddContext::addIntVar(name,siz);
   if(siz > maxSize){
     if(maxSize == 0){
       //This is when we *create* the extra levels needed
-      int domains[1] = {siz+1};
+      int domains[1] = {(int)siz+1};
       int retSizeInfo = fdd_extdomain(domains,1);
       if(retSizeInfo < 0)
         LOG(FATAL) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(retSizeInfo) << "\"" << endl
@@ -355,7 +385,7 @@ void ProgramBddContext::addIntVar(std::string name, unsigned siz)
       //We will create indices such that we get a default variable ordering where
       //baseLhs, baseRhs, baseExtra are mixed.
       {
-        int domains2[3] = {siz, siz, siz};
+        int domains2[3] = {(int)siz, (int)siz, (int)siz};
         regAInfo = new BddInfo();
         //Create fdds for base
         int base = fdd_extdomain(domains2,3);
@@ -374,7 +404,7 @@ void ProgramBddContext::addIntVar(std::string name, unsigned siz)
         idx2Name[regAInfo->baseExtra] = "__regA''";
       }
       {
-        int domains2[3] = {siz, siz, siz};
+        int domains2[3] = {(int)siz, (int)siz, (int)siz};
         regBInfo = new BddInfo();
         //Create fdds for base
         int base = fdd_extdomain(domains2,3);
@@ -553,7 +583,7 @@ bdd ProgramBddContext::From(std::string var) const
   bdd ret = bddfalse;
   ProgramBddContext::const_iterator iter = (this->find(var));
   if(iter == this->end())
-    LOG(FATAL) << "Attempted From () on \"" << var << "\". I don't recognize this name\n";
+    LOG(FATAL) << "attempted from () on \"" << var << "\". i don't recognize this name\n";
   const bddinfo_t bi = iter->second;
   for(unsigned i = 0; i < bi->maxVal; ++i)
     ret = ret | (fdd_ithvar(bi->baseLhs, i) & fdd_ithvar(regAInfo->baseRhs, i));
@@ -689,6 +719,84 @@ bdd ProgramBddContext::Div(bdd lexpr, bdd rexpr) const
   return applyBinOp(lexpr, rexpr, bddDiv(in1,in2));
 }
 #endif
+
+bdd ProgramBddContext::setPre(std::string var) const
+{
+  bdd ret;
+  ProgramBddContext::const_iterator iter = (this->find(var));
+  if(iter == this->end())
+    LOG(FATAL) << "attempted setPre () on \"" << var << "\". i don't recognize this name\n";
+  const bddinfo_t bi = iter->second;
+  for(unsigned i = 0; i < bi->maxVal; ++i)
+    ret = fdd_ithvar(bi->baseLhs, 1);
+  ret = bdd_exist(ret, fdd_ithset(sizeInfo));
+  return ret;
+}
+
+bdd ProgramBddContext::unsetPre(std::string var) const
+{
+  bdd ret;
+  ProgramBddContext::const_iterator iter = (this->find(var));
+  if(iter == this->end())
+    LOG(FATAL) << "attempted unsetPre () on \"" << var << "\". i don't recognize this name\n";
+  const bddinfo_t bi = iter->second;
+  for(unsigned i = 0; i < bi->maxVal; ++i)
+    ret = fdd_ithvar(bi->baseLhs, 0);
+  ret = bdd_exist(ret, fdd_ithset(sizeInfo));
+  return ret;
+}
+bdd ProgramBddContext::setPre(std::string var, unsigned val) const
+{
+  bdd ret;
+  ProgramBddContext::const_iterator iter = (this->find(var));
+  if(iter == this->end())
+    LOG(FATAL) << "attempted setPre () on \"" << var << "\". i don't recognize this name\n";
+  const bddinfo_t bi = iter->second;
+  if(val > bi->maxVal)
+    LOG(FATAL) << "setPre: val too large\n";
+  for(unsigned i = 0; i < bi->maxVal; ++i)
+    ret = fdd_ithvar(bi->baseLhs, val);
+  ret = bdd_exist(ret, fdd_ithset(sizeInfo));
+  return ret;
+}
+bdd ProgramBddContext::setPost(std::string var) const
+{
+  bdd ret;
+  ProgramBddContext::const_iterator iter = (this->find(var));
+  if(iter == this->end())
+    LOG(FATAL) << "attempted setPoist () on \"" << var << "\". i don't recognize this name\n";
+  const bddinfo_t bi = iter->second;
+  for(unsigned i = 0; i < bi->maxVal; ++i)
+    ret = fdd_ithvar(bi->baseRhs, 1);
+  ret = bdd_exist(ret, fdd_ithset(sizeInfo));
+  return ret;
+}
+bdd ProgramBddContext::unsetPost(std::string var) const
+{
+  bdd ret;
+  ProgramBddContext::const_iterator iter = (this->find(var));
+  if(iter == this->end())
+    LOG(FATAL) << "attempted unsetPost () on \"" << var << "\". i don't recognize this name\n";
+  const bddinfo_t bi = iter->second;
+  for(unsigned i = 0; i < bi->maxVal; ++i)
+    ret = fdd_ithvar(bi->baseRhs, 0);
+  ret = bdd_exist(ret, fdd_ithset(sizeInfo));
+  return ret;
+}
+bdd ProgramBddContext::setPost(std::string var, unsigned val) const
+{
+  bdd ret;
+  ProgramBddContext::const_iterator iter = (this->find(var));
+  if(iter == this->end())
+    LOG(FATAL) << "attempted setPost () on \"" << var << "\". i don't recognize this name\n";
+  const bddinfo_t bi = iter->second;
+  if(val > bi->maxVal)
+    LOG(FATAL) << "setPost: val too large\n";
+  for(unsigned i = 0; i < bi->maxVal; ++i)
+    ret = fdd_ithvar(bi->baseLhs, val);
+  ret = bdd_exist(ret, fdd_ithset(sizeInfo));
+  return ret;
+}
 
 bdd ProgramBddContext::bddAnd() const
 {
@@ -926,7 +1034,8 @@ bdd ProgramBddContext::Assign(std::string var, bdd expr) const
   bddinfo_t bi;
   if(this->find(var) == this->end()){
     LOG(WARNING) << "[ProgramBddContext::Assign] Unknown Variable: " << var;
-    return bddfalse;
+    //This is a safe result. We assume that anything can be assigned to anything!
+    return bddtrue;
   }else{
     bi = this->find(var)->second;
   }
@@ -994,12 +1103,17 @@ bdd ProgramBddContext::Assume(bdd expr1, bdd expr2) const
         regBInfo->baseExtra
         );
 
+  // expr1 and expr2 can have different regSize.
+  // In that case, only the smaller number of bits are constrainted.
+  expr1 = bdd_exist(expr1, fdd_ithset(sizeInfo));
+  expr2 = bdd_exist(expr2, fdd_ithset(sizeInfo));
+
   bdd ret = expr1 & expr2 & equate;
 
   ret = bdd_exist(ret, fdd_ithset(regAInfo->baseExtra));
   ret = bdd_exist(ret, fdd_ithset(regBInfo->baseExtra));
 
-  return bdd_exist(ret, fdd_ithset(sizeInfo));
+  return ret;
 }
 
 bdd ProgramBddContext::tGetRandomTransformer(bool isTensored, unsigned seed) const
@@ -1054,6 +1168,83 @@ bdd ProgramBddContext::tGetRandomTransformer(bool isTensored, unsigned seed) con
   return ret;
 }
 
+void ProgramBddContext::printHistory(std::ostream& o) const
+{
+  boost::archive::text_oarchive oa(o);
+  oa << creationHistory;
+}
+
+ProgramBddContext * ProgramBddContext::buildFromHistory(std::istream& in)
+{
+  CreationHistory ch;
+  boost::archive::text_iarchive ia(in);
+  ia >> ch;
+
+  ProgramBddContext * con = new ProgramBddContext();
+  for(CreationHistory::const_iterator ci = ch.begin(); ci != ch.end(); ++ci){
+    CreationCall cc = *ci;
+    switch(cc.cf){
+      case SET_INT_VECT:
+        con->setIntVars(cc.arg);
+        break;
+      case SET_INT_MAP:
+        con->setIntVars(cc.arg[0]);
+        break;
+      case ADD_INT:        
+        {
+          map< string, int >::iterator m = cc.arg[0].begin();
+          con->addIntVar(m->first, m->second);
+        }
+        break;
+      case ADD_BOOL:
+      default:
+        assert(0);
+    }
+  }
+  return con;
+}
+
+template<class Archive>
+void ProgramBddContext::CreationCall::serialize(Archive &ar, const unsigned int)
+{
+  //ignore file_version
+  ar & cf;
+  ar & arg;
+}
+
+ostream& ProgramBddContext::CreationCall::print(ostream& o) const
+{
+  switch(cf){
+    case SET_INT_VECT:
+      o << "SET_INT_VECT";
+      break;
+    case SET_INT_MAP:
+      o << "SET_INT_MAP";
+      break;
+    case ADD_INT:
+      o << "ADD_INT";
+      break;
+    case ADD_BOOL:
+      o << "ADD_BOOL";
+      break;
+    default:
+      o << "UNKNOWN";
+  }
+  o << ": ";
+  for(vector< map< string, int > >::const_iterator cvi = arg.begin(); cvi != arg.end(); ++cvi){
+    o << "{";
+    bool first = true;
+    for(map< string, int >::const_iterator cmi = cvi->begin(); cmi != cvi->end(); ++cmi){
+      if(!first)
+        o << ", ";
+      o << cmi->first << ": " << cmi->second;
+      first = false;
+    }
+    o << "}";
+  }
+  o << endl;
+  return o;
+}
 // Yo, Emacs!
 // Local Variables:
 //   c-file-style: "ellemtel"

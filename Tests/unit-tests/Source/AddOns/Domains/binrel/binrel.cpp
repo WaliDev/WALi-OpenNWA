@@ -10,6 +10,7 @@
 #include <string>
 #include <cstdlib>
 #include <map>
+#include <boost/cast.hpp>
 
 #include <boost/static_assert.hpp>
 
@@ -246,8 +247,8 @@ namespace{
     EXPECT_TRUE(compareOutput("BinRelTestBool","extendTests",ss));
 
     binrel_t be1,be2;
-    be1 = dynamic_cast<BinRel*>(se1.get_ptr());
-    be2 = dynamic_cast<BinRel*>(se2.get_ptr());
+    be1 = boost::polymorphic_downcast<BinRel*>(se1.get_ptr());
+    be2 = boost::polymorphic_downcast<BinRel*>(se2.get_ptr());
 
     EXPECT_TRUE(se1->extend(se2.get_ptr())->equal((be1 * be2).get_ptr()));
     EXPECT_TRUE(se2->extend(se1.get_ptr())->equal((be2 * be1).get_ptr()));
@@ -276,8 +277,8 @@ namespace{
     EXPECT_TRUE(compareOutput("BinRelTestBool","combineTests",ss));
 
     binrel_t be1,be2;
-    be1 = dynamic_cast<BinRel*>(se1.get_ptr());
-    be2 = dynamic_cast<BinRel*>(se2.get_ptr());
+    be1 = boost::polymorphic_downcast<BinRel*>(se1.get_ptr());
+    be2 = boost::polymorphic_downcast<BinRel*>(se2.get_ptr());
     EXPECT_TRUE(se1->combine(se2.get_ptr())->equal((be1 | be2).get_ptr()));
   }
 
@@ -330,7 +331,7 @@ namespace{
     sem_elem_tensor_t se3 = se1->tensor(se2.get_ptr());
     sem_elem_tensor_t se4 = se3->detensor();
     sem_elem_tensor_t se5 =
-      dynamic_cast<SemElemTensor*>(se1->extend(se2.get_ptr()).get_ptr());
+      boost::polymorphic_downcast<SemElemTensor*>(se1->extend(se2.get_ptr()).get_ptr());
 
     se1->print(ss << "se1: ") << endl;
     se2->print(ss << "se2: ") << endl;
@@ -352,11 +353,11 @@ namespace{
     sem_elem_tensor_t se3 = se1->tensor(se2.get_ptr());
     sem_elem_tensor_t se4 = se3->detensor();
     sem_elem_tensor_t se5 =
-      dynamic_cast<SemElemTensor*>(se1->extend(se2.get_ptr()).get_ptr());
+      boost::polymorphic_downcast<SemElemTensor*>(se1->extend(se2.get_ptr()).get_ptr());
     sem_elem_tensor_t se6 = se2->tensor(se1.get_ptr());
     sem_elem_tensor_t se7 = se6->detensorTranspose();
     sem_elem_tensor_t se8 =
-      dynamic_cast<SemElemTensor*>(se2->extend(se1.get_ptr()).get_ptr());
+      boost::polymorphic_downcast<SemElemTensor*>(se2->extend(se1.get_ptr()).get_ptr());
 
     EXPECT_TRUE(se5->equal(se4.get_ptr()));
     EXPECT_TRUE(se8->equal(se7.get_ptr()));
@@ -378,13 +379,13 @@ namespace{
 
   sem_elem_tensor_t BinRelTestInt::screenVar(string var, sem_elem_tensor_t wt){
     sem_elem_tensor_t screen = new BinRel(brm.get_ptr(),brm->Assume(brm->From(var),brm->Const(0)), false);
-    return dynamic_cast<SemElemTensor*>(wt->extend(screen.get_ptr()).get_ptr());
+    return boost::polymorphic_downcast<SemElemTensor*>(wt->extend(screen.get_ptr()).get_ptr());
   }
 
   TEST_F(BinRelTestInt,testScreen){
     stringstream ss;
     sem_elem_tensor_t wt = new BinRel(brm.get_ptr(),brm->Const(0), false);
-    wt = dynamic_cast<SemElemTensor*>(wt->one().get_ptr());
+    wt = boost::polymorphic_downcast<SemElemTensor*>(wt->one().get_ptr());
     wt->print(ss << "W[1]: ") << endl;
     wt = screenVar("a",wt);
     wt->print(ss << "W[1 & a==0]: ") << endl;
@@ -559,10 +560,10 @@ namespace{
 
       w1 = b1->tensor(b2.get_ptr());
       w2 = b3->tensor(b4.get_ptr());
-      w1 = dynamic_cast<SemElemTensor*>(w1->extend(w2.get_ptr()).get_ptr());
+      w1 = boost::polymorphic_downcast<SemElemTensor*>(w1->extend(w2.get_ptr()).get_ptr());
 
-      w3 = dynamic_cast<SemElemTensor*>(b1->extend(b3.get_ptr()).get_ptr());
-      w4 = dynamic_cast<SemElemTensor*>(b2->extend(b4.get_ptr()).get_ptr());
+      w3 = boost::polymorphic_downcast<SemElemTensor*>(b1->extend(b3.get_ptr()).get_ptr());
+      w4 = boost::polymorphic_downcast<SemElemTensor*>(b2->extend(b4.get_ptr()).get_ptr());
       w3 = w3->tensor(w4.get_ptr());
 
       if(!w1->equal(w3) || dump){
@@ -576,7 +577,7 @@ namespace{
         w1->print(ss << "(b1,b2): ") << endl;
         w2 = b3->tensor(b4.get_ptr());
         w2->print(ss << "(b3,b4): ") << endl;
-        w1 = dynamic_cast<SemElemTensor*>(w1->extend(w2.get_ptr()).get_ptr());
+        w1 = boost::polymorphic_downcast<SemElemTensor*>(w1->extend(w2.get_ptr()).get_ptr());
         w1->print(ss << "(b1,b2) & (b3,b4): ") << endl;
 
 
@@ -584,9 +585,9 @@ namespace{
         b2->print(ss << "b2: ") << endl;
         b3->print(ss << "b3: ") << endl;
         b4->print(ss << "b4: ") << endl;
-        w3 = dynamic_cast<SemElemTensor*>(b1->extend(b3.get_ptr()).get_ptr());
+        w3 = boost::polymorphic_downcast<SemElemTensor*>(b1->extend(b3.get_ptr()).get_ptr());
         w3->print(ss << "b1 & b3: ") << endl;
-        w4 = dynamic_cast<SemElemTensor*>(b2->extend(b4.get_ptr()).get_ptr());
+        w4 = boost::polymorphic_downcast<SemElemTensor*>(b2->extend(b4.get_ptr()).get_ptr());
         w4->print(ss << "b2 & b4: ") << endl;
         w3 = w3->tensor(w4.get_ptr());
         w3->print(ss << "(b1 & b3,b2 & b4): ") << endl;
@@ -594,19 +595,19 @@ namespace{
         failed = true;
       }
 
-      w1 = dynamic_cast<SemElemTensor*>(t1->combine(t2.get_ptr()).get_ptr());
+      w1 = boost::polymorphic_downcast<SemElemTensor*>(t1->combine(t2.get_ptr()).get_ptr());
       w1 = w1->detensor();
 
       w2 = t1->detensor();
       w3 = t2->detensor();
-      w2 = dynamic_cast<SemElemTensor*>(w2->combine(w3.get_ptr()).get_ptr());
+      w2 = boost::polymorphic_downcast<SemElemTensor*>(w2->combine(w3.get_ptr()).get_ptr());
 
       if(!w1->equal(w2) || dump){
         ss << "#################################\nD(t1 | t2) <> D(t1) | D(t2)\n\n";
         t1->print(ss << "t1: ") << endl;
         t2->print(ss << "t2: ") << endl;
 
-        w1 = dynamic_cast<SemElemTensor*>(t1->combine(t2.get_ptr()).get_ptr());
+        w1 = boost::polymorphic_downcast<SemElemTensor*>(t1->combine(t2.get_ptr()).get_ptr());
         w1->print(ss << "t1 | t2: ") << endl;
         w1 = w1->detensor();
         w1->print(ss << "D(t1 | t2): ") << endl;
@@ -615,7 +616,7 @@ namespace{
         w2->print(ss << "D(t1): ") << endl;
         w3 = t2->detensor();
         w3->print(ss << "D(t2): ") << endl;
-        w2 = dynamic_cast<SemElemTensor*>(w2->combine(w3.get_ptr()).get_ptr());
+        w2 = boost::polymorphic_downcast<SemElemTensor*>(w2->combine(w3.get_ptr()).get_ptr());
         w2->print(ss << "D(t1) | D(t2): ") << endl;
 
         failed = true;
@@ -624,7 +625,7 @@ namespace{
       w1 = b1->tensor(b2.get_ptr());
       w1 = w1->detensor();
 
-      w2 = dynamic_cast<SemElemTensor*>(b1->extend(b2.get_ptr()).get_ptr());
+      w2 = boost::polymorphic_downcast<SemElemTensor*>(b1->extend(b2.get_ptr()).get_ptr());
 
       if(!w1->equal(w2) || dump){
         ss << "#################################\nD((b1, b2)) <> b1 & b2\n\n";
@@ -635,7 +636,7 @@ namespace{
         w1 = w1->detensor();
         w1->print(ss << "D((b1,r2)): ") << endl;
 
-        w2 = dynamic_cast<SemElemTensor*>(b1->extend(b2.get_ptr()).get_ptr());
+        w2 = boost::polymorphic_downcast<SemElemTensor*>(b1->extend(b2.get_ptr()).get_ptr());
         w2->print(ss << "b1 & b2: ") << endl;
 
         failed = true;
@@ -1004,19 +1005,19 @@ namespace{
     c = c->combine(a);
 
 
-    sem_elem_tensor_t e = dynamic_cast<SemElemTensor*>(a.get_ptr());
-    sem_elem_tensor_t f = dynamic_cast<SemElemTensor*>(b.get_ptr());
+    sem_elem_tensor_t e = boost::polymorphic_downcast<SemElemTensor*>(a.get_ptr());
+    sem_elem_tensor_t f = boost::polymorphic_downcast<SemElemTensor*>(b.get_ptr());
     sem_elem_tensor_t g,h;
 
-    g = dynamic_cast<SemElemTensor*>(f.get_ptr());
+    g = boost::polymorphic_downcast<SemElemTensor*>(f.get_ptr());
     g = g->transpose();
 
     g = e->tensor(f.get_ptr());
     h = e->tensor(f.get_ptr());
 
-    g = dynamic_cast<SemElemTensor*>(g->extend(h.get_ptr()).get_ptr());
-    g = dynamic_cast<SemElemTensor*>(g->extend(h.get_ptr()).get_ptr());
-    g = dynamic_cast<SemElemTensor*>(g->combine(h.get_ptr()).get_ptr());
+    g = boost::polymorphic_downcast<SemElemTensor*>(g->extend(h.get_ptr()).get_ptr());
+    g = boost::polymorphic_downcast<SemElemTensor*>(g->extend(h.get_ptr()).get_ptr());
+    g = boost::polymorphic_downcast<SemElemTensor*>(g->combine(h.get_ptr()).get_ptr());
 
     c = g->detensor();
     c = h->detensorTranspose();
@@ -1035,11 +1036,11 @@ namespace{
     brm->addBoolVar("b");
 
     binrel_t a = new BinRel(brm.get_ptr(), brm->True());
-    a = dynamic_cast<BinRel*>(a->one().get_ptr());
+    a = boost::polymorphic_downcast<BinRel*>(a->one().get_ptr());
 
-    binrel_t b = dynamic_cast<BinRel*>(a->tensor(a.get_ptr()).get_ptr());
+    binrel_t b = boost::polymorphic_downcast<BinRel*>(a->tensor(a.get_ptr()).get_ptr());
     b->print(cout) << std::endl;
-    binrel_t wt = dynamic_cast<BinRel*>(b->detensorTranspose().get_ptr());
+    binrel_t wt = boost::polymorphic_downcast<BinRel*>(b->detensorTranspose().get_ptr());
     if(wt == NULL){
       ASSERT_TRUE(false);
       return;
@@ -1112,7 +1113,7 @@ namespace{
     }
   }
 
-#if defined(TENSOR_MATCHED_PAREN)
+#if defined(TENSOR_MATCHED_PAREN) && defined(NWA_DETENSOR) && 0
   TEST(BddContext, bitLevelInfo)
   {
     program_bdd_context_t con;
@@ -1305,6 +1306,27 @@ namespace{
     }
   }
 
+  TEST(wali$domains$binrel$ProgramBddContext$printHistoryAndRecreate, setIntVarsMap)
+  {
+    stringstream ss;
+    ProgramBddContext * con = new ProgramBddContext();
+    std::map<string, int> m;
+    m["a"] = 3;
+    m["b"] = 4;
+    con->setIntVars(m);
+    con->printHistory(ss);
+
+    ProgramBddContext * hist;
+    hist = ProgramBddContext::buildFromHistory(ss);
+    BddContext::const_iterator cit = con->begin();
+    ASSERT_TRUE(string("a") == cit->first);
+    ASSERT_TRUE(3 == cit->second->maxVal);
+    ++cit;
+    ASSERT_TRUE(string("b") == cit->first);
+    ASSERT_TRUE(4 == cit->second->maxVal);
+    delete con;
+    delete hist;
+  }
 
   TEST(wali$domains$binrel$$BinRel$$underApproximates, bddContainmentChecks)
   {
@@ -1336,6 +1358,40 @@ namespace{
   }
   
 
+  TEST(wali$domains$binrel$ProgramBddContext$printHistoryAndRecreate, bddSaveNRestore)
+  {
+    stringstream ss;
+    {
+      ProgramBddContext * con = new ProgramBddContext();
+      std::map<string, int> m;
+      m["a"] = 3;
+      m["b"] = 4;
+      con->setIntVars(m);
+      bdd b = con->Assign("a", con->From("b"));
+      con->printHistory(ss);
+      bdd_fnsave("dusty_bdd", b);
+      delete con;
+    }
+    ProgramBddContext * hist;
+    hist = ProgramBddContext::buildFromHistory(ss);
+    bdd c;
+    bdd_fnload("dusty_bdd", c);
+    bdd d = hist->Assign("a", hist->From("b"));
+    ASSERT_EQ(c,d);
+    delete hist;
+  }
+  
+  TEST(wali$domains$binrel$$BinRel$$Assume, differentVocSizes)
+  {
+    ProgramBddContext p;
+    map< string, int> m;
+    m["a"] = 2;
+    m["b"] = 4;
+    p.setIntVars(m);
+
+    bdd b = p.Assume(p.From("a"), p.Const(0));
+    ASSERT_NE(b, bddfalse);
+  }
 } //namespace
 
 

@@ -522,7 +522,6 @@ private:
    
    friend bdd    fdd_ithvarpp(int, int);
    friend bdd    fdd_ithsetpp(int);
-//   friend bdd    fdd_biimppp(int, int, int);
    friend bdd    fdd_domainpp(int);
    friend int    fdd_scanvar(const bdd &, int);
    friend int*   fdd_scanallvar(const bdd &);
@@ -546,6 +545,10 @@ private:
    friend bdd  bvec_gte(const bvec &left, const bvec &right);
    friend bdd  bvec_equ(const bvec &left, const bvec &right);
    friend bdd  bvec_neq(const bvec &left, const bvec &right);
+
+   /** Added for nwa_detensor **/
+   friend void bdd_fprintdot_levels(FILE *ofile, bdd r);
+   friend size_t hash_value(bdd const& b); 
 };
 
 

@@ -347,6 +347,62 @@ namespace wali {
             EXPECT_EQ_REACHABLE(expected, reachable);
         }
 
+        TEST(wali$wfa$WFA$$computeAllReachingWeights, cycleKeepingMin)
+        {
+            Key start = getKey("start"), other = getKey("other"), final = getKey("final"), sym = getKey("sym");
+            sem_elem_t distance_one = new LongestSaturatingPathSemiring(1, 5);
+            sem_elem_t distance_two = new LongestSaturatingPathSemiring(2, 5);
+            sem_elem_t distance_three = new LongestSaturatingPathSemiring(3, 5);
+            sem_elem_t distance_four = new LongestSaturatingPathSemiring(4, 5);
+            sem_elem_t distance_five = new LongestSaturatingPathSemiring(5, 5);
+            sem_elem_t zero = distance_one->zero();
+
+            //         <----------------
+            //   start ----------------> final
+            WFA wfa;
+            wfa.addState(start, zero);
+            wfa.addState(other, zero);
+            wfa.setInitialState(start);
+            wfa.addTrans(start, sym, final, distance_one);
+            wfa.addTrans(final, sym, start, distance_one);
+
+            WFA::AccessibleStateSetMap expected;
+            expected[start] = make_vector(zero->one());
+            expected[final] = make_vector(distance_one);
+
+            WFA::AccessibleStateSetMap reachable = wfa.computeAllReachingWeights(SemElemSet::KeepMinimalElements);
+
+            EXPECT_EQ_REACHABLE(expected, reachable);
+        }
+
+        TEST(wali$wfa$WFA$$computeAllReachingWeights, cycleKeepingMax)
+        {
+            Key start = getKey("start"), other = getKey("other"), final = getKey("final"), sym = getKey("sym");
+            sem_elem_t distance_one = new LongestSaturatingPathSemiring(1, 5);
+            sem_elem_t distance_two = new LongestSaturatingPathSemiring(2, 5);
+            sem_elem_t distance_three = new LongestSaturatingPathSemiring(3, 5);
+            sem_elem_t distance_four = new LongestSaturatingPathSemiring(4, 5);
+            sem_elem_t distance_five = new LongestSaturatingPathSemiring(5, 5);
+            sem_elem_t zero = distance_one->zero();
+
+            //         <----------------
+            //   start ----------------> final
+            WFA wfa;
+            wfa.addState(start, zero);
+            wfa.addState(other, zero);
+            wfa.setInitialState(start);
+            wfa.addTrans(start, sym, final, distance_one);
+            wfa.addTrans(final, sym, start, distance_one);
+
+            WFA::AccessibleStateSetMap expected;
+            expected[start] = make_vector(distance_five);
+            expected[final] = make_vector(distance_five);
+
+            WFA::AccessibleStateSetMap reachable = wfa.computeAllReachingWeights(SemElemSet::KeepMaximalElements);
+
+            EXPECT_EQ_REACHABLE(expected, reachable);
+        }
+
     }
 }
 

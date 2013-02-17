@@ -51,10 +51,15 @@ else:
 built = [env.Install(LibInstallDir, bpparser)]
 
 penv = env.Clone()
-penv.Append(LIBS = ['bpparser', 'walidomains', 'glog', 'bdd']);
+penv.Append(LIBS = ['bpparser', 'walidomains', 'glog', 'bdd', 'pthread']); #'tcmalloc_minimal'
+
+penv.Append(LIBPATH = ['/unsup/gperftools-2.0/lib'])
+penv.Append(RPATH = ['/unsup/gperftools-2.0/lib'])
+penv.Append(LIBS = ['profiler'])
 built += penv.Program('PrintBplStats.cpp')
 built += penv.Program('NewtonCompare.cpp')
 built += penv.Program('ParseAndPrint.cpp')
+built += penv.Program('CheckRecursive.cpp')
 
 Return('built')
 

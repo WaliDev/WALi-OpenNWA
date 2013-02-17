@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "fixtures.hpp"
+#include <boost/tuple/tuple.hpp>
 
 using namespace wali::xfa;
 
@@ -51,6 +52,19 @@ static std::string expected_intersection[][7] = {
     /* {a,b}  */ { "{}",  "{}",    "{a}", "{a}",    "{}",     "{}",   "{a,b}" }
 };
 
+
+static bool expected_containment[][7] = {
+    /*             {}     {eps}    {a}    {a^n}     {a^2n}    {ab}    {a,b} */
+    /* {}     */ { true,  true,    true,  true,     true,     true,   true    },
+    /* {eps}  */ { false, true,    false, false,    false,    false,  false   },
+    /* {a}    */ { false, false,   true,  true,     false,    false,  true    },
+    /* {a^n}  */ { false, false,   false, true,     false,    false,  false   },
+    /* {a^2n} */ { false, false,   false, true,     true,     false,  false   },
+    /* {ab}   */ { false, false,   false, false,    false,    true,   false   },
+    /* {a,b}  */ { false, false,   false, false,    false,    false,  true    }
+};
+
+
 static std::string languages[] = {
     "{}", "{eps}", "{a}", "{a^n}", "{a^2n}", "{ab}", "{a,b}"
 };
@@ -66,6 +80,19 @@ static std::string get_expected_intersection_language(std::string const & left, 
     assert(right_ptr != end);
 
     return expected_intersection[left_ptr - start][right_ptr - start];
+}
+
+static bool get_expected_containment(std::string const & left, std::string const & right) {
+    std::string const
+        * start = &languages[0],
+        * end = start + NUM_ELEMENTS(languages),
+        * left_ptr = std::find(start, end, left),
+        * right_ptr = std::find(start, end, right);
+
+    assert(left_ptr != end);
+    assert(right_ptr != end);
+
+    return expected_containment[left_ptr - start][right_ptr - start];
 }
 
 
@@ -105,15 +132,13 @@ namespace wali {
             rxfa.wfa().epsilonCloseCached(getKey("q"), rcache);
         }
 
-        TEST(wali$xfa$Xfa$intersect, Battery)
+
+        std::pair<std::map<std::string, std::vector<Xfa> >,
+                  std::map<std::string, std::vector<Xfa> > >
+        produce_xfas(BinaryRelation zero,
+                     Relations const & left_relations,
+                     Relations const & right_relations)
         {
-            XfaContext context;
-            Relations left_relations(context.voc, "left");
-            Relations right_relations(context.voc, "right");
-
-            BinaryRelation zero = left_relations.false_;
-            ASSERT_TRUE(zero->equal(right_relations.false_.get_ptr()));
-
             std::map<std::string, std::vector<Xfa>> left_xfas, right_xfas;
 
             left_xfas["{}"].push_back(TrivialEmptyXfa(zero).xfa);
@@ -138,7 +163,23 @@ namespace wali {
             REGISTER_XFA("{a}",    AlternativePathImpossible);
             REGISTER_XFA("{}",     EmptyByImpossibleDataTransitionEpsilon);
             REGISTER_XFA("{eps}",  SingleSimpleTransEpsilon);
+#undef REGISTER_XFA
 
+            return std::make_pair(left_xfas, right_xfas);
+        }
+        
+
+        TEST(wali$xfa$Xfa$intersect, Battery)
+        {
+            XfaContext context;
+            Relations left_relations(context.voc, "left");
+            Relations right_relations(context.voc, "right");
+
+            BinaryRelation zero = left_relations.false_;
+            ASSERT_TRUE(zero->equal(right_relations.false_.get_ptr()));
+
+            std::map<std::string, std::vector<Xfa>> left_xfas, right_xfas;
+            boost::tie(left_xfas, right_xfas) = produce_xfas(zero, left_relations, right_relations);
 
             // Sanity check: every language should be the same.
             for (auto left_map_iter = left_xfas.begin(); left_map_iter != left_xfas.end(); ++left_map_iter) {
@@ -190,8 +231,59 @@ namespace wali {
                                << "Current XFA in that right language: " << (right_xfa - right_some_xfas.begin()) << "\n";
                             SCOPED_TRACE(ss.str());
 
-                            Xfa const & intersection = left_xfa->intersect(*right_xfa);
+                            Xfa const & intersection = left_xfa->intersect_conjoin(*right_xfa);
                             EXPECT_TRUE(xfas_same_modulo_words(expected_representative, intersection));
+                        }
+                    }
+                }
+            }
+            
+        }
+
+
+        TEST(wali$xfa$Xfa$language_contains, Battery)
+        {
+            XfaContext context;
+            Relations & left_relations = context.left;
+            Relations & right_relations = context.right;
+            //std::cerr << "left_relations\n";
+            //Relations left_relations(context.voc, "left");
+            //std::cerr << "right_relations\n";
+            //Relations right_relations(context.voc, "right");
+
+            BinaryRelation zero = left_relations.false_;
+            ASSERT_TRUE(zero->equal(right_relations.false_.get_ptr()));
+
+            std::map<std::string, std::vector<Xfa>> left_xfas, right_xfas;
+            boost::tie(left_xfas, right_xfas) = produce_xfas(zero, left_relations, right_relations);
+
+            // Now intersect every XFA in left_xfas with every XFA in
+            // right_xfas. Each "every" gets TWO loops. We'll interleave them
+            // though.
+            for (auto left_map_iter = left_xfas.begin(); left_map_iter != left_xfas.end(); ++left_map_iter) {
+                for (auto right_map_iter = right_xfas.begin(); right_map_iter != right_xfas.end(); ++right_map_iter) {
+                    std::string const & left_language = left_map_iter->first;
+                    std::string const & right_language = right_map_iter->first;
+
+                    auto const & left_some_xfas = left_map_iter->second;
+                    auto const & right_some_xfas = right_map_iter->second;
+
+                    bool expected = get_expected_containment(left_language, right_language);
+
+                    // Now make sure all XFAs with the given left and right
+                    // languages, when intersected, give the
+                    // expected_representative.
+                    for (auto left_xfa = left_some_xfas.begin(); left_xfa != left_some_xfas.end(); ++left_xfa) {
+                        for (auto right_xfa = right_some_xfas.begin(); right_xfa != right_some_xfas.end(); ++right_xfa) {
+                            std::stringstream ss;
+                            ss << "Current left language: " << left_language << "\n"
+                               << "Current right language: " << right_language << "\n"
+                               << "Current XFA in that left language: " << (left_xfa - left_some_xfas.begin()) << "\n"
+                               << "Current XFA in that right language: " << (right_xfa - right_some_xfas.begin()) << "\n";
+                            SCOPED_TRACE(ss.str());
+
+                            bool actual = language_contains(*left_xfa, *right_xfa, context.voc);
+                            EXPECT_EQ(expected, actual);
                         }
                     }
                 }

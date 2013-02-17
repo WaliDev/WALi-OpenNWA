@@ -27,6 +27,7 @@
 
 #include <boost/shared_ptr.hpp> // It'd be nice to include the standard version but there are too many ways to get it.
 #include <boost/unordered_set.hpp>
+#include <boost/unordered_map.hpp>
 #include <boost/function.hpp>
 
 #include "wali/wfa/WeightMaker.hpp"
@@ -34,6 +35,7 @@
 #include "wali/ref_ptr.hpp"
 #include "wali/SemElemTensor.hpp"
 #include "buddy/fdd.h"
+#include "wali/Key.hpp"
 
 
 /**
@@ -77,8 +79,8 @@
  * NOTE: ***This currently only works correctly with boolean variables.***
  * The tensor choice is determined by the following macro:
  **/
-#define TENSOR_MIN_AFFINITY
-//#define TENSOR_MAX_AFFINITY
+//#define TENSOR_MIN_AFFINITY
+#define TENSOR_MAX_AFFINITY
 //#define BASE_MAX_AFFINITY_TENSOR_MIXED
 /*** NOTE: This currently only works correctly with boolean variables.***/
 //#define TENSOR_MATCHED_PAREN
@@ -87,6 +89,12 @@
 //#define DETENSOR_TOGETHER
 #define DETENSOR_BIT_BY_BIT
 
+//#define NWA_DETENSOR
+
+
+#if defined(NWA_DETENSOR) && not defined(TENSOR_MATCHED_PAREN)
+#error "Nwa based detensor only works with TENSOR_MATCHED_PAREN variable order"
+#endif
 
 /** 
   To switch on statistics collection in BinRel
@@ -98,12 +106,24 @@
 /// each other (one faster, one simpler)
 #define CHECK_BDD_SUBSUMES_WITH_SLOWER_VERSION 1
 
+#ifdef NWA_DETENSOR
+namespace opennwa
+{
+  typedef wali::Key State;
+  typedef wali::Key Symbol;
+}
+
+std::size_t hash_value(bdd const& b);
+#endif
+
 namespace wali 
 {
   namespace domains 
   {
     namespace binrel 
     {
+      class DetensorNwa;
+
       /// Reference-counting bddPair pointer. These must be freed using
       /// bdd_freepair, not delete, so we can't used ref_ptr. This just wraps
       /// Boost's shared_ptr, setting bdd_freepair as the custom
@@ -171,8 +191,10 @@ namespace wali
       class BddContext : public std::map<const std::string,bddinfo_t>
       {
         friend class BinRel;
+#ifdef NWA_DETENSOR
         public:
-          typedef boost::unordered_set<int> VocLevelSet;
+          typedef std::vector<int> VocLevelArray;
+#endif
         public:
            /** 
            * A BddContext manages the vocabularies and stores some useful bdds
@@ -201,21 +223,16 @@ namespace wali
           virtual void setIntVars(const std::map<std::string, int>& vars);
           virtual void setIntVars(const std::vector<std::map<std::string, int> >& vars);
 
+#ifdef NWA_DETENSOR
           /**
            * These functions are used by an NWA based implementation of detensor.
-           * They provide information about the bit level information per variable, and
-           * provide ways to test what part of the vocabulary a certain buddy
-           * bdd level belongs to.
+           * They provide information about the bit level information per variable.
            **/
           // Setup the sets of levels in the different vocabularies for fast lookup
-          void setupLevelSets();
-          
-          unsigned numVarsPerVoc();
-          bool isRootInVocTensor1Lhs(bdd b); //A
-          bool isRootInVocTensor1Rhs(bdd b); //A'
-          bool isRootInVocTensor2Lhs(bdd b); //B
-          bool isRootInVocTensor2Rhs(bdd b); //B'
-          bool isRootRelevant(bdd b);
+          void setupLevelArray();
+          VocLevelArray const& getLevelArray(); 
+          unsigned numVars() const;
+#endif
 
         protected:
           /**
@@ -238,6 +255,8 @@ namespace wali
           // Comments contain the more meaningful, but ghastly names
           //B1->B2 B2->B1
           BddPairPtr baseSwap;
+          //TL1->TL2 TL2->TL1
+          BddPairPtr tensor1Swap;
           //B1->B2 B2->B3
           BddPairPtr baseRightShift;
           //TL1->TL2 TR1->TR2 TL2->TL3 TR2->TR3 
@@ -273,13 +292,14 @@ namespace wali
           binrel_t cachedBaseZero;
           binrel_t cachedTensorOne;
           binrel_t cachedTensorZero;
-  
-          // Hash sets to store what bdd levels belong to what part of the voc.
-          VocLevelSet tensor1LhsLevels;
-          VocLevelSet tensor1RhsLevels;
-          VocLevelSet tensor2LhsLevels;
-          VocLevelSet tensor2RhsLevels;
+#ifdef NWA_DETENSOR
+          VocLevelArray tensorVocLevels;
+          VocLevelArray baseLhsVocLevels;
+          VocLevelArray baseRhsVocLevels;
           
+          bdd t1OneBdd;
+          BddPairPtr rawMove2Tensor2;
+#endif
 #ifdef BINREL_STATS
         private:
           //Statistics for this contex
@@ -288,9 +308,10 @@ namespace wali
           mutable StatCount numIntersect;
           mutable StatCount numEqual;
           mutable StatCount numKronecker;
+          mutable StatCount numReverse;
           mutable StatCount numTranspose;
-          mutable StatCount numEq23Project;
-          mutable StatCount numEq13Project;
+          mutable StatCount numDetensor;
+          mutable StatCount numDetensorTranspose;
 
           // Related functions
         public:
@@ -328,7 +349,15 @@ namespace wali
                                 std::vector<std::string> const & keep_these,
                                 bdd b);
       
-      
+#ifdef NWA_DETENSOR
+      /*
+       * Subclass of opennwa::WeightGen used to attache weights to the nwa used
+       * for detensor. The class is declared in nwa_detensor.hpp. We can
+       * declare it here because we do not want to include Nwa.hpp above. 
+       **/
+      class DetensorWeightGen;
+#endif
+
       class BinRel : public wali::SemElemTensor 
       {
         public:
@@ -360,15 +389,17 @@ namespace wali
           sem_elem_t zero() const;
 
           bool isOne() const {
-            sem_elem_t one_semelem = one();
-            BinRel * one_binrel = dynamic_cast<BinRel*>(one_semelem.get_ptr());
-            return getBdd() == one_binrel->getBdd();
+            if(isTensored)
+              return getBdd() == con->cachedTensorOne->getBdd();
+            else
+              return getBdd() == con->cachedBaseOne->getBdd();
           }
 
           bool isZero() const {
-            sem_elem_t zero_semelem = zero();
-            BinRel * zero_binrel = dynamic_cast<BinRel*>(zero_semelem.get_ptr());
-            return getBdd() == zero_binrel->getBdd();
+            if(isTensored)
+              return getBdd() == con->cachedTensorZero->getBdd();
+            else
+              return getBdd() == con->cachedBaseZero->getBdd();
           }
         
           /** @return [this]->Union( cast<BinRel*>(se) ) */
@@ -429,6 +460,36 @@ namespace wali
           BddContext const * con;
           bdd rel;
           bool isTensored;
+#ifdef NWA_DETENSOR
+        private:
+          //TODO: Cleanup in the destructor for all these
+          typedef std::pair< unsigned, bdd > StateTranslationKey;
+          typedef boost::unordered_map< StateTranslationKey, opennwa::State > StateTranslationTable; 
+          typedef std::vector< std::vector< opennwa::State > > LevelToStatesTable;
+          typedef boost::unordered_set< opennwa::State > StateHashSet;
+          // Maps etc needed during detensor operation
+          // We don't store the Nwa here because we don't have the complete type of DetensorNwa yet
+          // Same goes for wali::domains::binrel::DetensorWeightGen
+          StateTranslationTable tTable;
+          LevelToStatesTable lTable;
+          StateHashSet visited;
+          opennwa::State rejectState;
+          opennwa::State acceptStateNwa;
+          opennwa::State initialStateNwa;
+          opennwa::State initialStateWfa;
+          opennwa::State acceptStateWfa;
+          opennwa::Symbol low, high;
+          // Converts rel to an nwa, and solves a path problem to obtain the detensorTranspose bdd
+          bdd detensorViaNwa();
+          void populateNwa(DetensorNwa& nwa, DetensorWeightGen& wts);
+          void setupConstraintNwa(DetensorNwa& nwa);
+          void tabulateStates(DetensorNwa& nwa, unsigned v, bdd r);
+          opennwa::State generateTransitions(DetensorNwa& nwa, DetensorWeightGen& wts, unsigned v, bdd n);
+          opennwa::State generateTransitionsLowerPlies(DetensorNwa& nwa, DetensorWeightGen& wts, unsigned v, bdd n);
+
+          bdd reverse(bdd toReverse) const;
+          bdd tensorViaDetensor(bdd other) const;
+#endif
       };
 
 

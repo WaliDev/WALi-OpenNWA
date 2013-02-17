@@ -27,7 +27,7 @@ namespace wali
     }
 
     State::State( Key k, sem_elem_t W ) :
-      Countable(),key(k),se(W),delta_se(W),quasi(W),tag(0)
+      Countable(),key(k),accepting_weight(W->zero()),se(W),delta_se(W),quasi(W),tag(0)
     {
       if (!W.is_valid()) {
         *waliErr << "[WARNING] wfa::State created with a NULL weight\n";
@@ -42,7 +42,7 @@ namespace wali
 
     State::State( const State& st ) :
       IMarkable(),Printable(),Markable(),Countable(),
-      key(st.key),se(st.se),delta_se(st.delta_se),quasi(st.quasi),tag(0)
+      key(st.key),accepting_weight(st.accepting_weight),se(st.se),delta_se(st.delta_se),quasi(st.quasi),tag(0)
     {
       { // BEGIN DEBUGGING
         //print(*waliErr << "State(const State&):" << numStates) << std::endl;;

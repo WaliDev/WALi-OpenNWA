@@ -588,21 +588,22 @@ namespace wali {
 #define SETS(name, setname) \
             name = new SemElemSet(SemElemSet::KeepAllNonduplicates, elem->one(), setname)
             
-            SemElemSet
-                * SETS(empty, set1),
-                * SETS(two, set2),
-                * SETS(six, set4),
-                * SETS(both, set6);
+            ref_ptr<SemElemSet>
+                SETS(empty, set1),
+                SETS(two, set2),
+                SETS(six, set4),
+                SETS(both, set6);
 
 #undef SETS
 
             // Here we set up the PAIRS and singleton SETS OF THOSE PAIRS
 
 #define DEFINE_INPUT(first, second) \
-            SemElemPair * first##_then_##second##_pair = new SemElemPair(first, second); \
+            ref_ptr<SemElemPair> first##_then_##second##_pair = new SemElemPair(first, second); \
             SemElemSet::ElementSet first##_then_##second##_set;                          \
             first##_then_##second##_set.insert(first##_then_##second##_pair);            \
-            SemElemSet * first##_then_##second = new SemElemSet(merge, first##_then_##second##_pair->one(), first##_then_##second##_set);
+            ref_ptr<SemElemSet> first##_then_##second##_holder = new SemElemSet(merge, first##_then_##second##_pair->one(), first##_then_##second##_set); \
+            SemElemSet * first##_then_##second = first##_then_##second##_holder.get_ptr();
             
             DEFINE_INPUT(empty, empty);
             DEFINE_INPUT(two, two);
@@ -616,7 +617,7 @@ namespace wali {
             SemElemSet::ElementSet two_pairs_two_and_six_set;
             two_pairs_two_and_six_set.insert(two_then_two_pair);
             two_pairs_two_and_six_set.insert(six_then_six_pair);
-            SemElemSet * two_pairs_two_and_six = new SemElemSet(merge, empty_then_empty_pair->one(), two_pairs_two_and_six_set);
+            ref_ptr<SemElemSet> two_pairs_two_and_six = new SemElemSet(merge, empty_then_empty_pair->one(), two_pairs_two_and_six_set);
 
             ASSERT_EQ(2u, two_pairs_two_and_six->getElements().size());
 

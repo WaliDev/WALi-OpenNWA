@@ -56,6 +56,7 @@ test_files = Split("""
     Source/wali/wfa/class-wfa/computeAllReachingWeights.cpp
     Source/wali/wfa/class-wfa/determinize.cpp
     Source/wali/wfa/class-wfa/complementStates.cpp
+    Source/wali/wfa/class-wfa/misc.cpp
     Source/wali/wpds/class-fwpds/poststar.cpp
     Source/wali/wpds/class-fwpds/prestar.cpp
 
@@ -90,6 +91,7 @@ test_files = Split("""
 
     Source/AddOns/Domains/binrel/binrelmanager.cpp
     Source/AddOns/Domains/binrel/binrel.cpp
+    Source/AddOns/Domains/binrel/nwa_detensor.cpp
 
     Source/AddOns/Xfa/wali/util/base64.cpp
     Source/AddOns/Xfa/wali/util/DisjointSets.cpp

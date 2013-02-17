@@ -692,7 +692,7 @@ void emit_stmt(FILE * fout, const stmt * s, unsigned indent)
       }
       fprintf(fout, "%s(", s->f);
       emit_comma_separated_expr_list(fout, s->el);
-      fprintf(fout, ")\n");
+      fprintf(fout, ");\n");
       break;
     default:
       assert(0 && "emit_stmt: Unknown case");
@@ -736,7 +736,7 @@ void emit_proc(FILE * fout, const proc * p, unsigned indent)
   }
   
   emit_space(fout, indent);
-  fprintf(fout, "end\n");
+  fprintf(fout, "end\n\n");
 }
 void emit_prog(FILE * fout, const prog * pg)
 {
@@ -748,7 +748,7 @@ void emit_prog(FILE * fout, const prog * pg)
 
   const proc_list * pl = pg->pl;
   while(pl){
-    emit_proc(fout, pl->p, 2);
+    emit_proc(fout, pl->p, 0);
     pl = pl->n;
   }
 }

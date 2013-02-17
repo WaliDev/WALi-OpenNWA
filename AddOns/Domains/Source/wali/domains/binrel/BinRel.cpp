@@ -16,6 +16,8 @@
 
 #include <boost/algorithm/string/predicate.hpp>
 
+#include <tr1/unordered_map>
+
 using namespace wali::domains::binrel;
 using std::endl;
 using wali::waliErr;
@@ -29,7 +31,6 @@ using std::cout;
 // Find out emperically what the best ratio of memsize to cache size is
 #define MEMTOCACHE 10
 
-#define CACHESIZE BDDMEMSIZE/MEMTOCACHE
 #define MAXMEMINC BDDMEMSIZE/10
 
 //It's a good habit to forward declare all the static functions in the
@@ -54,14 +55,25 @@ namespace wali
       static BinRel* convert(wali::SemElem* se);
 
 
+      /*
       struct BddLessThan
       {
         bool operator() (bdd left, bdd right) const {
           return left.id() < right.id();
         }
       };
-
       std::map<bdd, sem_elem_t, BddLessThan> star_cache;
+      */
+
+      typedef std::pair< bdd, bool> StarCacheKey;
+      struct StarCacheHash
+      {
+        size_t operator() (StarCacheKey k) const
+        {
+          return k.first.id() << 1 & (int) k.second;
+        }
+      };
+      std::tr1::unordered_map< StarCacheKey, sem_elem_t, StarCacheHash> star_cache;
 
 
       namespace details {
@@ -202,7 +214,7 @@ BddContext::BddContext(int bddMemSize, int cacheSize) :
     // ///////////////////////
     // Begin initialize BuDDy
     bddMemSize = (bddMemSize==0)?BDDMEMSIZE:bddMemSize;
-    cacheSize = (cacheSize==0)?CACHESIZE:cacheSize;
+    cacheSize = (bddMemSize/MEMTOCACHE > cacheSize)? bddMemSize/MEMTOCACHE : cacheSize;
     if (0 == bdd_isrunning()){
       int rc = bdd_init(bddMemSize,cacheSize);
       if( rc < 0 ){
@@ -225,6 +237,7 @@ BddContext::BddContext(int bddMemSize, int cacheSize) :
   //release mutex
 
   baseSwap = BddPairPtr(bdd_newpair());
+  tensor1Swap = BddPairPtr(bdd_newpair());
   baseRightShift = BddPairPtr(bdd_newpair());
   tensorRightShift = BddPairPtr(bdd_newpair());
   baseRestore = BddPairPtr(bdd_newpair());
@@ -233,6 +246,9 @@ BddContext::BddContext(int bddMemSize, int cacheSize) :
   move2Tensor2 = BddPairPtr(bdd_newpair());
   move2Base = BddPairPtr(bdd_newpair());
   move2BaseTwisted = BddPairPtr(bdd_newpair());
+#ifdef NWA_DETENSOR
+  rawMove2Tensor2 = BddPairPtr(bdd_newpair());
+#endif
 
   //initialize static bdds
   baseSecBddContextSet = bddtrue;
@@ -253,9 +269,10 @@ BddContext::BddContext(int bddMemSize, int cacheSize) :
   numIntersect = 0;
   numEqual = 0;
   numKronecker = 0;
+  numReverse = 0;
   numTranspose = 0;
-  numEq23Project = 0;
-  numEq13Project = 0;
+  numDetensor = 0;
+  numDetensorTranspose = 0;
 #endif
   populateCache();
 }
@@ -265,6 +282,7 @@ BddContext::BddContext(const BddContext& other) :
   std::map< const std::string, bddinfo_t>(other),
   count(0),
   baseSwap(other.baseSwap),
+  tensor1Swap(other.tensor1Swap),
   baseRightShift(other.baseRightShift),
   tensorRightShift(other.tensorRightShift),
   baseRestore(other.baseRestore),
@@ -292,9 +310,10 @@ BddContext::BddContext(const BddContext& other) :
   numIntersect = 0;
   numEqual = 0;
   numKronecker = 0;
+  numReverse = 0;
   numTranspose = 0;
-  numEq23Project = 0;
-  numEq13Project = 0;
+  numDetensor = 0;
+  numDetensorTranspose = 0;
 #endif
   populateCache();
 }
@@ -304,6 +323,7 @@ BddContext& BddContext::operator = (const BddContext& other)
   if(this!=&other){
     count=0;
     baseSwap=other.baseSwap;
+    tensor1Swap = other.baseSwap;
     baseRightShift=other.baseRightShift;
     tensorRightShift=other.tensorRightShift;
     baseRestore=other.baseRestore;
@@ -331,6 +351,7 @@ BddContext::~BddContext()
 {
   // shared_ptr::reset sets it to NULL
   baseSwap.reset();
+  tensor1Swap.reset();
   baseRightShift.reset();
   tensorRightShift.reset();
   baseRestore.reset();
@@ -339,6 +360,9 @@ BddContext::~BddContext()
   move2Tensor2.reset();
   move2Base.reset();
   move2BaseTwisted.reset();
+#ifdef NWA_DETENSOR
+  rawMove2Tensor2.reset();
+#endif
   
   baseSecBddContextSet = bddtrue;
   tensorSecBddContextSet = bddtrue;
@@ -558,9 +582,9 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
     for(std::map<std::string, int>::const_iterator ci = interleavedVars.begin(); ci != interleavedVars.end(); ++ci){
       bddinfo_t varInfo = (*this)[ci->first];
       int j = 3 * vari;
-      varInfo->baseLhs = base + j++;
-      varInfo->baseRhs = base + j++;
       varInfo->baseExtra = base + j++;
+      varInfo->baseRhs = base + j++;
+      varInfo->baseLhs = base + j++;
       vari++;  
     }
   }
@@ -694,8 +718,7 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
     }
   }
 #else
-  Do not comment this. The code should not compile if this part is active.
-  assert(0);
+#error "Unknown bdd level arrangement macro"
 #endif
 
   // Also update the reverse vocabulary for printing.
@@ -711,6 +734,10 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
     idx2Name[varInfo->tensor2Rhs] = ci->first + "_t2'";
     idx2Name[varInfo->tensor2Extra] = ci->first + "_t2''";
   } 
+
+#ifdef NWA_DETENSOR
+  setupLevelArray();
+#endif
 }
 
 void BddContext::setIntVars(const std::vector<std::map<std::string, int> >& vars)
@@ -792,6 +819,8 @@ void BddContext::setupCachedBdds()
 
   fdd_setpairs(baseSwap.get(), baseLhs, baseRhs, this->size());
   fdd_setpairs(baseSwap.get(), baseRhs, baseLhs, this->size());
+  fdd_setpairs(tensor1Swap.get(), tensor1Lhs, tensor1Rhs, this->size());
+  fdd_setpairs(tensor1Swap.get(), tensor1Rhs, tensor1Lhs, this->size());
   fdd_setpairs(baseRightShift.get(), baseLhs, baseRhs, this->size());
   fdd_setpairs(baseRightShift.get(), baseRhs, baseExtra, this->size());
   fdd_setpairs(tensorRightShift.get(), tensor1Lhs, tensor1Rhs, this->size());
@@ -865,6 +894,10 @@ void BddContext::addIntVar(std::string name, unsigned size)
     assert(false);
   }
   bddinfo_t varInfo = new BddInfo;
+#if defined(NWA_DETENSOR)
+  // Only boolean variables are supported under NWA_DETENSOR
+  assert(size == 2);
+#endif
   varInfo->maxVal = size;
   (*this)[name] = varInfo;
 
@@ -876,7 +909,7 @@ void BddContext::addIntVar(std::string name, unsigned size)
 
   //lock mutex
   int base;
-  int domains[3] = {varInfo->maxVal, varInfo->maxVal, varInfo->maxVal};
+  int domains[3] = {(int)varInfo->maxVal, (int)varInfo->maxVal, (int)varInfo->maxVal};
 
   //Create fdds for base
   base = fdd_extdomain(domains,3);
@@ -916,6 +949,8 @@ void BddContext::addIntVar(std::string name, unsigned size)
   //update bddPairs
   fdd_setpair(baseSwap.get(), varInfo->baseLhs, varInfo->baseRhs);
   fdd_setpair(baseSwap.get(), varInfo->baseRhs, varInfo->baseLhs);
+  fdd_setpair(tensor1Swap.get(), varInfo->tensor1Lhs, varInfo->tensor1Rhs);
+  fdd_setpair(tensor1Swap.get(), varInfo->tensor1Rhs, varInfo->tensor1Lhs);
   fdd_setpair(baseRightShift.get(), varInfo->baseLhs, varInfo->baseRhs);
   fdd_setpair(baseRightShift.get(), varInfo->baseRhs, varInfo->baseExtra);
   fdd_setpair(tensorRightShift.get(), varInfo->tensor1Lhs, varInfo->tensor1Rhs);
@@ -982,89 +1017,10 @@ void BddContext::populateCache()
   cachedBaseZero = new BinRel(this, bddfalse, false);
   cachedTensorOne = new BinRel(this, tensorId, true);
   cachedTensorZero = new BinRel(this, bddfalse, true);
-}
 
-
-// //////////////////////////////////////////
-// These functions provide a sneak-peek into the buddy bit-level
-// variable ordering.
-
-// Setup maps to enable quick lookup of information
-void BddContext::setupLevelSets()
-{
-  tensor1LhsLevels.clear();
-  tensor1RhsLevels.clear();
-  tensor2LhsLevels.clear();
-  tensor2RhsLevels.clear();
-
-  for(BddContext::const_iterator cit = this->begin(); cit != this->end(); ++cit){
-    int const * vars;
-    bddinfo_t const varInfo = cit->second;
-    //How many bits are used for me?
-    if(varInfo->maxVal <= 0)
-      continue;
-    double fracnumbits = log2(varInfo->maxVal);
-    int numbits = ceil(fracnumbits);
-
-    vars = fdd_vars(varInfo->tensor1Lhs);
-    assert(vars != NULL);
-    for(int i=0; i < numbits; ++i)
-      tensor1LhsLevels.insert(bdd_var2level(vars[i]));
-
-    vars = fdd_vars(varInfo->tensor1Rhs);
-    assert(vars != NULL);
-    for(int i=0; i < numbits; ++i)
-      tensor1RhsLevels.insert(bdd_var2level(vars[i]));
-
-    vars = fdd_vars(varInfo->tensor2Lhs);
-    assert(vars != NULL);
-    for(int i=0; i < numbits; ++i)
-      tensor2LhsLevels.insert(bdd_var2level(vars[i]));
-
-    vars = fdd_vars(varInfo->tensor2Rhs);
-    assert(vars != NULL);
-    for(int i=0; i < numbits; ++i)
-      tensor2RhsLevels.insert(bdd_var2level(vars[i]));
-  }
-  assert(tensor1LhsLevels.size() == tensor1RhsLevels.size());
-  assert(tensor1RhsLevels.size() == tensor2LhsLevels.size());
-  assert(tensor2LhsLevels.size() == tensor2RhsLevels.size());
-}
-
-unsigned BddContext::numVarsPerVoc()
-{
-  return tensor1LhsLevels.size();
-}
-
-bool BddContext::isRootInVocTensor1Lhs(bdd b)
-{
-  if(b == bddfalse || b == bddtrue) return false;
-  return tensor1LhsLevels.find(bdd_var2level(bdd_var(b))) != tensor1LhsLevels.end();
-}
-
-bool BddContext::isRootInVocTensor2Lhs(bdd b)
-{
-  if(b == bddfalse || b == bddtrue) return false;
-  return tensor2LhsLevels.find(bdd_var2level(bdd_var(b))) != tensor2LhsLevels.end();
-}
-
-bool BddContext::isRootInVocTensor1Rhs(bdd b)
-{
-  if(b == bddfalse || b == bddtrue) return false;
-  return tensor1RhsLevels.find(bdd_var2level(bdd_var(b))) != tensor1RhsLevels.end();
-}
-
-bool BddContext::isRootInVocTensor2Rhs(bdd b)
-{
-  if(b == bddfalse || b == bddtrue) return false;
-  return tensor2RhsLevels.find(bdd_var2level(bdd_var(b))) != tensor2RhsLevels.end();
-}
-
-bool BddContext::isRootRelevant(bdd b)
-{
-  if(b == bddfalse || b == bddtrue) return false;
-  return isRootInVocTensor1Lhs(b) || isRootInVocTensor1Rhs(b) 
-    || isRootInVocTensor2Lhs(b) || isRootInVocTensor2Rhs(b);
+#ifdef NWA_DETENSOR
+  setupLevelArray();
+#endif
 }
 
 // ////////////////////////////
@@ -1072,7 +1028,6 @@ bool BddContext::isRootRelevant(bdd b)
 void BinRel::reset()
 {
 }
-
 
 // ////////////////////////////
 // Friends
@@ -1120,20 +1075,6 @@ binrel_t BinRel::Compose( binrel_t that ) const
 #ifdef BINREL_STATS
   con->numCompose++;
 #endif
-  if (this->isOne()) {
-    return that;
-  }
-  if (that->isOne()) {
-    return new BinRel(*this);
-  }
-
-  if (this->isZero() || that->isZero()) {
-    sem_elem_t zero_semelem = zero();
-    BinRel * zero_binrel = dynamic_cast<BinRel*>(zero_semelem.get_ptr());
-    return zero_binrel;
-  }
-  
-  
   //We skip this test if you insist
 #ifndef BINREL_HASTY
   if(isTensored != that->isTensored || con != that->con){
@@ -1143,6 +1084,13 @@ binrel_t BinRel::Compose( binrel_t that ) const
     return new BinRel(con,bddfalse,isTensored);
   }
 #endif
+  if (this->isZero() || that->isZero())
+    return static_cast<BinRel*>(zero().get_ptr());;
+  if (this->isOne())
+    return that;
+  if (that->isOne())
+    return new BinRel(*this);
+
   bdd c;
   if(!isTensored){
     bdd temp1 = bdd_replace(that->rel, con->baseRightShift.get());
@@ -1153,7 +1101,14 @@ binrel_t BinRel::Compose( binrel_t that ) const
     bdd temp2 = bdd_relprod(rel, temp1, con->tensorSecBddContextSet);
     c = bdd_replace(temp2, con->tensorRestore.get());
   }
-  return new BinRel(con,c,isTensored);
+
+  binrel_t ret = new BinRel(con,c,isTensored);
+  // Keep zero/one unique.
+  if(ret->isZero())
+    return static_cast<BinRel*>(ret->zero().get_ptr());
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  return ret;
 }
 
 binrel_t BinRel::Union( binrel_t that ) const
@@ -1161,13 +1116,6 @@ binrel_t BinRel::Union( binrel_t that ) const
 #ifdef BINREL_STATS
   con->numUnion++;
 #endif
-  if (this->isZero()) {
-    return that;
-  }
-  if (that->isZero()) {
-    return new BinRel(*this);
-  }  
-  
   //We skip this test if you insist
 #ifndef BINREL_HASTY
   if(isTensored != that->isTensored || con != that->con){
@@ -1177,7 +1125,17 @@ binrel_t BinRel::Union( binrel_t that ) const
     return new BinRel(con,bddtrue,isTensored);
   }
 #endif
-  return new BinRel(con,rel | that->rel, isTensored);
+  if (this->isZero())
+    return that;
+  if (that->isZero())
+    return new BinRel(*this);
+
+  // Keep zero/one unique
+  binrel_t ret = new BinRel(con,rel | that->rel, isTensored);
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  //can't be zero.
+  return ret;
 }
 
 binrel_t BinRel::Intersect( binrel_t that ) const
@@ -1194,7 +1152,16 @@ binrel_t BinRel::Intersect( binrel_t that ) const
     return new BinRel(con,bddfalse,isTensored);
   }
 #endif
-  return new BinRel(con, rel & that->rel,isTensored);
+  if(this->isZero() || that->isZero())
+    return static_cast<BinRel*>(this->zero().get_ptr());
+
+  // Keep zero/one unique
+  binrel_t ret = new BinRel(con, rel & that->rel,isTensored);
+  if(ret->isZero())
+    return static_cast<BinRel*>(ret->zero().get_ptr());
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  return ret;
 }
 
 
@@ -1252,6 +1219,11 @@ binrel_t BinRel::Transpose() const
     return new BinRel(con, bddfalse, true);
   }
 #endif
+  if(this->isZero())
+    return static_cast<BinRel*>(zero().get_ptr());
+  if(this->isOne())
+    return static_cast<BinRel*>(one().get_ptr());
+
   bdd c = bdd_replace(rel, con->baseSwap.get());
   return new BinRel(con, c, isTensored);
 }
@@ -1270,17 +1242,25 @@ binrel_t BinRel::Kronecker(binrel_t that) const
     return new BinRel(con, bddfalse, true);
   }
 #endif
+  if(rel == bddfalse || that->rel == bddfalse)
+    return con->cachedTensorZero;
+#ifdef NWA_DETENSOR
+  bdd c = tensorViaDetensor(that->rel); //nwa_detensor.cpp
+#else
   bdd rel1 = bdd_replace(rel, con->move2Tensor1.get());
   bdd rel2 = bdd_replace(that->rel, con->move2Tensor2.get());
   bdd c = rel1 & rel2;
-  return new BinRel(con, c,true);
+#endif
+  binrel_t ret = new BinRel(con, c,true);
+  if(ret->isZero())
+    return static_cast<BinRel*>(ret->zero().get_ptr());
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  return ret;
 }
 
 binrel_t BinRel::Eq23Project() const
 {
-#ifdef BINREL_STATS
-  con->numEq23Project++;
-#endif
 #ifndef BINREL_HASTY
   if(!isTensored){
     *waliErr << "[WARNING] " << "Attempted to detensor untensored weight."
@@ -1304,14 +1284,16 @@ binrel_t BinRel::Eq23Project() const
   }
   bdd c = bdd_replace(rel1, con->move2Base.get());
 #endif
-  return new BinRel(con,c,false);
+  binrel_t ret = new BinRel(con,c,false);
+  if(ret->isZero())
+    return static_cast<BinRel*>(ret->zero().get_ptr());
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  return ret;
 }
 
 binrel_t BinRel::Eq13Project() const
 {
-#ifdef BINREL_STATS
-  con->numEq13Project++;
-#endif
 #ifndef BINREL_HASTY
   if(!isTensored){
     *waliErr << "[WARNING] " << "Attempted to detensor untensored weight."
@@ -1335,7 +1317,12 @@ binrel_t BinRel::Eq13Project() const
   }
   bdd c = bdd_replace(rel1, con->move2BaseTwisted.get());
 #endif
-  return new BinRel(con,c,false);
+  binrel_t ret = new BinRel(con,c,false);
+  if(ret->isZero())
+    return static_cast<BinRel*>(ret->zero().get_ptr());
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  return ret;
 }
 
 
@@ -1345,17 +1332,18 @@ binrel_t BinRel::Eq13Project() const
 
 wali::sem_elem_t BinRel::star()
 {
-  if (star_cache.find(getBdd()) == star_cache.end()) {
+  StarCacheKey k(getBdd(), isTensored);
+  if (star_cache.find(k) == star_cache.end()) {
     sem_elem_t w = combine(one().get_ptr());
     sem_elem_t wn = w->extend(w);
     while(!w->equal(wn)) {
       w = wn;
       wn = wn->extend(wn);
     }
-    star_cache[getBdd()] = wn;
+    star_cache[k] = wn;
   }
 
-  return star_cache[getBdd()];
+  return star_cache[k];
 }
 
 
@@ -1423,12 +1411,29 @@ wali::sem_elem_tensor_t BinRel::tensor(wali::SemElemTensor* se)
 
 wali::sem_elem_tensor_t BinRel::detensor()
 {
+#ifdef BINREL_STATS
+  con->numDetensor++;
+#endif
   return Eq23Project();
 }
 
 wali::sem_elem_tensor_t BinRel::detensorTranspose()
 {
+#ifdef BINREL_STATS
+  con->numDetensorTranspose++;
+#endif
+#ifdef NWA_DETENSOR
+  assert(isTensored);
+  bdd c = detensorViaNwa();
+  binrel_t ret = new BinRel(con, detensorViaNwa());
+  if(ret->isZero())
+    return static_cast<BinRel*>(ret->zero().get_ptr());
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  return ret;
+#else
   return Eq13Project();
+#endif
 }
 
 #ifdef BINREL_STATS
@@ -1440,9 +1445,12 @@ std::ostream& BddContext::printStats( std::ostream& o) const
   o << "#Intersect: " << numIntersect << endl; 
   o << "#Equal: " << numEqual << endl; 
   o << "#Kronecker: " << numKronecker << endl;
+#if defined(NWA_DETENSOR)
+  o << "#Reverse: " << numReverse << endl;
+#endif
   o << "#Transpose: " << numTranspose << endl;
-  o << "#Eq23Project: " << numEq23Project << endl;
-  o << "#Eq13Project: " << numEq13Project << endl;
+  o << "#Eq23Project: " << numDetensor << endl;
+  o << "#Eq13Project: " << numDetensorTranspose << endl;
   return o;
 }
 
@@ -1453,9 +1461,10 @@ void BddContext::resetStats()
   numIntersect = 0;
   numEqual = 0;
   numKronecker = 0;
+  numReverse = 0;
   numTranspose = 0;
-  numEq23Project = 0;
-  numEq13Project = 0;
+  numDetensor = 0;
+  numDetensorTranspose = 0;
 }
 #endif //BINREL_STATS
 
