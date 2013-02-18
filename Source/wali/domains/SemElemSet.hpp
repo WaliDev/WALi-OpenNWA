@@ -7,7 +7,7 @@
 #include <tr1/unordered_set>
 
 #include <boost/function.hpp>
-#include <boost/container/flat_set.hpp>
+//#include <boost/container/flat_set.hpp>
 
 namespace wali
 {
