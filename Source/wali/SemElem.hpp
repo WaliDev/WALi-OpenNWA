@@ -6,9 +6,7 @@
  */
 
 #include "wali/Common.hpp"
-#include "wali/ref_ptr.hpp"
-#include "wali/Countable.hpp"
-#include "wali/Printable.hpp"
+#include "wali/ExtendMonoid.hpp"
 #include <cstdlib>
 #include <string>
 
@@ -53,7 +51,8 @@ namespace wali
    *   o   x * 1 = x = 1 * x
    */
 
-  class SemElem : public Printable, public Countable
+  class SemElem
+    : public ExtendMonoid
   {
 
     public:
@@ -72,30 +71,18 @@ namespace wali
        */
       virtual ~SemElem() {}
 
-      /**
-       *  return the One element of the semiring
-       */
-      virtual sem_elem_t one() const = 0;
-
-      /**
-       *  return the Zero element of the semiring
-       */
-      virtual sem_elem_t zero() const = 0;
-
-      /**
-       *  Perform the extend operation
-       */
-      virtual sem_elem_t extend( SemElem * se ) = 0;
+      // The following are all pure virtual functions that you should override in your subclass. They are listed here for convenience.
+      using ExtendMonoid::one;
+      using ExtendMonoid::zero;
+      using ExtendMonoid::extend;
+      using ExtendMonoid::equal;
+      using ExtendMonoid::print;
+      using ExtendMonoid::star;
 
       /**
        *  Perform the combine operation
        */
       virtual sem_elem_t combine( SemElem * se ) = 0;
-
-      /**
-       *  Equality comparison between two semiring elements
-       */
-      virtual bool equal( SemElem * se ) const = 0;
 
       /**
        *  Determines whether 'this' underapproximates 'that'
@@ -108,11 +95,6 @@ namespace wali
        *  The latter is what the default implementation performs
        */
       virtual bool underApproximates(SemElem * that);
-
-      /**
-       *  Print the semiring element to the std::ostream o
-       */
-      virtual std::ostream& print( std::ostream & o ) const = 0;
 
       /**
        *  Used to print weights to XML. Default implementation
@@ -157,19 +139,6 @@ namespace wali
        */
       virtual std::pair<sem_elem_t,sem_elem_t> delta( SemElem * se );
 
-      /**
-       *  Perform the star operation (returns this^\inf)
-       */
-      virtual sem_elem_t star();
-
-      /** 
-       * Wrapper method for extend that will remove the ref_ptr
-       * to make the call to the user's code. 
-       */
-      sem_elem_t extend( sem_elem_t se ) 
-      { 
-        return extend( se.get_ptr() ); 
-      }
 
       /** 
        * Wrapper method for combine that will remove the ref_ptr
@@ -178,15 +147,6 @@ namespace wali
       sem_elem_t combine( sem_elem_t se ) 
       { 
         return combine( se.get_ptr() ); 
-      }
-
-      /** 
-       * Wrapper method for equal that will remove the ref_ptr
-       * to make the call to the user's code. 
-       */
-      bool equal( sem_elem_t se ) const 
-      { 
-        return equal( se.get_ptr() ); 
       }
 
       bool underApproximates( sem_elem_t se )
@@ -212,7 +172,6 @@ namespace wali
       {
         return delta( se.get_ptr() );
       }
-
 
       /// Returns true if this is less than the other. Should be
       /// fast. HOWEVER -- does not need to have semantic meaning, other than
@@ -257,34 +216,6 @@ namespace wali
    */
   void test_semelem_impl(sem_elem_t x);
 
-
-
-  struct SemElemRefPtrContainerLessThan
-  {
-    bool
-    operator() (sem_elem_t left, sem_elem_t right) const
-    {
-      return left->containerLessThan(right);
-    }
-  };
-
-  struct SemElemRefPtrHash
-  {
-    size_t
-    operator() (sem_elem_t se) const
-    {
-      return se->hash();
-    }
-  };
-
-  struct SemElemRefPtrEqual
-  {
-    bool
-    operator() (sem_elem_t left, sem_elem_t right) const
-    {
-      return left->equal(right);
-    }
-  };
 }
 #endif  // wali_SEM_ELEM_GUARD
 

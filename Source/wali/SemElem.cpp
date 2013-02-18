@@ -80,16 +80,6 @@ namespace wali
     return rp;
   }
 
-  sem_elem_t SemElem::star() {
-    sem_elem_t w = combine(one());
-    sem_elem_t wn = w->extend(w);
-    while(!w->equal(wn)) {
-      w = wn;
-      wn = wn->extend(wn);
-    }
-    return wn;
-  }
-
 
   void test_semelem_impl(sem_elem_t x)
   {
