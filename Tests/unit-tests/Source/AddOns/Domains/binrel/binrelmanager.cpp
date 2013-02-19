@@ -191,7 +191,7 @@ namespace{
     ASSERT_TRUE(compareOutput("ProgramBddContextTest","intOps",ss));
   }
 
-  TEST_F(ProgramBddContextTest, assignNassumeBool){
+  TEST_F(ProgramBddContextTest, DISABLED_assignNassumeBool){
     std::stringstream ss;
 
     brm = new ProgramBddContext();
