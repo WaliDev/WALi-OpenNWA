@@ -325,12 +325,14 @@ TEST(wali$domains$PositionKey$$pre$and$post, testAccessors)
 
 struct ShortestPathLengths
 {
-    sem_elem_t ten, twenty, thirty;
+    sem_elem_t ten, twenty, thirty, fourty, fifty;
 
     ShortestPathLengths()
         : ten(new ShortestPathSemiring(10))
         , twenty(new ShortestPathSemiring(20))
         , thirty(new ShortestPathSemiring(30))
+        , fourty(new ShortestPathSemiring(40))
+        , fifty(new ShortestPathSemiring(50))
     {}
 };
 
@@ -340,26 +342,34 @@ struct Mappings
     PKFixtures keys;
     ShortestPathLengths paths;
     
-    KeyedSemElemSet::BackingMap a, b, c, str_a;
+    KeyedSemElemSet::BackingMap a, b, c, str_a, ac, aca;
 
     Mappings() {
         // 0 ---> 0   length 20
         // 0 ---> 1   length 10
-        a[keys.i00] = paths.twenty;
-        a[keys.i01] = paths.ten;
+        a.insert(std::make_pair(keys.i00, paths.twenty));
+        a.insert(std::make_pair(keys.i01, paths.ten));
 
-        str_a[keys.s00] = paths.twenty;
-        str_a[keys.s01] = paths.ten;
+        str_a.insert(std::make_pair(keys.s00, paths.twenty));
+        str_a.insert(std::make_pair(keys.s01, paths.ten));
 
         // 0 ---> 0   length 10
         // 1 ---> 1   length 10
-        b[keys.i00] = paths.ten;
-        b[keys.i11] = paths.ten;
+        b.insert(std::make_pair(keys.i00, paths.ten));
+        b.insert(std::make_pair(keys.i11, paths.ten));
 
         // 0 ---> 0   length 10
         // 1 ---> 0   length 10
-        c[keys.i00] = paths.ten;
-        c[keys.i10] = paths.ten;
+        c.insert(std::make_pair(keys.i00, paths.ten));
+        c.insert(std::make_pair(keys.i10, paths.ten));
+
+        ac.insert(std::make_pair(keys.i00, paths.twenty));
+        ac.insert(std::make_pair(keys.i00, paths.thirty));
+
+        aca.insert(std::make_pair(keys.i00, paths.fourty));
+        aca.insert(std::make_pair(keys.i00, paths.fifty));
+        aca.insert(std::make_pair(keys.i01, paths.thirty));
+        aca.insert(std::make_pair(keys.i01, paths.fourty));
     }
 };
 
@@ -367,7 +377,7 @@ struct Mappings
 struct KeyedSets
 {
     Mappings maps;
-    KeyedSemElemSet a, b, c, str_a;
+    KeyedSemElemSet a, b, c, str_a, ac, aca;
     
     ShortestPathLengths paths;
     PKFixtures keys;
@@ -377,8 +387,24 @@ struct KeyedSets
         , b(maps.b)
         , c(maps.c)
         , str_a(maps.str_a)
+        , ac(maps.ac)
+        , aca(maps.aca)
     {}
 };
+
+
+sem_elem_t at(KeyedSemElemSet const & ks, sem_elem_t key)
+{
+    std::pair<KeyedSemElemSet::const_iterator, KeyedSemElemSet::const_iterator>
+        p = ks.equal_range(key);
+    KeyedSemElemSet::const_iterator first = p.first;
+    
+    assert(p.first != p.second);
+    p.first++;
+    assert(p.first == p.second);
+
+    return first->second;
+}
 
 
 TEST(wali$domains$KeyedSemElemSet$$at, accessors)
@@ -386,12 +412,12 @@ TEST(wali$domains$KeyedSemElemSet$$at, accessors)
     KeyedSets sets;
 
     EXPECT_EQ(2u, sets.a.size());
-    EXPECT_TRUE(sets.a.at(sets.keys.i00)->equal(sets.paths.twenty));
-    EXPECT_TRUE(sets.a.at(sets.keys.i01)->equal(sets.paths.ten));
+    EXPECT_TRUE(at(sets.a, sets.keys.i00)->equal(sets.paths.twenty));
+    EXPECT_TRUE(at(sets.a, sets.keys.i01)->equal(sets.paths.ten));
 
     EXPECT_EQ(2u, sets.b.size());
-    EXPECT_TRUE(sets.b.at(sets.keys.i00)->equal(sets.paths.ten));
-    EXPECT_TRUE(sets.b.at(sets.keys.i11)->equal(sets.paths.ten));
+    EXPECT_TRUE(at(sets.b, sets.keys.i00)->equal(sets.paths.ten));
+    EXPECT_TRUE(at(sets.b, sets.keys.i11)->equal(sets.paths.ten));
 }
 
 
@@ -412,9 +438,9 @@ TEST(wali$domains$KeyedSemElemSet$$one, returnsSingletonOne)
     EXPECT_EQ(1u, b_one->size());
     EXPECT_EQ(1u, c_one->size());
 
-    EXPECT_TRUE(a_one->at(sets.keys.i00->one())->equal(sets.paths.ten->one()));
-    EXPECT_TRUE(b_one->at(sets.keys.i00->one())->equal(sets.paths.ten->one()));
-    EXPECT_TRUE(c_one->at(sets.keys.i00->one())->equal(sets.paths.ten->one()));
+    EXPECT_TRUE(at(*a_one, sets.keys.i00->one())->equal(sets.paths.ten->one()));
+    EXPECT_TRUE(at(*b_one, sets.keys.i00->one())->equal(sets.paths.ten->one()));
+    EXPECT_TRUE(at(*c_one, sets.keys.i00->one())->equal(sets.paths.ten->one()));
 }
 
 
@@ -453,9 +479,9 @@ TEST(wali$domains$KeyedSemElemSet$$zero, canTakeZeroThenOne)
     EXPECT_EQ(1u, b_one->size());
     EXPECT_EQ(1u, c_one->size());
     
-    EXPECT_TRUE(a_one->at(sets.keys.i00->one())->equal(sets.paths.ten->one()));
-    EXPECT_TRUE(b_one->at(sets.keys.i00->one())->equal(sets.paths.ten->one()));
-    EXPECT_TRUE(c_one->at(sets.keys.i00->one())->equal(sets.paths.ten->one()));
+    EXPECT_TRUE(at(*a_one, sets.keys.i00->one())->equal(sets.paths.ten->one()));
+    EXPECT_TRUE(at(*b_one, sets.keys.i00->one())->equal(sets.paths.ten->one()));
+    EXPECT_TRUE(at(*c_one, sets.keys.i00->one())->equal(sets.paths.ten->one()));
 }
 
 TEST(wali$domains$KeyedSemElemSet$$extend, simpleExtend)
@@ -468,8 +494,27 @@ TEST(wali$domains$KeyedSemElemSet$$extend, simpleExtend)
     // 0->0 distance 30; 0->1 distance 20
 
     EXPECT_EQ(2u, a_extend_b->size());
-    EXPECT_TRUE(a_extend_b->at(sets.keys.i00)->equal(sets.paths.thirty));
-    EXPECT_TRUE(a_extend_b->at(sets.keys.i01)->equal(sets.paths.twenty));
+    EXPECT_TRUE(at(*a_extend_b, sets.keys.i00)->equal(sets.paths.thirty));
+    EXPECT_TRUE(at(*a_extend_b, sets.keys.i01)->equal(sets.paths.twenty));
+}
+
+TEST(wali$domains$KeyedSemElemSet$$extend, extendsResultingInMultiplePaths)
+{
+    KeyedSets sets;
+
+    sem_elem_t
+        ac_actual_se = sets.a.extend(&sets.c),
+        aca_actual_se = ac_actual_se->extend(&sets.a);
+    
+    KeyedSemElemSet
+        * ac_actual = down_ks(ac_actual_se),
+        * aca_actual = down_ks(aca_actual_se);
+
+    EXPECT_EQ(2u, ac_actual->size());
+    EXPECT_EQ(4u, aca_actual->size());
+    
+    EXPECT_TRUE(ac_actual_se->equal(&sets.ac));
+    EXPECT_TRUE(aca_actual_se->equal(&sets.aca));
 }
 
 TEST(wali$domains$KeyedSemElemSet$$extend, extendingWithZeroGivesZero)

@@ -47,9 +47,11 @@ namespace wali
       : public wali::SemElem
     {
     public:
-      typedef std::tr1::unordered_map<sem_elem_t, sem_elem_t,
-                                      SemElemRefPtrHash, SemElemRefPtrEqual>
+      typedef std::tr1::unordered_multimap<sem_elem_t, sem_elem_t,
+                                           SemElemRefPtrHash, SemElemRefPtrEqual>
               BackingMap;
+
+      typedef BackingMap::const_iterator const_iterator;
 
       KeyedSemElemSet(BackingMap const & m)
         : map_(m)
@@ -67,11 +69,9 @@ namespace wali
         , one_value_(example_value->one())
       {}
 
-      sem_elem_t at(sem_elem_t key) const {
-        if (map_.find(key) == map_.end()) {
-          abort();
-        }
-        return map_.find(key)->second;
+      std::pair<const_iterator, const_iterator>
+      equal_range(sem_elem_t key) const {
+        return map_.equal_range(key);
       }
 
       size_t size() const {
@@ -80,7 +80,7 @@ namespace wali
       
       sem_elem_t one() const {
         BackingMap m;
-        m[one_key_] = one_value_;
+        m.insert(std::make_pair(one_key_, one_value_));
         return new KeyedSemElemSet(m);
       }
       
