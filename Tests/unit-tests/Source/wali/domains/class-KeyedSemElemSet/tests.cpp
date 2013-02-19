@@ -347,36 +347,36 @@ struct Mappings
     Mappings() {
         // 0 ---> 0   length 20
         // 0 ---> 1   length 10
-        a.insert(std::make_pair(keys.i00, paths.twenty));
-        a.insert(std::make_pair(keys.i01, paths.ten));
+        a[keys.i00].insert(paths.twenty);
+        a[keys.i01].insert(paths.ten);
 
-        str_a.insert(std::make_pair(keys.s00, paths.twenty));
-        str_a.insert(std::make_pair(keys.s01, paths.ten));
+        str_a[keys.s00].insert(paths.twenty);
+        str_a[keys.s01].insert(paths.ten);
 
         // 0 ---> 0   length 10
         // 1 ---> 1   length 10
-        b.insert(std::make_pair(keys.i00, paths.ten));
-        b.insert(std::make_pair(keys.i11, paths.ten));
+        b[keys.i00].insert(paths.ten);
+        b[keys.i11].insert(paths.ten);
 
         // 0 ---> 0   length 10
         // 1 ---> 0   length 10
-        c.insert(std::make_pair(keys.i00, paths.ten));
-        c.insert(std::make_pair(keys.i10, paths.ten));
+        c[keys.i00].insert(paths.ten);
+        c[keys.i10].insert(paths.ten);
 
-        ac.insert(std::make_pair(keys.i00, paths.twenty));
-        ac.insert(std::make_pair(keys.i00, paths.thirty));
+        ac[keys.i00].insert(paths.twenty);
+        ac[keys.i00].insert(paths.thirty);
 
-        aca.insert(std::make_pair(keys.i00, paths.fourty));
-        aca.insert(std::make_pair(keys.i00, paths.fifty));
-        aca.insert(std::make_pair(keys.i01, paths.thirty));
-        aca.insert(std::make_pair(keys.i01, paths.fourty));
+        aca[keys.i00].insert(paths.fourty);
+        aca[keys.i00].insert(paths.fifty);
+        aca[keys.i01].insert(paths.thirty);
+        aca[keys.i01].insert(paths.fourty);
 
-        all_combine.insert(std::make_pair(keys.i00, paths.twenty));
-        all_combine.insert(std::make_pair(keys.i00, paths.ten));
-        all_combine.insert(std::make_pair(keys.i00, paths.ten));
-        all_combine.insert(std::make_pair(keys.i01, paths.ten));
-        all_combine.insert(std::make_pair(keys.i11, paths.ten));
-        all_combine.insert(std::make_pair(keys.i10, paths.ten));
+        all_combine[keys.i00].insert(paths.twenty);
+        all_combine[keys.i00].insert(paths.ten);
+        all_combine[keys.i00].insert(paths.ten);
+        all_combine[keys.i01].insert(paths.ten);
+        all_combine[keys.i11].insert(paths.ten);
+        all_combine[keys.i10].insert(paths.ten);
     }
 };
 
@@ -411,7 +411,7 @@ sem_elem_t at(KeyedSemElemSet const & ks, sem_elem_t key)
     p.first++;
     assert(p.first == p.second);
 
-    return first->second;
+    return *first;
 }
 
 
@@ -590,6 +590,6 @@ TEST(wali$domains$KeyedSemElemSet$$combine, allCombine)
     sem_elem_t actual_se = sets.a.combine(&sets.b)->combine(&sets.c)->combine(sets.c.zero());
     KeyedSemElemSet * actual = down_ks(actual_se);
 
-    EXPECT_EQ(6u, actual->size());
+    EXPECT_EQ(5u, actual->size());
     EXPECT_TRUE(actual_se->equal(&sets.all_combine));
 }

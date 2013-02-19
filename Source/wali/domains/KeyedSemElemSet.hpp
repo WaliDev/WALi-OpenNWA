@@ -5,6 +5,7 @@
 
 #include <boost/optional.hpp>
 #include <tr1/unordered_map>
+#include <tr1/unordered_set>
 #include <limits>
 
 #include <iostream>
@@ -47,18 +48,21 @@ namespace wali
       : public wali::SemElem
     {
     public:
-      typedef std::tr1::unordered_multimap<sem_elem_t, sem_elem_t,
-                                           SemElemRefPtrHash, SemElemRefPtrEqual>
+      typedef std::tr1::unordered_set<sem_elem_t, SemElemRefPtrHash, SemElemRefPtrEqual>
+              InternalSet;
+      
+      typedef std::tr1::unordered_map<sem_elem_t, InternalSet,
+                                      SemElemRefPtrHash, SemElemRefPtrEqual>
               BackingMap;
 
-      typedef BackingMap::const_iterator const_iterator;
+      typedef InternalSet::const_iterator const_iterator;
 
       KeyedSemElemSet(BackingMap const & m)
         : map_(m)
       {
         assert(m.size() > 0u);
         one_key_ = m.begin()->first->one();
-        one_value_ = m.begin()->second->one();
+        one_value_ = (*(m.begin()->second.begin()))->one();
       }
       
       KeyedSemElemSet(BackingMap const & m,
@@ -71,16 +75,26 @@ namespace wali
 
       std::pair<const_iterator, const_iterator>
       equal_range(sem_elem_t key) const {
-        return map_.equal_range(key);
+        BackingMap::const_iterator it = map_.find(key);
+        if (it == map_.end()) {
+          return std::make_pair(const_iterator(), const_iterator());
+        }
+        return std::make_pair(it->second.begin(), it->second.end());
       }
 
       size_t size() const {
-        return map_.size();
+        size_t s = 0;
+        for (BackingMap::const_iterator values = this->map_.begin();
+             values != this->map_.end(); ++values)
+        {
+          s += values->second.size();
+        }
+        return s;
       }
       
       sem_elem_t one() const {
         BackingMap m;
-        m.insert(std::make_pair(one_key_, one_value_));
+        m[one_key_].insert(one_value_);
         return new KeyedSemElemSet(m);
       }
       
@@ -95,26 +109,28 @@ namespace wali
 
         BackingMap m;
 
-        for (BackingMap::const_iterator this_element = this->map_.begin();
-             this_element != this->map_.end(); ++this_element)
+        for (BackingMap::const_iterator this_guard = this->map_.begin();
+             this_guard != this->map_.end(); ++this_guard)
         {
-          for (BackingMap::const_iterator that_element = that->map_.begin();
-               that_element != that->map_.end(); ++that_element)
+          for (BackingMap::const_iterator that_guard = that->map_.begin();
+               that_guard != that->map_.end(); ++that_guard)
           {
-            sem_elem_t
-              this_guard = this_element->first,
-              that_guard = that_element->first,
-              this_weight = this_element->second,
-              that_weight = that_element->second;
-
-            sem_elem_t new_guard = this_guard->extend(that_guard);
-
+            sem_elem_t new_guard = this_guard->first->extend(that_guard->first);
+            
             if (!new_guard->equal(new_guard->zero())) {
-              sem_elem_t new_weight = this_weight->extend(that_weight);
-              m.insert(std::make_pair(new_guard, new_weight));
-            }
-          }
-        }
+              for (const_iterator this_value = this_guard->second.begin();
+                   this_value != this_guard->second.end(); ++this_value)
+              {
+                for (const_iterator that_value = that_guard->second.begin();
+                     that_value != that_guard->second.end(); ++that_value)
+                {
+                  sem_elem_t new_weight = (*this_value)->extend(*that_value);
+                  m[new_guard].insert(new_weight);
+                } // for
+              } // for
+            } // if
+          } // for
+        } // for
         
         return new KeyedSemElemSet(m, one_key_, one_value_);
       }
@@ -124,7 +140,12 @@ namespace wali
         assert(that);
 
         BackingMap m(this->map_);
-        m.insert(that->map_.begin(), that->map_.end());
+        for (BackingMap::const_iterator that_guard = that->map_.begin();
+             that_guard != that->map_.end(); ++that_guard)
+        {
+          m[that_guard->first].insert(that_guard->second.begin(),
+                                      that_guard->second.end());
+        }
 
         return new KeyedSemElemSet(m, one_key_, one_value_);
       }
@@ -140,19 +161,21 @@ namespace wali
           return false;
         }
 
-        for (BackingMap::const_iterator this_element = this->map_.begin();
-             this_element != this->map_.end(); ++this_element)
+        for (BackingMap::const_iterator this_guard = this->map_.begin();
+             this_guard != this->map_.end(); ++this_guard)
         {
-          std::pair<BackingMap::const_iterator, BackingMap::const_iterator>
-            range = that->map_.equal_range(this_element->first);
-          bool found = false;
-          for ( ; range.first != range.second; ++range.first) {
-            if (range.first->second->equal(this_element->second)) {
-              found = true;
-            }
-          }
-          if (!found) {
+          if (that->map_.count(this_guard->first) == 0u
+              || that->map_[this_guard->first].size() != this_guard->second.size())
+          {
             return false;
+          }
+
+          for (const_iterator this_value = this_guard->second.begin();
+               this_value != this_guard->second.end(); ++this_value)
+          {
+            if (that->map_[this_guard->first].count(*this_value) == 0u) {
+              return false;
+            }
           }
         }
 
@@ -168,8 +191,7 @@ namespace wali
           if (!first) {
             o << ", ";
           }
-          element->first->print(o) << " ";
-          element->second->print(o);
+          element->first->print(o) << ": <stuff>";
           first = false;
         }
         o << "}";
