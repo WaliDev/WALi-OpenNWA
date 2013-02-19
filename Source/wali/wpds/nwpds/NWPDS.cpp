@@ -45,6 +45,9 @@ namespace wali
   } //namespace wpds
 } //namewpace wali
 
+// ////////////////////////////////////////////////////////////////
+// class NWPDS
+// ////////////////////////////////////////////////////////////////
 NWPDS::NWPDS(bool b) :
   EWPDS(),
   dbg(b)
@@ -89,6 +92,10 @@ NWPDS::~NWPDS()
   savedRules.clear();
 }
 
+/**
+ * Create a key for the Old values of variables in the equations system
+ * if a key does not already exist. Return the existing / created key.
+ **/
 Key NWPDS::getOldKey(Key newKey)
 {
   if(stack2ConstMap.find(newKey) == stack2ConstMap.end()){
@@ -191,11 +198,13 @@ void NWPDS::prestarSetupPds()
 
 /*
    replace each delta_2 rule <p,y> -> <p',y'y''>
-   by two rules:
+   by three rules:
     - False call site, real call:
      <p,t> -> <p',y'y''>
     - Real call site, summary call:
      <p,y> -> <p't'y''> and <p't'> -><p',.> (w = 0)
+    - False call site, summary call:
+     <p,t> -> <p',t'y''> // TODO#1
      here t and t' are new stack symbols that will hold on to the values of y,y' from last Newton 
      iteration during saturation.
 */
@@ -228,6 +237,7 @@ void NWPDS::poststarSetupPds()
   oldFuncEntry.clear();
   oldFuncEntryPair.clear();
 
+  // Find the delta2 rules in PDS
   Delta2Rules dr;
   this->for_each(dr);
   for(std::vector<rule_t>::iterator it = dr.rules.begin();
@@ -242,6 +252,7 @@ void NWPDS::poststarSetupPds()
     // backup the current rule
     savedRules.push_back(r);
 
+    // p, y, p', y', y''
     Key p = r->from_state();
     Key y = r->from_stack();
     Key p_prime = r->to_state();
@@ -251,6 +262,7 @@ void NWPDS::poststarSetupPds()
     assert(y_prime_prime != WALI_EPSILON);
     assert(y_prime != WALI_EPSILON);
 
+    // t, t' are keys to hold on to values from the last newton round for y and y' respectively.
     Key t = getOldKey(y);
     Key t_prime = getOldKey(y_prime);
 
@@ -260,11 +272,11 @@ void NWPDS::poststarSetupPds()
     // erase rule from the WPDS
     erase_rule(p,y,p_prime,y_prime,y_prime_prime);
     ERule * er = boost::polymorphic_downcast<ERule*>(r.get_ptr()); //change to static_cast ? 
-    //<p,t> -> <p',y'y''>
+    //Add: <p,t> -> <p',y'y''>
     add_rule(p,t,p_prime,y_prime,y_prime_prime,er->weight(),er->merge_fn());
-    //<p,y> -> <p',t'y''>
+    //Add: <p,y> -> <p',t'y''>
     add_rule(p,y,p_prime,t_prime,y_prime_prime,er->weight(),er->merge_fn());
-    //<p',t'> -> <p',.>
+    //Add: <p',t'> -> <p',.>
     add_rule(p_prime,t_prime,p_prime,er->weight()->zero());
   }
   if(dbg){
@@ -423,6 +435,27 @@ void NWPDS::prestar(wfa::WFA const &, wfa::WFA &)
 #endif
 }
 
+/**
+ * poststar using newton method
+ * This involves --
+ *  (1) Change the PDS so that we replace every delta2 rule <p,y> --> <p',y'y''> by 3 rules
+ *      (i)   <p,t> --> <p',y'y''> 
+ *      (ii)  <p,y> --> <p',t'y''> and <p',t'> --> <p',*> with weight = 0
+ *      (iii) <p,t> --> <p',t'y''>  // TODO#1
+ *  The idea behind this transformation is as follows:
+ *  <p,y> --> <p',y'y''> gives us in the poststar GFA problem, the equation -- 
+ *  \Forall{q} (p,y'',q) = (p,y,q) . (p_{y'},*,q)
+ *  where p_{y'} is the intermediate state generated during poststar for the entry function y', and * is the epsilon symbol.
+ *  Upon linearlzing this equation, we obrain,
+ *  \Forall{q} (p,y'',q) = ((p,y,q).(p_{t'},*,q)) + ((p,t,q).(p_{y'},*,q)) + ((p,t,q) . (p_{t'},*,q))
+ *  where the values with y (y')replaced by t (t') are constants corresponding to the values obtained in the last newton
+ *  round.
+ *  We can obtain this linearized GFA problem if we change our PDS as above. Note that (ii) replace the actual function 
+ *  body for the call at t' with a 0 weight edge. This ensures that no information flows through the summary call. 
+ *
+ *  (2) Update the WFA to correctly setup the values on the transitions (p,t,q) and (p_{t'},*,q) between newton rounds.
+ *  For this, between newton rounds, we copy values from (p,y,q) to (p,t,q) and (p_{y'},*,q) to (p_{t'},*,q).
+ **/
 void NWPDS::poststar(wfa::WFA const & input, wfa::WFA & output)
 {
   int newtonSteps = 0;
@@ -432,15 +465,20 @@ void NWPDS::poststar(wfa::WFA const & input, wfa::WFA & output)
   oldFuncEntry.clear();
   oldFuncEntryPair.clear();
 
+  // Step 1:
   poststarSetupPds();
+  // Calls EWPDS::poststarSetupFixpoint, and does some light book keeping.
   poststarSetupFixpoint(input,output);
 
+  // Add all transitions in output to the outer worklist (that goes across linear solves)
   CreateInitialNewtonWl cinw(newtonWl);
   output.for_each(cinw);
   do{
+    // linear solve.
     EWPDS::poststarComputeFixpoint(output);
+    // Step 2:
     poststarUpdateFa(output);
-    {
+    if(dbg){
       std::stringstream ss;
       ss << "outfa_int_" << newtonSteps << ".dot";
       fstream outfile(ss.str().c_str(), fstream::out);
@@ -449,11 +487,12 @@ void NWPDS::poststar(wfa::WFA const & input, wfa::WFA & output)
     }
     newtonSteps++;
   }while(!worklist->empty());
-  //if(dbg)
   *waliErr << "Total Newton Steps: " << newtonSteps << std::endl;
+  // Fix the delta2 rules to be as before
   restorePds();
   EWPDS::unlinkOutput(output);
   EWPDS::currentOutputWFA = 0;
+  // Remove all transitions that use t / t' anywhere.
   cleanUpFa(output);
 }
 
