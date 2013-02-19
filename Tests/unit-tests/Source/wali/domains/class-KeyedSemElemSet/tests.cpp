@@ -340,13 +340,16 @@ struct Mappings
     PKFixtures keys;
     ShortestPathLengths paths;
     
-    KeyedSemElemSet::BackingMap a, b, c;
+    KeyedSemElemSet::BackingMap a, b, c, str_a;
 
     Mappings() {
         // 0 ---> 0   length 20
         // 0 ---> 1   length 10
         a[keys.i00] = paths.twenty;
         a[keys.i01] = paths.ten;
+
+        str_a[keys.s00] = paths.twenty;
+        str_a[keys.s01] = paths.ten;
 
         // 0 ---> 0   length 10
         // 1 ---> 1   length 10
@@ -364,7 +367,7 @@ struct Mappings
 struct KeyedSets
 {
     Mappings maps;
-    KeyedSemElemSet a, b, c;
+    KeyedSemElemSet a, b, c, str_a;
     
     ShortestPathLengths paths;
     PKFixtures keys;
@@ -373,6 +376,7 @@ struct KeyedSets
         : a(maps.a)
         , b(maps.b)
         , c(maps.c)
+        , str_a(maps.str_a)
     {}
 };
 
@@ -484,10 +488,45 @@ TEST(wali$domains$KeyedSemElemSet$$extend, extendingWithZeroGivesZero)
         * c_extend_zero = down_ks(c_extend_zero_se),
         * zero_extend_zero = down_ks(z_extend_z_se);
 
-    // 0->0 distance 30; 0->1 distance 20
-
     EXPECT_EQ(0u, a_extend_zero->size());
     EXPECT_EQ(0u, b_extend_zero->size());
     EXPECT_EQ(0u, c_extend_zero->size());
     EXPECT_EQ(0u, zero_extend_zero->size());
 }
+
+TEST(wali$domains$KeyedSemElemSet$$equal, fixtureComparisons)
+{
+    KeyedSets sets;
+
+    EXPECT_TRUE(sets.a.equal(&sets.a));
+    EXPECT_TRUE(sets.b.equal(&sets.b));
+    EXPECT_TRUE(sets.c.equal(&sets.c));
+
+    EXPECT_FALSE(sets.a.equal(&sets.b));
+    EXPECT_FALSE(sets.a.equal(&sets.c));
+    EXPECT_FALSE(sets.b.equal(&sets.c));
+}
+
+TEST(wali$domains$KeyedSemElemSet$$equal, sameKeysDifferentWeightsUnequal)
+{
+    KeyedSets sets;
+
+    sem_elem_t a_extend_b = sets.a.extend(&sets.b);
+
+    // has 0->0 and 0->1 just like a
+    EXPECT_FALSE(sets.a.equal(a_extend_b));
+}
+
+TEST(wali$domains$KeyedSemElemSet$$zero, differentZeroTestsEqual)
+{
+    KeyedSets sets;
+
+    EXPECT_FALSE(sets.a.zero()->equal(&sets.a));
+
+    EXPECT_TRUE(sets.a.zero()->equal(sets.a.zero()));
+    EXPECT_TRUE(sets.a.zero()->equal(sets.b.zero()));
+    EXPECT_TRUE(sets.c.zero()->equal(sets.b.zero()));
+    EXPECT_TRUE(sets.str_a.zero()->equal(sets.str_a.zero()));
+}
+
+

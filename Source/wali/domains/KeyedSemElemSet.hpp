@@ -91,6 +91,7 @@ namespace wali
 
       sem_elem_t extend(SemElem * se) {
         KeyedSemElemSet * that = dynamic_cast<KeyedSemElemSet*>(se);
+        assert(that);
 
         BackingMap m;
 
@@ -120,9 +121,52 @@ namespace wali
       
       sem_elem_t combine(SemElem * UNUSED_PARAMETER(se)) { abort(); }
 
-      bool equal(SemElem * UNUSED_PARAMETER(se)) const   { abort(); }
+      bool equal(SemElem * se) const {
+        KeyedSemElemSet * that = dynamic_cast<KeyedSemElemSet*>(se);
+        assert(that);
 
-      std::ostream& print( std::ostream & UNUSED_PARAMETER(os) ) const     { abort(); }
+        if (this->map_.size() != that->map_.size()
+            || !this->one_key_->equal(that->one_key_)
+            || !this->one_value_->equal(that->one_value_))
+        {
+          return false;
+        }
+
+        for (BackingMap::const_iterator this_element = this->map_.begin();
+             this_element != this->map_.end(); ++this_element)
+        {
+          std::pair<BackingMap::const_iterator, BackingMap::const_iterator>
+            range = that->map_.equal_range(this_element->first);
+          bool found = false;
+          for ( ; range.first != range.second; ++range.first) {
+            if (range.first->second->equal(this_element->second)) {
+              found = true;
+            }
+          }
+          if (!found) {
+            return false;
+          }
+        }
+
+        return true;
+      }
+
+      std::ostream& print( std::ostream & o ) const {
+        o << "{ ";
+        bool first = true;
+        for (BackingMap::const_iterator element = this->map_.begin();
+             element != this->map_.end(); ++element)
+        {
+          if (!first) {
+            o << ", ";
+          }
+          element->first->print(o) << " ";
+          element->second->print(o);
+          first = false;
+        }
+        o << "}";
+        return o;
+      }
 
 
       // Pull in the sem_elem_t overloads
