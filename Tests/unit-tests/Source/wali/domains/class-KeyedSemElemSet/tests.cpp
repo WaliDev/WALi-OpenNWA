@@ -12,17 +12,19 @@ using namespace wali;
 using namespace wali::domains;
 
 struct PKFixtures {
-    PositionKey<int> i0, i00, i01, i10, i11, i10copy;
-    PositionKey<string> s_empty, s00, s01, s10, s11, s10copy;
+    PositionKey<int> i_empty, i_id, i00, i01, i10, i11, i10copy;
+    PositionKey<string> s_empty, s_id, s00, s01, s10, s11, s10copy;
 
     PKFixtures()
-        : i0()
+        : i_empty(PositionKey<int>::makeZero())
+        , i_id(PositionKey<int>::makeOne())
         , i00(0, 0)
         , i01(0, 1)
         , i10(1, 0)
         , i11(1, 1)
         , i10copy(i10)
-        , s_empty()
+        , s_empty(PositionKey<string>::makeZero())
+        , s_id(PositionKey<string>::makeOne())
         , s00("zero", "zero")
         , s01("zero", "one")
         , s10("one", "zero")
@@ -37,13 +39,15 @@ struct PKLists {
 
     PKLists() {
         PKFixtures f;
-        ints.push_back(new PositionKey<int>(f.i0));        
+        ints.push_back(new PositionKey<int>(f.i_empty));
+        ints.push_back(new PositionKey<int>(f.i_id));
         ints.push_back(new PositionKey<int>(f.i00));
         ints.push_back(new PositionKey<int>(f.i01));
         ints.push_back(new PositionKey<int>(f.i10));
         ints.push_back(new PositionKey<int>(f.i11));
 
         strings.push_back(new PositionKey<string>(f.s_empty));
+        strings.push_back(new PositionKey<string>(f.s_id));
         strings.push_back(new PositionKey<string>(f.s00));
         strings.push_back(new PositionKey<string>(f.s01));
         strings.push_back(new PositionKey<string>(f.s10));
@@ -67,23 +71,57 @@ TEST(wali$domains$PositionKey$$extend, zeroExtendBlahGivesZero)
     PKFixtures f;
 
     sem_elem_t
-        ai = f.i0.extend(&f.i0),
-        bi = f.i10.extend(&f.i0),
-        ci = f.i11.extend(&f.i0),
-        di = f.i0.extend(&f.i10),
+        ai = f.i_empty.extend(&f.i_empty),
+        bi = f.i10.extend(&f.i_empty),
+        ci = f.i11.extend(&f.i_empty),
+        di = f.i_empty.extend(&f.i10),
+        ei = f.i_empty.extend(&f.i_id),
+        fi = f.i_id.extend(&f.i_empty),
         as = f.s_empty.extend(&f.s_empty),
         bs = f.s10.extend(&f.s_empty),
         cs = f.s11.extend(&f.s_empty),
-        ds = f.s_empty.extend(&f.s10);
+        ds = f.s_empty.extend(&f.s10),
+        es = f.s_empty.extend(&f.s_id),
+        fs = f.s_id.extend(&f.s_empty);
 
     EXPECT_TRUE(downi(ai)->isZero());
     EXPECT_TRUE(downi(bi)->isZero());
     EXPECT_TRUE(downi(ci)->isZero());
     EXPECT_TRUE(downi(di)->isZero());
+    EXPECT_TRUE(downi(ei)->isZero());
+    EXPECT_TRUE(downi(fi)->isZero());
+    
     EXPECT_TRUE(downs(as)->isZero());
     EXPECT_TRUE(downs(bs)->isZero());
     EXPECT_TRUE(downs(cs)->isZero());
     EXPECT_TRUE(downs(ds)->isZero());
+    EXPECT_TRUE(downs(es)->isZero());
+    EXPECT_TRUE(downs(fs)->isZero());
+}
+
+TEST(wali$domains$PositionKey$$extend, oneExtendBlahGivesBlah)
+{
+    PKFixtures f;
+
+    sem_elem_t
+        ai = f.i_id.extend(&f.i_id),
+        bi = f.i10.extend(&f.i_id),
+        ci = f.i11.extend(&f.i_id),
+        di = f.i_id.extend(&f.i10),
+        as = f.s_id.extend(&f.s_id),
+        bs = f.s10.extend(&f.s_id),
+        cs = f.s11.extend(&f.s_id),
+        ds = f.s_id.extend(&f.s10);
+
+    EXPECT_TRUE(ai->equal(&f.i_id));
+    EXPECT_TRUE(bi->equal(&f.i10));
+    EXPECT_TRUE(ci->equal(&f.i11));
+    EXPECT_TRUE(di->equal(&f.i10));
+    
+    EXPECT_TRUE(as->equal(&f.s_id));
+    EXPECT_TRUE(bs->equal(&f.s10));
+    EXPECT_TRUE(cs->equal(&f.s11));
+    EXPECT_TRUE(ds->equal(&f.s10));
 }
 
 TEST(wali$domains$PositionKey$$extend, nonmatchesGiveZero)
@@ -91,7 +129,7 @@ TEST(wali$domains$PositionKey$$extend, nonmatchesGiveZero)
     PKFixtures f;
 
     sem_elem_t
-        ai = f.i0.extend(&f.i11),
+        ai = f.i_empty.extend(&f.i11),
         bi = f.i10.extend(&f.i11),
         ci = f.i11.extend(&f.i00),
         as = f.s_empty.extend(&f.s11),
@@ -216,34 +254,49 @@ TEST(wali$domains$PositionKey$$hash, differentElementsProduceDifferentHashes)
 TEST(wali$domains$PositionKey$$isZero, isZeroForFixture)
 {
     PKFixtures f;
-    EXPECT_TRUE(f.i0.isZero());
+    EXPECT_TRUE(f.i_empty.isZero());
     EXPECT_TRUE(f.s_empty.isZero());
 
+    EXPECT_FALSE(f.i_id.isZero());
     EXPECT_FALSE(f.i00.isZero());
     EXPECT_FALSE(f.i01.isZero());
     EXPECT_FALSE(f.i10.isZero());
     EXPECT_FALSE(f.i11.isZero());
 
+    EXPECT_FALSE(f.s_id.isZero());
     EXPECT_FALSE(f.s00.isZero());
     EXPECT_FALSE(f.s01.isZero());
     EXPECT_FALSE(f.s10.isZero());
     EXPECT_FALSE(f.s11.isZero());
 }
 
-TEST(wali$domains$PositionKey$$one, oneAborts)
+
+TEST(wali$domains$PositionKey$$isOne, isOneForFixture)
 {
     PKFixtures f;
-    EXPECT_DEATH({
-            f.i0.one();
-        },
-        "");
+
+    EXPECT_TRUE(f.s_id.isOne());
+    EXPECT_TRUE(f.s_id.isOne());    
+    
+    EXPECT_FALSE(f.i_empty.isOne());
+    EXPECT_FALSE(f.i00.isOne());
+    EXPECT_FALSE(f.i01.isOne());
+    EXPECT_FALSE(f.i10.isOne());
+    EXPECT_FALSE(f.i11.isOne());
+    
+    EXPECT_FALSE(f.s_empty.isOne());
+    EXPECT_FALSE(f.s00.isOne());
+    EXPECT_FALSE(f.s01.isOne());
+    EXPECT_FALSE(f.s10.isOne());
+    EXPECT_FALSE(f.s11.isOne());
 }
+
 
 TEST(wali$domains$PositionKey$$combine, combineAborts)
 {
     PKFixtures f;
     EXPECT_DEATH({
-            f.i0.combine(&f.i0);
+            f.i_empty.combine(&f.i_empty);
         },
         "");
 }
