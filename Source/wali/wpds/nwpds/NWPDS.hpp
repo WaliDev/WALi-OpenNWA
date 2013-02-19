@@ -40,6 +40,18 @@ namespace wali
     namespace nwpds 
     {
 
+      /**
+       * @class NWPDS
+       * @brief Implement a newton solver for WPDS queries, using EWPDS solvers for the genearted linear equations
+       * This class extends EWPDS to replace the poststar solver with a newton
+       * solver. The newton solver modifies the NWPDS to mimick the solution of
+       * the linearized Newton's equations for the given NWPDS. The overall
+       * solution is computed in newton rounds. Each newton round is similar to
+       * a poststar query to the underlying EWPDS. Between rounds, the WFA on
+       * which poststar is being computed is updated to prepare it for the next
+       * round. 
+       * @note Only poststar is implemented
+       **/
       class NWPDS : public wpds::ewpds::EWPDS
       {
         public:
@@ -85,6 +97,7 @@ namespace wali
           ///////////
           // pre*
           ///////////
+
           virtual void prestar( wfa::WFA const & input, wfa::WFA & output );
 
           virtual wfa::WFA prestar( wfa::WFA const & input) {
@@ -102,6 +115,11 @@ namespace wali
           }
 
         protected:
+          /**
+           * We need to change update and update_prime so that we maintain a
+           * worklist of nodes that are changed in the linear-solve. Only these
+           * nodes be considered for update between newton rounds.
+           **/
           virtual void update(
               Key from,
               Key stack,
@@ -135,8 +153,7 @@ namespace wali
            **/
           void restorePds();
           /**
-           * Sets the weights on transitions in outfa that correspond to constants in the fix point calculation
-           * to zero
+           * Removes transitions in outfa that correspond to constants in the fix point calculation
            **/
           void cleanUpFa(wali::wfa::WFA& fa);
 
@@ -207,7 +224,7 @@ namespace wali
        *
        * Gets all delta_2 rules from the wpds. Holds on to const rule_t
        * so that it can be cast down to the correct ERule/Rule type.
-       */
+       **/
       class Delta2Rules: public RuleFunctor
       {
         public:
@@ -217,6 +234,11 @@ namespace wali
           virtual void operator() (rule_t & r);
       };
 
+      /**
+       * @class RemoveOldTrans
+       * Sets the weights of transitions with stack symbols or states generated
+       * during the NWPDS poststar query to 0.
+       **/
       class RemoveOldTrans : public wali::wfa::TransFunctor
       {
         public:
@@ -227,6 +249,11 @@ namespace wali
           const NWPDS::Key2KeyMap& oldStateMap;
       };
 
+      /**
+       * @class CreateInitialNewtonWl
+       * NWPDS needs all transitions in the input fa to be on the Newton
+       * worklist. So, add them.
+       **/
       class CreateInitialNewtonWl : public wali::wfa::TransFunctor
       {
         public:
