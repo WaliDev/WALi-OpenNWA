@@ -68,6 +68,9 @@ namespace {
     PositionKey<string>* downs(sem_elem_t p) {
         return dynamic_cast<PositionKey<string>*>(p.get_ptr());
     }
+    KeyedSemElemSet * down_ks(sem_elem_t p) {
+        return dynamic_cast<KeyedSemElemSet*>(p.get_ptr());
+    }
 }
 
 
@@ -385,4 +388,68 @@ TEST(wali$domains$KeyedSemElemSet$$at, accessors)
     EXPECT_EQ(2u, sets.b.size());
     EXPECT_TRUE(sets.b.at(sets.keys.i00)->equal(sets.paths.ten));
     EXPECT_TRUE(sets.b.at(sets.keys.i11)->equal(sets.paths.ten));
+}
+
+
+TEST(wali$domains$KeyedSemElemSet$$one, returnsSingletonOne)
+{
+    KeyedSets sets;
+    sem_elem_t
+        a_one_se = sets.a.one(),
+        b_one_se = sets.b.one(),
+        c_one_se = sets.c.one();
+
+    KeyedSemElemSet
+        * a_one = down_ks(a_one_se),
+        * b_one = down_ks(b_one_se),
+        * c_one = down_ks(c_one_se);
+
+    EXPECT_EQ(1u, a_one->size());
+    EXPECT_EQ(1u, b_one->size());
+    EXPECT_EQ(1u, c_one->size());
+
+    EXPECT_TRUE(a_one->at(sets.keys.i00->one())->equal(sets.paths.ten->one()));
+    EXPECT_TRUE(b_one->at(sets.keys.i00->one())->equal(sets.paths.ten->one()));
+    EXPECT_TRUE(c_one->at(sets.keys.i00->one())->equal(sets.paths.ten->one()));
+}
+
+
+TEST(wali$domains$KeyedSemElemSet$$zero, zeroGivesEmptySet)
+{
+    KeyedSets sets;
+    sem_elem_t
+        a_zero_se = sets.a.zero(),
+        b_zero_se = sets.b.zero(),
+        c_zero_se = sets.c.zero();
+
+    KeyedSemElemSet
+        * a_zero = down_ks(a_zero_se),
+        * b_zero = down_ks(b_zero_se),
+        * c_zero = down_ks(c_zero_se);
+
+    EXPECT_EQ(0u, a_zero->size());
+    EXPECT_EQ(0u, b_zero->size());
+    EXPECT_EQ(0u, c_zero->size());
+}
+
+TEST(wali$domains$KeyedSemElemSet$$zero, canTakeZeroThenOne)
+{
+    KeyedSets sets;
+    sem_elem_t
+        a_one_se = sets.a.zero()->one(),
+        b_one_se = sets.b.zero()->one(),
+        c_one_se = sets.c.zero()->one();
+
+    KeyedSemElemSet
+        * a_one = down_ks(a_one_se),
+        * b_one = down_ks(b_one_se),
+        * c_one = down_ks(c_one_se);
+
+    EXPECT_EQ(1u, a_one->size());
+    EXPECT_EQ(1u, b_one->size());
+    EXPECT_EQ(1u, c_one->size());
+    
+    EXPECT_TRUE(a_one->at(sets.keys.i00->one())->equal(sets.paths.ten->one()));
+    EXPECT_TRUE(b_one->at(sets.keys.i00->one())->equal(sets.paths.ten->one()));
+    EXPECT_TRUE(c_one->at(sets.keys.i00->one())->equal(sets.paths.ten->one()));
 }

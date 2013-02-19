@@ -48,9 +48,21 @@ namespace wali
       typedef std::tr1::unordered_map<sem_elem_t, sem_elem_t,
                                       SemElemRefPtrHash, SemElemRefPtrEqual>
               BackingMap;
-    
+
       KeyedSemElemSet(BackingMap const & m)
         : map_(m)
+      {
+        assert(m.size() > 0u);
+        one_key_ = m.begin()->first->one();
+        one_value_ = m.begin()->second->one();
+      }
+      
+      KeyedSemElemSet(BackingMap const & m,
+                      sem_elem_t example_key,
+                      sem_elem_t example_value)
+        : map_(m)
+        , one_key_(example_key->one())
+        , one_value_(example_value->one())
       {}
 
       sem_elem_t at(sem_elem_t key) const {
@@ -64,8 +76,16 @@ namespace wali
         return map_.size();
       }
       
-      sem_elem_t one() const            { abort(); }
-      sem_elem_t zero() const           { abort(); }
+      sem_elem_t one() const {
+        BackingMap m;
+        m[one_key_] = one_value_;
+        return new KeyedSemElemSet(m);
+      }
+      
+      sem_elem_t zero() const {
+        BackingMap m;
+        return new KeyedSemElemSet(m, one_key_, one_value_);
+      }
 
       sem_elem_t extend(SemElem * UNUSED_PARAMETER(se))  { abort(); }
       sem_elem_t combine(SemElem * UNUSED_PARAMETER(se)) { abort(); }
@@ -75,7 +95,8 @@ namespace wali
       std::ostream& print( std::ostream & UNUSED_PARAMETER(os) ) const     { abort(); }
 
     private:      
-      BackingMap map_;      
+      BackingMap map_;
+      sem_elem_t one_key_, one_value_;
     };
     
 
