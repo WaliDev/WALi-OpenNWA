@@ -12,6 +12,51 @@ namespace wali
   namespace domains
   {
 
+
+    /// Represents a domain from a key to a weight.
+    ///
+    /// The "key" acts a bit like a guard, except that keys that are not
+    /// present act like 0/bottom (concretizes to nothing) rather than top
+    /// (concretizes to the universe).
+    ///
+    /// Thus, if I denote an element by <k,w> where k is the key and w the
+    /// weight:
+    ///
+    ///   o  zero is the empty set {}
+    ///   o  one  is the singleton set { <1,1> }
+    ///   o  combine does something like set union but combining elements with
+    ///              matching keys
+    ///   o   extend extends every mapping of the first with every mapping of
+    ///              the second, doing extend of both key and weight: if the
+    ///              extend of the key is 0, then that pair is dropped and the
+    ///              extend of the weights is not computed
+    ///
+    /// The key is treated as a sem_elem_t, but it really doesn't have to be
+    /// one -- in particular, keys are never combined.
+    ///
+    /// Another way that the keys aren't like guards (i.e. what the word
+    /// 'guard' suggests) is that keys have to be disjoint. The combine
+    ///     { <k1, w1> } + { <k2, w2> }
+    /// will always be either
+    ///     { <k1, w1+w2> }  or  { <k1, w1>,  <k2, w2> }
+    /// depending on whether k1==k2 (in the first case). So if two keys are
+    /// different, there is no mixing of their associated values.
+    class KeyedSemElemSet
+      : public wali::SemElem
+    {
+    public:
+      sem_elem_t one() const            { abort(); }
+      sem_elem_t zero() const           { abort(); }
+
+      sem_elem_t extend(SemElem * UNUSED_PARAMETER(se))  { abort(); }
+      sem_elem_t combine(SemElem * UNUSED_PARAMETER(se)) { abort(); }
+
+      bool equal(SemElem * UNUSED_PARAMETER(se)) const   { abort(); }
+
+      std::ostream& print( std::ostream & os ) const     { abort(); }
+    };
+    
+
     /// Represents a key that might be written [s->s'](w). It applies when
     /// a portion of the current state moves from s to s'. s and s' are some
     /// literal value of type 'PositionType'.

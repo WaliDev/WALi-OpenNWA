@@ -314,3 +314,8 @@ TEST(wali$domains$PositionKey$$pre$and$post, testAccessors)
 }
 
 
+
+TEST(wali$domains$KeyedSemElemSet, constructor)
+{
+    KeyedSemElemSet k;
+}
