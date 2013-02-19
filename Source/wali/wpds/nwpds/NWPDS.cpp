@@ -390,7 +390,7 @@ void NWPDS::poststarUpdateFa(wfa::WFA& fa)
   } 
   newtonWl.clear();
 }
-
+ 
 void NWPDS::prestar(wfa::WFA const &, wfa::WFA &)
 {
   assert(0);
@@ -489,7 +489,6 @@ void NWPDS::poststarSetupFixpoint( WFA const & input, WFA& fa )
 void NWPDS::update(Key from, Key stack, Key to, sem_elem_t se, Config * cfg)
 {
 
-  cout << "addEtrans: " << addEtrans << endl;
   wali::wfa::ITrans *t;
   if(addEtrans) {
     t = currentOutputWFA->insert(new wali::wpds::ewpds::ETrans(from, stack, to,
@@ -499,7 +498,7 @@ void NWPDS::update(Key from, Key stack, Key to, sem_elem_t se, Config * cfg)
   }
 
   t->setConfig(cfg);
-  if (t->modified()) {
+  if (dbg && t->modified()) {
     t->print(cout << "Modified: ") << endl;
     worklist->put( t );
     newtonWl.push_back( t );
@@ -519,7 +518,7 @@ wali::wfa::ITrans* NWPDS::update_prime( Key from, wali::wfa::ITrans* call, rule_
         from, r->to_stack2(), call->to(),
         delta, wWithRule, er);
   wali::wfa::ITrans* t = currentOutputWFA->insert(tmp);
-  if(t->modified()){
+  if(dbg && t->modified()){
     t->print(cout << "Modified: ") << endl;
     newtonWl.push_back( t );
   }
