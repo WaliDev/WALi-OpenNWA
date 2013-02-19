@@ -119,7 +119,15 @@ namespace wali
         return new KeyedSemElemSet(m, one_key_, one_value_);
       }
       
-      sem_elem_t combine(SemElem * UNUSED_PARAMETER(se)) { abort(); }
+      sem_elem_t combine(SemElem * se) {
+        KeyedSemElemSet * that = dynamic_cast<KeyedSemElemSet*>(se);
+        assert(that);
+
+        BackingMap m(this->map_);
+        m.insert(that->map_.begin(), that->map_.end());
+
+        return new KeyedSemElemSet(m, one_key_, one_value_);
+      }
 
       bool equal(SemElem * se) const {
         KeyedSemElemSet * that = dynamic_cast<KeyedSemElemSet*>(se);

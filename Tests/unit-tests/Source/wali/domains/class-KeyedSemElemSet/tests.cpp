@@ -342,7 +342,7 @@ struct Mappings
     PKFixtures keys;
     ShortestPathLengths paths;
     
-    KeyedSemElemSet::BackingMap a, b, c, str_a, ac, aca;
+    KeyedSemElemSet::BackingMap a, b, c, str_a, ac, aca, all_combine;
 
     Mappings() {
         // 0 ---> 0   length 20
@@ -370,6 +370,13 @@ struct Mappings
         aca.insert(std::make_pair(keys.i00, paths.fifty));
         aca.insert(std::make_pair(keys.i01, paths.thirty));
         aca.insert(std::make_pair(keys.i01, paths.fourty));
+
+        all_combine.insert(std::make_pair(keys.i00, paths.twenty));
+        all_combine.insert(std::make_pair(keys.i00, paths.ten));
+        all_combine.insert(std::make_pair(keys.i00, paths.ten));
+        all_combine.insert(std::make_pair(keys.i01, paths.ten));
+        all_combine.insert(std::make_pair(keys.i11, paths.ten));
+        all_combine.insert(std::make_pair(keys.i10, paths.ten));
     }
 };
 
@@ -377,7 +384,7 @@ struct Mappings
 struct KeyedSets
 {
     Mappings maps;
-    KeyedSemElemSet a, b, c, str_a, ac, aca;
+    KeyedSemElemSet a, b, c, str_a, ac, aca, all_combine;
     
     ShortestPathLengths paths;
     PKFixtures keys;
@@ -389,6 +396,7 @@ struct KeyedSets
         , str_a(maps.str_a)
         , ac(maps.ac)
         , aca(maps.aca)
+        , all_combine(maps.all_combine)
     {}
 };
 
@@ -575,3 +583,13 @@ TEST(wali$domains$KeyedSemElemSet$$zero, differentZeroTestsEqual)
 }
 
 
+TEST(wali$domains$KeyedSemElemSet$$combine, allCombine)
+{
+    KeyedSets sets;
+
+    sem_elem_t actual_se = sets.a.combine(&sets.b)->combine(&sets.c)->combine(sets.c.zero());
+    KeyedSemElemSet * actual = down_ks(actual_se);
+
+    EXPECT_EQ(6u, actual->size());
+    EXPECT_TRUE(actual_se->equal(&sets.all_combine));
+}
