@@ -320,7 +320,69 @@ TEST(wali$domains$PositionKey$$pre$and$post, testAccessors)
 
 
 
-TEST(wali$domains$KeyedSemElemSet, constructor)
+struct ShortestPathLengths
 {
-    KeyedSemElemSet k;
+    sem_elem_t ten, twenty, thirty;
+
+    ShortestPathLengths()
+        : ten(new ShortestPathSemiring(10))
+        , twenty(new ShortestPathSemiring(20))
+        , thirty(new ShortestPathSemiring(3))
+    {}
+};
+
+
+struct Mappings
+{
+    PKFixtures keys;
+    ShortestPathLengths paths;
+    
+    KeyedSemElemSet::BackingMap a, b, c;
+
+    Mappings() {
+        // 0 ---> 0   length 20
+        // 0 ---> 1   length 10
+        a[keys.i00] = paths.twenty;
+        a[keys.i01] = paths.ten;
+
+        // 0 ---> 0   length 10
+        // 1 ---> 1   length 10
+        b[keys.i00] = paths.ten;
+        b[keys.i11] = paths.ten;
+
+        // 0 ---> 0   length 10
+        // 1 ---> 0   length 10
+        c[keys.i00] = paths.ten;
+        c[keys.i10] = paths.ten;
+    }
+};
+
+
+struct KeyedSets
+{
+    Mappings maps;
+    KeyedSemElemSet a, b, c;
+    
+    ShortestPathLengths paths;
+    PKFixtures keys;
+    
+    KeyedSets()
+        : a(maps.a)
+        , b(maps.b)
+        , c(maps.c)
+    {}
+};
+
+
+TEST(wali$domains$KeyedSemElemSet$$at, accessors)
+{
+    KeyedSets sets;
+
+    EXPECT_EQ(2u, sets.a.size());
+    EXPECT_TRUE(sets.a.at(sets.keys.i00)->equal(sets.paths.twenty));
+    EXPECT_TRUE(sets.a.at(sets.keys.i01)->equal(sets.paths.ten));
+
+    EXPECT_EQ(2u, sets.b.size());
+    EXPECT_TRUE(sets.b.at(sets.keys.i00)->equal(sets.paths.ten));
+    EXPECT_TRUE(sets.b.at(sets.keys.i11)->equal(sets.paths.ten));
 }

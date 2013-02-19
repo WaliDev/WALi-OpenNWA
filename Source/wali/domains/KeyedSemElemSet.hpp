@@ -45,6 +45,25 @@ namespace wali
       : public wali::SemElem
     {
     public:
+      typedef std::tr1::unordered_map<sem_elem_t, sem_elem_t,
+                                      SemElemRefPtrHash, SemElemRefPtrEqual>
+              BackingMap;
+    
+      KeyedSemElemSet(BackingMap const & m)
+        : map_(m)
+      {}
+
+      sem_elem_t at(sem_elem_t key) const {
+        if (map_.find(key) == map_.end()) {
+          abort();
+        }
+        return map_.find(key)->second;
+      }
+
+      size_t size() const {
+        return map_.size();
+      }
+      
       sem_elem_t one() const            { abort(); }
       sem_elem_t zero() const           { abort(); }
 
@@ -53,7 +72,10 @@ namespace wali
 
       bool equal(SemElem * UNUSED_PARAMETER(se)) const   { abort(); }
 
-      std::ostream& print( std::ostream & os ) const     { abort(); }
+      std::ostream& print( std::ostream & UNUSED_PARAMETER(os) ) const     { abort(); }
+
+    private:      
+      BackingMap map_;      
     };
     
 
