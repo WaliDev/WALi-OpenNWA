@@ -35,7 +35,6 @@ env.AppendUnique(CPPPATH=['#/Tests/unit-tests/Source',
 env.AppendUnique(LIBPATH=['#/AddOns/Domains/ThirdParty/'])
 env.AppendUnique(CPPPATH=[glog_inc])
 env.AppendUnique(LIBS=[glog_lib, 'walidomains', 'bdd', "xfa"])
-env.Append(CXXFLAGS=["-std=c++0x"])
 
 #gtest and glog are ill begaved w.r.t. to these flags.
 env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wundef', '')
@@ -44,6 +43,17 @@ env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wsign-compare', '')
 
 #boost is ill-behaved w.r.t. these flags
 env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wfloat-equal', '')
+
+
+#############################################
+### NO ENV MODIFICATIONS AFTER THIS POINT ###
+###                                       ###
+### (changes won't apply to cpp11_env)    ###
+#############################################
+
+cpp11_env = env.Clone()
+cpp11_env.AppendUnique(CXXFLAGS=["-std=c++0x"])
+
 
 test_files = Split("""
     Source/test.cpp
@@ -92,18 +102,25 @@ test_files = Split("""
     Source/AddOns/Domains/binrel/binrelmanager.cpp
     Source/AddOns/Domains/binrel/binrel.cpp
     Source/AddOns/Domains/binrel/nwa_detensor.cpp
+    """)
 
+cpp11_test_files = Split("""
     Source/AddOns/Xfa/wali/util/base64.cpp
     Source/AddOns/Xfa/wali/util/DisjointSets.cpp
     Source/AddOns/Xfa/wali/util/details/Partition.cpp
 
     Source/AddOns/Xfa/wali/xfa/class-xfa/intersect.cpp
     Source/AddOns/Xfa/wali/xfa/class-xfa/is-member.cpp
-    """)
+""")
+
 
 just_compile = env.SConscript('Source/header-compilation/SConscript')
 
-unit_tests = env.Program('unit-tests', test_files + just_compile)
+cpp11_objs = []
+for f in cpp11_test_files:
+    cpp11_objs.extend(cpp11_env.Object(f))
+
+unit_tests = env.Program('unit-tests', test_files + cpp11_objs + just_compile)
 built = unit_tests
 built += env.Install('#/Tests/harness/unit-tests', unit_tests)
 built += env.Install('#/Tests/harness/unit-tests/', '#/Tests/unit-tests/regression_baseline')
