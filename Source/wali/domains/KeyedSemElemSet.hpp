@@ -7,6 +7,8 @@
 #include <tr1/unordered_map>
 #include <limits>
 
+#include <iostream>
+
 namespace wali
 {
   namespace domains
@@ -87,12 +89,46 @@ namespace wali
         return new KeyedSemElemSet(m, one_key_, one_value_);
       }
 
-      sem_elem_t extend(SemElem * UNUSED_PARAMETER(se))  { abort(); }
+      sem_elem_t extend(SemElem * se) {
+        KeyedSemElemSet * that = dynamic_cast<KeyedSemElemSet*>(se);
+
+        BackingMap m;
+
+        for (BackingMap::const_iterator this_element = this->map_.begin();
+             this_element != this->map_.end(); ++this_element)
+        {
+          for (BackingMap::const_iterator that_element = that->map_.begin();
+               that_element != that->map_.end(); ++that_element)
+          {
+            sem_elem_t
+              this_guard = this_element->first,
+              that_guard = that_element->first,
+              this_weight = this_element->second,
+              that_weight = that_element->second;
+
+            sem_elem_t new_guard = this_guard->extend(that_guard);
+
+            if (!new_guard->equal(new_guard->zero())) {
+              sem_elem_t new_weight = this_weight->extend(that_weight);
+              m.insert(std::make_pair(new_guard, new_weight));
+            }
+          }
+        }
+        
+        return new KeyedSemElemSet(m, one_key_, one_value_);
+      }
+      
       sem_elem_t combine(SemElem * UNUSED_PARAMETER(se)) { abort(); }
 
       bool equal(SemElem * UNUSED_PARAMETER(se)) const   { abort(); }
 
       std::ostream& print( std::ostream & UNUSED_PARAMETER(os) ) const     { abort(); }
+
+
+      // Pull in the sem_elem_t overloads
+      using SemElem::extend;
+      using SemElem::combine;
+      using SemElem::equal;
 
     private:      
       BackingMap map_;

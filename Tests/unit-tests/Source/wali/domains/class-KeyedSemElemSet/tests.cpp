@@ -330,7 +330,7 @@ struct ShortestPathLengths
     ShortestPathLengths()
         : ten(new ShortestPathSemiring(10))
         , twenty(new ShortestPathSemiring(20))
-        , thirty(new ShortestPathSemiring(3))
+        , thirty(new ShortestPathSemiring(30))
     {}
 };
 
@@ -452,4 +452,42 @@ TEST(wali$domains$KeyedSemElemSet$$zero, canTakeZeroThenOne)
     EXPECT_TRUE(a_one->at(sets.keys.i00->one())->equal(sets.paths.ten->one()));
     EXPECT_TRUE(b_one->at(sets.keys.i00->one())->equal(sets.paths.ten->one()));
     EXPECT_TRUE(c_one->at(sets.keys.i00->one())->equal(sets.paths.ten->one()));
+}
+
+TEST(wali$domains$KeyedSemElemSet$$extend, simpleExtend)
+{
+    KeyedSets sets;
+
+    sem_elem_t a_extend_b_se = sets.a.extend(&sets.b);
+    KeyedSemElemSet * a_extend_b = down_ks(a_extend_b_se);
+
+    // 0->0 distance 30; 0->1 distance 20
+
+    EXPECT_EQ(2u, a_extend_b->size());
+    EXPECT_TRUE(a_extend_b->at(sets.keys.i00)->equal(sets.paths.thirty));
+    EXPECT_TRUE(a_extend_b->at(sets.keys.i01)->equal(sets.paths.twenty));
+}
+
+TEST(wali$domains$KeyedSemElemSet$$extend, extendingWithZeroGivesZero)
+{
+    KeyedSets sets;
+
+    sem_elem_t
+        a_extend_zero_se = sets.a.extend(sets.a.zero()),
+        b_extend_zero_se = sets.b.extend(sets.a.zero()),
+        c_extend_zero_se = sets.c.extend(sets.a.zero()),
+        z_extend_z_se = sets.a.zero()->extend(sets.a.zero());
+    
+    KeyedSemElemSet
+        * a_extend_zero = down_ks(a_extend_zero_se),
+        * b_extend_zero = down_ks(b_extend_zero_se),
+        * c_extend_zero = down_ks(c_extend_zero_se),
+        * zero_extend_zero = down_ks(z_extend_z_se);
+
+    // 0->0 distance 30; 0->1 distance 20
+
+    EXPECT_EQ(0u, a_extend_zero->size());
+    EXPECT_EQ(0u, b_extend_zero->size());
+    EXPECT_EQ(0u, c_extend_zero->size());
+    EXPECT_EQ(0u, zero_extend_zero->size());
 }
