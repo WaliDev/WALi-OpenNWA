@@ -27,23 +27,19 @@ namespace wali
     ///
     ///   o  zero is the empty set {}
     ///   o  one  is the singleton set { <1,1> }
-    ///   o  combine does something like set union but combining elements with
-    ///              matching keys
-    ///   o   extend extends every mapping of the first with every mapping of
-    ///              the second, doing extend of both key and weight: if the
-    ///              extend of the key is 0, then that pair is dropped and the
-    ///              extend of the weights is not computed
+    ///   o  combine does set union (it's possible to have multiple weights
+    ///      with the same key, though not more than one entry with the same
+    ///      key AND weight)
+    ///   o  extend extends every mapping of the first with every mapping of
+    ///      the second, doing extend of both key and weight: if the extend
+    ///      of the key is 0, then that pair is dropped and the extend of the
+    ///      weights is not computed
     ///
     /// The key is treated as a sem_elem_t, but it really doesn't have to be
     /// one -- in particular, keys are never combined.
     ///
     /// Another way that the keys aren't like guards (i.e. what the word
-    /// 'guard' suggests) is that keys have to be disjoint. The combine
-    ///     { <k1, w1> } + { <k2, w2> }
-    /// will always be either
-    ///     { <k1, w1+w2> }  or  { <k1, w1>,  <k2, w2> }
-    /// depending on whether k1==k2 (in the first case). So if two keys are
-    /// different, there is no mixing of their associated values.
+    /// 'guard' suggests) is that there is no mixing of weights between keys.
     class KeyedSemElemSet
       : public wali::SemElem
     {
