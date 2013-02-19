@@ -183,6 +183,8 @@ namespace wali
         return new PositionKey(*this->pre_, *that->post_);
       }
 
+      using SemElem::extend;
+
       ///
       /// This aborts
       sem_elem_t combine(SemElem * UNUSED_PARAMETER(se)) {
@@ -213,6 +215,9 @@ namespace wali
         return (*this->pre_ == *that->pre_)
           && (*this->post_ == *that->post_);
       }
+
+      using SemElem::equal;
+      using SemElem::combine;
 
       ///
       /// This actually prints the guard
