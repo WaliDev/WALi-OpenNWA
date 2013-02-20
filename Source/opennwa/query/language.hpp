@@ -1,9 +1,14 @@
 #ifndef WALI_NWA_QUERY_LANGUAGE_HPP
 #define WALI_NWA_QUERY_LANGUAGE_HPP
 
+#include <map>
+#include <list>
+
 #include "opennwa/NwaFwd.hpp"
 #include "opennwa/NestedWord.hpp"
 #include "opennwa/WeightGen.hpp"
+#include "wali/witness/Witness.hpp"
+#include "wali/witness/CalculatingVisitor.hpp"
 
 namespace opennwa {
   namespace query {
@@ -62,7 +67,11 @@ namespace opennwa {
       
     extern
     ref_ptr<NestedWord>
-    getSomeShortestAcceptedWordWithWeights(Nwa const & nwa, WeightGen const & wg);
+    getSomeAcceptedWordWithWeights(Nwa const & nwa, WeightGen const & wg);
+
+    extern
+    sem_elem_t
+    getWitnessForSomeAcceptedWordWithWeights(Nwa const & nwa, WeightGen const & wg);
 
     /**
      *

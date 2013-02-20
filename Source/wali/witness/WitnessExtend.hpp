@@ -67,6 +67,7 @@ namespace wali
 
         //! @return true if the right child is valid
         bool hasRight() const { return !rchild.is_empty(); }
+          
 
       protected:
         witness_t lchild;      //! < left parameter of binary extend

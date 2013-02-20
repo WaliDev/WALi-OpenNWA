@@ -22,6 +22,7 @@ namespace wali
       Witness(the_weight), witness_merge_fn(the_witness_merge_fn),
       fCaller(the_caller),fRule(the_rule),fCallee(the_callee) 
     {
+      min_length = 0UL;
     }
 
     // virtual destructor
