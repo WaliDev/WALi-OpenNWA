@@ -1946,8 +1946,8 @@ namespace wali
       EpsilonCloseCache eclose_cache;
 
       WFA result;
-      sem_elem_t zero = getSomeWeight()->zero();
-      sem_elem_t one = getSomeWeight()->one();
+      sem_elem_t one = wg.getOne(*this);
+      sem_elem_t zero = one->zero();
 
       {
         // Set up initial states
