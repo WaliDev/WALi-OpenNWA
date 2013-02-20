@@ -511,6 +511,7 @@ namespace wali {
         }
 
 
+        // FIXME: this isn't a test!
         TEST(wali$wfa$$semideterminize, zeroWeightPathDoesNotAccept)
         {
             //      zero
