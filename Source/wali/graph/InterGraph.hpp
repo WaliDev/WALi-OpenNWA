@@ -122,7 +122,15 @@ namespace wali {
                 }
         };
 
-        //This class is used to compute SCCs of the call graph.
+
+        /**
+         * @class SCCGraph
+         * @brief A light-weight graph data structure to find SCCs in the call graph of TDG
+         *
+         * This is a light-weight version of IntraGraph. This is used by
+         * InterGraph::setupNewtonSolution to obtain SCCs in the call graph *before* the IntraGraphs
+         * are created.
+         **/
         class SCCGraph;
         typedef wali::ref_ptr<SCCGraph> scc_graph_t;
         typedef std::list< scc_graph_t > SCCGraphs;
@@ -133,7 +141,6 @@ namespace wali {
               return lhs.get_ptr() < rhs.get_ptr();
             }
         };
-
         class SCCGraph : public Countable 
         {
           // Graph data
@@ -141,7 +148,6 @@ namespace wali {
             std::vector<int> nodes;
             std::vector<GraphEdge> intraEdges;
             std::vector<HyperEdge> interEdges;
-            // Used for computing SCC
           public:
             bool visited;
             unsigned scc_number;
@@ -254,6 +260,19 @@ namespace wali {
             void setESource(Transition t, wali::sem_elem_t wtAtCall, wali::sem_elem_t wtAfterCall);
 
             void setupInterSolution(std::list<Transition> *wt_required = NULL);
+
+            /**
+             * @brief From the given TDG (The original InterGraph), create linearized TDGs corresponding
+             * to each step of Newton. Then, solve the poststar problem by executing steps of the newton's 
+             * method till fix-point.
+             *
+             * @note Only works for poststar
+             * @note When the function returns, the result automaton may obtain tensored or non-tensored weights
+             * based on some heuristics. You must be prepared to obtain either.
+             * @see isOutputAutomatonTensored
+             * @see setupInterSolution -- This function evolved originally from that.
+             * @see IntraGraph, RegExp, SCCGraph. Uses them heavily.
+             **/
             void setupNewtonSolution();
 
             sem_elem_t get_weight(Transition t);
@@ -297,11 +316,19 @@ namespace wali {
 
             unsigned SCC(std::list<IntraGraph *> &grlist, std::list<IntraGraph *> &grsorted);
 
-            // The two following functions are identical to SCC and dfsIntraForward, except that they operate on SCCGraph objects
+            /**
+             * @brief A depth first walk on SCCGraph rooted at gr. addes all reverse edges found to rev_edges
+             * @note  This function is identical to dfs, except that it walks the SCCGraph data structure.
+             **/
             void dfsLight(
                 scc_graph_t gr, 
                 SCCGraphs& finished, 
                 std::map< scc_graph_t, SCCGraphs, SCCGraphLE> & rev_edges);
+            /**
+             * @brief Walk the whole SCCGraph set and find out SCCs. 
+             * Sets the scc_number field in SCCGraphs.
+             * @note This function is identical to SCC, except that it works with SCCGraphs data structure.
+             **/
             unsigned SCCLight(
                 SCCGraphs& grlist,
                 SCCGraphs& grsorted);

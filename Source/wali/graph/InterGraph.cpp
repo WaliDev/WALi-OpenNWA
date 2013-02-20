@@ -448,7 +448,8 @@ namespace wali {
           return scc;
         }
 
-        void InterGraph::dfsLight(scc_graph_t gr, SCCGraphs& finished, std::map<scc_graph_t, SCCGraphs, SCCGraphLE >& rev_edges) {
+        void InterGraph::dfsLight(scc_graph_t gr, SCCGraphs& finished, std::map<scc_graph_t, SCCGraphs, SCCGraphLE >& rev_edges) 
+        {
           gr->visited = true;
           for(SCCGraphs::iterator it = gr->nextGraphs.begin();
               it != gr->nextGraphs.end();
@@ -630,6 +631,89 @@ namespace wali {
         }
 #endif
 
+        /**
+         * @brief From the given TDG (The original InterGraph), create linearized TDGs corresponding
+         * to each step of Newton. Then, solve the poststar problem by executing steps of the newton's 
+         * method till fix-point.
+         *
+         * @note Only works for poststar
+         * @note When the function returns, the result automaton may obtain tensored or non-tensored weights
+         * based on some heuristics. You must be prepared to obtain either.
+         * @see isOutputAutomatonTensored
+         * @see setupInterSolution -- This function evolved originally from that.
+         * @see IntraGraph, RegExp, SCCGraph. Uses them heavily.
+         *
+         * Function description: 
+         * A TDG is an InterGraph (yes, me!) that consists of IntraGraphs.
+         * The nodes of the TDG (referred to as n/s/c/x/r) are effectively transitions in the output
+         * automaton
+         * The edges of the TDG (referred to as e) are effectively the Grammar Flow Problem
+         * equations (poststar rules, if you will)
+         * (1) Find out SCCs in the graph.
+         * Consider a graph where each node is an IntraGraph (this is close to the callgraph of the
+         * original program).  The fix-point problem will be solved by linearizing each SCC in turn,
+         * while walking the list of SCCs in reverse topological order.
+         *
+         * For each SCC:
+         *   // Create one actual IntraGraph for current Intragraph.
+         *   // There are two options here:
+         *   //   - if |SCC| == 1 (i.e., SCC is just one procedure), mimic non-newton FWPDS
+         *   //   - if |SCC| > 1 (i.e., we must coalesce multiple procedures by linearizing), use
+         *   //     Newton's linearization
+         *   (2) Add nodes to IntraGraph, along with unique source node s.
+         *   (3) Compute |SCC|
+         *   if |SCC| == 1 then
+         *     // Mimic FWPDS
+         *     // Add IntraEdges: since there is no recursive call, all edges will be immutable
+         *        (4.1.1) For every source node n in InterGraph (roughly, procedure entry), add an
+         *        Edge from s to n with weight 1 (call to setSource())
+         *        (4.1.2) For every Edge (\delta_1 rule) n1-e->n2, add an edge n1-e->n2 to the
+         *        IntraGraph
+         *        (4.1.3) For every HyperEdge (\delta_2 rule) c-e-x->r (x is the external source),
+         *        add an edge c-e->r with weight w(x). Since the call can't possibly be recursive,
+         *        the summary for this procedure must already have been computed in some earlier
+         *        SCC. Use that weight.
+         *   else   
+         *     // There are multiple SCCGraphs in this SCC. We will coalesce them into one
+         *     // IntraGraph.
+         *     // The basic outline here follows that in (4.1), but the equation system we are
+         *     // forming in this case is the linear system. 
+         *     // For source nodes and \delta_1 rules, instead of edges with weight w, we create
+         *     // edges with weight (w,1^T) where (.,.) is tensor and ^T is transpose
+         *     // The case for \delta_2 is split in two -- if the call is made to a function
+         *     // belonging to a function with lower SCC number, then this case is handled
+         *     // identically to (4.1.3). Instead, if the call is made to a function within this
+         *     // SCC, for the call c-e-x->r, we add three edges: c-e1->r with functional(x);
+         *     // x-e2->r with functional(c) and s-e3->r with functional(c,x) all mutable. This
+         *     // corresponds. A functional is a recipe that is later used to compute the weight
+         *     // that must go on the edge (between newton rounds) from the weights on the argument
+         *     // nodes. For details of the exact weights and functionals that go on various edges,
+         *     // see comments below within the function.
+         *     (4.2.1) Add edges for source nodes
+         *     (4.2.2) Add edges for \delta_1 rules
+         *     (4.2.3.1) Add edges for \delta_2 rules where the call is to a function with lower SCC
+         *     (4.2.3.2) Add edges for \delta_2 rules where the call is to a function with from same
+         *     SCC.
+         *     TODO: Argue that mutable edges are not needed in (4.2.1) and (4.2.2)
+         *   (5) Use Tarjan's path listing algorithm to generate regular expressions for the
+         *   IntraGraph.
+         *   (6) Solve the linearized problem by saturation. 
+         *   @see IntraGraph::saturate 
+         *   Till fix-point:
+         *      -- Evaluate the regular expressions (This corresponds to one Newton's round)
+         *      -- update functionals and repeat.
+         * (7) Decide whether the output automaton is tensored.
+         * Because the weights on IntraGraphs can be both tensored and non-tensored (tensored in
+         * 4.2, non-tensored in 4.1), we must decide how the weights on the output automaton are.
+         * We do that by counting the number of extra tensor / detensor operations needed in either
+         * choice, and then using a heuristic to decide between the two.
+         * FIXME: Currently, we override the choice, and always tensor weights. This might be the
+         * best choice anyway, because detensor is a lot costlier than tensor in most cases. (Not
+         * true with nwa_detensor)
+         * (8) Set some more stuff that IntraGraph, FWPDS need after poststar. Mostly copied from
+         * setupInterSolution.
+         * 
+         **/
         void InterGraph::setupNewtonSolution()
         {
           runningNewton = true;         
@@ -640,6 +724,11 @@ namespace wali {
           unsigned int max_scc_required;
           SCCGraphs scc_gr_list;
           SCCGraphs gr_sorted;
+          // (1) The SCC computation.
+          // We will use a light-weight graph data structure called SCCGraph to find out the 
+          // SCCs in the TDG. Each SCCGraph roughly corresponds to what will later (in the function) become
+          // an IntraGraph. But SCCGraph have no extra information beyond the graph node and edge information,
+          // just enough to find the SCCs.
           intra_graph_uf = new UnionFind(n);
           {
             vector<GraphEdge>::iterator it;
@@ -700,7 +789,7 @@ namespace wali {
               SCCGraphs::iterator scc_head = gr_it;
               IntraGraph * graph = new IntraGraph(dag, false, sem); //pre = false
               linear_gr_list.push_back(graph);
-              //Add nodes to IntraGraph
+              // (2) Add nodes to IntraGraph
               while(gr_it != gr_sorted.end() && (*gr_it)->scc_number == scc_n){
                 scc_graph_t gr = *gr_it;
                 for(vector<int>::iterator iter = gr->nodes.begin(); iter != gr->nodes.end(); ++iter){
@@ -713,7 +802,7 @@ namespace wali {
 
               //Reset gr_it
               gr_it = scc_head;
-              // Determine if this SCC has a recursive call
+              // (3) Determine if this SCC has a recursive call
               bool isRecursive = false;
               while(gr_it != gr_sorted.end() && (*gr_it)->scc_number == scc_n){
                 scc_graph_t gr = *gr_it;
@@ -727,7 +816,9 @@ namespace wali {
                   break;
                 gr_it++;
               }
+
               // Will the current graph have tensored weights?
+              // We need to know this for weight queries on the graph after saturation.
               graph->hasTensoredWeights = isRecursive;
               
               //Reset gr_it
@@ -739,7 +830,7 @@ namespace wali {
                 while(gr_it != gr_sorted.end() && (*gr_it)->scc_number == scc_n){
                   scc_graph_t gr = *gr_it;
 
-                  // Source nodes:
+                  // (4.2.1) Source nodes:
                   for(vector<int>::iterator iter = gr->nodes.begin(); iter != gr->nodes.end(); ++iter){
                     int i = *iter;
                     if(is_source_type(nodes[i].type)) {
@@ -756,7 +847,7 @@ namespace wali {
                       nodes[i].weight = zerot;
                   }
 
-                  // Intra Edges:
+                  // (4.2.2) Intra Edges:
                   for(vector<GraphEdge>::iterator iter = gr->intraEdges.begin(); iter != gr->intraEdges.end(); iter++){
                     //This is an edge (src--w-->tgt)
                     //Add an immutable edge src--w'-->tgt)
@@ -794,7 +885,7 @@ namespace wali {
 
                     // src2 is the external source for a hyperedge
                     if(nodes[iter->src2].gr != NULL && nodes[iter->src2].gr != graph){
-                      // Case: The entry node belongs to a graph that has a lower scc.
+                      // (4.2.3.1) The entry node belongs to a graph that has a lower scc.
                       // Treat this case as an intraedge
 
 
@@ -830,7 +921,7 @@ namespace wali {
                       graph->addDependentEdge(e, nodes[iter->src1].intra_nodeno);
 #endif
                     }else{
-                      // Case: The entry node does not belong to a graph that has a lower scc.
+                      // (4.2.3.2) The entry node does not belong to a graph that has a lower scc.
                       // Note: It must belong to the same scc then
                       assert(nodes[iter->src2].gr == graph);
 
@@ -883,12 +974,15 @@ namespace wali {
 
                   gr_it++;
                 }              
-              }else{
+              }
+              else
+              {
                 //Do Fwpds Magic
                 dag->startSatProcess(sem_old); //non tensored
                 while(gr_it != gr_sorted.end() && (*gr_it)->scc_number == scc_n){
                   scc_graph_t gr = *gr_it;
 
+                  // (4.1.1)
                   // Source nodes:
                   for(vector<int>::iterator iter = gr->nodes.begin(); iter != gr->nodes.end(); ++iter){
                     int i = *iter;
@@ -903,6 +997,7 @@ namespace wali {
                       nodes[i].weight = zero;
                   }
 
+                  // (4.1.2)
                   // Intra Edges:
                   for(vector<GraphEdge>::iterator iter = gr->intraEdges.begin(); iter != gr->intraEdges.end(); iter++){
                     //This is an edge (src--w-->tgt)
@@ -910,7 +1005,8 @@ namespace wali {
                     sem_elem_t wt = iter->weight;
                     graph->addEdge(nodes[iter->src].intra_nodeno, nodes[iter->tgt].intra_nodeno, wt);
                   }
-                  int trash; 
+                  int trash;
+                  // (4.1.3) 
                   // Inter Edges:
                   for(vector<HyperEdge>::iterator iter = gr->interEdges.begin(); iter != gr->interEdges.end(); ++iter){
                     // Obtain the weight on the call edge
@@ -938,6 +1034,7 @@ namespace wali {
                   gr_it++;
                 }              
               }
+              // (5)
               // Use Tarjan's path listing algorithm to generate regular expressions for nodes.
               graph->setupIntraSolution();
 
@@ -954,7 +1051,7 @@ namespace wali {
                 foo.close();
               cout << "GRAPH " << scc_n << "\n";
 #endif 
-              // Now solve the linearized problem by saturating.
+              // (6) Now solve the linearized problem by saturating.
               unsigned numRounds = 0;
               graph->saturate(numRounds);
 #if defined(PPP_DBG) && PPP_DBG >= 0
@@ -966,6 +1063,7 @@ namespace wali {
             }
           }
 
+          // (7)
           // It is time to decide whether the output automaton should have
           // tensored weights or not.
           // Currently, we will decide by counting the number of edges in the
@@ -1379,6 +1477,11 @@ namespace wali {
       return get_weight(n);
     }
 
+    // Changed for Newton Solver.  
+    // When the output automaton is tensored (@see comment above setupNewtonSolution), make sure
+    // that the returned weight is also tensored.  
+    // When the output automaton is non-tensored, make sure that the returned weight is
+    // non-tensored. 
     sem_elem_t InterGraph::get_weight(unsigned n) 
     {
       // check eHandler

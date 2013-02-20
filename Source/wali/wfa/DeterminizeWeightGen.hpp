@@ -43,6 +43,8 @@ namespace wali {
                                          WFA const & determinized_wfa_so_far,
                                          std::set<Key> const & cell) const
       = 0;
+
+      virtual sem_elem_t getOne(WFA const & original_wfa) const = 0;
     };
 
 
@@ -65,6 +67,8 @@ namespace wali {
       sem_elem_t getAcceptWeight(WFA const & original_wfa,
                                  WFA const & determinized_wfa_so_far,
                                  std::set<Key> const & cell) const;
+
+      sem_elem_t getOne(WFA const & original_wfa) const;
     };
       
 
@@ -92,7 +96,8 @@ namespace wali {
                                           sem_elem_t original_accept_weight) const
       = 0;
 
-
+      virtual sem_elem_t getOne(WFA const & original_wfa) const = 0;
+      
       sem_elem_t getWeight(WFA const & original_wfa,
                            WFA const & UNUSED_PARAMETER(determinized_wfa_so_far),
                            ComputedWeights const & weight_spec,
@@ -132,7 +137,11 @@ namespace wali {
       {
         return one;
       }
-      
+
+      virtual sem_elem_t getOne(WFA const & UNUSED_PARAMETER(original_wfa)) const
+      {
+        return one;
+      }
     };
 
   }

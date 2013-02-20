@@ -20,19 +20,27 @@
 
 using namespace std;
 
+
+// TODO(pprabhu, 2/20/2013): Move RegExpDag to its own file.
+
 /* RegExp usage:
  *
- * (1) The calls to RegExp::startSatProcess() and RegExp::stopSatProcess() must alternate.
- * (2) RegExp::startSatProcess() must be called once before RegExps can be used.
+ * RegExpDag is a context in which all RegExp nodes are created.
+ * The intended usafe is that a RegExp node belongs to a unique RegExpDag.
+ * Hopefully, to RegExpDag objects do not interfere -- so you can use two RegExpDags independently.
+ *
+ * Within a RegExpDag context, follow the following sanity rules --
+ * (1) The calls to RegExpDag::startSatProcess() and RegExpDag::stopSatProcess() must alternate.
+ * (2) RegExpDag::startSatProcess() must be called once before RegExps can be used.
  * (3) The period between startSatProcess() and stopSatProcess() is available to carry out a saturation process
- * (4) RegExp::stopSatProcess() resets the set of updatable nodes and fixes old updatable nodes to act as
+ * (4) RegExpDag::stopSatProcess() resets the set of updatable nodes and fixes old updatable nodes to act as
  *     constants forever. Old RegExps can still be reevaluated if they were not evaluated before
  *     stopSatProcess was called, but once evaluated there would be no need to evaluate them again.
  * (5) RegExp created in different startSatProcess()-stopSatProcess periods can be mixed together with the understanding
  *     that RegExps are always used as constant and are never mutated (its hopefully enforced by the compiler ---
  *     keep the constructors private)
- * (6) To achieve the above, we use the static value currentSatProcess (an unsigned int) and non-static
- *     value satProcess (also an unsigned int)
+ * (6) To achieve the above, we use the context variable RegExpDag::currentSatProcess (an unsigned int) and a per-RegExp
+ *     value RegExp::satProcess (also an unsigned int)
  * (7) One can also change the semiring being used by calling startSatProcess() but then it should not be
  *     mixed with old RegExps.
  */
@@ -151,8 +159,7 @@ namespace wali {
             private:
                 /**
                  * @author Prathmesh Prabhu
-                 * Ideally, I would like to not store dag in RegExp.
-                 * but RegExp accesses static variables formerly in RegExp, now in RegExpDag very often. 
+                 * RegExp accesses static variables formerly in RegExp, now in RegExpDag very often. 
                  * We will indirect all such accesses through dag.
                  **/
                 RegExpDag * dag;
@@ -228,8 +235,10 @@ namespace wali {
                         assert(0);
                     }
 #if defined(PUSH_EVAL)
-                    // Not thread safe? Constructore isn't done yet, and some
+                    // Not thread safe? Constructor isn't done yet, and some
                     // outside has a pointer to the object.
+                    // (pprabhu, 2/20/2013): The best solution I know is to create an init() and
+                    // call init after the constructor. To heavy handed to implement right now.
                     dirty = true;
                     r1->parents.insert(static_cast<RegExp*>(this));
                     if(!(r2 == NULL))
@@ -408,12 +417,12 @@ namespace wali {
 
           public:
              // Add a reg_exp_t to the set of regular expressions labelling some
-             // IntraGraphEdge. Used only for diagnostic purposes.
+             // IntraGraphEdge. 
              void markAsLabel(reg_exp_t r);
 
           private:
             /**
-             * Functions related to those copied from RegExp (used to be static).
+             * Functions related to those moved from RegExp (used to be static).
              **/
             reg_exp_t _minimize_height(reg_exp_t r, reg_exp_cache_t &cache);
             reg_exp_t compressExtend(reg_exp_t r1, reg_exp_t r2);
@@ -421,7 +430,7 @@ namespace wali {
             reg_exp_t _compress(reg_exp_t r, reg_exp_cache_t &cache);
 
             /**
-             * Functions copied from RegExp (used to be static)
+             * Functions moved from RegExp (used to be static)
              **/
           public:
             reg_exp_t star(reg_exp_t r);

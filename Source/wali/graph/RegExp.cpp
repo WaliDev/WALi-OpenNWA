@@ -1156,7 +1156,9 @@ namespace wali {
 
         void RegExpDag::computeMinimalRoots()
         {
-          visited.clear();          
+          visited.clear();         
+          // Get the set of regexp nodes that are reachable from some node labelling the
+          // IntraGraph in one or more steps.
           for(reg_exp_hash_t::iterator it = graphLabelsInSatProcess.begin(); it != graphLabelsInSatProcess.end(); ++it){
             reg_exp_t root = it->second;
             for(list<reg_exp_t>::iterator cit = root->children.begin(); cit != root->children.end(); ++cit){
@@ -1165,6 +1167,7 @@ namespace wali {
             }
           }
 
+          // collect a subset of regexp nodes that were not covered in the search above.
           for(reg_exp_hash_t::iterator it = graphLabelsInSatProcess.begin(); it != graphLabelsInSatProcess.end(); ++it){
             if(visited.find(it->first) == visited.end())
               minimalRoots.insert(*it);
@@ -1172,6 +1175,9 @@ namespace wali {
           visited.clear();
         }
 
+        // @see RegExpDag::evaluate -- originally copied from there
+        // @see computeMinimalRoots to set up the 'roots'
+        // Evaluate the regexp dag under current 'roots' in one fell swoop.
         void RegExpDag::evaluateRoots()
         {
           for(reg_exp_hash_t::const_iterator iter = minimalRoots.begin(); iter != minimalRoots.end(); ++iter){

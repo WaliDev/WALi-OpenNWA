@@ -137,6 +137,19 @@ namespace wali
       return new KeyedSemElemSet(map);
     }
     
+
+    sem_elem_t
+    CreateKeyedSet::getOne(WFA const & original_wfa) const
+    {
+      KeyedSemElemSet::BackingMap map;
+
+      sem_elem_t guard = PositionKey<Key>::makeOne().one();
+      sem_elem_t weight = original_wfa.getSomeWeight()->one();
+      map[guard].insert(weight);
+
+      return new KeyedSemElemSet(map);
+    }
+    
     
 
   }

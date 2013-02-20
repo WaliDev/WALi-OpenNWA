@@ -230,8 +230,10 @@ namespace wali {
             sem_elem_t se;
 
             /**
-             * An IntraGraph can be created with a preallocated
-             * memory buffer to use for its operations.  
+             * @class SharedMemBuffer
+             * @brief Preallocated memory buffer to use for all operations in IntraGraphs.
+             * A SharedMemBuffer can be preallocated and then passed to the constructor of multiple IntraGraphs.
+             * - replaces an earlier implementation that used  global buffers.
              **/
             struct SharedMemBuffer {
               int * intraGraphBuffer;
@@ -337,9 +339,12 @@ namespace wali {
             void solveSummarySolution(list<WTransition> &change);
             void preSolveSummarySolution(list<WTransition> &change);
             void setupSummarySolution();
+
             /**
-             * IntraGraph holds on to some static variables. 
-             * These should be cleaned up when we're finished with the analysis.
+             * Newton saturation.
+             * @see setupNewtonSolution.
+             * When using Newton's method for poststar, each IntraGraph corresponds to a linearized system of equations.
+             * Solve this system by iterating through Newton rounds. 
              **/
             void saturate(unsigned& numRounds);
 
@@ -384,6 +389,13 @@ namespace wali {
             void solveRegSummarySolution();
             void preSolveRegSummarySolution();
             
+            /**
+             * @see RegExpDag
+             * mark the regular expression nodes that labels the nodes in this IntraGraph as being 'useful'.
+             * These will be used to compute the set of regular expression nodes that must be recomputed
+             * between Newton rounds.
+             * @see IntraGraph::saturate
+             **/
             void markLabels();
         };
 
