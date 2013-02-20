@@ -1,4 +1,10 @@
-#include <map>
+#ifndef WALI_SHORT_WITNESS_VISITOR_GUARD
+#define WALI_SHORT_WITNESS_VISITOR_GUARD 1
+
+/*!
+ * @author Rich Joiner
+ */
+
 #include <list>
 
 #include "opennwa/NwaFwd.hpp"
@@ -24,3 +30,5 @@ namespace opennwa {
     };
   }
 }
+
+#endif  // WALI_SHORT_WITNESS_VISITOR_GUARD

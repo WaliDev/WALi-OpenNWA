@@ -1,8 +1,8 @@
-#ifndef wali_WITNESS_LENGTH_WORKLIST_GUARD
-#define wali_WITNESS_LENGTH_WORKLIST_GUARD 1
+#ifndef WALI_WITNESS_LENGTH_WORKLIST_GUARD
+#define WALI_WITNESS_LENGTH_WORKLIST_GUARD 1
 
 /*!
- * @author Nicholas Kidd
+ * @author Rich Joiner
  */
 
 #include "wali/Common.hpp"
@@ -23,7 +23,7 @@ namespace wali
         Witness *witb = dynamic_cast<Witness*>(b->weight().get_ptr());
         assert (witb && "Transition without witness used with WitnessLengthWorklist");
 
-        if (wita->getLength() > witb->getLength()) {
+        if (wita->getMinimumLength() > witb->getMinimumLength()) {
           return false;
         } else {
           return true;
@@ -44,5 +44,5 @@ namespace wali
 
 } // namespace wali
 
-#endif  // wali_WITNESS_LENGTH_WORKLIST_GUARD
+#endif  // WALI_WITNESS_LENGTH_WORKLIST_GUARD
 

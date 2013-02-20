@@ -23,7 +23,7 @@ namespace wali
       Witness(the_weight),lchild(the_left),rchild(the_right) {
       assert(the_left != NULL);
       assert(the_right != NULL);
-      min_length = the_left->getLength() + the_right->getLength() + 1UL;
+      min_length = the_left->getMinimumLength() + the_right->getMinimumLength() + 1UL;
     }
 
     // virtual destructor
