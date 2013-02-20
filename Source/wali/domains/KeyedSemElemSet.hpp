@@ -3,6 +3,7 @@
 
 #include "wali/SemElem.hpp"
 
+#include <boost/iterator/iterator_facade.hpp>
 #include <boost/optional.hpp>
 #include <tr1/unordered_map>
 #include <tr1/unordered_set>
@@ -51,7 +52,104 @@ namespace wali
                                       SemElemRefPtrHash, SemElemRefPtrEqual>
               BackingMap;
 
-      typedef InternalSet::const_iterator const_iterator;
+
+      /// KeyedSemElemSet stores its elements as a map of sets.
+      ///
+      /// This stores an inner iterator (InternalSet).
+      class const_iterator
+        : public boost::iterator_facade<const_iterator,
+                                        std::pair<sem_elem_t, sem_elem_t>,
+                                        boost::forward_traversal_tag,
+                                        std::pair<sem_elem_t, sem_elem_t> >
+      {
+      public:
+        const_iterator() {}
+        
+      private:
+        friend class KeyedSemElemSet;
+        friend class boost::iterator_core_access;
+
+        BackingMap::const_iterator outer_iter_current_, outer_iter_end_;
+        InternalSet::const_iterator inner_iter_current_, inner_iter_end_;
+
+        const_iterator(BackingMap const & m)
+          : outer_iter_current_(m.begin())
+          , outer_iter_end_(m.end())
+        {
+          if (outer_iter_current_ != outer_iter_end_) {
+            inner_iter_current_ = outer_iter_current_->second.begin();
+            inner_iter_end_ = outer_iter_current_->second.end();
+          }
+        }
+
+        const_iterator(BackingMap::const_iterator outer_start,
+                       BackingMap::const_iterator outer_end)
+          : outer_iter_current_(outer_start)
+          , outer_iter_end_(outer_end)
+        {
+          if (outer_iter_current_ != outer_iter_end_) {
+            inner_iter_current_ = outer_iter_current_->second.begin();
+            inner_iter_end_ = outer_iter_current_->second.end();
+          }
+        }
+
+        const_iterator(BackingMap::const_iterator outer_start,
+                       BackingMap::const_iterator outer_end,
+                       InternalSet::const_iterator inner_start,
+                       InternalSet::const_iterator inner_end)
+          : outer_iter_current_(outer_start)
+          , outer_iter_end_(outer_end)
+          , inner_iter_current_(inner_start)
+          , inner_iter_end_(inner_end)
+        {
+          if (outer_iter_current_ == outer_iter_end_) {
+            inner_iter_current_ = inner_iter_end_ = InternalSet::const_iterator();
+          }
+          else if (inner_iter_current_ == inner_iter_end_) {
+            fixup();
+          }
+        }
+
+        void
+        fixup() {
+          // If we are at the end of the current inner set, then advance to
+          // the next inner set, and reset the inner iterators.
+          if (inner_iter_current_ == inner_iter_end_) {
+            ++outer_iter_current_;
+            if (outer_iter_current_ != outer_iter_end_) {
+              inner_iter_current_ = outer_iter_current_->second.begin();
+              inner_iter_end_ = outer_iter_current_->second.end();
+            }
+            else {
+              // Well, unless that's the very last thing.
+              inner_iter_current_ = inner_iter_end_ = InternalSet::const_iterator();
+            }
+          }
+        }
+
+        void
+        increment() {
+          assert(outer_iter_current_ != outer_iter_end_);
+
+          // Advance the inner pointer.
+          ++inner_iter_current_;
+          fixup();
+        }
+
+
+        bool
+        equal(const_iterator const & other) const {
+          return this->outer_iter_current_ == other.outer_iter_current_ &&
+            this->inner_iter_current_ == other.inner_iter_current_;
+        }
+
+
+        std::pair<sem_elem_t, sem_elem_t>
+        dereference() const {
+          return std::make_pair(outer_iter_current_->first, *inner_iter_current_);
+        }
+      }; // end of DisjointSets::const_iterator
+      
 
       KeyedSemElemSet(BackingMap const & m)
         : map_(m)
@@ -71,11 +169,23 @@ namespace wali
 
       std::pair<const_iterator, const_iterator>
       equal_range(sem_elem_t key) const {
-        BackingMap::const_iterator it = map_.find(key);
+        BackingMap::const_iterator it = map_.find(key), it2 = it;
         if (it == map_.end()) {
           return std::make_pair(const_iterator(), const_iterator());
         }
-        return std::make_pair(it->second.begin(), it->second.end());
+        it2++;
+        return std::make_pair(const_iterator(it, it2, it->second.begin(), it->second.end()),
+                              const_iterator(it, it2, it->second.end(), it->second.end()));
+      }
+
+      const_iterator
+      begin() const {
+        return const_iterator(map_);
+      }
+
+      const_iterator
+      end() const {
+        return const_iterator(map_.end(), map_.end());
       }
 
       size_t size() const {
@@ -114,10 +224,10 @@ namespace wali
             sem_elem_t new_guard = this_guard->first->extend(that_guard->first);
             
             if (!new_guard->equal(new_guard->zero())) {
-              for (const_iterator this_value = this_guard->second.begin();
+              for (InternalSet::const_iterator this_value = this_guard->second.begin();
                    this_value != this_guard->second.end(); ++this_value)
               {
-                for (const_iterator that_value = that_guard->second.begin();
+                for (InternalSet::const_iterator that_value = that_guard->second.begin();
                      that_value != that_guard->second.end(); ++that_value)
                 {
                   sem_elem_t new_weight = (*this_value)->extend(*that_value);
@@ -166,7 +276,7 @@ namespace wali
             return false;
           }
 
-          for (const_iterator this_value = this_guard->second.begin();
+          for (InternalSet::const_iterator this_value = this_guard->second.begin();
                this_value != this_guard->second.end(); ++this_value)
           {
             if (that->map_[this_guard->first].count(*this_value) == 0u) {
