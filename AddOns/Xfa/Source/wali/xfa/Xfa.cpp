@@ -213,6 +213,13 @@ namespace wali {
 
 
         sem_elem_t
+        IntroduceStateToRelationWeightGen::getOne(wali::wfa::WFA const & original_wfa) const
+        {
+            return original_wfa.getSomeWeight()->one();
+        }
+
+
+        sem_elem_t
         IntroduceStateToRelationWeightGen::liftWeight(wali::wfa::WFA const & UNUSED_PARAMETER(original_wfa),
                                                       wali::Key source,
                                                       wali::Key UNUSED_PARAMETER(symbol),

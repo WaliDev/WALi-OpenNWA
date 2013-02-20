@@ -341,7 +341,10 @@ namespace wali {
                 }
                 return new StringWeight(ss.str());
             }
-            
+
+            sem_elem_t getOne(WFA const & UNUSED_PARAMETER(original_wfa)) const {
+                return new StringWeight("");
+            }
         };
 
 #define ASSERT_CONTAINS(container, value) ASSERT_FALSE(container.end() == container.find(value))
