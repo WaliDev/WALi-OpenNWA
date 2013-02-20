@@ -334,10 +334,10 @@ namespace wali
             Key to_stack1,
             Key to_stack2,
             sem_elem_t se,
-	    bool replace_weight,
+            bool replace_weight,
             rule_t& r );
 
-        /** @brief Actually creates the rule, hanldes the mappings,
+        /** @brief Actually creates the rule, handles the mappings,
          * etc.
          *
          * @return true if rule existed

@@ -341,7 +341,10 @@ namespace wali {
                 }
                 return new StringWeight(ss.str());
             }
-            
+
+            sem_elem_t getOne(WFA const & UNUSED_PARAMETER(original_wfa)) const {
+                return new StringWeight("");
+            }
         };
 
 #define ASSERT_CONTAINS(container, value) ASSERT_FALSE(container.end() == container.find(value))
@@ -511,6 +514,7 @@ namespace wali {
         }
 
 
+        // FIXME: this isn't a test!
         TEST(wali$wfa$$semideterminize, zeroWeightPathDoesNotAccept)
         {
             //      zero
@@ -538,6 +542,35 @@ namespace wali {
 
             std::cerr << "wfa accepts: " << wfa.isAcceptedWithNonzeroWeight(w) << "\n";
             std::cerr << "det accepts: " << det.isAcceptedWithNonzeroWeight(w) << "\n";
+        }
+        
+
+        TEST(wali$wfa$$semideterminize, initialStateGetsLabeledWithTheCorrectKindOfWeight)
+        {
+            //      zero
+            //  -> A ---> (B)
+            Key A = getKey("A");
+            Key B = getKey("B");
+
+            sem_elem_t zero = Reach(true).zero();
+
+            WFA wfa;
+            wfa.addState(A, zero);
+            wfa.addState(B, zero);
+            wfa.addTrans(A, A, B, zero);
+
+            wfa.setInitialState(A);
+            wfa.addFinalState(B);
+
+            WFA det = wfa.semideterminize(TestLifter());
+            
+            sem_elem_t initial_weight = det.getState(det.getInitialState())->weight();
+
+            Reach * reach = dynamic_cast<Reach*>(initial_weight.get_ptr());
+            StringWeight * str = dynamic_cast<StringWeight*>(initial_weight.get_ptr());
+
+            EXPECT_EQ(NULL, reach);
+            EXPECT_TRUE(str != NULL);
         }
         
         

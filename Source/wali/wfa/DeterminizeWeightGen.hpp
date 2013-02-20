@@ -43,7 +43,34 @@ namespace wali {
                                          WFA const & determinized_wfa_so_far,
                                          std::set<Key> const & cell) const
       = 0;
+
+      virtual sem_elem_t getOne(WFA const & original_wfa) const = 0;
     };
+
+
+    /// Provides a class that computes the weight for a determinized
+    /// transition by creating a KeyedSemElemSet where the key marks the
+    /// endpoints of the transition.
+    ///
+    /// The accept weight of a state is the set of accept weights of its
+    /// constituant states, guarded by the id transition on that state only.
+    class CreateKeyedSet
+      : public DeterminizeWeightGen
+    {
+      sem_elem_t getWeight(WFA const & original_wfa,
+                           WFA const & UNUSED_PARAMETER(determinized_wfa_so_far),
+                           ComputedWeights const & weight_spec,
+                           std::set<Key> const & sources,
+                           Key symbol,
+                           std::set<Key> const & targets) const;
+
+      sem_elem_t getAcceptWeight(WFA const & original_wfa,
+                                 WFA const & determinized_wfa_so_far,
+                                 std::set<Key> const & cell) const;
+
+      sem_elem_t getOne(WFA const & original_wfa) const;
+    };
+      
 
 
     /// Provides a class that computes the weight for a determinizied
@@ -69,7 +96,8 @@ namespace wali {
                                           sem_elem_t original_accept_weight) const
       = 0;
 
-
+      virtual sem_elem_t getOne(WFA const & original_wfa) const = 0;
+      
       sem_elem_t getWeight(WFA const & original_wfa,
                            WFA const & UNUSED_PARAMETER(determinized_wfa_so_far),
                            ComputedWeights const & weight_spec,
@@ -109,7 +137,11 @@ namespace wali {
       {
         return one;
       }
-      
+
+      virtual sem_elem_t getOne(WFA const & UNUSED_PARAMETER(original_wfa)) const
+      {
+        return one;
+      }
     };
 
   }

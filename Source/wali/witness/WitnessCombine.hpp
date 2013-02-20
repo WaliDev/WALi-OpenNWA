@@ -58,6 +58,7 @@ namespace wali
       protected:
         std::list< witness_t > kids;
 
+
     }; // class WitnessCombine
 
   } // namespace witness
