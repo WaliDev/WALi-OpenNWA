@@ -276,8 +276,11 @@ void NWPDS::poststarSetupPds()
     add_rule(p,t,p_prime,y_prime,y_prime_prime,er->weight(),er->merge_fn());
     //Add: <p,y> -> <p',t'y''>
     add_rule(p,y,p_prime,t_prime,y_prime_prime,er->weight(),er->merge_fn());
+    // <p,t> -> <p',t'y''>
+    add_rule(p,t,p_prime,t_prime,y_prime_prime,er->weight(),er->merge_fn());
     //Add: <p',t'> -> <p',.>
     add_rule(p_prime,t_prime,p_prime,er->weight()->zero());
+    
   }
   if(dbg){
     WpdsRules wr;
