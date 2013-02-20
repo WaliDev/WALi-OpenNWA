@@ -411,7 +411,7 @@ sem_elem_t at(KeyedSemElemSet const & ks, sem_elem_t key)
     p.first++;
     assert(p.first == p.second);
 
-    return *first;
+    return first->second;
 }
 
 
@@ -426,6 +426,26 @@ TEST(wali$domains$KeyedSemElemSet$$at, accessors)
     EXPECT_EQ(2u, sets.b.size());
     EXPECT_TRUE(at(sets.b, sets.keys.i00)->equal(sets.paths.ten));
     EXPECT_TRUE(at(sets.b, sets.keys.i11)->equal(sets.paths.ten));
+}
+
+
+TEST(wali$domains$KeyedSemElemSet$$begin$and$end, range)
+{
+    KeyedSets sets;
+
+    KeyedSemElemSet::BackingMap m;
+    for (KeyedSemElemSet::const_iterator iter = sets.a.begin();
+         iter != sets.a.end(); ++iter)
+    {
+        m[iter->first].insert(iter->second);
+    }
+
+    // We want to check that m is equal to sets.a, but the easiest way to do
+    // that is make a new KeyedSemElemSet. :-)
+    ASSERT_EQ(2u, m.size());
+    KeyedSemElemSet a_again(m);
+
+    EXPECT_TRUE(sets.a.equal(&a_again));
 }
 
 
