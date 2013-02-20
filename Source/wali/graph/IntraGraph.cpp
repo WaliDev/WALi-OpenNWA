@@ -1612,6 +1612,27 @@ namespace wali {
 #if defined(PPP_DBG) && PPP_DBG >= 0
     static unsigned saturateCount = 0;
 #endif
+    /**
+     * Newton saturation.
+     * @see setupNewtonSolution.
+     * When using Newton's method for poststar, each IntraGraph corresponds to a linearized system
+     * of equations.
+     * Solve this system by iterating through Newton rounds.
+     *
+     * Function description:
+     *   // The actual function is quite simple. This implementation is long because when PPP_DBG is
+     *   // >= 2, it dumps lots of debugging information.
+     *   (1) Find out the minimal set of regular expression dags such that computing the value for
+     *   these nodes computes all the needed weights, i.e., all regular expression nodes that label
+     *   some IntraGraph node are computed. 
+     *   In each newton round 
+     *     (2) evaluate minimal set of regular expressions (as computed above)
+     *     (3) Find out what nodes have new values. FIXME: can this be done faster? Currently this
+     *     is a linear time operation.
+     *     (4) Reevaluate the required functionals (this changes the weights on some mutable edges)
+     *     (5) did we change any edge? If yes, repeat, else we're done.
+     *
+     **/
     void IntraGraph::saturate(unsigned& numRounds)
     {
 
@@ -1621,14 +1642,14 @@ namespace wali {
       ++saturateCount;
 #endif
 
-      // Just once, set up the minimal dag that needs to be evaluated each time.
+      // (1) Just once, set up the minimal dag that needs to be evaluated each time.
       dag->computeMinimalRoots();
       while(repeat){
         ++numRounds;
-        //First, evaluate the current regular expressions completely.
+        //(2) First, evaluate the current regular expressions completely.
         dag->evaluateRoots();
 
-        //Now, obtain the set of nodes who's values have changed.
+        //(3) Now, obtain the set of nodes who's values have changed.
         std::vector<IntraGraphNode*> changedNodes;
         // The first node is the source node.
         for(int i = 1; i < nnodes; ++i){
@@ -1637,8 +1658,8 @@ namespace wali {
             nodes[i].weight = nodes[i].regexp->get_weight();
           }
         }
-        // Given the set of nodes who's weights have changed, find the set of mutable edges that need to
-        // be updated.
+        // (4) Given the set of nodes who's weights have changed, find the set of mutable edges that
+        // need to be updated.
         std::set<unsigned long> updateEdgesSet;
         std::vector<unsigned long> updateEdges;
         std::vector<sem_elem_t> weights;
@@ -1656,6 +1677,7 @@ namespace wali {
             }
           }
         }
+        // (5)
         if(updateEdges.size() > 0){
           repeat  = true;
           dag->update(updateEdges, weights);
@@ -1736,6 +1758,13 @@ namespace wali {
       }
     }
 
+    /**
+     * @see RegExpDag
+     * mark the regular expression nodes that labels the nodes in this IntraGraph as being 'useful'.
+     * These will be used to compute the set of regular expression nodes that must be recomputed
+     * between Newton rounds.
+     * @see IntraGraph::saturate
+     **/
     void IntraGraph::markLabels()
     {
       for(int i=0; i < nnodes; ++i)
