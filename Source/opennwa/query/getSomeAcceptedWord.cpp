@@ -14,6 +14,7 @@
 #include "wali/wpds/WPDS.hpp"
 #include "opennwa/ClientInfo.hpp"
 #include "wali/witness/WitnessWrapper.hpp"
+#include "wali/witness/WitnessLengthWorklist.hpp"
 #include "opennwa/query/PathVisitor.hpp"
 #include "opennwa/query/ShortWitnessVisitor.hpp"
 
@@ -60,7 +61,7 @@ namespace opennwa {
       wpds::WPDS conv = nwa_pds::NwaToWpdsCalls(nwa, wg, wrapper);
 
       // Set the worklist to determine the order of poststar traversal.
-      conv.setWorklist(new TotalOrderWorklist());
+      conv.setWorklist(new witness::WitnessLengthWorklist());
 
       Key state = nwa_pds::getProgramControlLocation();
       Key accept = getKey("__accept");

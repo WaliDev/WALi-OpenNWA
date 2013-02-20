@@ -791,7 +791,7 @@ namespace wali {
           return res;
         }
 
-        // precond: Extend and Combine have 2 sucesssors and Star has 1
+        // precond: Extend and Combine have 2 successors and Star has 1
         // postcond: r is not changed
         reg_exp_t RegExpDag::_compress(reg_exp_t r, reg_exp_cache_t &cache) {
             reg_exp_cache_t::iterator cpos = cache.find(r);

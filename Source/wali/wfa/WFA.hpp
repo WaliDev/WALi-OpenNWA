@@ -785,7 +785,6 @@ namespace wali
                     boost::function<bool (ITrans const *)> trans_accept,
                     bool reverse=false) const;
 
-
         /// Returns the set of symbols that appear on a transition somewhere
         /// in this WFA. Never includes epsilon.
         ///
