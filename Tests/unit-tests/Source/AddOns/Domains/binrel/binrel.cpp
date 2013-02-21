@@ -1113,7 +1113,7 @@ namespace{
     }
   }
 
-#if defined(TENSOR_MATCHED_PAREN) && defined(NWA_DETENSOR) && 0
+#if (TENSOR_MATCHED_PAREN == 1) && (NWA_DETENSOR == 1) && 0
   TEST(BddContext, bitLevelInfo)
   {
     program_bdd_context_t con;

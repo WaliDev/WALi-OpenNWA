@@ -106,7 +106,7 @@
 /// each other (one faster, one simpler)
 #define CHECK_BDD_SUBSUMES_WITH_SLOWER_VERSION 1
 
-#ifdef NWA_DETENSOR
+#if(NWA_DETENSOR == 1)
 namespace opennwa
 {
   typedef wali::Key State;
@@ -191,7 +191,7 @@ namespace wali
       class BddContext : public std::map<const std::string,bddinfo_t>
       {
         friend class BinRel;
-#ifdef NWA_DETENSOR
+#if (NWA_DETENSOR == 1)
         public:
           typedef std::vector<int> VocLevelArray;
 #endif
@@ -223,7 +223,7 @@ namespace wali
           virtual void setIntVars(const std::map<std::string, int>& vars);
           virtual void setIntVars(const std::vector<std::map<std::string, int> >& vars);
 
-#ifdef NWA_DETENSOR
+#if (NWA_DETENSOR == 1)
           /**
            * These functions are used by an NWA based implementation of detensor.
            * They provide information about the bit level information per variable.
@@ -292,7 +292,7 @@ namespace wali
           binrel_t cachedBaseZero;
           binrel_t cachedTensorOne;
           binrel_t cachedTensorZero;
-#ifdef NWA_DETENSOR
+#if (NWA_DETENSOR == 1)
           VocLevelArray tensorVocLevels;
           VocLevelArray baseLhsVocLevels;
           VocLevelArray baseRhsVocLevels;
@@ -349,7 +349,7 @@ namespace wali
                                 std::vector<std::string> const & keep_these,
                                 bdd b);
       
-#ifdef NWA_DETENSOR
+#if (NWA_DETENSOR == 1)
       /*
        * Subclass of opennwa::WeightGen used to attache weights to the nwa used
        * for detensor. The class is declared in nwa_detensor.hpp. We can
@@ -460,7 +460,7 @@ namespace wali
           BddContext const * con;
           bdd rel;
           bool isTensored;
-#ifdef NWA_DETENSOR
+#if(NWA_DETENSOR == 1)
         private:
           //TODO: Cleanup in the destructor for all these
           typedef std::pair< unsigned, bdd > StateTranslationKey;

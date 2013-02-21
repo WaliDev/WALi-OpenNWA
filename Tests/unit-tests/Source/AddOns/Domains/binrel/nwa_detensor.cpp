@@ -26,7 +26,7 @@ using namespace std;
 using namespace wali;
 using namespace wali::domains::binrel;
 using namespace wali::domains::binrel::details;
-#ifdef NWA_DETENSOR
+#if (NWA_DETENSOR == 1)
 namespace
 {
   TEST(Nwa_detensor, paperExample){

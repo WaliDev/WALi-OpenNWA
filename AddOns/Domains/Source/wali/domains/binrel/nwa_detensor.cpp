@@ -19,7 +19,7 @@
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/Trans.hpp"
 
-#ifdef NWA_DETENSOR
+#if (NWA_DETENSOR == 1)
 
 using namespace std;
 using namespace std::tr1;
