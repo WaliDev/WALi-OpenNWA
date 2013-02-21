@@ -540,8 +540,9 @@ void NWPDS::update(Key from, Key stack, Key to, sem_elem_t se, Config * cfg)
   }
 
   t->setConfig(cfg);
-  if (dbg && t->modified()) {
-    t->print(cout << "Modified: ") << endl;
+  if(t->modified()) {
+    if(dbg)
+      t->print(cout << "Modified: ") << endl;
     worklist->put( t );
     newtonWl.push_back( t );
   }
@@ -560,8 +561,9 @@ wali::wfa::ITrans* NWPDS::update_prime( Key from, wali::wfa::ITrans* call, rule_
         from, r->to_stack2(), call->to(),
         delta, wWithRule, er);
   wali::wfa::ITrans* t = currentOutputWFA->insert(tmp);
-  if(dbg && t->modified()){
-    t->print(cout << "Modified: ") << endl;
+  if(t->modified()){
+    if(dbg)
+      t->print(cout << "Modified: ") << endl;
     newtonWl.push_back( t );
   }
   return t;
