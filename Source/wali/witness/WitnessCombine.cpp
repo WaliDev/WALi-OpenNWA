@@ -164,8 +164,8 @@ namespace wali
     {
       //*waliErr << "[WitnessCombine::addChild]\n";
       kids.push_back( w );
-      if (w->getLength() < min_length) {
-        min_length = w->getLength() + 1UL;
+      if (w->getMinimumLength() < min_length) {
+        min_length = w->getMinimumLength() + 1UL;
       }
     }
 

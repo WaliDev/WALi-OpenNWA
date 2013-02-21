@@ -111,12 +111,15 @@ namespace opennwa {
 
       wfa::KeepLeft wmaker;
 
-      // %%% The new intersect screws with the Nwa somehow.
       wfa::WFA ipath;
-      path.intersect_cross(wmaker, fa, ipath);
+      path.intersect(wmaker, fa, ipath);
+
+      // Intersect may prune all final states.
+      if (ipath.getFinalStates().size() == 0) {
+        return sem_elem_t();
+      }
 
       ipath.path_summary_tarjan();
-      //path.path_summary();
 
       return ipath.getState(ipath.getInitialState())->weight();
     }

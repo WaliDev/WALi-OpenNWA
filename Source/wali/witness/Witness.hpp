@@ -124,7 +124,7 @@ namespace wali
         virtual void reset_marks() const;
 
         // @return length, taking the shorter of any combine branches
-        virtual unsigned long getLength() const;
+        virtual unsigned long getMinimumLength() const;
 
       protected:
         sem_elem_t user_se; //!< The user SemElem value

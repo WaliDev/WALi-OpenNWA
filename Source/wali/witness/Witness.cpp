@@ -227,7 +227,7 @@ namespace wali
       return o;
     }
 
-    unsigned long Witness::getLength() const {
+    unsigned long Witness::getMinimumLength() const {
       return min_length;
     }
 

@@ -1,3 +1,9 @@
+#ifndef WALI_PATH_VISITOR_GUARD
+#define WALI_PATH_VISITOR_GUARD 1
+
+/*!
+ * @author Rich Joiner
+ */
 
 #include <map>
 #include <list>
@@ -85,3 +91,4 @@ namespace opennwa {
 //   c-basic-offset: 2
 // End:
 
+#endif  // WALI_PATH_VISITOR_GUARD

@@ -27,7 +27,7 @@ namespace opennwa {
       for (wit=children.begin(); wit!=children.end(); wit++) {
         witness_t ptr = *wit;
         assert (ptr.is_valid() && "Invalid combine child pointer");
-        unsigned long len = ptr->getLength();
+        unsigned long len = ptr->getMinimumLength();
         //std::cerr << "LEN: " << len << std::endl;
         if (len <= min) {
           min = len;

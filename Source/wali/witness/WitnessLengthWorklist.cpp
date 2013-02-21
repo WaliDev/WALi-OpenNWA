@@ -1,5 +1,5 @@
 /*!
- * @author Nicholas Kidd
+ * @author Rich Joiner
  */
 
 #include "wali/Common.hpp"
