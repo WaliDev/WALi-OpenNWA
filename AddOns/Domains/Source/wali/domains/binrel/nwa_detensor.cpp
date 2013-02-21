@@ -254,7 +254,12 @@ size_t hash_value(bdd const& b)
   return b.root;
 }
 
-
+/**
+ * For an explanation of the algorithm implemented in detensorViaNwa, 
+ * see the draft on SpeedingUpNewton.
+ *
+ * This is a direct implementation of the psuedocode there.
+ **/
 bdd BinRel::detensorViaNwa()
 {
   if(rel == bddfalse)

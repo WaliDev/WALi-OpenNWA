@@ -26,6 +26,48 @@ namespace wali
       class ProgramBddContext;
       typedef ref_ptr< ProgramBddContext > program_bdd_context_t;
 
+      /**
+       * @see BddContext
+       * All BinRel objects are built in a BddContext.
+       * ProgramBddContext is a BddContext with utility functions to create the
+       * bdds that can then be encapsulated in a BinRel as a semiring object.
+       * The target clients of ProgramBddContext are program analysis tools --
+       * it provides ways to build up transformers for program expressions,
+       * assignments and assumes.
+       *
+       * Partial list of functions, grouped by usage:
+       * (1) Constructors
+       * @see Constructors of BddContext
+       * Among other tasks, these intitialize buddy.
+       *
+       * (2) addBoolVar/addIntVar/setBoolVar/setIntVar variants.
+       * A ProgramBddContext has a vocabulary that is intended to correspond to
+       * program variables.
+       * A base BddContext also has a vocabulary, that is used for pretty
+       * printing, and can be used as logical variables.  These functions are
+       * used to setup the vocabulary.
+       * @see BddContext variants of these functions
+       *
+       * (3) From, NonDet, Const, Plus, Minus, Times, Div
+       * Expression builders. From creates an expression for an rval. NonDet is
+       * non-deterministic choice.
+       * The bdd returned by these functions *must* (unless you really know
+       * what you're doing) be used as an argument to Assign or Assume
+       *
+       * (4) Assign, Assume
+       * Transformer builders. Given lval/rval etc, they build the transformer
+       * bdds for assignment and assume statements. Note that Assume takes two
+       * expression bdds e1 and e2 as input and returns the transformer for 
+       * (e1 == e2)
+       *
+       * (5) setPre, unsetPre, setPost, unsetPost
+       * More low level functions to set the value of a certain variable. These
+       * quntify out the rest of the bdd, so to compose them together, you need
+       * to take conjunction / disjunction yourself.
+       * These functions are meant for testing / experimenting.
+       * If these functions are all you need, you should probably be using
+       * BddContext, not the more heavy-weight ProgramBddContext.
+       **/
       class ProgramBddContext : public BddContext
       {
         public:
