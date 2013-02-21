@@ -5,10 +5,38 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-
+/*
+ * Important common properties of the ast data-structures (Marker for easy search (%*%*%))
+ *
+ * There are many functions provided in this file to manipulate the AST data-structures.
+ * Some things to remember
+ * (1) All unused fields *must* be NULL. This property is used extensively in the code.
+ * (2) All lists store a tail pointer to the end of list. Maintain this
+ * (3) All data structures take ownership of char * pointed to.
+ * invariant if you manipulate the lists yourself
+ *
+ * Functions that should be used when possible
+ * (1) There are constructor functions called make_* 
+ *     These functions take ownership of the passed in char * values.
+ * (2) For the lists there are functions to 
+ *      - add element to the right add_*_right
+ *      - add element to the left add_*_left (These return the new head of list, which might change)
+ *      - splice two lists splice_* (and return the new head)
+ * (3) To erase any part of the AST completely, use deep_erase_* functions
+ * (4) emit_* can be used to obtain a human readable representation of the ast objects.
+ **/
 typedef enum {ZERO = 0, ONE = 1} constant;
 
 typedef enum {AST_NOT, AST_XOR, AST_OR, AST_AND, AST_EQ, AST_NEQ, AST_IMP, AST_NONDET, AST_SCHOOSE, AST_VAR, AST_VAR_POST, AST_CONSTANT} binop;
+/**
+ * op is the operand
+ * l,r are children
+ * c is 0 or 1
+ * v is the name of the variable
+ *
+ * unused fields *must* be NULL.
+ * read above (search for %*%*%) before you manipulate these structures.
+ **/
 typedef struct expr_struct
 {
   binop op;
@@ -19,12 +47,28 @@ typedef struct expr_struct
 } expr;
 
 typedef enum {AST_SKIP, AST_GOTO, AST_RETURN, AST_ASSIGN, AST_ITE, AST_WHILE, AST_ASSERT, AST_ASSUME, AST_CALL} stmt_type;
+/**
+ * v is the string in the list
+ * n is the next item
+ * t is the last item
+ *
+ * unused fields *must* be NULL.
+ * read above (search for %*%*%) before you manipulate these structures.
+ **/
 typedef struct str_list_struct 
 {
   char * v;
   struct str_list_struct * n;
   struct str_list_struct * t;
 } str_list;
+/**
+ * e is the expression in the list
+ * n is the next item
+ * t is the last item
+ *
+ * unused fields *must* be NULL.
+ * read above (search for %*%*%) before you manipulate these structures.
+ **/
 typedef struct expr_list_struct
 {
   expr * e;
@@ -33,12 +77,37 @@ typedef struct expr_list_struct
 } expr_list;
 struct stmt_struct;
 struct proc_struct;
+/**
+ * s is the stmt in the list
+ * n is the next item
+ * t is the last item
+ *
+ * unused fields *must* be NULL.
+ * read above (search for %*%*%) before you manipulate these structures.
+ **/
 typedef struct stmt_list_struct
 {
   struct stmt_struct * s;
   struct stmt_list_struct * n;
   struct stmt_list_struct * t;
 } stmt_list;
+/**
+ * ll is the list of labels
+ * op is the statement type
+ * e is 
+ *  for AST_ASSUME, AST_ASSERT: condition
+ *  for AST_ITE, AST_WHILE: condition
+ * vl is 
+ *  for AST_ASSIGN: lvals
+ * el is
+ *  for AST_ASSIGN: rvals
+ *  for AST_CALL: arguments
+ *  for AST_RETURN: return rvals 
+ * sl1, sl2 are statement lists for if and else clauses
+ *
+ * unused fields *must* be NULL.
+ * read above (search for %*%*%) before you manipulate these structures.
+ **/
 typedef struct stmt_struct 
 { 
   str_list * ll;
@@ -51,6 +120,17 @@ typedef struct stmt_struct
   stmt_list * sl2;
 } stmt;
 
+/**
+ * r is the number of return values
+ * f is the function name
+ * al is the list of arguments
+ * vl is the list of local variables
+ * e is the 'enforce' condition
+ * sl is the statement list for the body
+ *
+ * unused fields *must* be NULL.
+ * read above (search for %*%*%) before you manipulate these structures.
+ **/
 typedef struct proc_struct
 {
   unsigned r;
@@ -60,6 +140,15 @@ typedef struct proc_struct
   expr * e;
   stmt_list * sl;
 } proc;
+
+/**
+ * p is the proc in the list
+ * n is the next item
+ * t is the last item
+ *
+ * unused fields *must* be NULL.
+ * read above (search for %*%*%) before you manipulate these structures.
+ **/
 typedef struct proc_list_struct
 {
   proc * p;
@@ -67,6 +156,14 @@ typedef struct proc_list_struct
   struct proc_list_struct * t;
 } proc_list;
 
+/**
+ * vl is the list of global variables
+ * pl is the list of procedures
+ * e is probably not used any more.
+ *
+ * unused fields *must* be NULL.  
+ * read above (search for %*%*%) before you manipulate these structures.
+ **/
 typedef struct prog_struct
 {
   str_list * vl;
