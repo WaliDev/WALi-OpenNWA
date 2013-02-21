@@ -45,6 +45,10 @@ using namespace std;
  *     mixed with old RegExps.
  */
 
+/**
+ * Relevant macros: PUSH_EVAL REGEXP_CACHING
+ * Look at GraphCommon.hpp
+ **/
 namespace wali {
 
     namespace graph {

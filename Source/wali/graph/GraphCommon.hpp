@@ -4,9 +4,32 @@
 #include "wali/Common.hpp"
 #include "wali/wfa/ITrans.hpp"
 
+/**
+ * Debugging output from flavours of FWPDS, and how much you want.
+ * Here's roughly what they do --
+ * #define PPP_DBG 0 -- gives statistical information about the runs
+ * #define PPP_DBG 1 -- debugging output that may be used to debug FWPDS at a high level
+ * #define PPP_DBG 2 -- (or higher) Loads of dump. Don't run with large examples.
+ * These are only rough guidelines. They may not have always been followed.
+ **/
 //#define PPP_DBG 0
+/**
+ * define PUSH_EVAL to turn on push based regular expression evaluation.
+ * This macro could probably be defined in RegExp.hpp, but I haven't tried that.
+ * In this scheme of evaluation, a updatable leaf RegExp Node sets the dirty
+ * bit of all nodes backwards reachable in the RegExpDag from the leaf.
+ * During evaluation, only dirty nodes are re-evaluated. This restricts the
+ * re-evaluation to the spine of the RegExpDag -- along paths from the root on
+ * which evaluate is called, to leaf nodes that have been updated since the last
+ * evaluate.
+ **/
 #define PUSH_EVAL
+/**
+ * define REGEXP_CACHING to turn on hash-consing of reg_exp nodes in a given RegExpDag.
+ * We have found that this has a huge impact on the size of dag, and hence on running time.
+ **/
 #define REGEXP_CACHING
+
 namespace wali {
 
     namespace graph {
