@@ -20,7 +20,116 @@ interleave_all_fdds();
 extern
 void
 print_bdd_variable_order(std::ostream & os);
+
+
+    using namespace wali::xfa;
+    using namespace wali::domains::binrel;
+
+    struct RelationMaker
+    {
+        virtual
+        BinaryRelation
+        initialize_variable_to_val(ProgramBddContext const & voc,
+                                   std::string const & varname,
+                                   int val) const = 0;
+
+        virtual
+        BinaryRelation
+        multiply_variable_by_two(ProgramBddContext const & voc,
+                                 std::string const & varname) const = 0;
+
+        virtual
+        BinaryRelation
+        increment_variable(ProgramBddContext const & voc,
+                           std::string const & varname) const = 0;
+
+        virtual
+        BinaryRelation
+        assume_equality(ProgramBddContext & voc,
+                        bdd ident,
+                        std::string const & lhs_name,
+                        std::string const & rhs_name) const = 0;
+
+        virtual
+        BinaryRelation
+        zero(ProgramBddContext const & voc) const = 0;
+
+        virtual
+        BinaryRelation
+        one(ProgramBddContext const & voc, bdd ident) const = 0;
+    };
+
+
+    struct BddRelationMaker
+        : RelationMaker
+    {
+        BinaryRelation
+        initialize_variable_to_val(ProgramBddContext const & voc,
+                                   std::string const & varname,
+                                   int val) const CPP11_OVERRIDE
+        {
+            bdd b = voc.Assign(varname, voc.Const(val));
+            BinaryRelation init = new BinRel(&voc, b);
+            std::cerr << "> read: =0 bdd node count " << bdd_nodecount(b) << "\n";
+            return init;
+        }
+
+        BinaryRelation
+        multiply_variable_by_two(ProgramBddContext const & voc,
+                                 std::string const & varname) const CPP11_OVERRIDE
+        {
+            // x = x + x (where x is the __io_return being read into)
+            bdd b = voc.Assign(varname,
+                               voc.Plus(voc.From(varname), voc.From(varname)));
+            BinaryRelation times2 = new BinRel(&voc, b);
+            std::cerr << "> read: *2 bdd node count " << bdd_nodecount(b) << "\n";
+            return times2;
+        }
+
+        BinaryRelation
+        increment_variable(ProgramBddContext const & voc,
+                           std::string const & varname) const CPP11_OVERRIDE
+        {
+            bdd b = voc.Assign(varname,
+                               voc.Plus(voc.From(varname), voc.Const(1)));
+            BinaryRelation plus1 = new BinRel(&voc, b);
+            std::cerr << "> read: +1 bdd node count " << bdd_nodecount(b) << "\n";
+            return plus1;
+        }    
+
+        BinaryRelation
+        assume_equality(ProgramBddContext & voc,
+                        bdd ident,
+                        std::string const & lhs_name,
+                        std::string const & rhs_name) const CPP11_OVERRIDE
+        {
+            int lhs_fdd = voc[lhs_name]->baseLhs;
+            int rhs_fdd = voc[rhs_name]->baseLhs;
+            bdd eq = fdd_equals(lhs_fdd, rhs_fdd);
+            binrel_t enforce_eq = new BinRel(&voc, eq & ident);
+            return enforce_eq;
+
+            bdd kill_counter = voc.Assign(rhs_name, voc.Const(0));
+            binrel_t kill_k = new BinRel(&voc, kill_counter);
+
+            return enforce_eq->Compose(kill_k.get_ptr());                      
+        }
+
+        BinaryRelation
+        zero(ProgramBddContext const & voc) const CPP11_OVERRIDE
+        {
+            return new BinRel(&voc, voc.False());        
+        }
+
+        BinaryRelation
+        one(ProgramBddContext const & voc, bdd ident) const CPP11_OVERRIDE
+        {
+            return new BinRel(&voc, ident);
+        }
+    };
 }
+
+using ::details::RelationMaker;
 
 
 namespace wali {
@@ -141,9 +250,9 @@ namespace wali {
         }
 
         BinaryRelation
-        get_relation(ast::Action const & act,
+        get_relation(RelationMaker const & maker,
+                     ast::Action const & act,
                      wali::domains::binrel::ProgramBddContext & voc,
-                     BinaryRelation zero,
                      bdd ident,
                      std::string const & prefix)
         {
@@ -154,7 +263,8 @@ namespace wali {
             {
                 std::cerr << "    fire or alert\n";
                 // Hmmm.
-                return zero;
+                abort();
+                return BinaryRelation();
             }
 
             assert(act.command);
@@ -162,28 +272,15 @@ namespace wali {
 
             if (cmd.name == "read") {
                 BinaryRelation times2, plus1, init;
+                std::string varname = var_name(act.operand_id, prefix);
                 {
-                    // x = 0
-                    bdd b = voc.Assign(var_name(act.operand_id, prefix),
-                                       voc.Const(0));
-                    init = new BinRel(&voc, b);
-                    std::cerr << "> read: =0 bdd node count " << bdd_nodecount(b) << "\n";
+                    init = maker.initialize_variable_to_val(voc, varname, 0);
                 }
                 {
-                    // x = x + x (where x is the __io_return being read into)
-                    bdd b = voc.Assign(var_name(act.operand_id, prefix),
-                                       voc.Plus(voc.From(var_name(act.operand_id, prefix)),
-                                                voc.From(var_name(act.operand_id, prefix))));
-                    times2 = new BinRel(&voc, b);
-                    std::cerr << "> read: *2 bdd node count " << bdd_nodecount(b) << "\n";
+                    times2 = maker.multiply_variable_by_two(voc, varname);
                 }
                 {
-                    // x = x + 1 (where x is the __io_return being read into)
-                    bdd b = voc.Assign(var_name(act.operand_id, prefix),
-                                       voc.Plus(voc.From(var_name(act.operand_id, prefix)),
-                                                voc.Const(1)));
-                    plus1 = new BinRel(&voc, b);
-                    std::cerr << "> read: +1 bdd node count " << bdd_nodecount(b) << "\n";
+                    plus1 = maker.increment_variable(voc, varname);
                 }
                 throw ReadTransitionException(init, times2, plus1);
             }
@@ -191,15 +288,14 @@ namespace wali {
             if (cmd.name == "reset") {
                 assert(cmd.arguments.size() == 1u);
                 int val = boost::lexical_cast<int>(cmd.arguments[0]);
-                BinaryRelation ret = new BinRel(&voc, voc.Assign(var_name(act.operand_id, prefix),
-                                                                 voc.Const(val)));
-                return ret;
+
+                return maker.initialize_variable_to_val(voc,
+                                                             var_name(act.operand_id, prefix),
+                                                             val);
             }
 
             if (cmd.name == "incr") {
-                return new BinRel(&voc, voc.Assign(var_name(act.operand_id, prefix),
-                                                   voc.Plus(voc.From(var_name(act.operand_id, prefix)),
-                                                            voc.Const(1))));
+                return maker.increment_variable(voc, var_name(act.operand_id, prefix));
             }
 
             if (cmd.name == "testnectr2") {
@@ -212,16 +308,7 @@ namespace wali {
                 std::string lhs_name = var_name(act.operand_id, prefix);
                 std::string rhs_name = var_name(rhs_id, prefix);
                 
-                int lhs_fdd = voc[lhs_name]->baseLhs;
-                int rhs_fdd = voc[rhs_name]->baseLhs;
-                bdd eq = fdd_equals(lhs_fdd, rhs_fdd);
-                binrel_t enforce_eq = new BinRel(&voc, eq & ident);
-                return enforce_eq;
-                    
-                bdd kill_counter = voc.Assign(rhs_name, voc.Const(0));
-                binrel_t kill_k = new BinRel(&voc, kill_counter);
-
-                return enforce_eq->Compose(kill_k.get_ptr());              
+                return maker.assume_equality(voc, ident, lhs_name, rhs_name);
             }
 
             assert(false);
@@ -229,9 +316,9 @@ namespace wali {
         
 
         TransList
-        get_transitions(ast::Transition const & trans,
+        get_transitions(RelationMaker const & maker,
+                        ast::Transition const & trans,
                         wali::domains::binrel::ProgramBddContext & voc,
-                        BinaryRelation zero,
                         bdd ident,
                         std::string const & prefix)
         {
@@ -246,11 +333,11 @@ namespace wali {
 
             try {
                 if (trans.actions.size() == 0u) {
-                    rel = new BinRel(&voc, ident);
+                    rel = maker.one(voc, ident);
                     //rel->is_effectively_one = true;
                 }
                 else if (trans.actions.size() == 1u) {
-                    rel = get_relation(*trans.actions[0], voc, zero, ident, prefix);
+                    rel = get_relation(maker, *trans.actions[0], voc, ident, prefix);
                 }
                 else {
                     assert(false);
@@ -293,7 +380,7 @@ namespace wali {
                     // intermediate --> dest has two transitions:
                     //     '__bit_0' has identity weight
                     //     '__bit_1' has +1 weight
-                    ret.push_back(WeightedTransition(intermediate, bit0, dest, new BinRel(&voc, ident)));
+                    ret.push_back(WeightedTransition(intermediate, bit0, dest, maker.one(voc, ident)));
                     ret.push_back(WeightedTransition(intermediate, bit1, dest, e.bit1_weight));
 
                     // dest --> intermediate has epsilon and weight *2
@@ -306,13 +393,13 @@ namespace wali {
 
 
         Xfa
-        from_parser_ast(XfaAst const & ast,
+        from_parser_ast(RelationMaker const & maker,
+                        XfaAst const & ast,
                         wali::domains::binrel::ProgramBddContext & voc,
                         int fdd_size,
                         std::string const & domain_var_name_prefix)
         {
             using namespace wali::domains::binrel;
-            BinaryRelation zero = new BinRel(&voc, voc.False());
             bdd ident = voc.Assume(voc.True(), voc.True());
             Symbol eps(wali::WALI_EPSILON);
             
@@ -320,11 +407,11 @@ namespace wali {
 
             for (auto ast_state = ast.states.begin(); ast_state != ast.states.end(); ++ast_state) {
                 State state = getState((*ast_state)->name);
-                ret.addState(state, zero);
+                ret.addState(state, maker.zero(voc));
             }
 
             for (auto ast_trans = ast.transitions.begin(); ast_trans != ast.transitions.end(); ++ast_trans) {
-                TransList transs = get_transitions(**ast_trans, voc, zero, ident, domain_var_name_prefix);
+                TransList transs = get_transitions(maker, **ast_trans, voc, ident, domain_var_name_prefix);
                 for (auto trans = transs.begin(); trans != transs.end(); ++trans) {
                     ret.addTrans(trans->source, trans->symbol, trans->target, trans->weight);
                 }
