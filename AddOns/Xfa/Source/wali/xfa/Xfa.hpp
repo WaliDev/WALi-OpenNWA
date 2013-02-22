@@ -247,6 +247,13 @@ namespace wali {
             }
 
             Xfa
+            intersect(wali::wfa::WeightMaker & maker, Xfa const & other) const {
+                Xfa output;
+                this->wfa_.intersect(maker, other.wfa_, output.wfa_);
+                return output;
+            }
+
+            Xfa
             intersect_conjoin(Xfa const & other) const {
                 Xfa output;
                 details::IntersectionWeightMaker maker;
