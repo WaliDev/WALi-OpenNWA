@@ -11,6 +11,20 @@
 
 #include <iostream>
 
+namespace {
+  std::string
+  clamp(std::string const & str)
+  {
+    const size_t maxlen = 50;
+    if (str.size() < maxlen) {
+      return str;
+    }
+    else {
+      return str.substr(0, maxlen-3) + "...";
+    }
+  }
+}  
+
 namespace wali
 {
   namespace domains
@@ -360,9 +374,20 @@ namespace wali
         {
           if (!first) {
             o << ", ";
+            first = false;
           }
-          element->first->print(o) << ": <stuff>";
-          first = false;
+          element->first->print(o) << ": {";
+          bool internal_first = true;
+          for (InternalSet::const_iterator weight = element->second.begin();
+               weight != element->second.end(); ++weight)
+          {
+            if (!internal_first) {
+              o << ", ";
+              internal_first = false;
+            }
+            o << clamp((*weight)->toString());
+          }
+          o << "}";
         }
         o << "}";
         return o;
