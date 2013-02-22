@@ -373,6 +373,18 @@ namespace goals {
     fa.setInitialState(getPdsState());
     fa.addFinalState(acc);
 
+   if(dump){
+      fstream outfile("init_outfa.dot", fstream::out);
+      fa.print_dot(outfile, true);
+      outfile.close();
+    }
+    if(dump){
+      fstream outfile("init_outfa.txt", fstream::out);
+      fa.print(outfile);
+      outfile.close();
+    }
+
+
     cout << "[Newton Compare] Computing poststar..." << endl;
     FWPDS * fpds = NULL;
     fpds = dynamic_cast<FWPDS*>(pds);
@@ -380,6 +392,19 @@ namespace goals {
       pds->poststar(fa,outfa); 
     }else{
       fpds->poststarIGR(fa,outfa);
+    }
+
+    if(dump){
+      cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
+      fstream outfile("final_outfa.dot", fstream::out);
+      outfa.print_dot(outfile, true);
+      outfile.close();
+    }
+    if(dump){
+      cout << "[Newton Compare] Dumping the output automaton to final_outfa.txt" << endl;
+      fstream outfile("final_outfa.txt", fstream::out);
+      outfa.print(outfile);
+      outfile.close();
     }
   }
   
