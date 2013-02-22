@@ -232,7 +232,7 @@ namespace wali {
                             SCOPED_TRACE(ss.str());
 
                             Xfa const & intersection = left_xfa->intersect_conjoin(*right_xfa);
-                            EXPECT_TRUE(xfas_same_modulo_words(expected_representative, intersection));
+                            ASSERT_TRUE(xfas_same_modulo_words(expected_representative, intersection));
                         }
                     }
                 }
