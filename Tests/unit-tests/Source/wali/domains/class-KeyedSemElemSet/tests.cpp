@@ -653,3 +653,68 @@ TEST(wali$domains$KeyedSemElemSet$$combine, allCombine)
     EXPECT_EQ(5u, actual->size());
     EXPECT_TRUE(actual_se->equal(&sets.all_combine));
 }
+
+
+TEST(wali$domains$KeyedSemElemSet$$constructor, addingAZeroGuardOmitsEntry)
+{
+    PKFixtures keys;
+    ShortestPathLengths paths;
+
+    KeyedSemElemSet::BackingMap m;
+    m[keys.i_empty].insert(paths.ten);
+    m[keys.i00].insert(paths.ten);
+
+    KeyedSemElemSet kses(m);
+
+    ASSERT_EQ(2u, m.size());
+    EXPECT_EQ(1u, kses.size());
+}
+
+
+TEST(wali$domains$KeyedSemElemSet$$constructor, havingAZeroSizeWeightSetOmitsEntry)
+{
+    PKFixtures keys;
+    ShortestPathLengths paths;
+
+    KeyedSemElemSet::BackingMap m;
+    m[keys.i01];
+    m[keys.i00].insert(paths.ten);
+
+    KeyedSemElemSet kses(m);
+
+    ASSERT_EQ(2u, m.size());
+    EXPECT_EQ(1u, kses.size());
+}
+
+
+TEST(wali$domains$KeyedSemElemSet$$constructor, havingAWeightSetWithZeroWeightOmitsEntry)
+{
+    PKFixtures keys;
+    ShortestPathLengths paths;
+
+    KeyedSemElemSet::BackingMap m;
+    m[keys.i01].insert(paths.ten->zero());
+    m[keys.i00].insert(paths.ten);
+
+    KeyedSemElemSet kses(m);
+
+    ASSERT_EQ(2u, m.size());
+    EXPECT_EQ(1u, kses.size());
+}
+
+TEST(wali$domains$KeyedSemElemSet$$constructor, havingAWeightSetWithZeroWeightAndSomethingElseIncludesEntry)
+{
+    PKFixtures keys;
+    ShortestPathLengths paths;
+
+    KeyedSemElemSet::BackingMap m;
+    m[keys.i01].insert(paths.ten->zero());
+    m[keys.i01].insert(paths.ten);
+    m[keys.i00].insert(paths.ten);
+
+    KeyedSemElemSet kses(m);
+
+    ASSERT_EQ(2u, m.size());
+    EXPECT_EQ(3u, kses.size());
+}
+

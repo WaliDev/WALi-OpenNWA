@@ -182,11 +182,40 @@ namespace wali
         }
         return xor_part + 17*sum_part;
       }
+
+
+      static
+      BackingMap
+      remove_zeroes(BackingMap m)
+      {
+        for (BackingMap::const_iterator it = m.begin();
+             it != m.end(); /*nothing*/ )
+        {
+          sem_elem_t guard = it->first;
+          bool all_zero = true;
+          for (InternalSet::const_iterator weight = it->second.begin();
+               weight != it->second.end(); ++weight)
+          {
+            if (!(*weight)->equal((*weight)->zero())) {
+              all_zero = false;
+              break;
+            }
+          }
+          
+          if (guard->equal(guard->zero()) || all_zero) {
+            it = m.erase(it);
+          }
+          else {
+            ++it;
+          }
+        }
+        return m;
+      }
       
 
       KeyedSemElemSet(BackingMap const & m)
-        : map_(m)
-        , hash_(get_hash(m))
+        : map_(remove_zeroes(m))
+        , hash_(get_hash(map_))
       {
         assert(m.size() > 0u);
         one_key_ = m.begin()->first->one();
@@ -196,10 +225,10 @@ namespace wali
       KeyedSemElemSet(BackingMap const & m,
                       sem_elem_t example_key,
                       sem_elem_t example_value)
-        : map_(m)
+        : map_(remove_zeroes(m))
         , one_key_(example_key->one())
         , one_value_(example_value->one())
-        , hash_(get_hash(m))
+        , hash_(get_hash(map_))
       {}
 
       std::pair<const_iterator, const_iterator>
