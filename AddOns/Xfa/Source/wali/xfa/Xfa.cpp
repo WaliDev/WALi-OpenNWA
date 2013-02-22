@@ -252,6 +252,50 @@ namespace wali {
         }
 
 
+        class XfaContainWeightMaker
+            : public wali::wfa::WeightMaker
+        {
+        public:
+            virtual sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs ) {
+                // left and right are both KeyedSemElemSets. I want to make a
+                // new weight which is a normal semelemset, where the
+                // elements do the pairing. (So this is like a version of
+                // keepboth, but lifted to operate on sets instead.)
+                
+                // The pairs are are just pairs of (guard,weight) like I was
+                // thinking about using originally but decided not to for
+                // performance reasons. We'll see if those reasons are
+                // important.
+                KeyedSemElemSet
+                    * lhs_down = dynamic_cast<KeyedSemElemSet*>(lhs.get_ptr()),
+                    * rhs_down = dynamic_cast<KeyedSemElemSet*>(rhs.get_ptr());
+
+                sem_elem_t pair;
+
+                SemElemSet::ElementSet es;
+                for (KeyedSemElemSet::const_iterator left_element = lhs_down->begin();
+                     left_element != lhs_down->end(); ++left_element)
+                {
+                    for (KeyedSemElemSet::const_iterator right_element = rhs_down->begin();
+                         right_element != rhs_down->end(); ++right_element)
+                    {
+                        pair = new SemElemPair(new SemElemPair(left_element->first, left_element->second),
+                                               new SemElemPair(right_element->first, right_element->second));
+                        es.insert(pair);
+                    }
+                }
+
+                if (es.empty()) {
+                    return sem_elem_t();
+                }
+                return new SemElemSet(SemElemSet::KeepAllNonduplicates,
+                                      pair,
+                                      es);
+            }
+        };
+
+
+
         bool
         language_contains(Xfa const & left, Xfa const & right,
                           wali::domains::binrel::ProgramBddContext const & voc)
