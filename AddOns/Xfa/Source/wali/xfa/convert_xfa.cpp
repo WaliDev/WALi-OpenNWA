@@ -29,43 +29,45 @@ print_bdd_variable_order(std::ostream & os);
     {
         virtual
         BinaryRelation
-        initialize_variable_to_val(ProgramBddContext const & voc,
-                                   std::string const & varname,
+        initialize_variable_to_val(std::string const & varname,
                                    int val) const = 0;
 
         virtual
         BinaryRelation
-        multiply_variable_by_two(ProgramBddContext const & voc,
-                                 std::string const & varname) const = 0;
+        multiply_variable_by_two(std::string const & varname) const = 0;
 
         virtual
         BinaryRelation
-        increment_variable(ProgramBddContext const & voc,
-                           std::string const & varname) const = 0;
+        increment_variable(std::string const & varname) const = 0;
 
         virtual
         BinaryRelation
-        assume_equality(ProgramBddContext & voc,
-                        bdd ident,
-                        std::string const & lhs_name,
+        assume_equality(std::string const & lhs_name,
                         std::string const & rhs_name) const = 0;
 
         virtual
         BinaryRelation
-        zero(ProgramBddContext const & voc) const = 0;
+        zero() const = 0;
 
         virtual
         BinaryRelation
-        one(ProgramBddContext const & voc, bdd ident) const = 0;
+        one() const = 0;
     };
 
 
     struct BddRelationMaker
         : RelationMaker
     {
+        ProgramBddContext const & voc;
+        bdd ident;
+
+        BddRelationMaker(ProgramBddContext const & v, bdd i)
+            : voc(v)
+            , ident(i)
+        {}
+        
         BinaryRelation
-        initialize_variable_to_val(ProgramBddContext const & voc,
-                                   std::string const & varname,
+        initialize_variable_to_val(std::string const & varname,
                                    int val) const CPP11_OVERRIDE
         {
             bdd b = voc.Assign(varname, voc.Const(val));
@@ -75,8 +77,7 @@ print_bdd_variable_order(std::ostream & os);
         }
 
         BinaryRelation
-        multiply_variable_by_two(ProgramBddContext const & voc,
-                                 std::string const & varname) const CPP11_OVERRIDE
+        multiply_variable_by_two(std::string const & varname) const CPP11_OVERRIDE
         {
             // x = x + x (where x is the __io_return being read into)
             bdd b = voc.Assign(varname,
@@ -87,8 +88,7 @@ print_bdd_variable_order(std::ostream & os);
         }
 
         BinaryRelation
-        increment_variable(ProgramBddContext const & voc,
-                           std::string const & varname) const CPP11_OVERRIDE
+        increment_variable(std::string const & varname) const CPP11_OVERRIDE
         {
             bdd b = voc.Assign(varname,
                                voc.Plus(voc.From(varname), voc.Const(1)));
@@ -98,13 +98,11 @@ print_bdd_variable_order(std::ostream & os);
         }    
 
         BinaryRelation
-        assume_equality(ProgramBddContext & voc,
-                        bdd ident,
-                        std::string const & lhs_name,
+        assume_equality(std::string const & lhs_name,
                         std::string const & rhs_name) const CPP11_OVERRIDE
         {
-            int lhs_fdd = voc[lhs_name]->baseLhs;
-            int rhs_fdd = voc[rhs_name]->baseLhs;
+            int lhs_fdd = voc.find(lhs_name)->second->baseLhs;
+            int rhs_fdd = voc.find(rhs_name)->second->baseLhs;
             bdd eq = fdd_equals(lhs_fdd, rhs_fdd);
             binrel_t enforce_eq = new BinRel(&voc, eq & ident);
             return enforce_eq;
@@ -116,13 +114,13 @@ print_bdd_variable_order(std::ostream & os);
         }
 
         BinaryRelation
-        zero(ProgramBddContext const & voc) const CPP11_OVERRIDE
+        zero() const CPP11_OVERRIDE
         {
             return new BinRel(&voc, voc.False());        
         }
 
         BinaryRelation
-        one(ProgramBddContext const & voc, bdd ident) const CPP11_OVERRIDE
+        one() const CPP11_OVERRIDE
         {
             return new BinRel(&voc, ident);
         }
@@ -274,13 +272,13 @@ namespace wali {
                 BinaryRelation times2, plus1, init;
                 std::string varname = var_name(act.operand_id, prefix);
                 {
-                    init = maker.initialize_variable_to_val(voc, varname, 0);
+                    init = maker.initialize_variable_to_val(varname, 0);
                 }
                 {
-                    times2 = maker.multiply_variable_by_two(voc, varname);
+                    times2 = maker.multiply_variable_by_two(varname);
                 }
                 {
-                    plus1 = maker.increment_variable(voc, varname);
+                    plus1 = maker.increment_variable(varname);
                 }
                 throw ReadTransitionException(init, times2, plus1);
             }
@@ -289,13 +287,12 @@ namespace wali {
                 assert(cmd.arguments.size() == 1u);
                 int val = boost::lexical_cast<int>(cmd.arguments[0]);
 
-                return maker.initialize_variable_to_val(voc,
-                                                             var_name(act.operand_id, prefix),
-                                                             val);
+                return maker.initialize_variable_to_val(var_name(act.operand_id, prefix),
+                                                        val);
             }
 
             if (cmd.name == "incr") {
-                return maker.increment_variable(voc, var_name(act.operand_id, prefix));
+                return maker.increment_variable(var_name(act.operand_id, prefix));
             }
 
             if (cmd.name == "testnectr2") {
@@ -308,7 +305,7 @@ namespace wali {
                 std::string lhs_name = var_name(act.operand_id, prefix);
                 std::string rhs_name = var_name(rhs_id, prefix);
                 
-                return maker.assume_equality(voc, ident, lhs_name, rhs_name);
+                return maker.assume_equality(lhs_name, rhs_name);
             }
 
             assert(false);
@@ -333,7 +330,7 @@ namespace wali {
 
             try {
                 if (trans.actions.size() == 0u) {
-                    rel = maker.one(voc, ident);
+                    rel = maker.one();
                     //rel->is_effectively_one = true;
                 }
                 else if (trans.actions.size() == 1u) {
@@ -380,7 +377,7 @@ namespace wali {
                     // intermediate --> dest has two transitions:
                     //     '__bit_0' has identity weight
                     //     '__bit_1' has +1 weight
-                    ret.push_back(WeightedTransition(intermediate, bit0, dest, maker.one(voc, ident)));
+                    ret.push_back(WeightedTransition(intermediate, bit0, dest, maker.one()));
                     ret.push_back(WeightedTransition(intermediate, bit1, dest, e.bit1_weight));
 
                     // dest --> intermediate has epsilon and weight *2
@@ -407,7 +404,7 @@ namespace wali {
 
             for (auto ast_state = ast.states.begin(); ast_state != ast.states.end(); ++ast_state) {
                 State state = getState((*ast_state)->name);
-                ret.addState(state, maker.zero(voc));
+                ret.addState(state, maker.zero());
             }
 
             for (auto ast_trans = ast.transitions.begin(); ast_trans != ast.transitions.end(); ++ast_trans) {
