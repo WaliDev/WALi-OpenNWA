@@ -509,6 +509,40 @@ namespace goals {
     delete fpds;
   }
 
+  void runEwpds(WFA& outfa, EWPDS * originalPds = NULL)
+  {
+    cout << "#################################################" << endl;
+    cout << "[Newton Compare] Goal VI: end-to-end EWPDS run" << endl;
+    EWPDS * pds;
+    if(originalPds != NULL)
+      pds = new EWPDS(*originalPds);
+    else{
+      pds = new EWPDS();
+      con = pds_from_prog(pds, pg);
+    }
+
+#if defined(BINREL_STATS)
+    con->resetStats();
+#endif
+    wali::util::Timer * t = new wali::util::Timer("EWPDS poststar",cout);
+    t->measureAndReport =false;
+    doPostStar(pds, outfa);
+    sem_elem_t wt = computePathSummary(pds, outfa);
+    if(wt->equal(wt->zero()))
+      cout << "[Newton Compare] EWPDS ==> error not reachable" << endl;
+    else{
+      cout << "[Newton Compare] EWPDS ==> error reachable" << endl;
+    }
+    t->print(std::cout << "[Newton Compare] Time taken by EWPDS poststar: ") << endl;
+    delete t;
+
+#if defined(BINREL_STATS)
+    con->printStats(cout);
+#endif //if defined(BINREL_STATS)
+    delete pds;
+  }
+
+
   void runWpds(WFA& outfa, WPDS * originalPds = NULL)
   { 
     cout << "#################################################" << endl;
@@ -651,6 +685,9 @@ void * work(void *)
     case 6:
       runWpds(outfa);
       break;
+    case 7:
+      runEwpds(outfa);
+      break;
     default:
       assert(0 && "I don't understand that goal!!!");
   }
@@ -672,7 +709,8 @@ int main(int argc, char ** argv)
       << "Goal: 3 --> Run NWPDS end-to-end." << endl
       << "Goal: 4 --> Run FWPDS end-to-end." << endl 
       << "Goal: 5 --> Run old NWPDS end-to-end (Referred to as DirectNewton)." << endl
-      << "Goal: 6 --> Run WPDS end-to-end." << endl; 
+      << "Goal: 6 --> Run WPDS end-to-end." << endl
+      << "Goal: 7 --> Run EWPDS end-to-end." << endl;
     return -1;
   }
 
