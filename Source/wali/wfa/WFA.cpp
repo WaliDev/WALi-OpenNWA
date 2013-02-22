@@ -503,6 +503,9 @@ namespace wali
       dest.clear();
       dest.setQuery(this->getQuery());
       EpsilonCloseCache this_eclose_cache, fa_eclose_cache;
+
+      sem_elem_t zero = wmaker.make_weight(this->getSomeWeight()->one(),
+                                           fa.getSomeWeight()->one())->zero();
       
       // Sigh
       std::set<Key> alphabet;
@@ -566,9 +569,12 @@ namespace wali
         Key initial_key = getKey(this->getInitialState(), fa.getInitialState());
         KeyPair initial_pair(this->getInitialState(), fa.getInitialState());
 
-        dest.addState(initial_key,
-                      wmaker.make_weight(this->getState(initial_pair.first)->weight(),
-                                         fa.getState(initial_pair.second)->weight()));
+        sem_elem_t state_weight = wmaker.make_weight(this->getState(initial_pair.first)->weight(),
+                                                     fa.getState(initial_pair.second)->weight());
+        if (state_weight.get_ptr() == NULL) {
+          state_weight = zero;
+        }
+        dest.addState(initial_key, state_weight);
 
         worklist.push_back(initial_pair);
 
@@ -619,9 +625,12 @@ namespace wali
                   Key target_key = getKey(target_pair.first, target_pair.second);
 
                   if (dest.Q.count(target_key) == 0) {
-                    dest.addState(target_key,
-                                  wmaker.make_weight(this->getState(target_pair.first)->weight(),
-                                                     fa.getState(target_pair.second)->weight()));
+                    sem_elem_t state_weight = wmaker.make_weight(this->getState(target_pair.first)->weight(),
+                                                                 fa.getState(target_pair.second)->weight());
+                    if (state_weight.get_ptr() == NULL) {
+                      state_weight = zero;
+                    }
+                    dest.addState(target_key, state_weight);
                     worklist.push_back(target_pair);
                     if (this->isFinalState(target_pair.first)
                         && fa.isFinalState(target_pair.second))
