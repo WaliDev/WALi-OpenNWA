@@ -369,6 +369,17 @@ namespace goals {
   
   void doPostStar(WPDS * pds, WFA& outfa)
   {
+    if(dump){
+      fstream outfile("init_outfa.dot", fstream::out);
+      outfa.print_dot(outfile, true);
+      outfile.close();
+    }
+    if(dump){
+      fstream outfile("init_outfa.txt", fstream::out);
+      outfa.print(outfile);
+      outfile.close();
+    }
+
     WFA fa;
     wali::Key acc = wali::getKeySpace()->getKey("accept");
     fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, pds->get_theZero()->one());
@@ -385,13 +396,13 @@ namespace goals {
     }
     if(dump){
       cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
-      fstream outfile("outfa.dot", fstream::out);
+      fstream outfile("final_outfa.dot", fstream::out);
       outfa.print_dot(outfile, true);
       outfile.close();
     }
     if(dump){
-      cout << "[Newton Compare] Dumping the output automaton to outfa.txt" << endl;
-      fstream outfile("outfa.txt", fstream::out);
+      cout << "[Newton Compare] Dumping the output automaton to final_outfa.txt" << endl;
+      fstream outfile("final_outfa.txt", fstream::out);
       outfa.print(outfile);
       outfile.close();
     }
