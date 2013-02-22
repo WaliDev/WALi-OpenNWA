@@ -250,8 +250,6 @@ namespace wali {
         BinaryRelation
         get_relation(RelationMaker const & maker,
                      ast::Action const & act,
-                     wali::domains::binrel::ProgramBddContext & voc,
-                     bdd ident,
                      std::string const & prefix)
         {
             using namespace wali::domains::binrel;
@@ -315,8 +313,6 @@ namespace wali {
         TransList
         get_transitions(RelationMaker const & maker,
                         ast::Transition const & trans,
-                        wali::domains::binrel::ProgramBddContext & voc,
-                        bdd ident,
                         std::string const & prefix)
         {
             State source = getState(trans.source);
@@ -334,7 +330,7 @@ namespace wali {
                     //rel->is_effectively_one = true;
                 }
                 else if (trans.actions.size() == 1u) {
-                    rel = get_relation(maker, *trans.actions[0], voc, ident, prefix);
+                    rel = get_relation(maker, *trans.actions[0], prefix);
                 }
                 else {
                     assert(false);
@@ -392,12 +388,10 @@ namespace wali {
         Xfa
         from_parser_ast(RelationMaker const & maker,
                         XfaAst const & ast,
-                        wali::domains::binrel::ProgramBddContext & voc,
                         int fdd_size,
                         std::string const & domain_var_name_prefix)
         {
             using namespace wali::domains::binrel;
-            bdd ident = voc.Assume(voc.True(), voc.True());
             Symbol eps(wali::WALI_EPSILON);
             
             Xfa ret;
@@ -408,7 +402,7 @@ namespace wali {
             }
 
             for (auto ast_trans = ast.transitions.begin(); ast_trans != ast.transitions.end(); ++ast_trans) {
-                TransList transs = get_transitions(maker, **ast_trans, voc, ident, domain_var_name_prefix);
+                TransList transs = get_transitions(maker, **ast_trans, domain_var_name_prefix);
                 for (auto trans = transs.begin(); trans != transs.end(); ++trans) {
                     ret.addTrans(trans->source, trans->symbol, trans->target, trans->weight);
                 }
