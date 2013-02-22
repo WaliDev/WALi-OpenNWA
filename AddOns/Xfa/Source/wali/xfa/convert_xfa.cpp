@@ -22,9 +22,6 @@ print_bdd_variable_order(std::ostream & os);
 
 }
 
-using ::details::RelationMaker;
-
-
 namespace wali {
     namespace xfa {
 

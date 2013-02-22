@@ -5,38 +5,39 @@
 
 #include <string>
 
-namespace details
+namespace wali
 {
-    using wali::xfa::BinaryRelation;
-    
-    struct RelationMaker
+    namespace xfa
     {
-        virtual
-        BinaryRelation
-        initialize_variable_to_val(std::string const & varname,
-                                   int val) const = 0;
+        struct RelationMaker
+        {
+            virtual
+            BinaryRelation
+            initialize_variable_to_val(std::string const & varname,
+                                       int val) const = 0;
 
-        virtual
-        BinaryRelation
-        multiply_variable_by_two(std::string const & varname) const = 0;
+            virtual
+            BinaryRelation
+            multiply_variable_by_two(std::string const & varname) const = 0;
 
-        virtual
-        BinaryRelation
-        increment_variable(std::string const & varname) const = 0;
+            virtual
+            BinaryRelation
+            increment_variable(std::string const & varname) const = 0;
 
-        virtual
-        BinaryRelation
-        assume_equality(std::string const & lhs_name,
-                        std::string const & rhs_name) const = 0;
+            virtual
+            BinaryRelation
+            assume_equality(std::string const & lhs_name,
+                            std::string const & rhs_name) const = 0;
 
-        virtual
-        BinaryRelation
-        zero() const = 0;
+            virtual
+            BinaryRelation
+            zero() const = 0;
 
-        virtual
-        BinaryRelation
-        one() const = 0;
-    };
+            virtual
+            BinaryRelation
+            one() const = 0;
+        };
+    }
 }
 
 
