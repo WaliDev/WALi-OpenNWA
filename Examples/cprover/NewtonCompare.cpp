@@ -369,6 +369,17 @@ namespace goals {
   
   void doPostStar(WPDS * pds, WFA& outfa)
   {
+    if(dump){
+      fstream outfile("init_outfa.dot", fstream::out);
+      outfa.print_dot(outfile, true);
+      outfile.close();
+    }
+    if(dump){
+      fstream outfile("init_outfa.txt", fstream::out);
+      outfa.print(outfile);
+      outfile.close();
+    }
+
     WFA fa;
     wali::Key acc = wali::getKeySpace()->getKey("accept");
     fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, pds->get_theZero()->one());
