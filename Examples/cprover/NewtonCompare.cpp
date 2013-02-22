@@ -508,6 +508,8 @@ namespace goals {
       con = pds_from_prog(pds, pg);
     }
 
+    pds->print(std::cout) << endl;
+
 #if defined(BINREL_STATS)
     con->resetStats();
 #endif
