@@ -209,6 +209,46 @@ TEST(wali$domains$PositionKey$$equal, eachFixtureUnequal)
     }
 }
 
+TEST(wali$domains$PositionKey$$hash, eachFixtureHasDifferentHash)
+{
+    PKLists lists;
+
+    for (size_t i=0; i<lists.ints.size(); ++i) {
+        for (size_t j=0; j<lists.ints.size(); ++j) {
+            sem_elem_t
+                left = lists.ints.at(i),
+                right = lists.ints.at(j);
+            size_t
+                left_hash = left->hash(),
+                right_hash = right->hash();
+            if (i == j) {
+                EXPECT_EQ(left_hash, right_hash);
+            }
+            else {
+                EXPECT_NE(left_hash, right_hash);
+            }
+        }
+    }
+
+    for (size_t i=0; i<lists.strings.size(); ++i) {
+        for (size_t j=0; j<lists.strings.size(); ++j) {
+            sem_elem_t
+                left = lists.strings.at(i),
+                right = lists.strings.at(j);
+            size_t
+                left_hash = left->hash(),
+                right_hash = right->hash();
+            if (i == j) {
+                EXPECT_EQ(left_hash, right_hash);
+            }
+            else {
+                EXPECT_NE(left_hash, right_hash);
+            }
+        }
+    }
+}
+
+
 
 TEST(wali$domains$PositionKey$$containerLessThan, intsAreInCorrectOrder)
 {

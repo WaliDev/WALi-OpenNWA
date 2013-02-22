@@ -149,10 +149,44 @@ namespace wali
           return std::make_pair(outer_iter_current_->first, *inner_iter_current_);
         }
       }; // end of DisjointSets::const_iterator
+
+
+      static
+      size_t
+      get_hash(InternalSet const & s) {
+        size_t xor_part = 0u;
+        size_t sum_part = 0u;
+
+        for (InternalSet::const_iterator it = s.begin();
+             it != s.end(); ++it)
+        {
+          size_t elem_hash = (*it)->hash();
+          xor_part ^= elem_hash;
+          sum_part += elem_hash;
+        }
+        return xor_part + 17*sum_part;
+      }
+      
+      static
+      size_t
+      get_hash(BackingMap const & m) {
+        size_t xor_part = 0u;
+        size_t sum_part = 0u;
+
+        for (BackingMap::const_iterator it = m.begin();
+             it != m.end(); ++it)
+        {
+          size_t elem_hash = it->first->hash() + 17*get_hash(it->second);
+          xor_part ^= elem_hash;
+          sum_part += elem_hash;
+        }
+        return xor_part + 17*sum_part;
+      }
       
 
       KeyedSemElemSet(BackingMap const & m)
         : map_(m)
+        , hash_(get_hash(m))
       {
         assert(m.size() > 0u);
         one_key_ = m.begin()->first->one();
@@ -165,6 +199,7 @@ namespace wali
         : map_(m)
         , one_key_(example_key->one())
         , one_value_(example_value->one())
+        , hash_(get_hash(m))
       {}
 
       std::pair<const_iterator, const_iterator>
@@ -305,6 +340,9 @@ namespace wali
       }
 
 
+      virtual size_t hash() const { return hash_; }
+
+
       // Pull in the sem_elem_t overloads
       using SemElem::extend;
       using SemElem::combine;
@@ -313,6 +351,7 @@ namespace wali
     private:      
       BackingMap map_;
       sem_elem_t one_key_, one_value_;
+      size_t hash_;
     };
     
 
