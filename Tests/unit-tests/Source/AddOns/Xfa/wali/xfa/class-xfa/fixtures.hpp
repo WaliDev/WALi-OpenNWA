@@ -10,7 +10,7 @@ namespace wali {
         using wali::domains::binrel::BinRel;
 
         struct Relations {
-            BinaryRelation false_
+            sem_elem_t false_
                 , true_
                 , id
                 , set_to_zero
@@ -122,7 +122,7 @@ namespace wali {
             Xfa xfa;
             State state;
 
-            TrivialEmptyXfa(BinaryRelation zero)
+            TrivialEmptyXfa(sem_elem_t zero)
                 : state(getKey("q"))
             {
                 xfa.addState(state, zero);
@@ -140,7 +140,7 @@ namespace wali {
             Xfa xfa;
             State state;
 
-            AcceptEmptyStringOnly(BinaryRelation zero)
+            AcceptEmptyStringOnly(sem_elem_t zero)
                 : state(getKey("q"))
             {
                 xfa.addState(state, zero);
@@ -157,7 +157,7 @@ namespace wali {
             Xfa xfa;
             State start, accept;
 
-            EmptyByMissingTransition(BinaryRelation zero)
+            EmptyByMissingTransition(sem_elem_t zero)
                 : start(getKey("p"))
                 , accept(getKey("q"))
             {
@@ -183,7 +183,7 @@ namespace wali {
             State start, accept;
             Symbol a;
 
-            EmptyByImpossibleDataTransition(BinaryRelation zero, Relations const & rels)
+            EmptyByImpossibleDataTransition(sem_elem_t zero, Relations const & rels)
                 : start(getKey("p"))
                 , accept(getKey("q"))
                 , a(getKey("a"))
@@ -212,7 +212,7 @@ namespace wali {
             State start, accept;
             Symbol a;
 
-            SingleSimpleTrans(BinaryRelation zero, Relations const & rels)
+            SingleSimpleTrans(sem_elem_t zero, Relations const & rels)
                 : start(getKey("p"))
                 , accept(getKey("q"))
                 , a(getKey("a"))
@@ -242,7 +242,7 @@ namespace wali {
             State start, accept;
             Symbol a;
 
-            BoringCycle(BinaryRelation zero, Relations const & rels)
+            BoringCycle(sem_elem_t zero, Relations const & rels)
                 : start(getKey("p"))
                 , accept(getKey("q"))
                 , a(getKey("a"))
@@ -277,7 +277,7 @@ namespace wali {
             State start, middle, accept;
             Symbol a;
 
-            DataRestrictedCycle(BinaryRelation zero, Relations const & rels)
+            DataRestrictedCycle(sem_elem_t zero, Relations const & rels)
                 : start(getKey("p"))
                 , middle(getKey("middle"))
                 , accept(getKey("q"))
@@ -308,7 +308,7 @@ namespace wali {
             State start, middle, accept;
             Symbol a, b;
 
-            SimpleAB(BinaryRelation zero, Relations const & rels)
+            SimpleAB(sem_elem_t zero, Relations const & rels)
                 : start(getKey("p"))
                 , middle(getKey("middle"))
                 , accept(getKey("q"))
@@ -340,7 +340,7 @@ namespace wali {
             State start, second, third, accept;
             Symbol a, b, epsilon;
 
-            AEpsilonB(BinaryRelation zero, Relations const & rels)
+            AEpsilonB(sem_elem_t zero, Relations const & rels)
                 : start(getKey("p"))
                 , second(getKey("second"))
                 , third(getKey("third"))
@@ -378,7 +378,7 @@ namespace wali {
             State start, middle, accept;
             Symbol a, b;
 
-            ImpossibleSequence(BinaryRelation zero, Relations const & rels)
+            ImpossibleSequence(sem_elem_t zero, Relations const & rels)
                 : start(getKey("p"))
                 , middle(getKey("middle"))
                 , accept(getKey("q"))
@@ -411,7 +411,7 @@ namespace wali {
             State start, accept;
             Symbol a, b;
 
-            AOrB(BinaryRelation zero, Relations const & rels)
+            AOrB(sem_elem_t zero, Relations const & rels)
                 : start(getKey("p"))
                 , accept(getKey("q"))
                 , a(getKey("a"))
@@ -441,7 +441,7 @@ namespace wali {
             State start, accept;
             Symbol a, b;
 
-            AlternativePathImpossible(BinaryRelation zero, Relations const & rels)
+            AlternativePathImpossible(sem_elem_t zero, Relations const & rels)
                 : start(getKey("p"))
                 , accept(getKey("q"))
                 , a(getKey("a"))
@@ -471,7 +471,7 @@ namespace wali {
             State start, accept;
             Symbol epsilon;
 
-            EmptyByImpossibleDataTransitionEpsilon(BinaryRelation zero, Relations const & rels)
+            EmptyByImpossibleDataTransitionEpsilon(sem_elem_t zero, Relations const & rels)
                 : start(getKey("p"))
                 , accept(getKey("q"))
                 , epsilon(wali::WALI_EPSILON)
@@ -500,7 +500,7 @@ namespace wali {
             State start, accept;
             Symbol epsilon;
 
-            SingleSimpleTransEpsilon(BinaryRelation zero, Relations const & rels)
+            SingleSimpleTransEpsilon(sem_elem_t zero, Relations const & rels)
                 : start(getKey("p"))
                 , accept(getKey("q"))
                 , epsilon(wali::WALI_EPSILON)

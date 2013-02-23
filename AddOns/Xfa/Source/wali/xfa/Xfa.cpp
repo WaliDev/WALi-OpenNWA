@@ -36,11 +36,11 @@ namespace wali {
             IntersectionWeightMaker::make_weight( sem_elem_t lhs, sem_elem_t rhs )
             {
                 return lhs->extend(rhs);
-                BinaryRelation left = dynamic_cast<BinRel*>(lhs.get_ptr());
-                BinaryRelation right = dynamic_cast<BinRel*>(rhs.get_ptr());
+                BinRel * left = dynamic_cast<BinRel*>(lhs.get_ptr());
+                BinRel * right = dynamic_cast<BinRel*>(rhs.get_ptr());
 
-                assert(left.get_ptr());
-                assert(right.get_ptr());
+                assert(left);
+                assert(right);
 
                 bdd left_bdd = left->getBdd();
                 bdd right_bdd = right->getBdd();
@@ -48,7 +48,7 @@ namespace wali {
                 BddContext const & voc = left->getVocabulary();
                 assert(&voc == &(right->getVocabulary()));
 
-                BinaryRelation result = new BinRel(&voc, left_bdd & right_bdd);
+                BinRel * result = new BinRel(&voc, left_bdd & right_bdd);
 
                 std::cerr << "== IntersectionWeightMaker:\n"
                           << "==        " << lhs->toString() << "\n"
@@ -77,7 +77,7 @@ namespace wali {
 
         Xfa
         from_internal_only_nwa(opennwa::Nwa const & nwa,
-                               BinaryRelation rel)
+                               sem_elem_t rel)
         {
             assert(rel.get_ptr());
 
@@ -85,11 +85,11 @@ namespace wali {
             using wali::domains::binrel::BinRel;
             Xfa xfa;
 
-            BinaryRelation one = dynamic_cast<BinRel*>(rel->one().get_ptr());
-            BinaryRelation zero = dynamic_cast<BinRel*>(rel->zero().get_ptr());
+            BinRel * one = dynamic_cast<BinRel*>(rel->one().get_ptr());
+            BinRel * zero = dynamic_cast<BinRel*>(rel->zero().get_ptr());
 
-            assert(one.get_ptr());
-            assert(zero.get_ptr());
+            assert(one);
+            assert(zero);
 
             for (Nwa::StateIterator state = nwa.beginStates();
                  state != nwa.endStates() ; ++state)
@@ -127,7 +127,7 @@ namespace wali {
                                                    std::ostream & os)
         {
             wali::sem_elem_t w_se = t->weight();
-            BinaryRelation w = dynamic_cast<wali::domains::binrel::BinRel*>(w_se.get_ptr());
+            BinRel * w = dynamic_cast<wali::domains::binrel::BinRel*>(w_se.get_ptr());
 
             if (w == NULL) {
                 SemElemPair * p = dynamic_cast<SemElemPair*>(w_se.get_ptr());

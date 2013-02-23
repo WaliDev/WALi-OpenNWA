@@ -21,40 +21,40 @@ namespace wali
                 , ident(i)
             {}
         
-            BinaryRelation
+            sem_elem_t
             initialize_variable_to_val(std::string const & varname,
                                        int val) const CPP11_OVERRIDE
             {
                 using wali::domains::binrel::BinRel;                
                 bdd b = voc.Assign(varname, voc.Const(val));
-                BinaryRelation init = new BinRel(&voc, b);
+                sem_elem_t init = new BinRel(&voc, b);
                 std::cerr << "> read: =0 bdd node count " << bdd_nodecount(b) << "\n";
                 return init;
             }
 
-            BinaryRelation
+            sem_elem_t
             multiply_variable_by_two(std::string const & varname) const CPP11_OVERRIDE
             {
                 using wali::domains::binrel::BinRel;
                 bdd b = voc.Assign(varname,
                                    voc.Plus(voc.From(varname), voc.From(varname)));
-                BinaryRelation times2 = new BinRel(&voc, b);
+                sem_elem_t times2 = new BinRel(&voc, b);
                 std::cerr << "> read: *2 bdd node count " << bdd_nodecount(b) << "\n";
                 return times2;
             }
 
-            BinaryRelation
+            sem_elem_t
             increment_variable(std::string const & varname) const CPP11_OVERRIDE
             {
                 using wali::domains::binrel::BinRel;
                 bdd b = voc.Assign(varname,
                                    voc.Plus(voc.From(varname), voc.Const(1)));
-                BinaryRelation plus1 = new BinRel(&voc, b);
+                sem_elem_t plus1 = new BinRel(&voc, b);
                 std::cerr << "> read: +1 bdd node count " << bdd_nodecount(b) << "\n";
                 return plus1;
             }    
 
-            BinaryRelation
+            sem_elem_t
             assume_equality(std::string const & lhs_name,
                             std::string const & rhs_name) const CPP11_OVERRIDE
             {
@@ -71,14 +71,14 @@ namespace wali
                 return enforce_eq->Compose(kill_k.get_ptr());
             }
 
-            BinaryRelation
+            sem_elem_t
             zero() const CPP11_OVERRIDE
             {
                 using wali::domains::binrel::BinRel;
                 return new BinRel(&voc, voc.False());        
             }
 
-            BinaryRelation
+            sem_elem_t
             one() const CPP11_OVERRIDE
             {
                 using wali::domains::binrel::BinRel;

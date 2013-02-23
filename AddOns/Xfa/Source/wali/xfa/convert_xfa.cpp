@@ -26,9 +26,9 @@ namespace wali {
     namespace xfa {
 
         struct ReadTransitionException {
-            BinaryRelation back_weight, bit1_weight, init_weight;
+            sem_elem_t back_weight, bit1_weight, init_weight;
 
-            ReadTransitionException(BinaryRelation init, BinaryRelation back, BinaryRelation bit1)
+            ReadTransitionException(sem_elem_t init, sem_elem_t back, sem_elem_t bit1)
                 : back_weight(back)
                 , bit1_weight(bit1)
                 , init_weight(init)                  
@@ -39,9 +39,9 @@ namespace wali {
             State source;
             Symbol symbol;
             State target;
-            BinaryRelation weight;
+            sem_elem_t weight;
             
-            WeightedTransition(State src, Symbol sym, State tgt, BinaryRelation w)
+            WeightedTransition(State src, Symbol sym, State tgt, sem_elem_t w)
                 : source(src), symbol(sym), target(tgt), weight(w)
             {
                 assert (weight.get_ptr());
@@ -139,7 +139,7 @@ namespace wali {
             //::details::print_bdd_variable_order(std::cout);
         }
 
-        BinaryRelation
+        sem_elem_t
         get_relation(RelationMaker const & maker,
                      ast::Action const & act,
                      std::string const & prefix)
@@ -152,14 +152,14 @@ namespace wali {
                 std::cerr << "    fire or alert\n";
                 // Hmmm.
                 abort();
-                return BinaryRelation();
+                return sem_elem_t();
             }
 
             assert(act.command);
             auto cmd = *act.command;
 
             if (cmd.name == "read") {
-                BinaryRelation times2, plus1, init;
+                sem_elem_t times2, plus1, init;
                 std::string varname = var_name(act.operand_id, prefix);
                 {
                     init = maker.initialize_variable_to_val(varname, 0);
@@ -212,7 +212,7 @@ namespace wali {
             Symbol eps(wali::WALI_EPSILON);            
 
             using wali::domains::binrel::BinRel;
-            BinaryRelation rel;
+            sem_elem_t rel;
 
             TransList ret;            
 

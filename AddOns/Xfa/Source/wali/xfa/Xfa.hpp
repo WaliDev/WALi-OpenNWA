@@ -90,12 +90,6 @@ namespace wali {
         }
 
         
-        /// This is meant to abstract the representation of a relation so
-        /// it's not tied to BDDs. I'm not sure how successful it is.
-        typedef wali::domains::binrel::binrel_t BinaryRelation;
-
-        
-        
         /// An XFA is an "eXtended Finite Automaton".
         ///
         /// An XFA is a standard FA extended with an additional data domain
@@ -118,7 +112,7 @@ namespace wali {
         {
             wali::wfa::WFA wfa_;
 
-            std::map<State, BinaryRelation> accepting_weights;            
+            std::map<State, sem_elem_t> accepting_weights;            
 
         public:
             wali::wfa::WFA const &
@@ -140,7 +134,7 @@ namespace wali {
                 wfa_.addFinalState(final.key);
             }
 
-            void addTrans(State src, Symbol sym, State tgt, BinaryRelation relation) {
+            void addTrans(State src, Symbol sym, State tgt, sem_elem_t relation) {
                 assert(relation.get_ptr());
                 wfa_.addTrans(src.key, sym.key, tgt.key, relation);
             }
@@ -166,7 +160,7 @@ namespace wali {
                 return wfa_.getStates();
             }
 
-            void addState(State state, BinaryRelation relation) {
+            void addState(State state, sem_elem_t relation) {
                 assert(relation.get_ptr());
                 wfa_.addState(state.key, relation);
             }
@@ -272,7 +266,7 @@ namespace wali {
         extern
         Xfa
         from_internal_only_nwa(opennwa::Nwa const & nwa,
-                               BinaryRelation rel);
+                               sem_elem_t rel);
 
 
         extern
