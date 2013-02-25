@@ -1,7 +1,6 @@
 #include "wali/xfa/Xfa.hpp"
 #include "wali/xfa/ast.hpp"
-#include "wali/domains/binrel/ProgramBddContext.hpp"
-#include "wali/domains/binrel/BinRel.hpp"
+#include "wali/xfa/RelationMaker.hpp"
 #include "wali/wpds/WPDS.hpp"
 
 #include <boost/lexical_cast.hpp>
@@ -11,23 +10,10 @@
 
 #include "wali/domains/genkill/GenKillXformerTemplate.hpp"
 
-namespace details
-{
-extern
-void
-interleave_all_fdds();
-
-extern
-void
-print_bdd_variable_order(std::ostream & os);
-}
-
-
 using namespace wali::xfa;
 using namespace wali;
 using namespace wali::wfa;
 using namespace wali::wpds;
-using namespace wali::domains::binrel;
 
 struct VarSet : public std::set<std::string>
 {
@@ -304,7 +290,6 @@ namespace wali {
         {
             register_vars(ast, domain_var_name_prefix);
             
-            using namespace wali::domains::binrel;
             wali::wfa::WFA ret;
 
             VarSet empty;
@@ -333,7 +318,7 @@ namespace wali {
         {
             WFA * gen_kill_results;
             Key p_state;
-            ProgramBddContext * context;
+            RelationMaker * maker;
 
             VarSet get_live(Key state) {
                 TransSet matches = gen_kill_results->match(p_state, state);
@@ -363,8 +348,7 @@ namespace wali {
                               << key2str(trans->from()) << "--" << key2str(trans->stack()) << "--> "
                               << key2str(trans->to()) << "\n";
 
-                    bdd b = context->Assign(*v, context->Const(0));
-                    sem_elem_t kill_relation = new BinRel(context, b);
+                    sem_elem_t kill_relation = maker->initialize_variable_to_val(*v, 0);
                     sem_elem_t new_weight = trans->weight()->extend(kill_relation);
 
                     trans->setWeight(new_weight);
@@ -383,7 +367,7 @@ namespace wali {
         void
         kill_variables(ast::XfaAst const & ast,
                        wali::xfa::Xfa & xfa,
-                       ProgramBddContext & context,
+                       RelationMaker & maker,
                        std::string const & domain_var_name_prefix)
         {
             WFA wfa_genkill = create_live_var_wfa(ast, domain_var_name_prefix);
@@ -405,7 +389,7 @@ namespace wali {
             VarKiller killer;
             killer.gen_kill_results = &result;
             killer.p_state = p_state;
-            killer.context = &context;
+            killer.maker = &maker;
 
             xfa.for_each(killer);
         }
