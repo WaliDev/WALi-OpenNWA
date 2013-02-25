@@ -318,8 +318,7 @@ namespace wali {
         };
         
         bool
-        language_contains(Xfa const & left, Xfa const & right,
-                          wali::domains::binrel::ProgramBddContext const & voc);
+        language_contains(Xfa const & left, Xfa const & right);
 
     }
 }
