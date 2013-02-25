@@ -6,6 +6,7 @@
 #include <boost/bimap.hpp>
 
 #include "ast.hpp"
+#include "RelationMaker.hpp"
 
 #include <wali/wfa/WFA.hpp>
 #include <wali/wfa/WeightMaker.hpp>
@@ -277,8 +278,8 @@ namespace wali {
 
         extern
         Xfa
-        from_parser_ast(XfaAst const & ast,
-                        wali::domains::binrel::ProgramBddContext & voc,
+        from_parser_ast(RelationMaker const & maker,
+                        XfaAst const & ast,
                         int fdd_size,
                         std::string const & domain_var_name_prefix);
 
