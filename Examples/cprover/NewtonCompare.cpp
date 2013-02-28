@@ -618,6 +618,43 @@ namespace goals {
     delete npds;
   }
 
+  void run_newton_merge_notensor_fwpds(WFA& outfa, FWPDS * originalPds = NULL)
+  { 
+    cout << "#################################################" << endl;
+    cout << "[Newton Compare] Goal VIII: end-to-end newton_merge_notensor_fwpds run" << endl;
+    FWPDS * fpds;
+    if(originalPds != NULL)
+      fpds = new FWPDS(*originalPds);
+    else{
+      fpds = new FWPDS();
+      //con = pds_from_prog_with_tensor_merge(fpds, pg);
+      con = pds_from_prog_with_meet_merge(fpds, pg);
+    }
+
+    wali::set_verify_fwpds(false);
+    fpds->useNewtonNoTensor(true);
+
+#if defined(BINREL_STATS)
+    con->resetStats(); 
+#endif
+    wali::util::Timer * t = new wali::util::Timer("newton_merge_notensor_fwpds poststar",cout);
+    t->measureAndReport =false;
+    doPostStar(fpds, outfa);
+    sem_elem_t wt = computePathSummary(fpds, outfa);
+    if(wt->equal(wt->zero()))
+      cout << "[Newton Compare] newton_merge_notensor_fwpds ==> error not reachable" << endl;
+    else{
+      cout << "[Newton Compare] newton_merge_notensor_fwpds ==> error reachable" << endl;
+    }
+    t->print(std::cout << "[Newton Compare] Time taken by newton_merge_notensor_fwpds poststar: ") << endl;
+    delete t;
+
+#if defined(BINREL_STATS)
+    con->printStats(cout);
+#endif //if defined(BINREL_STATS)
+    delete fpds;
+  }
+
   void compareWpdsNwpds()
   {    
     FWPDS * originalPds = new FWPDS();
@@ -701,6 +738,9 @@ void * work(void *)
     case 7:
       runEwpds(outfa);
       break;
+    case 8:
+      run_newton_merge_notensor_fwpds(outfa);
+      break;
     default:
       assert(0 && "I don't understand that goal!!!");
   }
@@ -719,11 +759,12 @@ int main(int argc, char ** argv)
       << "./NewtonFwpdsCompare input_file goal(1/2) [<0/1> dump] [entry function (default:main)] [error label (default:error)]" << endl
       << "Goal: 1 --> Compare WPDS & NWPDS. Compute poststar and compare the output automata." << endl
       << "Goal: 2 [NOW DEFUNCT]--> Compare FWPDS & NWPDS. Compute poststar and check if any assertion can fail." << endl
-      << "Goal: 3 --> Run NWPDS end-to-end." << endl
-      << "Goal: 4 --> Run FWPDS end-to-end." << endl 
-      << "Goal: 5 --> Run old NWPDS end-to-end (Referred to as DirectNewton)." << endl
-      << "Goal: 6 --> Run WPDS end-to-end." << endl
-      << "Goal: 7 --> Run EWPDS end-to-end." << endl;
+      << "Goal: 3 --> Run newton_nomerge_tensor_fwpds end-to-end." << endl
+      << "Goal: 4 --> Run kleene_merge_fwpds end-to-end." << endl 
+      << "Goal: 5 --> Run newton_merge_notensor_ewpds end-to-end." << endl
+      << "Goal: 6 --> Run kleene_nomerge_wpds end-to-end." << endl
+      << "Goal: 7 --> Run kleene_merge_ewpds end-to-end." << endl
+      << "Goal: 8 --> Run newton_merge_notensor_fwpds end-to-end." << endl;
     return -1;
   }
 
