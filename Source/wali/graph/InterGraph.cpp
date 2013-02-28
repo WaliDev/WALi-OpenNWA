@@ -1516,6 +1516,288 @@ namespace wali {
       return wt;
     }
 
+
+        void InterGraph::setupNewtonNoTensorSolution() {
+          dag->startSatProcess(sem);
+          // First, find the IntraGraphs
+          int n = nodes.size();
+          int i;
+          unsigned int max_scc_required;
+          intra_graph_uf = new UnionFind(n);
+
+          vector<GraphEdge>::iterator it;
+          vector<HyperEdge>::iterator it2;
+          std::list<IntraGraph *>::iterator gr_it;
+          multiset<tup > worklist;
+
+
+          for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
+            intra_graph_uf->takeUnion((*it).src,(*it).tgt);
+          }
+          for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
+            intra_graph_uf->takeUnion((*it2).src1,(*it2).tgt);
+          }
+          IntraGraph::SharedMemBuffer * memBuf = NULL;
+#ifdef INTRAGRAPH_SHARED_MEMORY
+          // Before creating IntraGraphs, create a CommonBuffer, if needed.
+          int max_size = 0;
+          for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
+            max_size = (max_size > (*gr_it)->getSize()) ? max_size : (*gr_it)->getSize();
+          }
+          memBuf  = new IntraGraph::SharedMemBuffer(max_size);
+#endif
+
+          for(i = 0; i < n;i++) {
+            int j = intra_graph_uf->find(i);
+            if(nodes[j].gr == NULL) {
+              nodes[j].gr = new IntraGraph(dag, running_prestar,sem, memBuf);
+              gr_list.push_back(nodes[j].gr);
+            }
+            nodes[i].gr = nodes[j].gr;
+            nodes[i].intra_nodeno = nodes[i].gr->makeNode(nodes[i].trans);
+            if(is_source_type(nodes[i].type)) {
+              nodes[i].gr->setSource(nodes[i].intra_nodeno, nodes[i].weight);
+            }
+            // zero all weights (some are set by setSource() )
+            if(nodes[i].weight.get_ptr() != NULL)
+              nodes[i].weight = nodes[i].weight->zero();
+          }
+
+          // Now fill up the IntraGraphs
+          for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
+            int s = (*it).src;
+            int t = (*it).tgt;
+            nodes[s].gr->addEdge(nodes[s].intra_nodeno, nodes[t].intra_nodeno, (*it).weight);
+          }
+
+          for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
+            IntraGraph *gr = nodes[(*it2).tgt].gr;
+            // R = C . M(1,x) -- Edge weight M(1,x) to be updated between Newton Rounds
+            // Add a mutable intra-edge C-->R with weight M(1,x); the weight will be updated between newton rounds.
+            gr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, (*it2).mf->apply_f(sem->one(),sem->zero()), true);
+            // R = c . M(1,X) + c . M(1,x), to be updated both within and between Newton Rounds
+            // Add edge from the source s-->R weight weight c . M(1,X) + c . M(1,x). The first term will be updated within each newton round, the
+            // second term will be updated between newton rounds.
+            gr->setSource(nodes[it2->tgt].intra_nodeno, sem->zero(), NULL); //updatable
+            IntraGraph *gr2 = nodes[(*it2).src2].gr;
+            gr2->setOutNode(nodes[(*it2).src2].intra_nodeno, (*it2).src2);
+          }
+
+          // For SWPDS
+          vector<call_edge_t>::iterator it3;
+          for(it3 = call_edges.begin(); it3 != call_edges.end(); it3++) {
+            IntraGraph *gr1 = nodes[(*it3).first].gr;
+            IntraGraph *gr2 = nodes[(*it3).second].gr;
+            gr1->addCallEdge(gr2);
+          }
+
+          // Setup Worklist
+#if defined(PPP_DBG) && PPP_DBG >= 0
+          vector<reg_exp_t> outNodeRegExps;
+#endif
+          for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
+            (*gr_it)->setupIntraSolution(false);
+#if defined(PPP_DBG) && PPP_DBG >= 0
+            for(list<int>::const_iterator cit = (*gr_it)->out_nodes_intra->begin(); cit != (*gr_it)->out_nodes_intra->end(); ++cit)
+              outNodeRegExps.push_back((*gr_it)->nodes[*cit].regexp);
+#endif
+          }
+
+#if defined(PPP_DBG) && PPP_DBG >= 0
+          long totNodes = 0, totNotComputed = 0;
+          totNodes = dag->countTotalCombines() +
+            dag->countTotalExtends() +
+            dag->countTotalStars();
+          totNotComputed = dag->countExcept(outNodeRegExps); 
+          cout << "Total number of combines: " << dag->countTotalCombines() << endl;
+          cout << "Total number of Extends: " << dag->countTotalExtends() << endl;
+          cout << "Total number of Stars: " << dag->countTotalStars() << endl;
+          cout << "#nodes definitely not evaluated during saturation: " << dag->countExcept(outNodeRegExps) << endl;
+          cout << "%Nodes never computed > " << 100 * (double)(((double)totNotComputed)/ (double)totNodes) << endl;;
+#endif
+          // Do SCC decomposition of IntraGraphs
+          std::list<IntraGraph *> gr_sorted;
+          unsigned components = SCC(gr_list, gr_sorted);
+          STAT(stats.ncomponents = components);
+
+          int numSteps = 0;
+          // Saturate
+          max_scc_required = components;
+          gr_it = gr_sorted.begin();
+          for(unsigned scc_n = 1; scc_n <= max_scc_required; scc_n++) {
+            bfsIntra(*gr_it, scc_n);
+            setup_worklist(gr_sorted, gr_it, scc_n, worklist);
+            numSteps += saturateNewtonNoTensor(worklist,scc_n);
+          }
+#if defined(PPP_DBG) && PPP_DBG >= 0
+          cout << "Total number of steps: " << numSteps << endl;
+#endif
+        max_scc_computed = max_scc_required;
+
+        //DEBUGGING
+#if defined(PPP_DBG) && PPP_DBG >= 1
+        {
+          stringstream ss;
+          ss << "kleene_regexp.dot";
+          string filename = ss.str();
+          fstream foo;
+          foo.open(filename.c_str(), fstream::out);
+          const reg_exp_hash_t& roots = dag->getRoots();
+          foo << "digraph {\n";
+          std::set<long> seen;
+          for(reg_exp_hash_t::const_iterator iter = roots.begin();
+              iter != roots.end();
+              ++iter){
+            (iter->second)->toDot(foo, seen, true, true);
+          }
+          foo << "}\n";
+          foo.close();
+        }
+        int graphnum = 0;
+        for(gr_it = gr_list.begin(); gr_it != gr_list.end(); ++gr_it)
+        {
+          ++graphnum;
+          stringstream ss;
+          ss << "kleene_graph_" << graphnum << ".dot";
+          string filename = ss.str();
+          fstream foo;
+          foo.open(filename.c_str(), fstream::out);
+          foo << "digraph{\n";
+          foo << (*gr_it)->toDot();
+          foo << "}";
+          foo.close();
+        }
+#endif
+        dag->stopSatProcess();
+        dag->executingPoststar(!running_prestar);
+#ifdef INTRAGRAPH_SHARED_MEMORY
+        delete memBuf;
+#endif
+    }
+    // New Saturation Procedure -- minimize calls to get_weight
+    int InterGraph::saturateNewtonNoTensor(multiset<tup> &worklist, unsigned scc_n) {
+      // This function is dumb about how it update weights *between* newton rounds
+      // It simply checks all call sites for updated c/x values.
+      // This could probably be made better by remembering what c/x values might have changed in the last solve of linear problem. (The inner while loop).
+      //
+      int numSteps = 0;
+      sem_elem_t weight;
+      std::list<int> *moutnodes;
+
+      std::tr1::unordered_map<int, sem_elem_t> cwt, xwt;
+      vector<HyperEdge>::iterator it2;
+
+      // Initially store the values of c/x to compare against.
+      for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
+        int onode1 = it2->src1;
+        int onode = it2->src2;
+        cwt[onode1] = nodes[onode1].gr->get_weight(nodes[onode1].intra_nodeno);
+        xwt[onode] = nodes[onode].gr->get_weight(nodes[onode].intra_nodeno);
+      }
+
+      bool change = false;
+      do{
+        while(!worklist.empty()) {
+          // Get an outnode whose weight is to be propagated
+          multiset<tup>::iterator wit = worklist.begin();
+          int onode = (*wit).second;
+          worklist.erase(wit);
+          //int onode = worklist.front();
+          //worklist.pop_front();
+
+          numSteps++;
+          weight = nodes[onode].gr->get_weight(nodes[onode].intra_nodeno);
+          if(nodes[onode].weight.get_ptr() != NULL && nodes[onode].weight->equal(weight))
+            continue;
+          nodes[onode].weight = weight;
+
+          STAT(stats.niter++);
+
+          FWPDSDBGS(
+              cout << "Popped ";
+              IntraGraph::print_trans(nodes[onode].trans,cout) << "with weight ";
+              weight->print(cout) << "\n";
+              );
+
+          // Go through all its targets and modify their weights
+          std::list<int>::iterator beg = nodes[onode].out_hyper_edges.begin();
+          std::list<int>::iterator end = nodes[onode].out_hyper_edges.end();
+          for(; beg != end; beg++) {
+            int inode = inter_edges[*beg].tgt;
+            int onode1 = inter_edges[*beg].src1;
+            sem_elem_t uw;
+            if(running_ewpds && inter_edges[*beg].mf.get_ptr()) {
+              uw = inter_edges[*beg].mf->apply_f(sem->one(), weight);
+              FWPDSDBGS(
+                  cout << "Apply merge function ";
+                  inter_edges[*beg].mf->print(cout) << " to ";
+                  weight->print(cout) << "\n";
+                  uw->print(cout << "Got ") << "\n";
+                  );
+            } else {
+              uw = inter_edges[*beg].weight->extend(weight);
+            }
+            STAT(stats.nextend++);
+            uw = cwt[onode1]->extend(uw);
+            // update R = c . M(1,X), here X has changed.
+            nodes[inode].gr->updateEdgeWeight(0, nodes[inode].intra_nodeno, uw); //update source edge
+          }
+          // Go through all targets again and insert them into the workist without
+          // seeing if they actually got modified or not
+          beg = nodes[onode].out_hyper_edges.begin();
+          for(; beg != end; beg++) {
+            int inode = inter_edges[*beg].tgt;
+            IntraGraph *gr = nodes[inode].gr;
+            if(gr->scc_number != scc_n) {
+              assert(gr->scc_number > scc_n);
+              continue;
+            }
+            moutnodes = gr->getOutTransitions();
+            std::list<int>::iterator mbeg = moutnodes->begin();
+            std::list<int>::iterator mend = moutnodes->end();
+            for(; mbeg != mend; mbeg++) {
+              int mnode = (*mbeg);
+              worklist.insert(tup(gr->bfs_number, mnode));
+            }
+          }
+        }
+        change = false;
+        for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
+          int inode = it2->tgt;
+          int onode1 = it2->src1;
+          int onode = it2->src2;
+          sem_elem_t wt;
+          sem_elem_t Cwt = nodes[onode1].gr->get_weight(nodes[onode1].intra_nodeno);
+          sem_elem_t Xwt = nodes[onode].gr->get_weight(nodes[onode].intra_nodeno);
+          if(! Cwt->equal(cwt[onode1])){
+            cwt[onode1] = Cwt;
+            change = true;
+          }
+          if(! Xwt->equal(xwt[onode])){
+            xwt[onode] = Xwt;
+            if(running_ewpds && it2->mf.get_ptr()){
+              wt = it2->mf->apply_f(Xwt->one(), Xwt);             
+            }else{
+              wt = it2->weight->extend(Xwt);
+            }              
+            // Update R = C . M(1,x); here, x has changed from the last newton round. So update the intra-edge we had added.
+            nodes[inode].gr->updateEdgeWeight(nodes[onode1].intra_nodeno, nodes[inode].intra_nodeno, wt);
+            change = true;
+          } 
+          if(running_ewpds && it2->mf.get_ptr())
+            wt = cwt[onode1]->extend(it2->mf->apply_f(cwt[onode1]->one(), xwt[onode]));
+          else
+            wt = cwt[onode1]->extend(it2->weight->extend(xwt[onode]));
+          // Update R = c . M(1,x); here, c and/or x might have changed. Update anyway.
+          nodes[inode].gr->updateEdgeWeight(0, nodes[inode].intra_nodeno, wt); 
+        }
+      }while(change);
+      //DEBUGGING
+      //cout << "Kleene saturation # Steps: " << numSteps << endl;
+      return numSteps;
+
+    }
+
     void InterGraph::update_all_weights() {
       unsigned int i;
       for(i=0;i<nodes.size();i++) {
