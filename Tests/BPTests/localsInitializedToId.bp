@@ -1,0 +1,19 @@
+// This program tests the initialization of variables
+// The error will not be reachable if each local inherits the value of a local from the caller
+//  With the semantics of boolean programs, the error is expected to be reachable
+
+decl g;
+
+void main() begin
+  decl l;
+  l:= 1;
+  g:= 1;
+  f();
+end
+
+void f() begin
+  decl l;
+  if (l != g) then
+    assert(0);
+  fi
+end
