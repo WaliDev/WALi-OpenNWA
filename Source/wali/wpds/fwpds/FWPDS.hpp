@@ -47,7 +47,6 @@ namespace wali {
 
         public:
           FWPDS();
-          FWPDS(bool newton);
           FWPDS(ref_ptr<Wrapper> wrapper);
           FWPDS( const FWPDS& f );
           ~FWPDS();
@@ -57,8 +56,11 @@ namespace wali {
           // Constrol Solver behaviour
           ///////////
           ///Must be called before the graph based solvers are setup.
-          ///So, call before calling poststar/prestar etc.
+          ///So, call before calling poststar. I  don't think works with prestar.
           void useNewton(bool set);
+          /// Must be called before the graph based solvers are setup.
+          //So, call before calling poststar (does not work with prestar).
+          void useNewtonNoTensor(bool set);
           
           // Newton can leave the output automaton with either tensored weights or not.
           bool isOutputTensored();
@@ -156,7 +158,10 @@ namespace wali {
           std::vector< graph::InterGraphPtr > interGrs;
           graph::InterGraphPtr interGr;
           bool checkingPhase;
+          // If set, use InterGraph::setupNewtonSolution for poststar
           bool newton;
+          // If set, use InterGraph::setupNewtonNoTensorSolution for poststar
+          bool newtonNoTensor;
           bool topDown;
 
       }; // class FWPDS
