@@ -186,7 +186,14 @@ namespace wali
        *  Perform the combine operation
        */
       virtual std::pair<std::pair<sem_elem_t, sem_elem_t>, bool> 
-        combineTransWeights( sem_elem_t dnew, sem_elem_t tweight, sem_elem_t told, sem_elem_t dold, bool existold );
+        extendAndCombineTransWeights( const sem_elem_t & dnew, 
+                             const sem_elem_t & rweight, 
+                             const sem_elem_t & se_old, 
+                             const sem_elem_t & se_propagated,
+                             const sem_elem_t & told,
+                             const sem_elem_t & dold, bool existold );
+
+      virtual sem_elem_t computeDifference(const sem_elem_t & se_prop, const sem_elem_t & d);
 
       /** 
        * Wrapper method for equal that will remove the ref_ptr

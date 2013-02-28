@@ -262,6 +262,13 @@ namespace wali
               WFA & ca  ,
               rule_t & r,
               sem_elem_t delta );
+      
+          virtual void post( wfa::ITrans* t, WFA& fa );
+          virtual void poststar_handle_eps_trans(
+              wfa::ITrans *teps,
+              wfa::ITrans*tprime,
+              sem_elem_t delta
+              );
 
           /**
            * @brief helper method for poststar
@@ -295,8 +302,8 @@ namespace wali
               , Key to
               , Config * cfg
               , wfa::ITrans* t
-              , rule_t & r
-              , sem_elem_t delta
+              , const sem_elem_t & rweight
+              , const sem_elem_t & delta
               );
 
           virtual wfa::ITrans* update_prime(

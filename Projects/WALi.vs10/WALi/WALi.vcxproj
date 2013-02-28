@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugMD|Win32">
@@ -403,6 +403,7 @@
     <ClInclude Include="..\..\..\Source\opennwa\query\details\iterators.hpp" />
     <ClInclude Include="..\..\..\Source\opennwa\query\details\selectors.hpp" />
     <ClInclude Include="..\..\..\Source\opennwa\query\language.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\domains\SemElemSet.hpp" />
     <ClInclude Include="..\..\..\Source\wali\graph\Functional.hpp" />
     <ClInclude Include="..\..\..\Source\wali\graph\NewtonLogger.hpp" />
     <ClInclude Include="..\..\..\Source\wali\Progress.hpp" />

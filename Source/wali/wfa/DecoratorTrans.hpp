@@ -73,6 +73,24 @@ namespace wali
           return delegate->getDelta();
         }
 
+        /*!
+         * @return const sem_elem_t se_old of ITrans
+         *
+         * se_old is used in computing fixpoints
+         */
+        virtual const sem_elem_t getSeOld() const throw() {
+          return delegate->getSeOld();
+        }
+
+        /*!
+         * @return const sem_elem_t delta of ITrans
+         *
+         * delta is used in computing fixpoints
+         */
+        virtual const sem_elem_t getSePropagated() const throw() {
+          return delegate->getSePropagated();
+        }
+
         //
         // getters (non const)
         //
@@ -104,6 +122,24 @@ namespace wali
         virtual sem_elem_t getDelta() throw() {
           return delegate->getDelta();
         }
+        
+        /*!
+         * @return sem_elem_t se_old of ITrans
+         *
+         * se_old is used in computing fixpoints
+         */
+        virtual sem_elem_t getSeOld() throw() {
+          return delegate->getSeOld();
+        }
+
+        /*!
+         * @return sem_elem_t se_propagated of ITrans
+         *
+         * se_propagated is used in computing fixpoints
+         */
+        virtual sem_elem_t getSePropagated() throw() {
+          return delegate->getSePropagated();
+        }
 
         //
         // setters
@@ -123,8 +159,22 @@ namespace wali
         /*!
          * Set the delta value for the ITrans.
          */
-        virtual void setDelta( const sem_elem_t w ) {
+        virtual void setDelta( const sem_elem_t & w ) {
           delegate->setDelta( w );
+        }
+        
+        /*!
+         * Set the delta value for the ITrans.
+         */
+        virtual void setSeOld( const sem_elem_t & w ) {
+          delegate->setSeOld( w );
+        }
+
+        /*!
+         * Set the delta value for the ITrans.
+         */
+        virtual void setSePropagated( const sem_elem_t & w ) {
+          delegate->setSePropagated( w );
         }
 
         /*!

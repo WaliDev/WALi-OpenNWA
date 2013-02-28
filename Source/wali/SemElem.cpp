@@ -78,8 +78,7 @@ namespace wali
     }
     else {
       assert(this->count >= 1); // try to make sure 'this' is already a refptr
-      rp.second = this;
-      //rp.second = rp.first;
+      rp.second = rp.first;
     }
     return rp;
   }
@@ -94,20 +93,30 @@ namespace wali
     return wn;
   }
 
-  // default implementation of combineTransWeights
+  // computeDifference
+  //
+  //    the default implementation just returns d
+  // 
+  sem_elem_t SemElem::computeDifference(const sem_elem_t & se_prop, const sem_elem_t & d)
+  {
+    return d;
+  }
+
+  // extendAndCombineTransWeights
   // 
   //   wnew := delta extend this;
   //   < wnew + told, delta combine (wnew - told), !delta->equal(delta combine (wnew - told)) >
   //
   std::pair<std::pair<sem_elem_t, sem_elem_t>, bool> 
-      SemElem::combineTransWeights( sem_elem_t delta, sem_elem_t rweight, sem_elem_t told, sem_elem_t dold, bool existold)
+      SemElem::extendAndCombineTransWeights( 
+                             const sem_elem_t & delta, 
+                             const sem_elem_t & rweight, 
+                             const sem_elem_t & se_old, 
+                             const sem_elem_t & se_propagated,
+                             const sem_elem_t & told,
+                             const sem_elem_t & dold, bool existold )
   {
     sem_elem_t wnew = delta->extend(rweight);
-
-    if(!existold) {
-      std::pair<sem_elem_t, sem_elem_t> tmp(wnew, wnew);
-      return std::pair<std::pair<sem_elem_t, sem_elem_t>, bool>(tmp, true);
-    }
 
     // delta returns ( wnew + told, wnew - told )
     // Use w->delta(told) b/c we want the returned diff
