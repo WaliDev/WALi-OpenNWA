@@ -540,6 +540,7 @@ bool FWPDS::isOutputTensored()
 {
   if(interGr != NULL)
     return interGr->isOutputTensored();
+  else return false;
 }
 
 ////////////////////////////////////////////
