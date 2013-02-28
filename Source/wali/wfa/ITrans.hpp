@@ -116,6 +116,20 @@ namespace wali
          * delta is used in computing fixpoints
          */
         virtual const sem_elem_t getDelta() const throw() = 0;
+        
+        /*!
+         * @return const sem_elem_t se_old of ITrans
+         *
+         * se_old is used in computing fixpoints
+         */
+        virtual const sem_elem_t getSeOld() const throw() = 0;
+
+        /*!
+         * @return const sem_elem_t se_propagated of ITrans
+         *
+         * se_propagated is used in computing fixpoints
+         */
+        virtual const sem_elem_t getSePropagated() const throw() = 0;
 
         //
         // getters (non const)
@@ -138,6 +152,20 @@ namespace wali
          * delta is used in computing fixpoints
          */
         virtual sem_elem_t getDelta() throw() = 0;
+        
+        /*!
+         * @return sem_elem_t se_old of ITrans
+         *
+         * se_old is used in computing fixpoints
+         */
+        virtual sem_elem_t getSeOld() throw() = 0;
+
+        /*!
+         * @return sem_elem_t se_propagated of ITrans
+         *
+         * se_propagated is used in computing fixpoints
+         */
+        virtual sem_elem_t getSePropagated() throw() = 0;
 
         //
         // setters
@@ -155,7 +183,17 @@ namespace wali
         /*!
          * Set the delta value for the ITrans.
          */
-        virtual void setDelta( const sem_elem_t w ) = 0;
+        virtual void setDelta( const sem_elem_t & w ) = 0;
+        
+        /*!
+         * Set the delta value for the ITrans.
+         */
+        virtual void setSeOld( const sem_elem_t & w ) = 0;
+        
+        /*!
+         * Set the delta value for the ITrans.
+         */
+        virtual void setSePropagated( const sem_elem_t & w ) = 0;
 
         /*! @return the worklist info */
         virtual void setWorklistData(ref_ptr<WorklistData> wd) = 0;

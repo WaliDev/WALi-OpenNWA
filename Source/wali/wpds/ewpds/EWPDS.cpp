@@ -32,6 +32,12 @@
 #include <iostream>
 #include <cassert>
 
+#if defined(JL_EWPDS_DEBUG)
+extern std::ostream * jl_ewpds_dot;
+extern std::ostream * jl_ewpds_log;
+extern std::ostream * jl_wfa_log;
+#endif
+
 namespace wali
 {
   using wfa::TransSet;
@@ -423,6 +429,96 @@ namespace wali
       }
 
 
+      void EWPDS::post( wfa::ITrans* t, WFA& fa )
+      {
+#if defined(JL_EWPDS_DEBUG)
+        *jl_wfa_log << "-----------------------------------------------------------------\n";
+        t->print(*jl_wfa_log) << std::endl << "--------------\n";
+        currentOutputWFA->print(*jl_wfa_log) << std::endl;
+
+        fa.print_dot(*jl_ewpds_dot);
+        *jl_ewpds_log << "<-"; t->print(*jl_ewpds_log) << std::endl;
+        *jl_ewpds_log << "tweight: \n";
+        t->weight()->print(*jl_ewpds_log) << std::endl;
+        *jl_ewpds_log << "tdelta: \n";
+        t->getDelta()->print(*jl_ewpds_log) << std::endl;
+#endif
+
+        // Get config
+        Config * config = t->getConfig();
+
+        // Get delta
+        sem_elem_t dnew = t->getDelta();
+        
+        // Reset delta of t to zero to signify completion
+        // of work for that delta
+        t->setDelta(theZero);
+
+        sem_elem_t se = t->weight();
+        t->setSeOld(se);
+
+        // For each forward rule of config
+        // Apply rule to create new transition
+        if( WALI_EPSILON != t->stack() )
+        {
+          //std::cerr << "Looking for rules from " << key2str(config->kp.first) << " (" << config->kp.first << ") to " << key2str(config->kp.second) << " (" << config->kp.second << ")\n";
+          Config::iterator fwit = config->begin();
+          for( ; fwit != config->end() ; fwit++ ) {
+            rule_t & r = *fwit;
+#if defined(JL_EWPDS_DEBUG)
+            *jl_ewpds_log << "rweight:\n";
+            r->weight()->print(*jl_ewpds_log) << std::endl;
+#endif
+            poststar_handle_trans( t,fa,r,dnew );
+          }
+        }
+        else {
+          sem_elem_t se_old = t->getSeOld();
+          sem_elem_t se_propagated = t->getSePropagated();
+          sem_elem_t difference = se_old->computeDifference(se_propagated, dnew);
+
+          // t:(p,eps,q) + tprime:(q,y,q') => (p,y,q')
+          State * state = fa.getState( t->to() );
+          State::iterator it = state->begin();
+          for(  ; it != state->end() ; it++ )
+          {
+            wfa::ITrans* tprime = *it;
+#if defined(JL_EWPDS_DEBUG)
+            *jl_ewpds_log << "tweight2:\n";
+            tprime->print(*jl_ewpds_log) << std::endl;
+            tprime->weight()->print(*jl_ewpds_log) << std::endl;
+            tprime->getDelta()->print(*jl_ewpds_log) << std::endl;
+            *jl_ewpds_log << "tweight3:\n";
+#endif
+            poststar_handle_eps_trans(t, tprime, difference);
+          }
+        }
+
+        t->setSePropagated(t->getSeOld());
+      }
+
+
+      void EWPDS::poststar_handle_eps_trans(wfa::ITrans *teps, wfa::ITrans*tprime, sem_elem_t delta)
+      {
+#if defined(JL_EWPDS_DEBUG)
+        *jl_ewpds_log << "difference:\n";
+        delta->print(*jl_ewpds_log) << std::endl;
+#endif
+        sem_elem_t wght = tprime->poststar_eps_closure( delta );
+#if defined(JL_EWPDS_DEBUG)
+        *jl_ewpds_log << "after poststar_eps_closure:\n";
+        wght->print(*jl_ewpds_log) << std::endl;
+#endif
+        Config * config = make_config( teps->from(),tprime->stack() );
+        update( teps->from()
+            , tprime->stack()
+            , tprime->to()
+            , wght
+            , config
+            );
+      }
+
+
       void EWPDS::poststar_handle_trans(
           wfa::ITrans * t, // t is a non-epsilon transition 
           WFA & fa,
@@ -435,18 +531,28 @@ namespace wali
 
         if( r->to_stack2() == WALI_EPSILON ) { // r is a rule 0 or rule 1 
           //update( rtstate, rtstack, t->to(), wrule_trans, r->to() );
-          update( r->to_state(), r->to_stack1(), t->to(), r->to(), t, r, delta );
+#if defined(JL_EWPDS_DEBUG)
+          *jl_ewpds_log << "old_tnew and tnew:\n";
+#endif
+          update( r->to_state(), r->to_stack1(), t->to(), r->to(), t, r->weight(), delta );
         }
         else 
         {
-          //sem_elem_t wrule_trans = delta->extend(r->weight());
           //sem_elem_t wrule_trans = delta->extend( er->extended_weight() );
+          sem_elem_t wrule_trans = delta->extend(r->weight());
 
           // Is a rule 2 so we must generate a state
           // and create 2 new transitions
           Key gstate = gen_state( rtstate,rtstack );
 
-          wfa::ITrans* tprime = update_prime( gstate, t, r, delta, delta );
+          wfa::ITrans* tprime = update_prime( gstate, t, r, delta );
+
+#if defined(JL_EWPDS_DEBUG)
+          *jl_ewpds_log << "old_tprime and tprime:\n";
+          tprime->print(*jl_ewpds_log) << std::endl;
+          tprime->weight()->print(*jl_ewpds_log) << std::endl;
+          tprime->getDelta()->print(*jl_ewpds_log) << std::endl;
+#endif
 
           // Setup the weight for taking quasione
           // TODO: This does not use the diff operator because for pair we would
@@ -462,12 +568,14 @@ namespace wali
           // This combine operation is redundant because called_weight is
           // computed on the transition weight, not its delta
           //sem_elem_t quasi = state->quasi->combine( called_weight );
-          //state->quasi = quasi;
-          state->quasi = delta->one(); // FIXME: state->quasi->combine( wrule_trans->quasi_one() );
+          //state->quasi = quasi; 
+          state->quasi = state->quasi->combine( wrule_trans->quasi_one() );
 
+#if defined(JL_EWPDS_DEBUG)
+          *jl_ewpds_log << "old_quasit and quasit:\n";
+#endif
           //sem_elem_t quasi_extended = new SemElemPair(quasi->quasi_one(), quasi->one());
           //update( rtstate, rtstack, gstate, quasi_extended, r->to() );
-          //update( rtstate, rtstack, gstate, state->quasi, r->to() );
           update( rtstate, rtstack, gstate, state->quasi, r->to() );
 
           // Trans with generated from states do not go on the worklist
@@ -496,6 +604,10 @@ namespace wali
                 Config* config = make_config( teps->from(),tpstk );
                 sem_elem_t epsW = tprime->poststar_eps_closure( teps->weight() );
 
+#if defined(JL_EWPDS_DEBUG)
+                teps->print(*jl_ewpds_log) << std::endl;
+                *jl_ewpds_log << "old_tnew and tnew2:\n";
+#endif
                 update( teps->from(),tpstk,tpto, epsW, config );
               }
             }
@@ -541,6 +653,9 @@ namespace wali
         currentOutputWFA->addTrans( t );
 
         // add t to the worklist for saturation
+#if defined(JL_EWPDS_DEBUG)
+        *jl_ewpds_log << "->"; t->print(*jl_ewpds_log) << std::endl;
+#endif
         worklist->put( t );
       }
 
@@ -576,10 +691,21 @@ namespace wali
         }
 
         t->setConfig(cfg);
+
+#if defined(JL_EWPDS_DEBUG)
+        t->print(*jl_ewpds_log) << std::endl;
+        t->weight()->print(*jl_ewpds_log) << std::endl;
+        t->getDelta()->print(*jl_ewpds_log) << std::endl;
+#endif
+
         if (t->modified()) {
           //t->print(std::cout << "Adding transition: ") << "\n";
+#if defined(JL_EWPDS_DEBUG)
+          *jl_ewpds_log << "->"; t->print(*jl_ewpds_log) << std::endl;
+#endif
           worklist->put( t );
         }
+
       }
 
       void EWPDS::update(
@@ -588,11 +714,11 @@ namespace wali
           Key to,
           Config * cfg,
           wfa::ITrans* t,
-          rule_t & r,
-          sem_elem_t delta
+          const sem_elem_t & rweight, // 
+          const sem_elem_t & delta
           )
       {
-        sem_elem_t se = delta; //delta->extend(r->weight()); // dummy: tnew's weight will be set later in this function
+        sem_elem_t se = delta->extend(rweight); // delta; //dummy: tnew's weight will be set later in this function
        
         wfa::ITrans* _tnew;
         if(addEtrans) {
@@ -604,6 +730,8 @@ namespace wali
 
         wfa::ITrans* told = currentOutputWFA->lookup_trans(_tnew);
 
+        sem_elem_t prevWatCall = delta->zero();
+
         bool existold;
         if(told == 0)
         { // Not exist in currentOutputWFA
@@ -614,14 +742,33 @@ namespace wali
         else 
         {
           existold = true;
+
+#if defined(JL_EWPDS_DEBUG)
+          told->print(*jl_ewpds_log) << std::endl;
+          *jl_ewpds_log << "told:\n"; told->weight()->print(*jl_ewpds_log) << std::endl;
+          *jl_ewpds_log << "dold:\n"; told->getDelta()->print(*jl_ewpds_log) << std::endl;
+#endif
+
+          if(addEtrans) {
+            ETrans* tmptnew = dynamic_cast<ETrans*>(_tnew);
+            prevWatCall = tmptnew->getWeightAtCall();
+          }
         }
+
+        sem_elem_t se_old = t->getSeOld();
+        sem_elem_t se_propagated = t->getSePropagated();
+
+#if defined(JL_EWPDS_DEBUG)
+        *jl_ewpds_log << "delta:\n"; delta->print(*jl_ewpds_log) << std::endl;        
+        *jl_ewpds_log << "delta->extend(rweight):\n"; se->print(*jl_ewpds_log) << std::endl;
+#endif
 
         // se := delta extend r->weight()
         // dold := told->getDelta()
-        // Default implementation of combineTransWeights: 
+        // Default implementation of extendAndCombineTransWeights: 
         //   < se + told, dold combine (se - told), !dold->equal(dold combine (se - told)) >
         std::pair<std::pair<sem_elem_t, sem_elem_t>, bool> res = 
-                t->weight()->combineTransWeights( delta, r->weight(), told->weight(), told->getDelta(), existold );
+                t->weight()->extendAndCombineTransWeights( delta, rweight, se_old, se_propagated, told->weight(), told->getDelta(), existold );
 
         // Delete _tnew if told is an existing trans from currentOutputWFA and told does not equal to _tnew
         if( existold && told != _tnew ) {
@@ -638,6 +785,21 @@ namespace wali
         tnew->setWeight(ans);
         tnew->setDelta(ans_delta);
 
+        if(addEtrans) {
+          // For setting newWatCAll
+          sem_elem_t call_difference = se_old->computeDifference(se_propagated, delta);
+          sem_elem_t newWatCall = prevWatCall->combine(call_difference);
+          ETrans* tmptnew = dynamic_cast<ETrans*>(tnew);
+          tmptnew->setWeightAtCall(newWatCall);
+        }
+
+
+#if defined(JL_EWPDS_DEBUG)
+        tnew->print(*jl_ewpds_log) << std::endl;
+        *jl_ewpds_log << "ans:\n"; tnew->weight()->print(*jl_ewpds_log) << std::endl;
+        *jl_ewpds_log << "ans_delta:\n"; tnew->getDelta()->print(*jl_ewpds_log) << std::endl;
+#endif
+       
         // tnew->status = (is_changed ? SAME : MODIFIED)
         if(is_changed)
           tnew->setModified();
@@ -648,8 +810,12 @@ namespace wali
 
         if (tnew->modified()) {
           //tnew->print(std::cout << "Adding transition: ") << "\n";
+#if defined(JL_EWPDS_DEBUG)
+          *jl_ewpds_log << "->"; tnew->print(*jl_ewpds_log) << std::endl;
+#endif
           worklist->put( tnew );
         }
+        
       }
 
       wfa::ITrans* EWPDS::update_prime(
@@ -657,7 +823,7 @@ namespace wali
           wfa::ITrans* call, //<! The call transition
           rule_t r, //<! The push rule
           sem_elem_t delta, //<! Delta change on the call transition
-          sem_elem_t wWithRule //<! delta \extends r->weight()
+          sem_elem_t _wWithRule //<! delta \extends r->weight()
           )
       {
         /*
@@ -674,11 +840,16 @@ namespace wali
         return t;
         */
 
-        sem_elem_t se = delta; //delta->extend(r->weight()); // dummy: tnew's weight will be set later in this function
+        //sem_elem_t se = delta->extend(r->weight()); // dummy: tnew's weight will be set later in this function // delta; //
+
+        sem_elem_t wWithRule = delta->extend(r->weight());
 
         ERule* er = (ERule*)r.get_ptr();
-        wfa::ITrans* _tnew = new ETrans(from, r->to_stack2(), call->to(), delta, se, er);
+        wfa::ITrans* _tnew = new ETrans(from, r->to_stack2(), call->to(), delta, wWithRule, er);
         wfa::ITrans* told = currentOutputWFA->lookup_trans(_tnew);
+
+        
+        sem_elem_t prevWatCall; // previous weight at call
 
         bool existold;
         if(told == 0)
@@ -686,31 +857,61 @@ namespace wali
           // Insert the new trans to currentOutputWFA
           told = currentOutputWFA->insert_trans(_tnew);
           existold = false;
+          prevWatCall = delta->zero();
         }
         else {
           existold = true;
+          ETrans* tmptnew = dynamic_cast<ETrans*>(_tnew);
+          prevWatCall = tmptnew->getWeightAtCall();
+
+#if defined(JL_EWPDS_DEBUG)
+          told->print(*jl_ewpds_log) << std::endl;
+          *jl_ewpds_log << "told:\n"; told->weight()->print(*jl_ewpds_log) << std::endl;
+          *jl_ewpds_log << "dold:\n"; told->getDelta()->print(*jl_ewpds_log) << std::endl;
+#endif
         }
+
+        sem_elem_t se = call->weight();
+        sem_elem_t se_old = call->getSeOld();
+        sem_elem_t se_propagated = call->getSePropagated();
+
+#if defined(JL_EWPDS_DEBUG)
+        *jl_ewpds_log << "delta:\n"; delta->print(*jl_ewpds_log) << std::endl;
+#endif
 
         // se := delta extend r->weight()
         // dold := told->getDelta()
-        // Default implementation of combineTransWeights: 
+        // Default implementation of extendAndCombineTransWeights: 
         //    < se + told, dold combine (se - told), !dold->equal(dold combine (se - told)) >
         std::pair<std::pair<sem_elem_t, sem_elem_t>, bool> res = 
-              call->weight()->combineTransWeights( delta, r->weight(), told->weight(), told->getDelta(), existold );
+              se->extendAndCombineTransWeights( delta, r->weight(), se_old, se_propagated, told->weight(), told->getDelta(), existold );
 
         // Delete _tnew if told is an existing trans from currentOutputWFA and told does not equal to _tnew
-        if(existold && told != _tnew)
+        if(existold && told != _tnew) {
           delete _tnew;
+        }
 
         sem_elem_t ans = res.first.first;
         sem_elem_t ans_delta = res.first.second;
         bool is_changed = res.second || !existold;
 
-        // Set the resultant weight and delta to tnew
+        // Set the resultant weight and delta of tnew
         wfa::ITrans* tnew;
         tnew = told;
-        tnew->setDelta(ans_delta);
         tnew->setWeight(ans);
+        tnew->setDelta(ans_delta);
+
+        // For setting newWatCAll
+        sem_elem_t call_difference = se_old->computeDifference(se_propagated, delta);
+        sem_elem_t newWatCall = prevWatCall->combine(call_difference);
+        ETrans* tmptnew = dynamic_cast<ETrans*>(tnew);
+        tmptnew->setWeightAtCall(newWatCall);
+        
+#if defined(JL_EWPDS_DEBUG)
+        tnew->print(*jl_ewpds_log) << std::endl;
+        *jl_ewpds_log << "ans:\n"; tnew->weight()->print(*jl_ewpds_log) << std::endl;        
+        *jl_ewpds_log << "ans_delta:\n"; tnew->getDelta()->print(*jl_ewpds_log) << std::endl;
+#endif
 
         // tnew->status = (is_changed ? SAME : MODIFIED)
         if(is_changed)

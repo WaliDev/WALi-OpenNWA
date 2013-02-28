@@ -9,6 +9,10 @@
 
 #define TRANS_COUNT_INSTANCES 1
 
+#if defined(USE_DELTA_BILATERAL)
+extern bool delta_bilateral_flag;
+#endif
+
 namespace wali
 {
   namespace wfa
@@ -19,7 +23,7 @@ namespace wali
 
     Trans::Trans() :
       kp(WALI_EPSILON,WALI_EPSILON), toStateKey(WALI_EPSILON),
-      se(0),delta(0),status(MODIFIED),config(0)
+      se(0),delta(0),se_old(0),se_propagated(0),status(MODIFIED),config(0)
     {
 #if TRANS_COUNT_INSTANCES
       numTrans++;
@@ -35,6 +39,10 @@ namespace wali
       kp(from_,stack_), toStateKey(to_),
       se(se_), delta(se_), status(MODIFIED), config(0) 
     {
+      if(se != NULL) {
+        se_old = se->zero();
+        se_propagated = se->zero();
+      }
 #if TRANS_COUNT_INSTANCES
       numTrans++;
       //*waliErr << "Trans(...) : " << numTrans << std::endl;
@@ -72,6 +80,8 @@ namespace wali
       toStateKey= rhs.toStateKey;
       se      = rhs.weight();
       delta   = rhs.weight();
+      se_old  = rhs.getSeOld();
+      se_propagated = rhs.getSePropagated();
       status  = rhs.status;
       config  = rhs.config;
       return *this;
@@ -82,6 +92,8 @@ namespace wali
       toStateKey = rhs.to();
       se         = rhs.weight();
       delta      = rhs.weight();
+      se_old     = rhs.getSeOld();
+      se_propagated = rhs.getSePropagated();
       status     = (rhs.modified()) ? MODIFIED : SAME;
       config     = rhs.getConfig();
       return *this;
@@ -113,6 +125,8 @@ namespace wali
       // in the existing weight (se)
       std::pair< sem_elem_t , sem_elem_t > p = wnew->delta( se );
 
+      sem_elem_t most_recent = se;
+
       // This's weight is w+se
       se = p.first;
 
@@ -120,7 +134,12 @@ namespace wali
       // modified if this's delta changes value.
       sem_elem_t old_delta = delta;
       delta = delta->combine( p.second );
-      status = ( old_delta->equal(delta) ) ? SAME : MODIFIED;
+#if defined(USE_DELTA_BILATERAL)
+      if(delta_bilateral_flag)
+        status = ( most_recent->equal(se) ) ? SAME : MODIFIED;
+      else
+#endif
+        status = ( old_delta->equal(delta) ) ? SAME : MODIFIED;
     }
 
     wpds::Config* Trans::getConfig() const {

@@ -387,6 +387,12 @@
     <ClCompile Include="..\..\..\Source\wali\graph\NewtonLogger.cpp">
       <Filter>Source Files\wali.graph</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wfa\WFA-eclose.cpp">
+      <Filter>Source Files\wali.wfa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\domains\SemElemSet.cpp">
+      <Filter>Source Files\wali</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\FWPDS.hpp">
@@ -760,6 +766,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\wali\graph\NewtonLogger.hpp">
       <Filter>Header Files\wali.graph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\domains\SemElemSet.hpp">
+      <Filter>Header Files\wali</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

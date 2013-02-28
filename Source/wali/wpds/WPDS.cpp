@@ -23,8 +23,6 @@
 #include <fstream>
 #include <cassert>
 
-extern std::ofstream * awpdslog;
-
 //
 // TODO: 
 //      look into having each trans w/ pointers to States
@@ -474,8 +472,6 @@ namespace wali
 
       while( get_from_worklist( t ) ) 
       {
-        //*awpdslog << key2str(t->from()) << " -> " << key2str(t->to()) << std::endl; 
-        t->print(*awpdslog) << std::endl;// << key2str(t->r->from_stack()).c_str() << " -> " << key2str(r->to_stack1()).c_str() << std::endl;
         post( t , fa );
         if( fa.progress.is_valid() )
             fa.progress->tick();
@@ -1136,12 +1132,15 @@ namespace wali
         existold = true;
       }
 
+      sem_elem_t se_old = t->getSeOld();
+      sem_elem_t se_propagated = t->getSePropagated();
+
       // tnew := delta extend r->wright()
       // dold := told->getDelta()
-      // Default implementation of combineTransWeights: 
+      // Default implementation of extendAndCombineTransWeights: 
       //   < tnew + told, dold combine (tnew - told), !dold->equal(dold combine (tnew - told)) >
       std::pair<std::pair<sem_elem_t, sem_elem_t>, bool> res = 
-              t->weight()->combineTransWeights( delta, r->weight(), told->weight(), told->getDelta(), existold );
+              t->weight()->extendAndCombineTransWeights( delta, r->weight(), se_old, se_propagated, told->weight(), told->getDelta(), existold );
 
       // Delete _tnew if told is an existing trans from currentOutputWFA and told does not equal to _tnew
       if( existold && told != _tnew ) {
@@ -1202,12 +1201,15 @@ namespace wali
         existold = true;
       }
 
+      sem_elem_t se_old = call->getSeOld();
+      sem_elem_t se_propagated = call->getSePropagated();
+
       // tnew := delta extend r->weight()
       // dold := told->getDelta()
-      // Default implementation of combineTransWeights:
+      // Default implementation of extendAndCombineTransWeights:
       //    < tnew + tnew, dold combine (tnew - told), !dold->equal(dold combine (tnew - told)) >
       std::pair<std::pair<sem_elem_t, sem_elem_t>, bool> res = 
-            call->weight()->combineTransWeights(delta, r->weight(), told->weight(), told->getDelta(), existold);
+            call->weight()->extendAndCombineTransWeights(delta, r->weight(), se_old, se_propagated, told->weight(), told->getDelta(), existold);
 
       // Delete _tnew if told is an existing trans from currentOutputWFA and told does not equal to _tnew
       if(told != 0 && told != _tnew)

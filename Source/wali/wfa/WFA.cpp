@@ -33,6 +33,11 @@ std::set< Key >::iterator name##itEND = F.end();                \
 for( ; name##it != name##itEND && (0 != (name = getState(*name##it))) ; name##it++ )
 
 
+#if defined(JL_EWPDS_DEBUG)
+extern std::ostream * jl_ewpds_log;
+#endif
+
+
 namespace wali
 {
   namespace wfa
@@ -1085,7 +1090,27 @@ namespace wali
         if( told != tnew ) {
           // combine new into old
 
+#if defined(JL_EWPDS_DEBUG)
+          *jl_ewpds_log << "-----------\n";
+          told->print(*jl_ewpds_log) << std::endl;
+          told->weight()->print(*jl_ewpds_log) << std::endl;
+          told->getDelta()->print(*jl_ewpds_log) << std::endl;
+
+          *jl_ewpds_log << "-----------\n";
+          tnew->print(*jl_ewpds_log) << std::endl;
+          tnew->weight()->print(*jl_ewpds_log) << std::endl;
+          tnew->getDelta()->print(*jl_ewpds_log) << std::endl;
+#endif
+
           told->combineTrans( tnew );
+
+#if defined(JL_EWPDS_DEBUG)
+          *jl_ewpds_log << "+++++++++++\n";
+          told->print(*jl_ewpds_log) << std::endl;
+          told->weight()->print(*jl_ewpds_log) << std::endl;
+          told->getDelta()->print(*jl_ewpds_log) << std::endl;
+#endif
+
           delete tnew;
         }
         else {

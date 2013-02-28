@@ -138,6 +138,24 @@ namespace wali
         const sem_elem_t getDelta() const throw() {
           return delta;
         }
+        
+        /*!
+         * @return const sem_elem_t se_old of Trans
+         *
+         * se_old is used in computing fixpoints
+         */
+        const sem_elem_t getSeOld() const throw() {
+          return se_old;
+        }
+
+        /*!
+         * @return const sem_elem_t se_propagated of Trans
+         *
+         * se_propagated is used in computing fixpoints
+         */
+        const sem_elem_t getSePropagated() const throw() {
+          return se_propagated;
+        }
 
         ref_ptr<WorklistData> worklistData() const throw() {
           return worklist_data;
@@ -181,8 +199,26 @@ namespace wali
          *
          * delta is used in computing fixpoints
          */
-        sem_elem_t getDelta() throw() {
+        virtual sem_elem_t getDelta() throw() {
           return delta;
+        }
+        
+        /*!
+         * @return sem_elem_t se_old of Trans
+         *
+         * se_old is used in computing fixpoints
+         */
+        virtual sem_elem_t getSeOld() throw() {
+          return se_old;
+        }
+        
+        /*!
+         * @return sem_elem_t se_propagated of Trans
+         *
+         * se_propagated is used in computing fixpoints
+         */
+        virtual sem_elem_t getSePropagated() throw() {
+          return se_propagated;
         }
 
         //
@@ -204,8 +240,22 @@ namespace wali
         /*!
          * Set the delta value for the Trans.
          */
-        void setDelta( const sem_elem_t w ) {
+        virtual void setDelta( const sem_elem_t & w ) {
           delta = w;
+        }
+
+        /*!
+         * Set the se_old value for the Trans.
+         */
+        virtual void setSeOld( const sem_elem_t & w) {
+          se_old = w;
+        }
+        
+        /*!
+         * Set the se_propagated value for the Trans.
+         */
+        virtual void setSePropagated( const sem_elem_t & w) {
+          se_propagated = w;
         }
 
         /*!
@@ -298,6 +348,8 @@ namespace wali
         Key toStateKey;
         mutable sem_elem_t se;
         sem_elem_t delta;
+        sem_elem_t se_old;
+        sem_elem_t se_propagated;
         ref_ptr<WorklistData> worklist_data;
 
       protected:  // vars used in Process and not relevant to Trans

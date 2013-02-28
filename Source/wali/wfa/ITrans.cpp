@@ -52,7 +52,12 @@ namespace wali
       printKey(o,to());
       o << " )\t";
 
-      //weight()->print(o);
+      o << "\nweight:\n";
+      weight()->print(o) << std::endl;
+#if defined(JL_EWPDS_DEBUG)
+      o << "delta:\n";
+      getDelta()->print(o) << std::endl;
+#endif
       { // BEGIN DEBUGGING
         // FIXME: make a debugging print
         //o << "\tdelta: " << delta->toString();
