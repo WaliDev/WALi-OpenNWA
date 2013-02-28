@@ -1,0 +1,24 @@
+// This program tests the initialization of variables
+// The error will not be reachable if local variable values are carried through recursive calls of the same function 
+// (ie, a more deeply nested call starts with the values assigned in the previous call) 
+//  With the semantics of boolean programs, the error is expected to be reachable
+
+decl g;
+
+void main() begin
+  g:= 1;
+  f();
+end
+
+void f() begin
+  decl l;
+  if (g = 1) then
+    l:= 1;
+    g:= 0;
+    f();
+  else if (l = 0) then
+    assert(0);
+    fi
+  fi
+end
+

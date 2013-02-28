@@ -1,0 +1,14 @@
+//  This program tests the local initialization of variables
+//  The error will not be reachable if local variables are initialized to zero
+//  With the semantics of boolean programs, the error is expected to be reachable
+
+void main() begin
+  f();
+end
+
+void f() begin
+  decl l;
+  if (l = 1) then
+    assert(0);
+  fi
+end
