@@ -534,10 +534,10 @@ primary_expression
       }
     | CHOOSE '[' expression ',' expression ']'
 	  {
-	  	//$$ = make_non_det_expr();
-      //deep_erase_expr(&$3);
-      //deep_erase_expr(&$5);
-      make_schoose_expr($3,$5);
+	  	$$ = make_non_det_expr();
+      deep_erase_expr(&$3);
+      deep_erase_expr(&$5);
+      //make_schoose_expr($3,$5);
 	  }
 	| IDENTIFIER 	
 	  { 
