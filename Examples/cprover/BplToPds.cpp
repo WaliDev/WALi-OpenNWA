@@ -55,7 +55,7 @@ namespace wali
           case AST_IMP:
             return bdd_or(bdd_not(l), r);
           case AST_SCHOOSE:
-            assert(0 && "xformer_for_constrain: AST_SCHOOSE not implemented");
+            return bdd_or(l, bdd_and(bdd_not(r), bddtrue));
           case AST_VAR:
           case AST_VAR_POST:
             ss << f << "::" << e->v;

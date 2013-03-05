@@ -207,7 +207,9 @@ fun_type
     ;
 
 fun_search_order
-	: DFS
+	: DFS {
+    yyerror("DFS fun_search_order can not be parsed. Not implemented.");
+  }
 	|
 	;
 
@@ -225,6 +227,7 @@ abortif
 	: ABORTIF expression ';'
 	  {
 	  	deep_erase_expr(&$2);
+      yyerror("abortif not implmented");
 	  }
 	|
 	  {
@@ -531,10 +534,10 @@ primary_expression
       }
     | CHOOSE '[' expression ',' expression ']'
 	  {
-	  	$$ = make_non_det_expr();
-      deep_erase_expr(&$3);
-      deep_erase_expr(&$5);
-      //make_schoose_expr($3,$5);
+	  	//$$ = make_non_det_expr();
+      //deep_erase_expr(&$3);
+      //deep_erase_expr(&$5);
+      make_schoose_expr($3,$5);
 	  }
 	| IDENTIFIER 	
 	  { 

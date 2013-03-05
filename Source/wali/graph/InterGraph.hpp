@@ -13,6 +13,7 @@
 #include <iostream>
 #include <map>
 #include <set>
+# include <tr1/unordered_map>
 
 namespace wali {
 
@@ -255,6 +256,7 @@ namespace wali {
 
             void setupInterSolution(std::list<Transition> *wt_required = NULL);
             void setupNewtonSolution();
+            void setupNewtonNoTensorSolution();
 
             sem_elem_t get_weight(Transition t);
             sem_elem_t get_call_weight(Transition t);
@@ -308,6 +310,7 @@ namespace wali {
 
 
             int saturate(std::multiset<tup> &worklist, unsigned scc_n);
+            int saturateNewtonNoTensor(std::multiset<tup> &worklist, unsigned scc_n);
 
             void setup_worklist(std::list<IntraGraph *> &gr_sorted, 
                 std::list<IntraGraph *>::iterator &gr_it, 

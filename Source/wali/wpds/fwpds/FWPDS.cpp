@@ -49,19 +49,15 @@ using namespace wali::wpds::ewpds;
 
 const std::string FWPDS::XMLTag("FWPDS");
 
-FWPDS::FWPDS() : EWPDS(), interGr(NULL), checkingPhase(false), newton(false), topDown(true)
+FWPDS::FWPDS() : EWPDS(), interGr(NULL), checkingPhase(false), newton(false), newtonNoTensor(false), topDown(true)
 {
 }
 
-FWPDS::FWPDS(ref_ptr<wpds::Wrapper> wr) : EWPDS(wr) , interGr(NULL), checkingPhase(false), newton(false), topDown(true)
+FWPDS::FWPDS(ref_ptr<wpds::Wrapper> wr) : EWPDS(wr) , interGr(NULL), checkingPhase(false), newton(false), newtonNoTensor(false), topDown(true)
 {
 }
 
-FWPDS::FWPDS( const FWPDS& f ) : EWPDS(f),interGr(NULL),checkingPhase(false), newton(f.newton), topDown(f.topDown)
-{
-}
-
-FWPDS::FWPDS(bool _newton) : EWPDS(), newton(_newton), topDown(true)
+FWPDS::FWPDS( const FWPDS& f ) : EWPDS(f),interGr(NULL),checkingPhase(false), newton(f.newton), newtonNoTensor(f.newtonNoTensor), topDown(f.topDown)
 {
 }
 
@@ -171,7 +167,13 @@ std::ostream& graphPrintKey(std::ostream& o, int k) {
 }
 
 void FWPDS::useNewton(bool set){
+  newtonNoTensor = false;
   newton = set;
+}
+
+void FWPDS::useNewtonNoTensor(bool set){
+  newton = false;
+  newtonNoTensor = set;
 }
 
 void FWPDS::prestar( wfa::WFA const & input, wfa::WFA& output )
@@ -408,9 +410,10 @@ void FWPDS::poststarIGR( wfa::WFA const & input, wfa::WFA& output )
     std::string msg = (get_verify_fwpds()) ? "FWPDS Saturation" : "";
     util::Timer timer(msg);
     // Compute summaries
-    if(newton){
+    if(newton)
       interGr->setupNewtonSolution();
-    }
+    else if(newtonNoTensor)
+      interGr->setupNewtonNoTensorSolution();
     else
       interGr->setupInterSolution();
   }
@@ -537,6 +540,7 @@ bool FWPDS::isOutputTensored()
 {
   if(interGr != NULL)
     return interGr->isOutputTensored();
+  else return false;
 }
 
 ////////////////////////////////////////////
