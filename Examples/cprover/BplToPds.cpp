@@ -732,7 +732,7 @@ namespace wali
           case AST_NONDET:
             return con->NonDet();
           case AST_SCHOOSE:
-            assert(0 && "expr_as_bdd: AST_SCHOOSE not implemented");
+	    return con->Or(l, con->And(con->Not(r), con->NonDet()));
           case AST_VAR:
             ss << f << "::" << e->v;
             if(con->find(ss.str()) != con->end()){

@@ -516,10 +516,10 @@ namespace goals {
       pds = new EWPDS(*originalPds);
     else{
       pds = new EWPDS();
-      con = pds_from_prog(pds, pg);
+      con = pds_from_prog_with_meet_merge(pds, pg);
     }
 
-    pds->print(std::cout) << endl;
+    //pds->print(std::cout) << endl;
 
 #if defined(BINREL_STATS)
     con->resetStats();
@@ -543,15 +543,15 @@ namespace goals {
   }
 
 
-  void runWpds(WFA& outfa, WPDS * originalPds = NULL)
+  void runWpds(WFA& outfa, EWPDS * originalPds = NULL)
   { 
     cout << "#################################################" << endl;
     cout << "[Newton Compare] Goal VI: end-to-end WPDS run" << endl;
-    WPDS * pds;
+    EWPDS * pds;
     if(originalPds != NULL)
-      pds = new WPDS(*originalPds);
+      pds = new EWPDS(*originalPds);
     else{
-      pds = new WPDS();
+      pds = new EWPDS();
       con = pds_from_prog(pds, pg);
     }
 
