@@ -285,7 +285,7 @@ bdd BinRel::detensorViaNwa()
     infa.addTrans(initialStateWfa, *cit, acceptStateWfa, DetensorWeight::detensor_weight_one);
   infa.setInitialState(initialStateWfa);
   infa.addFinalState(acceptStateWfa);
-  wali::wfa::WFA outfa = nwa.poststar(infa, wts);
+  wali::wfa::WFA outfa = nwa.poststarViaFwpds(infa, wts);
   detensor_weight_t ans = DetensorWeight::detensor_weight_zero;
   const StateSet& nwaFinalStates = nwa.getFinalStates();
   for(StateSet::const_iterator cit = nwaFinalStates.begin(); cit != nwaFinalStates.end(); ++cit){

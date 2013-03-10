@@ -1,0 +1,32 @@
+//Testing the semantics of schoose in bebop, we expect it to be l | (!r ^ *)
+//
+void main() begin
+  decl l, r, x;
+  l := 1;
+  r := 0;
+  x := schoose[l,r];
+  if (x = 1) then
+    //assert(0);  //Should reach this error
+    skip;
+  fi
+
+  r := 1;
+  x := schoose[l,r];
+  if (x = 1) then
+   // assert(0);  //Should reach this error
+   skip;
+  fi
+
+  l := 0;
+  x := schoose[l,r];
+  if (x = 1) then
+    //assert(0); //Should not reach this error
+    skip;
+  fi
+
+  r := 0;
+  x := schoose[l,r];
+  if (x = 1) then
+    assert(0);  //Should reach this error
+  fi
+end
