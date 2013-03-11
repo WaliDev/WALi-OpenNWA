@@ -20,6 +20,27 @@ namespace {
     {
         m[key].insert(value);
     }
+
+    size_t total_size(KeyedSemElemSet const & m)
+    {
+        size_t size = 0;
+        for (KeyedSemElemSet::const_iterator iter = m.begin();
+             iter != m.end(); ++iter)
+        {
+            size += 1;
+        }
+        return size;
+    }
+
+    size_t total_size(KeyedSemElemSet const * m)
+    {
+        return total_size(*m);        
+    }
+
+    size_t total_size(sem_elem_t m)
+    {
+        return total_size(dynamic_cast<KeyedSemElemSet*>(m.get_ptr()));
+    }
 }
 
 
@@ -106,10 +127,12 @@ TEST(wali$domains$KeyedSemElemSet$$at, accessors)
     KeyedSets sets;
 
     EXPECT_EQ(2u, sets.a.size());
+    EXPECT_EQ(2u, total_size(sets.a));
     EXPECT_TRUE(at(sets.a, sets.keys.i00)->equal(sets.paths.twenty));
     EXPECT_TRUE(at(sets.a, sets.keys.i01)->equal(sets.paths.ten));
 
     EXPECT_EQ(2u, sets.b.size());
+    EXPECT_EQ(2u, total_size(sets.b));
     EXPECT_TRUE(at(sets.b, sets.keys.i00)->equal(sets.paths.ten));
     EXPECT_TRUE(at(sets.b, sets.keys.i11)->equal(sets.paths.ten));
 }
@@ -129,6 +152,7 @@ TEST(wali$domains$KeyedSemElemSet$$begin$and$end, range)
     // We want to check that m is equal to sets.a, but the easiest way to do
     // that is make a new KeyedSemElemSet. :-)
     ASSERT_EQ(2u, m.size());
+    EXPECT_EQ(2u, total_size(m));
     KeyedSemElemSet a_again(m);
 
     EXPECT_TRUE(sets.a.equal(&a_again));
@@ -151,6 +175,10 @@ TEST(wali$domains$KeyedSemElemSet$$one, returnsSingletonOne)
     EXPECT_EQ(1u, a_one->size());
     EXPECT_EQ(1u, b_one->size());
     EXPECT_EQ(1u, c_one->size());
+
+    EXPECT_EQ(1u, total_size(a_one));
+    EXPECT_EQ(1u, total_size(b_one));
+    EXPECT_EQ(1u, total_size(c_one));
 
     EXPECT_TRUE(at(*a_one, sets.keys.i00->one())->equal(sets.paths.ten->one()));
     EXPECT_TRUE(at(*b_one, sets.keys.i00->one())->equal(sets.paths.ten->one()));
@@ -192,6 +220,10 @@ TEST(wali$domains$KeyedSemElemSet$$zero, canTakeZeroThenOne)
     EXPECT_EQ(1u, a_one->size());
     EXPECT_EQ(1u, b_one->size());
     EXPECT_EQ(1u, c_one->size());
+
+    EXPECT_EQ(1u, total_size(a_one));
+    EXPECT_EQ(1u, total_size(b_one));
+    EXPECT_EQ(1u, total_size(c_one));
     
     EXPECT_TRUE(at(*a_one, sets.keys.i00->one())->equal(sets.paths.ten->one()));
     EXPECT_TRUE(at(*b_one, sets.keys.i00->one())->equal(sets.paths.ten->one()));
@@ -208,6 +240,8 @@ TEST(wali$domains$KeyedSemElemSet$$extend, simpleExtend)
     // 0->0 distance 30; 0->1 distance 20
 
     EXPECT_EQ(2u, a_extend_b->size());
+    EXPECT_EQ(2u, total_size(a_extend_b));
+    
     EXPECT_TRUE(at(*a_extend_b, sets.keys.i00)->equal(sets.paths.thirty));
     EXPECT_TRUE(at(*a_extend_b, sets.keys.i01)->equal(sets.paths.twenty));
 }
@@ -226,6 +260,9 @@ TEST(wali$domains$KeyedSemElemSet$$extend, extendsResultingInMultiplePaths)
 
     EXPECT_EQ(2u, ac_actual->size());
     EXPECT_EQ(4u, aca_actual->size());
+
+    EXPECT_EQ(2u, total_size(ac_actual));
+    EXPECT_EQ(4u, total_size(aca_actual));
     
     EXPECT_TRUE(ac_actual_se->equal(&sets.ac));
     EXPECT_TRUE(aca_actual_se->equal(&sets.aca));
@@ -297,6 +334,8 @@ TEST(wali$domains$KeyedSemElemSet$$combine, allCombine)
     KeyedSemElemSet * actual = down_ks(actual_se);
 
     EXPECT_EQ(5u, actual->size());
+    EXPECT_EQ(5u, total_size(actual));
+    
     EXPECT_TRUE(actual_se->equal(&sets.all_combine));
 }
 
@@ -314,6 +353,7 @@ TEST(wali$domains$KeyedSemElemSet$$constructor, addingAZeroGuardOmitsEntry)
 
     ASSERT_EQ(2u, m.size());
     EXPECT_EQ(1u, kses.size());
+    EXPECT_EQ(1u, total_size(kses));
 }
 
 
@@ -330,6 +370,7 @@ TEST(wali$domains$KeyedSemElemSet$$constructor, havingAZeroSizeWeightSetOmitsEnt
 
     ASSERT_EQ(2u, m.size());
     EXPECT_EQ(1u, kses.size());
+    EXPECT_EQ(1u, total_size(kses));
 }
 
 
@@ -346,6 +387,7 @@ TEST(wali$domains$KeyedSemElemSet$$constructor, havingAWeightSetWithZeroWeightOm
 
     ASSERT_EQ(2u, m.size());
     EXPECT_EQ(1u, kses.size());
+    EXPECT_EQ(1u, total_size(kses));
 }
 
 TEST(wali$domains$KeyedSemElemSet$$constructor, havingAWeightSetWithZeroWeightAndSomethingElseIncludesEntry)
@@ -362,5 +404,13 @@ TEST(wali$domains$KeyedSemElemSet$$constructor, havingAWeightSetWithZeroWeightAn
 
     ASSERT_EQ(2u, m.size());
     EXPECT_EQ(3u, kses.size());
+    EXPECT_EQ(3u, total_size(kses));
 }
 
+
+// Yo emacs!
+// Local Variables:
+//     c-file-style: "ellemtel"
+//     c-basic-offset: 4
+//     indent-tabs-mode: nil
+// End:
