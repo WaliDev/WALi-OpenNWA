@@ -13,6 +13,13 @@ namespace {
     KeyedSemElemSet * down_ks(sem_elem_t p) {
         return dynamic_cast<KeyedSemElemSet*>(p.get_ptr());
     }
+
+    void insert(KeyedSemElemSet::BackingMap & m,
+                sem_elem_t key,
+                sem_elem_t value)
+    {
+        m[key].insert(value);
+    }
 }
 
 
@@ -26,36 +33,36 @@ struct Mappings
     Mappings() {
         // 0 ---> 0   length 20
         // 0 ---> 1   length 10
-        a[keys.i00].insert(paths.twenty);
-        a[keys.i01].insert(paths.ten);
-
-        str_a[keys.s00].insert(paths.twenty);
-        str_a[keys.s01].insert(paths.ten);
-
+        insert(a, keys.i00, paths.twenty);
+        insert(a, keys.i01, paths.ten);
+        
+        insert(str_a, keys.s00, paths.twenty);
+        insert(str_a, keys.s01, paths.ten);
+        
         // 0 ---> 0   length 10
         // 1 ---> 1   length 10
-        b[keys.i00].insert(paths.ten);
-        b[keys.i11].insert(paths.ten);
-
+        insert(b, keys.i00, paths.ten);
+        insert(b, keys.i11, paths.ten);
+        
         // 0 ---> 0   length 10
         // 1 ---> 0   length 10
-        c[keys.i00].insert(paths.ten);
-        c[keys.i10].insert(paths.ten);
-
-        ac[keys.i00].insert(paths.twenty);
-        ac[keys.i00].insert(paths.thirty);
-
-        aca[keys.i00].insert(paths.fourty);
-        aca[keys.i00].insert(paths.fifty);
-        aca[keys.i01].insert(paths.thirty);
-        aca[keys.i01].insert(paths.fourty);
-
-        all_combine[keys.i00].insert(paths.twenty);
-        all_combine[keys.i00].insert(paths.ten);
-        all_combine[keys.i00].insert(paths.ten);
-        all_combine[keys.i01].insert(paths.ten);
-        all_combine[keys.i11].insert(paths.ten);
-        all_combine[keys.i10].insert(paths.ten);
+        insert(c, keys.i00, paths.ten);
+        insert(c, keys.i10, paths.ten);
+        
+        insert(ac, keys.i00, paths.twenty);
+        insert(ac, keys.i00, paths.thirty);
+        
+        insert(aca, keys.i00, paths.fourty);
+        insert(aca, keys.i00, paths.fifty);
+        insert(aca, keys.i01, paths.thirty);
+        insert(aca, keys.i01, paths.fourty);
+        
+        insert(all_combine, keys.i00, paths.twenty);
+        insert(all_combine, keys.i00, paths.ten);
+        insert(all_combine, keys.i00, paths.ten);
+        insert(all_combine, keys.i01, paths.ten);
+        insert(all_combine, keys.i11, paths.ten);
+        insert(all_combine, keys.i10, paths.ten);
     }
 };
 
@@ -116,7 +123,7 @@ TEST(wali$domains$KeyedSemElemSet$$begin$and$end, range)
     for (KeyedSemElemSet::const_iterator iter = sets.a.begin();
          iter != sets.a.end(); ++iter)
     {
-        m[iter->first].insert(iter->second);
+        insert(m, iter->first, iter->second);
     }
 
     // We want to check that m is equal to sets.a, but the easiest way to do
@@ -300,9 +307,9 @@ TEST(wali$domains$KeyedSemElemSet$$constructor, addingAZeroGuardOmitsEntry)
     ShortestPathLengths paths;
 
     KeyedSemElemSet::BackingMap m;
-    m[keys.i_empty].insert(paths.ten);
-    m[keys.i00].insert(paths.ten);
-
+    insert(m, keys.i_empty, paths.ten);
+    insert(m, keys.i00, paths.ten);
+    
     KeyedSemElemSet kses(m);
 
     ASSERT_EQ(2u, m.size());
@@ -317,8 +324,8 @@ TEST(wali$domains$KeyedSemElemSet$$constructor, havingAZeroSizeWeightSetOmitsEnt
 
     KeyedSemElemSet::BackingMap m;
     m[keys.i01];
-    m[keys.i00].insert(paths.ten);
-
+    insert(m, keys.i00, paths.ten);
+    
     KeyedSemElemSet kses(m);
 
     ASSERT_EQ(2u, m.size());
@@ -332,9 +339,9 @@ TEST(wali$domains$KeyedSemElemSet$$constructor, havingAWeightSetWithZeroWeightOm
     ShortestPathLengths paths;
 
     KeyedSemElemSet::BackingMap m;
-    m[keys.i01].insert(paths.ten->zero());
-    m[keys.i00].insert(paths.ten);
-
+    insert(m, keys.i01, paths.ten->zero());
+    insert(m, keys.i00, paths.ten);
+    
     KeyedSemElemSet kses(m);
 
     ASSERT_EQ(2u, m.size());
@@ -347,10 +354,10 @@ TEST(wali$domains$KeyedSemElemSet$$constructor, havingAWeightSetWithZeroWeightAn
     ShortestPathLengths paths;
 
     KeyedSemElemSet::BackingMap m;
-    m[keys.i01].insert(paths.ten->zero());
-    m[keys.i01].insert(paths.ten);
-    m[keys.i00].insert(paths.ten);
-
+    insert(m, keys.i01, paths.ten->zero());
+    insert(m, keys.i01, paths.ten);
+    insert(m, keys.i00, paths.ten);
+    
     KeyedSemElemSet kses(m);
 
     ASSERT_EQ(2u, m.size());
