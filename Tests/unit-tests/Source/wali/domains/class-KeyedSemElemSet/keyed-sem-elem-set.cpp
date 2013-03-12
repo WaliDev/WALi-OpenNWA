@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "wali/SemElemPair.hpp"
+#include "wali/domains/SemElemSet.hpp"
 
 #include "fixtures.hpp"
 
@@ -18,7 +19,15 @@ namespace {
                 sem_elem_t key,
                 sem_elem_t value)
     {
-        m[key].insert(value);
+        SemElemSet::ElementSet set;
+        set.insert(value);
+        sem_elem_t singleton = new SemElemSet(SemElemSet::KeepAllNonduplicates, true, value, set);
+        if (m.count(key) == 0) {
+            m[key] = singleton;
+        }
+        else {
+            m[key] = m[key]->combine(singleton);
+        }
     }
 
     size_t total_size(KeyedSemElemSet const & m)
@@ -27,7 +36,8 @@ namespace {
         for (KeyedSemElemSet::const_iterator iter = m.begin();
              iter != m.end(); ++iter)
         {
-            size += 1;
+            SemElemSet * set = dynamic_cast<SemElemSet*>(iter->second.get_ptr());
+            size += set->getElements().size();
         }
         return size;
     }
@@ -118,7 +128,10 @@ sem_elem_t at(KeyedSemElemSet const & ks, sem_elem_t key)
     p.first++;
     assert(p.first == p.second);
 
-    return first->second;
+    SemElemSet const * set = dynamic_cast<SemElemSet*>(first->second.get_ptr());
+    assert(set->getElements().size() == 1u);
+
+    return *(set->getElements().begin());
 }
 
 
@@ -146,7 +159,12 @@ TEST(wali$domains$KeyedSemElemSet$$begin$and$end, range)
     for (KeyedSemElemSet::const_iterator iter = sets.a.begin();
          iter != sets.a.end(); ++iter)
     {
-        insert(m, iter->first, iter->second);
+        SemElemSet const * elements = dynamic_cast<SemElemSet*>(iter->second.get_ptr());
+        for (SemElemSet::ElementSet::const_iterator element = elements->getElements().begin();
+             element != elements->getElements().end(); ++element)
+        {
+            insert(m, iter->first, *element);
+        }
     }
 
     // We want to check that m is equal to sets.a, but the easiest way to do
@@ -258,8 +276,8 @@ TEST(wali$domains$KeyedSemElemSet$$extend, extendsResultingInMultiplePaths)
         * ac_actual = down_ks(ac_actual_se),
         * aca_actual = down_ks(aca_actual_se);
 
-    EXPECT_EQ(2u, ac_actual->size());
-    EXPECT_EQ(4u, aca_actual->size());
+    EXPECT_EQ(1u, ac_actual->size());
+    EXPECT_EQ(2u, aca_actual->size());
 
     EXPECT_EQ(2u, total_size(ac_actual));
     EXPECT_EQ(4u, total_size(aca_actual));
@@ -333,7 +351,7 @@ TEST(wali$domains$KeyedSemElemSet$$combine, allCombine)
     sem_elem_t actual_se = sets.a.combine(&sets.b)->combine(&sets.c)->combine(sets.c.zero());
     KeyedSemElemSet * actual = down_ks(actual_se);
 
-    EXPECT_EQ(5u, actual->size());
+    EXPECT_EQ(4u, actual->size());
     EXPECT_EQ(5u, total_size(actual));
     
     EXPECT_TRUE(actual_se->equal(&sets.all_combine));
@@ -363,7 +381,7 @@ TEST(wali$domains$KeyedSemElemSet$$constructor, havingAZeroSizeWeightSetOmitsEnt
     ShortestPathLengths paths;
 
     KeyedSemElemSet::BackingMap m;
-    m[keys.i01];
+    m[keys.i01] = new SemElemSet(SemElemSet::KeepAllNonduplicates, true, paths.ten);
     insert(m, keys.i00, paths.ten);
     
     KeyedSemElemSet kses(m);
@@ -373,22 +391,6 @@ TEST(wali$domains$KeyedSemElemSet$$constructor, havingAZeroSizeWeightSetOmitsEnt
     EXPECT_EQ(1u, total_size(kses));
 }
 
-
-TEST(wali$domains$KeyedSemElemSet$$constructor, havingAWeightSetWithZeroWeightOmitsEntry)
-{
-    PKFixtures keys;
-    ShortestPathLengths paths;
-
-    KeyedSemElemSet::BackingMap m;
-    insert(m, keys.i01, paths.ten->zero());
-    insert(m, keys.i00, paths.ten);
-    
-    KeyedSemElemSet kses(m);
-
-    ASSERT_EQ(2u, m.size());
-    EXPECT_EQ(1u, kses.size());
-    EXPECT_EQ(1u, total_size(kses));
-}
 
 TEST(wali$domains$KeyedSemElemSet$$constructor, havingAWeightSetWithZeroWeightAndSomethingElseIncludesEntry)
 {
@@ -403,7 +405,7 @@ TEST(wali$domains$KeyedSemElemSet$$constructor, havingAWeightSetWithZeroWeightAn
     KeyedSemElemSet kses(m);
 
     ASSERT_EQ(2u, m.size());
-    EXPECT_EQ(3u, kses.size());
+    EXPECT_EQ(2u, kses.size());
     EXPECT_EQ(3u, total_size(kses));
 }
 

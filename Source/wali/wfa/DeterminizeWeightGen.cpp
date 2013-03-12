@@ -6,6 +6,29 @@
 using wali::domains::KeyedSemElemSet;
 using wali::domains::PositionKey;
 
+namespace
+{
+  using namespace wali;
+  using namespace wali::domains;
+  
+  void insert(KeyedSemElemSet::BackingMap & m,
+              sem_elem_t key,
+              sem_elem_t value)
+  {
+    SemElemSet::ElementSet set;
+    set.insert(value);
+    sem_elem_t singleton = new SemElemSet(SemElemSet::KeepAllNonduplicates, false, value, set);
+
+    if (m.count(key) == 0) {
+      m[key] = singleton;
+    }
+    else {
+      m[key] = m[key]->combine(singleton);
+    }
+  }
+}
+
+
 namespace wali
 {
   namespace wfa
@@ -109,7 +132,7 @@ namespace wali
 
           sem_elem_t weight = weight_to_target->second;
           sem_elem_t guard = new PositionKey<Key>(*source, *target);
-          map[guard].insert(weight);
+          insert(map, guard, weight);
         } // for each target state
       } // for each source state
 
@@ -130,7 +153,7 @@ namespace wali
       {
         sem_elem_t accept_weight = original_wfa.getState(*state)->acceptWeight();
         sem_elem_t guard = new PositionKey<Key>(*state, *state);
-        map[guard].insert(accept_weight);
+        insert(map, guard, accept_weight);
       }
 
       assert(map.size() > 0u);
@@ -145,7 +168,7 @@ namespace wali
 
       sem_elem_t guard = PositionKey<Key>::makeOne().one();
       sem_elem_t weight = original_wfa.getSomeWeight()->one();
-      map[guard].insert(weight);
+      insert(map, guard, weight);
 
       return new KeyedSemElemSet(map);
     }
