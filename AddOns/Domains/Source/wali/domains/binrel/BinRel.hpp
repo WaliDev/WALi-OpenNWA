@@ -549,6 +549,12 @@ namespace wali
           
           return new wali::domains::binrel::BinRel(&l_rel->getVocabulary(), both);
         }
+
+        virtual sem_elem_t make_weight( wali::wfa::ITrans const * UNUSED_PARAMETER(lhs),
+                                        wali::wfa::ITrans const * UNUSED_PARAMETER(rhs))
+        {
+          assert(false);
+        }
       }; // WeightMaker
         
       

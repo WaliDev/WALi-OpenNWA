@@ -18,7 +18,7 @@ namespace {
     }
 
     bool
-    is_any_transition(wali::wfa::ITrans const * trans)
+    is_any_transition(wali::wfa::ITrans const * UNUSED_PARAMETER(trans))
     {
         return true;
     }

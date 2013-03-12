@@ -280,7 +280,7 @@ namespace wali {
         Xfa
         from_parser_ast(RelationMaker const & maker,
                         XfaAst const & ast,
-                        int fdd_size,
+                        int UNUSED_PARAMETER(fdd_size),
                         std::string const & domain_var_name_prefix)
         {
             using namespace wali::domains::binrel;

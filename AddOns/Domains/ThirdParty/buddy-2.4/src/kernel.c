@@ -119,7 +119,7 @@ static bdd2inthandler resize_handler;  /* Node-table-resize handler */
 
 
    /* Strings for all error mesages */
-static char *errorstrings[BDD_ERRNUM] =
+static char const * errorstrings[BDD_ERRNUM] =
 { "Out of memory", "Unknown variable", "Value out of range",
   "Unknown BDD root dereferenced", "bdd_init() called twice",
   "File operation failed", "Incorrect file format",

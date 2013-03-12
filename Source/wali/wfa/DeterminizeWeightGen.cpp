@@ -82,11 +82,11 @@ namespace wali
     ////////////////////////////////////
 
     sem_elem_t
-    CreateKeyedSet::getWeight(WFA const & original_wfa,
+    CreateKeyedSet::getWeight(WFA const & UNUSED_PARAMETER(original_wfa),
                               WFA const & UNUSED_PARAMETER(determinized_wfa_so_far),
                               ComputedWeights const & weight_spec,
                               std::set<Key> const & sources,
-                              Key symbol,
+                              Key UNUSED_PARAMETER(symbol),
                               std::set<Key> const & targets) const
     {
       KeyedSemElemSet::BackingMap map;

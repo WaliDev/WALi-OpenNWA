@@ -23,7 +23,8 @@ namespace
   }
 
   std::pair<sem_elem_t, sem_elem_t>
-  dummy_keep_nonduplicates(sem_elem_t new_, sem_elem_t existing)
+  dummy_keep_nonduplicates(sem_elem_t UNUSED_PARAMETER(new_),
+                           sem_elem_t UNUSED_PARAMETER(existing))
   {
     std::abort();
   }
