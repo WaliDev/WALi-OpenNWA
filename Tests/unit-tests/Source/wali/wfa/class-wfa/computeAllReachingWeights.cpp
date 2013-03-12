@@ -150,6 +150,29 @@ namespace wali {
         }
 
 
+        TEST(wali$wfa$WFA$$computeAllReachingWeights, statesReachableWithWeightZeroAreNotReachableWithWeightZero)
+        {
+            Key start = getKey("start"), other = getKey("other"), sym = getKey("sym");
+            sem_elem_t zero = new ShortestPathSemiring(0);
+            zero = zero->zero(); // make the name correct
+
+            WFA wfa;
+            wfa.addState(start, zero);
+            wfa.addState(other, zero);
+            wfa.setInitialState(start);
+            wfa.addTrans(start, sym, other, zero);
+
+            WFA::AccessibleStateSetMap expected;
+            expected[start] = make_vector(zero->one());
+
+            WFA::AccessibleStateSetMap reachable1 = wfa.computeAllReachingWeights(SemElemSet::KeepAllNonduplicates,
+                                                                                  false);
+            WFA::AccessibleStateSetMap reachable2 = wfa.computeAllReachingWeights();
+            
+            EXPECT_EQ_REACHABLE(expected, reachable1);
+            EXPECT_EQ_REACHABLE(expected, reachable2);
+        }
+
         TEST(wali$wfa$WFA$$computeAllReachingWeights, statesReachableWithWeightZeroAreReachableWithWeightZero)
         {
             Key start = getKey("start"), other = getKey("other"), sym = getKey("sym");
@@ -166,7 +189,8 @@ namespace wali {
             expected[start] = make_vector(zero->one());
             expected[other] = make_vector(zero);
 
-            WFA::AccessibleStateSetMap reachable = wfa.computeAllReachingWeights();
+            WFA::AccessibleStateSetMap reachable = wfa.computeAllReachingWeights(SemElemSet::KeepAllNonduplicates,
+                                                                                 true);
 
             EXPECT_EQ_REACHABLE(expected, reachable);
         }
@@ -370,7 +394,7 @@ namespace wali {
             expected[start] = make_vector(zero->one());
             expected[final] = make_vector(distance_one);
 
-            WFA::AccessibleStateSetMap reachable = wfa.computeAllReachingWeights(SemElemSet::KeepMinimalElements);
+            WFA::AccessibleStateSetMap reachable = wfa.computeAllReachingWeights(SemElemSet::KeepMinimalElements, true);
 
             EXPECT_EQ_REACHABLE(expected, reachable);
         }
@@ -398,7 +422,7 @@ namespace wali {
             expected[start] = make_vector(distance_five);
             expected[final] = make_vector(distance_five);
 
-            WFA::AccessibleStateSetMap reachable = wfa.computeAllReachingWeights(SemElemSet::KeepMaximalElements);
+            WFA::AccessibleStateSetMap reachable = wfa.computeAllReachingWeights(SemElemSet::KeepMaximalElements, true);
 
             EXPECT_EQ_REACHABLE(expected, reachable);
         }

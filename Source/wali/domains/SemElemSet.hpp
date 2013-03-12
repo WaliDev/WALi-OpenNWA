@@ -37,8 +37,8 @@ namespace wali
       /// Constructs a SemElemSet with the given base element, which is only
       /// used to get a handle on base_element->one(). The result is semiring
       /// 0.
-      SemElemSet(SemElemSubsumptionComputer keep_what, sem_elem_t base_element);
-      SemElemSet(SemElemSubsumptionComputer keep_what, sem_elem_t base_element, ElementSet const & elements);
+      SemElemSet(SemElemSubsumptionComputer keep_what, bool include_zeroes, sem_elem_t base_element);
+      SemElemSet(SemElemSubsumptionComputer keep_what, bool include_zeroes, sem_elem_t base_element, ElementSet const & elements);
       
       virtual sem_elem_t one() const;
       virtual sem_elem_t zero() const;
@@ -62,6 +62,7 @@ namespace wali
       ElementSet elements;
       SemElemSubsumptionComputer keep_what;
       size_t the_hash;
+      bool include_zeroes;
 
     public:
       static SemElemSubsumptionComputer const KeepAllNonduplicates;
