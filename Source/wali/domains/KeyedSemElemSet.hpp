@@ -574,10 +574,11 @@ namespace wali
       ///
       /// This actually prints the guard
       std::ostream& print( std::ostream & os ) const {
+        assert(valid());
         if (isZero()) {
           os << "[ZERO]";
         }
-        if (isOne()) {
+        else if (isOne()) {
           os << "[ONE]";
         }
         else {
