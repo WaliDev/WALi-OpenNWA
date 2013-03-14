@@ -41,11 +41,11 @@ namespace
   {
     if (new_->underApproximates(existing)) {
       // new_ < existing; keeping smaller; keeping new_
-      return std::pair<sem_elem_t, sem_elem_t>(new_, NULL);
+      return std::pair<sem_elem_t, sem_elem_t>(new_, sem_elem_t(0));
     }
     else if (existing->underApproximates(new_)) {
       // existing < new; keeping smaller; keeping existing
-      return std::pair<sem_elem_t, sem_elem_t>(existing, NULL);
+      return std::pair<sem_elem_t, sem_elem_t>(existing, sem_elem_t(0));
     }
     else {
       // no subsumption; keep both
@@ -58,11 +58,11 @@ namespace
   {
     if (existing->underApproximates(new_)) {
       // existing < new_; keeping larger; keeping new_
-      return std::pair<sem_elem_t, sem_elem_t>(new_, NULL);
+      return std::pair<sem_elem_t, sem_elem_t>(new_, sem_elem_t(0));
     }
     else if (new_->underApproximates(existing)) {
       // new_ < existing; keeping larger; keeping existing
-      return std::pair<sem_elem_t, sem_elem_t>(existing, NULL);
+      return std::pair<sem_elem_t, sem_elem_t>(existing, sem_elem_t(0));
     }
     else {
       // no subsumption; keep both
