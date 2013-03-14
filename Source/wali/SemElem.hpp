@@ -214,6 +214,10 @@ namespace wali
       }
 
 
+#if defined(_MSC_VER)
+#  pragma warning(push)
+#  pragma warning(disable: 4716) // must return a value
+#endif                           // (std::abort not annotated as noreturn)
       /// Returns true if this is less than the other. Should be
       /// fast. HOWEVER -- does not need to have semantic meaning, other than
       /// it must be consistent with equal() and different objects
@@ -242,6 +246,9 @@ namespace wali
       {
         std::abort();
       }
+#if defined(_MSC_VER)
+#  pragma warning(pop)
+#endif
   };
 
   /**

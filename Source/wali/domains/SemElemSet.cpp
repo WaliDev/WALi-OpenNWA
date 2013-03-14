@@ -22,12 +22,19 @@ namespace
     }
   }
 
+#if defined(_MSC_VER)
+#  pragma warning(push)
+#  pragma warning(disable: 4716) // must return a value
+#endif                           // (std::abort not annotated as noreturn)
   std::pair<sem_elem_t, sem_elem_t>
   dummy_keep_nonduplicates(sem_elem_t UNUSED_PARAMETER(new_),
                            sem_elem_t UNUSED_PARAMETER(existing))
   {
     std::abort();
   }
+#if defined(_MSC_VER)
+#  pragma warning(pop)
+#endif
 
   std::pair<sem_elem_t, sem_elem_t>
   keep_smaller(sem_elem_t new_, sem_elem_t existing)
