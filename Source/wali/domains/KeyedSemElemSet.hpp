@@ -5,8 +5,8 @@
 
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/optional.hpp>
-#include <tr1/unordered_map>
-#include <tr1/unordered_set>
+#include "wali/util/unordered_map.hpp"
+#include "wali/util/unordered_set.hpp"
 #include <limits>
 
 #include <iostream>
@@ -59,8 +59,8 @@ namespace wali
       : public wali::SemElem
     {
     public:
-      typedef std::tr1::unordered_map<sem_elem_t, sem_elem_t,
-                                      SemElemRefPtrHash, SemElemRefPtrEqual>
+      typedef wali::util::unordered_map<sem_elem_t, sem_elem_t,
+                                        SemElemRefPtrHash, SemElemRefPtrEqual>
               BackingMap;
 
       typedef BackingMap::const_iterator const_iterator;

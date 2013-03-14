@@ -4,7 +4,7 @@
 #include "wali/SemElem.hpp"
 
 #include <set>
-#include <tr1/unordered_set>
+#include "wali/util/unordered_set.hpp"
 
 #include <boost/function.hpp>
 //#include <boost/container/flat_set.hpp>
@@ -29,7 +29,9 @@ namespace wali
       
       //typedef boost::container::flat_set<sem_elem_t, SemElemRefPtrFastLessThan> ElementSet;
       //typedef std::set<sem_elem_t, SemElemRefPtrFastLessThan> ElementSet;
-      typedef std::tr1::unordered_set<sem_elem_t, SemElemRefPtrHash, SemElemRefPtrEqual> ElementSet;
+      typedef wali::util::unordered_set<sem_elem_t,
+                                        SemElemRefPtrHash, SemElemRefPtrEqual
+                                       > ElementSet;
       
       typedef ref_ptr<SemElemSet> Ptr;
       typedef ref_ptr<SemElemSet const> ConstPtr;

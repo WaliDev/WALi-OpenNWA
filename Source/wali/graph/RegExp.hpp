@@ -5,7 +5,7 @@
 #include <list>
 #include <vector>
 #include <set>
-#include <tr1/unordered_set>
+#include "wali/util/unordered_set.hpp"
 #include <map>
 
 #include "wali/SemElem.hpp"
@@ -185,7 +185,7 @@ namespace wali {
                 /* When set, points to the ancestors in the RegExp dag. */
                 /* Must be a weak pointer because parents have reference to the child */
                 /* I don't know what will happen if I mix boost smart pointers and ref_ptr, so use raw */
-                tr1::unordered_set<RegExp*> parents;
+                wali::util::unordered_set<RegExp*> parents;
 #endif
                 unsigned int last_change;
                 unsigned int last_seen;
