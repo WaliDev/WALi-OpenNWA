@@ -49,12 +49,15 @@ namespace
   {
     WFA & target;
     wali::domains::SemElemSet::SemElemSubsumptionComputer const & computer;
+    bool include_zeroes;
     
   public:
     SemElemSetLifter(WFA * output_to_here,
-                     wali::domains::SemElemSet::SemElemSubsumptionComputer const & comp)
+                     wali::domains::SemElemSet::SemElemSubsumptionComputer const & comp,
+                     bool inc_zeroes)
       : target(*output_to_here)
       , computer(comp)
+      , include_zeroes(inc_zeroes)
     {}
     
     virtual void operator()(wali::wfa::ITrans const * t) {
@@ -66,6 +69,7 @@ namespace
                       t->stack(),
                       t->to(),
                       new wali::domains::SemElemSet(computer,
+                                                    include_zeroes,
                                                     t->weight(),
                                                     es));
     }
@@ -421,16 +425,17 @@ namespace wali
     WFA::AccessibleStateSetMap
     WFA::computeAllReachingWeights() const
     {
-      return computeAllReachingWeights(SemElemSet::KeepAllNonduplicates);
+      return computeAllReachingWeights(SemElemSet::KeepAllNonduplicates, false);
     }
 
     WFA::AccessibleStateSetMap
-    WFA::computeAllReachingWeights(SemElemSet::SemElemSubsumptionComputer computer) const
+    WFA::computeAllReachingWeights(SemElemSet::SemElemSubsumptionComputer computer,
+                                   bool include_zeroes) const
     {
       // Lift weights to the sets
       WFA lifted;
-      sem_elem_t lifted_zero = new SemElemSet(computer, this->getSomeWeight()->zero());
-      SemElemSetLifter lifter(&lifted, computer);
+      sem_elem_t lifted_zero = new SemElemSet(computer, include_zeroes, this->getSomeWeight()->zero());
+      SemElemSetLifter lifter(&lifted, computer, include_zeroes);
       for (std::set<Key>::const_iterator q = Q.begin(); q != Q.end(); ++q) {
         lifted.addState(*q, lifted_zero);
       }

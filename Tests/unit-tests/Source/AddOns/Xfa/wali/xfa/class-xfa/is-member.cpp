@@ -35,7 +35,7 @@ namespace wali {
         {
             XfaContext context;
             Relations relations(context.voc, "left");
-            BinaryRelation zero = relations.false_;
+            sem_elem_t zero = relations.false_;
 
             Xfa const xfas[] = {
                 TrivialEmptyXfa(zero).xfa,

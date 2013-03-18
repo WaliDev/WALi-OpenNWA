@@ -40,11 +40,11 @@
 
 /**
  *
- * The following describes how to control the bdd variables are setup in buddy
+ * The following describes how to control how the bdd variables are setup in buddy
  * Let x, y, w and z be variables, each requiring two bdd levels (x1 and x2)
  * Further, for the bit x1, there are three different levels x1b, x1t1 and x1t2 
  * -- the first one for base, the second and third for the two tensor spots. 
- * Finally, each spot needs three levels, x1b, x1b' and x1b''.
+ * Finally, each spot needs three levels, x1b, x1b' and x1b'', for pre vocabulary, post vocabulary, and an extra.
  *
  * Let's disregard tensors for the moment.
  * By default, the variables are interleaved at the bit level. So, a call to 
@@ -54,45 +54,74 @@
  * setInts({{(x, 2), (y, 2)}, {(z, 2), (w, 2)}}) 
  * x1b x1b' x1b'' y1b y1b' y1b'' x2b x2b' x2b'' y2b y2b' y2b'' z1b z1b' z1b'' w1b w1b' w1b'' z2b z2b' z2b'' w2b w2b' w2b''
  * 
- * There are two choices with regard to tensors. 
- * (1) TENSOR_MAX_AFFINITY
+ * There are various choices with regard to tensors. 
+ * (1) TENSOR_MAX_AFFINITY 
+ *    (Most useful, with BIT_BY_BIT_DETENSOR. DETENSOR_TOGETHER blows up)
  * This makes sure that all three levels for a bit are always together, i.e., you always get
  * x1b x1b' x1b'' x1t1 x1t1' x1t1'' x1t2 x1t2' x1t2''
  * The interleaving at higher levels remains the same
- * (2) TENSOR_MIN_AFFINITY
+ * (2) TENSOR_MIN_AFFINITY 
+ *    (almost never used) 
+ *    (You may try either BIT_BY_BIT_DETENSOR or DETENSOR_TOGETHER. But tensor itself is slow)
  * This makes sure that the three levels for the whole vocabulary are separate and copies of each other.
  * So, for the example above, the levels would look like.
  * x1b x1b' x1b'' y1b y1b' y1b'' x2b x2b' x2b'' y2b y2b' y2b'' z1b z1b' z1b'' w1b w1b' w1b'' z2b z2b' z2b'' w2b w2b' w2b''
  * x1t1 x1t1' x1t1'' y1t1 y1t1' y1t1'' x2t1 x2t1' x2t1'' y2t1 y2t1' y2t1'' z1t1 z1t1' z1t1'' w1t1 w1t1' w1t1'' z2t1 z2t1' z2t1'' w2t1 w2t1' w2t1''
  * x1t2 x1t2' x1t2'' y1t2 y1t2' y1t2'' x2t2 x2t2' x2t2'' y2t2 y2t2' y2t2'' z1t2 z1t2' z1t2'' w1t2 w1t2' w1t2'' z2t2 z2t2' z2t2'' w2t2 w2t2' w2t2''
  * (3) BASE_MAX_AFFINITY_TENSOR_MIXED
+ *    (almost never used)
+ *    (You may try either BIT_BY_BIT_DETENSOR or DETENSOR_TOGETHER. But tensor itself is slow)
  * This makes sure that base is separate, but mixes together tensors vocabularies. 
  * x1b x1b' x1b'' y1b y1b' y1b'' x2b x2b' x2b'' y2b y2b' y2b'' z1b z1b' z1b'' w1b w1b' w1b'' z2b z2b' z2b'' w2b w2b' w2b''
  * followed by tensor levels as x1t1 x1t1' x1t1'' x1t2 x1t2' x1t2''
  * (4) TENSOR_MATCHED_PAREN
+ *    (Must be used with NWA_DETENSOR)
+ *    NOTE: ***This currently only works correctly with boolean variables.***
  * Keeps all Three vocabs (base,tensor1,tensor2) separate, like TENSOR_MIN_AFFINITY.
  * Additionally, the three microlevels in each bit x x' x'' are in reverse order for tensor1.
  * So, for the example above, the levels would look like.
  * x1b x1b' x1b'' y1b y1b' y1b'' x2b x2b' x2b'' y2b y2b' y2b'' z1b z1b' z1b'' w1b w1b' w1b'' z2b z2b' z2b'' w2b w2b' w2b''
  * x1t1'' x1t1' x1t1 y1t1'' y1t1' y1t1 x2t1'' x2t1' x2t1 y2t1'' y2t1' y2t1 z1t1'' z1t1' z1t1 w1t1'' w1t1' w1t1 z2t1'' z2t1' z2t1 w2t1'' w2t1' w2t1
  * x1t2 x1t2' x1t2'' y1t2 y1t2' y1t2'' x2t2 x2t2' x2t2'' y2t2 y2t2' y2t2'' z1t2 z1t2' z1t2'' w1t2 w1t2' w1t2'' z2t2 z2t2' z2t2'' w2t2 w2t2' w2t2''
- * NOTE: ***This currently only works correctly with boolean variables.***
- * The tensor choice is determined by the following macro:
+ *
+ * The tensor choice is determined by setting **exactly one** macro to 1.
  **/
-//#define TENSOR_MIN_AFFINITY
-#define TENSOR_MAX_AFFINITY
-//#define BASE_MAX_AFFINITY_TENSOR_MIXED
-/*** NOTE: This currently only works correctly with boolean variables.***/
-//#define TENSOR_MATCHED_PAREN
+#define TENSOR_MAX_AFFINITY 1
+#define TENSOR_MIN_AFFINITY 0
+#define BASE_MAX_AFFINITY_TENSOR_MIXED 0
+#define TENSOR_MATCHED_PAREN 0
 
+// Make sure exactly one bdd variable order is chosen.
+#if (TENSOR_MAX_AFFINITY + TENSOR_MIN_AFFINITY + BASE_MAX_AFFINITY_TENSOR_MIXED + TENSOR_MATCHED_PAREN) != 1
+#error "Please choose exactly one bdd variable order."
+#endif
 
-//#define DETENSOR_TOGETHER
-#define DETENSOR_BIT_BY_BIT
+/**
+ * There are several ways to implement detensor
+ * (1) DETENSOR_TOGETHER
+ * This creates (and updates) a bdd when variables are added to the vocabulary that contains the constraints
+ * needed by detensor.
+ * During detensor, this bdd is used to enforce constraints at once.
+ * (2) DETENSOR_BIT_BY_BIT
+ * This does not explictly create the constraint bdd. Instead, during detensor, it enforces the equality 
+ * constraint on each bdd level one-by-one.
+ * (3) NWA_DETENSOR
+ * Converts the bdd to an Nwa, enforces the constraints by Nwa intersection, and converts back to, obtain
+ * the detensored bdd.
+ *
+ * The detensor choice is made by setting **exactly one** macro to 1
+ **/
+#define DETENSOR_TOGETHER 0
+#define DETENSOR_BIT_BY_BIT 1
+#define NWA_DETENSOR 0
 
-//#define NWA_DETENSOR
+// Make sure exactly one detensor method is chosen
+#if (DETENSOR_TOGETHER + DETENSOR_BIT_BY_BIT + NWA_DETENSOR) != 1
+#error "Please choose exactly one method for detensor."
+#endif
 
-
-#if defined(NWA_DETENSOR) && not defined(TENSOR_MATCHED_PAREN)
+// Make sure that NWA_DETENSOR is used with TENSOR_MATCHED_PAREN order.
+#if (NWA_DETENSOR + TENSOR_MATCHED_PAREN) % 2 != 0
 #error "Nwa based detensor only works with TENSOR_MATCHED_PAREN variable order"
 #endif
 
@@ -106,7 +135,7 @@
 /// each other (one faster, one simpler)
 #define CHECK_BDD_SUBSUMES_WITH_SLOWER_VERSION 1
 
-#ifdef NWA_DETENSOR
+#if(NWA_DETENSOR == 1)
 namespace opennwa
 {
   typedef wali::Key State;
@@ -187,11 +216,19 @@ namespace wali
        * domain.
        */
 
-
+      /**
+       * Usage:
+       *  -- initialize buddy by creating an object of BddContext
+       *  -- add variables to the vocabulary of your relations using add/set Vars variants
+       *     Note: If you are particular about the bdd variable order, use
+       *     setIntVars or setBoolVars instead of addBoolVars / addIntVars.
+       *     It's better tested and more flexible.
+       *  -- Create BinRels and play with them as you like.
+       **/
       class BddContext : public std::map<const std::string,bddinfo_t>
       {
         friend class BinRel;
-#ifdef NWA_DETENSOR
+#if (NWA_DETENSOR == 1)
         public:
           typedef std::vector<int> VocLevelArray;
 #endif
@@ -223,7 +260,7 @@ namespace wali
           virtual void setIntVars(const std::map<std::string, int>& vars);
           virtual void setIntVars(const std::vector<std::map<std::string, int> >& vars);
 
-#ifdef NWA_DETENSOR
+#if (NWA_DETENSOR == 1)
           /**
            * These functions are used by an NWA based implementation of detensor.
            * They provide information about the bit level information per variable.
@@ -292,7 +329,7 @@ namespace wali
           binrel_t cachedBaseZero;
           binrel_t cachedTensorOne;
           binrel_t cachedTensorZero;
-#ifdef NWA_DETENSOR
+#if (NWA_DETENSOR == 1)
           VocLevelArray tensorVocLevels;
           VocLevelArray baseLhsVocLevels;
           VocLevelArray baseRhsVocLevels;
@@ -349,7 +386,7 @@ namespace wali
                                 std::vector<std::string> const & keep_these,
                                 bdd b);
       
-#ifdef NWA_DETENSOR
+#if (NWA_DETENSOR == 1)
       /*
        * Subclass of opennwa::WeightGen used to attache weights to the nwa used
        * for detensor. The class is declared in nwa_detensor.hpp. We can
@@ -460,7 +497,7 @@ namespace wali
           BddContext const * con;
           bdd rel;
           bool isTensored;
-#ifdef NWA_DETENSOR
+#if(NWA_DETENSOR == 1)
         private:
           //TODO: Cleanup in the destructor for all these
           typedef std::pair< unsigned, bdd > StateTranslationKey;
@@ -511,6 +548,12 @@ namespace wali
           bdd both = bdd_and(l_rel->getBdd(), r_rel->getBdd());
           
           return new wali::domains::binrel::BinRel(&l_rel->getVocabulary(), both);
+        }
+
+        virtual sem_elem_t make_weight( wali::wfa::ITrans const * UNUSED_PARAMETER(lhs),
+                                        wali::wfa::ITrans const * UNUSED_PARAMETER(rhs))
+        {
+          assert(false);
         }
       }; // WeightMaker
         

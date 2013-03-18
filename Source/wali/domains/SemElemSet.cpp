@@ -22,22 +22,30 @@ namespace
     }
   }
 
+#if defined(_MSC_VER)
+#  pragma warning(push)
+#  pragma warning(disable: 4716) // must return a value
+#endif                           // (std::abort not annotated as noreturn)
   std::pair<sem_elem_t, sem_elem_t>
-  dummy_keep_nonduplicates(sem_elem_t new_, sem_elem_t existing)
+  dummy_keep_nonduplicates(sem_elem_t UNUSED_PARAMETER(new_),
+                           sem_elem_t UNUSED_PARAMETER(existing))
   {
     std::abort();
   }
+#if defined(_MSC_VER)
+#  pragma warning(pop)
+#endif
 
   std::pair<sem_elem_t, sem_elem_t>
   keep_smaller(sem_elem_t new_, sem_elem_t existing)
   {
     if (new_->underApproximates(existing)) {
       // new_ < existing; keeping smaller; keeping new_
-      return std::pair<sem_elem_t, sem_elem_t>(new_, NULL);
+      return std::pair<sem_elem_t, sem_elem_t>(new_, sem_elem_t(0));
     }
     else if (existing->underApproximates(new_)) {
       // existing < new; keeping smaller; keeping existing
-      return std::pair<sem_elem_t, sem_elem_t>(existing, NULL);
+      return std::pair<sem_elem_t, sem_elem_t>(existing, sem_elem_t(0));
     }
     else {
       // no subsumption; keep both
@@ -50,11 +58,11 @@ namespace
   {
     if (existing->underApproximates(new_)) {
       // existing < new_; keeping larger; keeping new_
-      return std::pair<sem_elem_t, sem_elem_t>(new_, NULL);
+      return std::pair<sem_elem_t, sem_elem_t>(new_, sem_elem_t(0));
     }
     else if (new_->underApproximates(existing)) {
       // new_ < existing; keeping larger; keeping existing
-      return std::pair<sem_elem_t, sem_elem_t>(existing, NULL);
+      return std::pair<sem_elem_t, sem_elem_t>(existing, sem_elem_t(0));
     }
     else {
       // no subsumption; keep both
@@ -134,8 +142,13 @@ namespace
   add_element_if_appropriate(SemElemSet::SemElemSubsumptionComputer keep_what,
                              SemElemSet::ElementSet & set,
                              size_t & the_hash,
-                             sem_elem_t add_this)
+                             sem_elem_t add_this,
+                             bool include_zeroes)
   {
+    if (!include_zeroes && add_this->equal(add_this->zero())) {
+      return;
+    }
+    
     if (keep_what == dummy_keep_nonduplicates) {
       push_if_not_present(set, the_hash, add_this);
     }
@@ -158,23 +171,25 @@ namespace wali
 
     
 
-    SemElemSet::SemElemSet(SemElemSubsumptionComputer keep, sem_elem_t base_element)
+    SemElemSet::SemElemSet(SemElemSubsumptionComputer keep, bool inc_zeroes, sem_elem_t base_element)
       : base_one(base_element->one())
       , keep_what(keep)
       , the_hash(0)
+      , include_zeroes(inc_zeroes)
     {}
 
 
-    SemElemSet::SemElemSet(SemElemSubsumptionComputer keep, sem_elem_t base_element, ElementSet const & es)
+    SemElemSet::SemElemSet(SemElemSubsumptionComputer keep, bool inc_zeroes, sem_elem_t base_element, ElementSet const & es)
       : base_one(base_element->one())
       , keep_what(keep)
       , the_hash(0)
+      , include_zeroes(inc_zeroes)
     {
       for (ElementSet::const_iterator element = es.begin();
            element != es.end(); ++element)
       {
         size_t pre_size = this->elements.size();
-        add_element_if_appropriate(this->keep_what, this->elements, this->the_hash, *element);
+        add_element_if_appropriate(this->keep_what, this->elements, this->the_hash, *element, include_zeroes);
         if (pre_size != this->elements.size()) {
           // Added
           assert(this->elements.size() == pre_size + 1u);
@@ -189,14 +204,14 @@ namespace wali
       ElementSet es;
       //es.push_back(this->base_one);
       es.insert(this->base_one);
-      return new SemElemSet(this->keep_what, this->base_one, es);
+      return new SemElemSet(this->keep_what, this->include_zeroes, this->base_one, es);
     }
 
     
     sem_elem_t
     SemElemSet::zero() const
     {
-      return new SemElemSet(this->keep_what, this->base_one);
+      return new SemElemSet(this->keep_what, this->include_zeroes, this->base_one);
     }
     
 
@@ -206,9 +221,10 @@ namespace wali
       SemElemSet const * other = dynamic_cast<SemElemSet const *>(se);
       assert(other);
       //assert(this->keep_what == other->keep_what);
+      assert(this->include_zeroes == other->include_zeroes);
       assert(this->base_one->equal(other->base_one));
 
-      Ptr result = new SemElemSet(this->keep_what, this->base_one);
+      Ptr result = new SemElemSet(this->keep_what, this->include_zeroes, this->base_one);
 
       for (ElementSet::const_iterator this_element = this->elements.begin();
            this_element != this->elements.end(); ++this_element)
@@ -219,7 +235,8 @@ namespace wali
           add_element_if_appropriate(this->keep_what,
                                      result->elements,
                                      result->the_hash,
-                                     (*this_element)->extend(*other_element));
+                                     (*this_element)->extend(*other_element),
+                                     include_zeroes);
         }
       }
       
@@ -233,13 +250,14 @@ namespace wali
       SemElemSet const * other = dynamic_cast<SemElemSet const *>(se);
       assert(other);
       //assert(this->keep_what == other->keep_what);
+      assert(this->include_zeroes == other->include_zeroes);
       assert(this->base_one->equal(other->base_one));
 
-      Ptr result = new SemElemSet(this->keep_what, this->base_one, this->elements);
+      Ptr result = new SemElemSet(this->keep_what, this->include_zeroes, this->base_one, this->elements);
       for (ElementSet::const_iterator other_element = other->elements.begin();
            other_element != other->elements.end(); ++other_element)
       {
-        add_element_if_appropriate(this->keep_what, result->elements, result->the_hash, *other_element);
+        add_element_if_appropriate(this->keep_what, result->elements, result->the_hash, *other_element, include_zeroes);
       }
 
       return result;

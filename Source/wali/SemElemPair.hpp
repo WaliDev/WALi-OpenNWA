@@ -47,6 +47,16 @@ namespace wali
       virtual std::pair<sem_elem_t,sem_elem_t> delta( SemElem * se );
 
       /** @brief return first element */
+      sem_elem_t getFirst() const {
+        return first; 
+      }
+
+      /** @brief return second element */
+      sem_elem_t getSecond() const {
+        return second; 
+      }
+
+      /** @brief return first element */
       sem_elem_t get_first() const {
         return first; 
       }

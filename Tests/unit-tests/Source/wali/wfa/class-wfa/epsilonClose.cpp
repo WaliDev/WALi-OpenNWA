@@ -146,7 +146,8 @@ namespace wali {
 
 
         ::testing::AssertionResult
-        check_all_source_epsilon_closure(char const * expr, WFA const & wfa)
+        check_all_source_epsilon_closure(char const * UNUSED_PARAMETER(expr),
+                                         WFA const & wfa)
         {
             WFA::EpsilonCloseCache mohri_closures, fwpds_singles_closures, fwpds_multi_closures;
 

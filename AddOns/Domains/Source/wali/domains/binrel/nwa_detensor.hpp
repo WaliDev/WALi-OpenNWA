@@ -29,6 +29,12 @@ namespace wali
     namespace binrel
     {
 
+      /**
+       * Subclass Nwa to
+       *   change the stateIntersect function to not create the key by splicing the strings together.
+       *   Instead, use a KeyPair.
+       *   FIXME? Change this back in Nwa?
+       **/
       class DetensorNwa : public opennwa::Nwa
       {
         public:
@@ -43,6 +49,19 @@ namespace wali
 
       class DetensorWeight;
       typedef wali::ref_ptr<DetensorWeight> detensor_weight_t;
+      /**
+       * A thin wrapper around buddy bdds.
+       * This is the weight domain for the Nwa created during BinRel::detensorViaNwa
+       *
+       * Semiring details:
+       * 0    : bddfalse
+       * 1    : bddtrue
+       * x    : bdd_and
+       * +    : bdd_or
+       *
+       * Additionally, two static variables, detensor_weight_one and detensor_weight_zero 
+       * maintain a unique represetntation of 0 and 1.
+       **/
       class DetensorWeight : public wali::SemElem
       {
         public:
@@ -99,6 +118,10 @@ namespace wali
           bdd rel;
       };
 
+      /**
+       * Nwa to WPDS conversion obtains weights for the transitions from a WeightGen object.
+       * DetensorWeightGen is used for that purpose for calling poststar on the created Nwa.
+       **/
       class DetensorWeightGen : public opennwa::WeightGen
       {
         //The kinds of edges that need to be considered.

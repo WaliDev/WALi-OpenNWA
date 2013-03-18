@@ -19,7 +19,7 @@
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/Trans.hpp"
 
-#ifdef NWA_DETENSOR
+#if (NWA_DETENSOR == 1)
 
 using namespace std;
 using namespace std::tr1;
@@ -254,7 +254,12 @@ size_t hash_value(bdd const& b)
   return b.root;
 }
 
-
+/**
+ * For an explanation of the algorithm implemented in detensorViaNwa, 
+ * see the draft on SpeedingUpNewton.
+ *
+ * This is a direct implementation of the psuedocode there.
+ **/
 bdd BinRel::detensorViaNwa()
 {
   if(rel == bddfalse)

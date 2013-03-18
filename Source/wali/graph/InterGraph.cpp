@@ -1561,7 +1561,9 @@ namespace wali {
           it->second.push_back(i);
         }
         // add initial (state, stack, _) transitions
-        if(nodes[i].trans.src == state && nodes[i].trans.stack == stack) {
+        if(((int)nodes[i].trans.src) == state &&
+           ((int)nodes[i].trans.stack) == stack)
+        {
           Transition t1(state,0,0);
           Transition t2(nodes[i].trans.tgt,0,0);
           if(newtonGr)

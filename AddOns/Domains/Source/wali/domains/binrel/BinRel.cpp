@@ -246,7 +246,7 @@ BddContext::BddContext(int bddMemSize, int cacheSize) :
   move2Tensor2 = BddPairPtr(bdd_newpair());
   move2Base = BddPairPtr(bdd_newpair());
   move2BaseTwisted = BddPairPtr(bdd_newpair());
-#ifdef NWA_DETENSOR
+#if (NWA_DETENSOR == 1)
   rawMove2Tensor2 = BddPairPtr(bdd_newpair());
 #endif
 
@@ -360,7 +360,7 @@ BddContext::~BddContext()
   move2Tensor2.reset();
   move2Base.reset();
   move2BaseTwisted.reset();
-#ifdef NWA_DETENSOR
+#if (NWA_DETENSOR == 1)
   rawMove2Tensor2.reset();
 #endif
   
@@ -424,7 +424,7 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
     }
   }
 
-#if defined(TENSOR_MAX_AFFINITY)
+#if (TENSOR_MAX_AFFINITY == 1)
   for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
     std::map<std::string, int> interleavedVars = *cvi;
     int * domains = new int[9 * interleavedVars.size()];
@@ -461,7 +461,7 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
       vari++;  
     }
   }
-#elif defined(TENSOR_MIN_AFFINITY)
+#elif (TENSOR_MIN_AFFINITY == 1)
   //First the base levels
   for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
     std::map<std::string, int> interleavedVars = *cvi;
@@ -556,7 +556,7 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
     }
   }
 
-#elif defined(TENSOR_MATCHED_PAREN)
+#elif (TENSOR_MATCHED_PAREN == 1)
   //First the base levels
   for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
     std::map<std::string, int> interleavedVars = *cvi;
@@ -651,7 +651,7 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
       vari++;  
     }
   }
-#elif defined(BASE_MAX_AFFINITY_TENSOR_MIXED)
+#elif (BASE_MAX_AFFINITY_TENSOR_MIXED == 1)
   //First the base levels
   for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
     std::map<std::string, int> interleavedVars = *cvi;
@@ -735,7 +735,7 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
     idx2Name[varInfo->tensor2Extra] = ci->first + "_t2''";
   } 
 
-#ifdef NWA_DETENSOR
+#if (NWA_DETENSOR == 1)
   setupLevelArray();
 #endif
 }
@@ -849,7 +849,7 @@ void BddContext::setupCachedBdds()
   commonBddContextSet13 &= fdd_makeset(tensor2Lhs, this->size());
   assert(this->size() == 0 || (baseSecBddContextSet != bddfalse && tensorSecBddContextSet != bddfalse
         && tensorSecBddContextSet != bddfalse && commonBddContextSet23 != bddfalse && commonBddContextSet13 != bddfalse));
-#if defined(DETENSOR_TOGETHER)
+#if (DETENSOR_TOGETHER == 1)
   // Somehow make this efficient
   for(std::map<const std::string, bddinfo_t>::const_iterator ci = this->begin(); ci != this->end(); ++ci){
     bddinfo_t varInfo = ci->second;
@@ -894,7 +894,7 @@ void BddContext::addIntVar(std::string name, unsigned size)
     assert(false);
   }
   bddinfo_t varInfo = new BddInfo;
-#if defined(NWA_DETENSOR)
+#if (NWA_DETENSOR == 1)
   // Only boolean variables are supported under NWA_DETENSOR
   assert(size == 2);
 #endif
@@ -1018,7 +1018,7 @@ void BddContext::populateCache()
   cachedTensorOne = new BinRel(this, tensorId, true);
   cachedTensorZero = new BinRel(this, bddfalse, true);
 
-#ifdef NWA_DETENSOR
+#if (NWA_DETENSOR == 1)
   setupLevelArray();
 #endif
 }
@@ -1244,7 +1244,7 @@ binrel_t BinRel::Kronecker(binrel_t that) const
 #endif
   if(rel == bddfalse || that->rel == bddfalse)
     return con->cachedTensorZero;
-#ifdef NWA_DETENSOR
+#if (NWA_DETENSOR == 1)
   bdd c = tensorViaDetensor(that->rel); //nwa_detensor.cpp
 #else
   bdd rel1 = bdd_replace(rel, con->move2Tensor1.get());
@@ -1270,7 +1270,7 @@ binrel_t BinRel::Eq23Project() const
     return new BinRel(con,bddfalse, false);
   }
 #endif
-#if defined(DETENSOR_TOGETHER)
+#if (DETENSOR_TOGETHER == 1)
   bdd rel1 = rel & con->commonBddContextId23; 
   bdd rel2 = bdd_exist(rel1, con->commonBddContextSet23);
   bdd c = bdd_replace(rel2, con->move2Base.get());
@@ -1303,7 +1303,7 @@ binrel_t BinRel::Eq13Project() const
     return new BinRel(con,bddfalse, false);
   }
 #endif
-#if defined(DETENSOR_TOGETHER)
+#if (DETENSOR_TOGETHER == 1)
   bdd rel1 = rel & con->commonBddContextId13; 
   bdd rel2 = bdd_exist(rel1, con->commonBddContextSet13);
   bdd c = bdd_replace(rel2, con->move2BaseTwisted.get());
@@ -1422,7 +1422,7 @@ wali::sem_elem_tensor_t BinRel::detensorTranspose()
 #ifdef BINREL_STATS
   con->numDetensorTranspose++;
 #endif
-#ifdef NWA_DETENSOR
+#if (NWA_DETENSOR == 1)
   assert(isTensored);
   bdd c = detensorViaNwa();
   binrel_t ret = new BinRel(con, detensorViaNwa());
@@ -1445,7 +1445,7 @@ std::ostream& BddContext::printStats( std::ostream& o) const
   o << "#Intersect: " << numIntersect << endl; 
   o << "#Equal: " << numEqual << endl; 
   o << "#Kronecker: " << numKronecker << endl;
-#if defined(NWA_DETENSOR)
+#if (NWA_DETENSOR == 1)
   o << "#Reverse: " << numReverse << endl;
 #endif
   o << "#Transpose: " << numTranspose << endl;

@@ -8,7 +8,7 @@
 #include <map>
 #include <set>
 
-//#include <tr1/unordered_set>
+//#include "wali/util/unordered_set.hpp"
 
 #include "wali/ref_ptr.hpp"
 #include "wali/KeyContainer.hpp"
@@ -224,8 +224,9 @@ namespace wali {
     template<typename State>
     struct RelationTypedefs
     {
-      // typedef std::tr1::unordered_set<pair<State, State>,
-      //                                 pairhash<State, State> > BinaryRelation;
+      // typedef wali::util::unordered_set<pair<State, State>,
+      //                                   pairhash<State, State>
+      //                                  > BinaryRelation;
       typedef std::set<pair<State, State> > BinaryRelation;
       typedef wali::relations::TernaryRelation<State> TernaryRelation;
     };

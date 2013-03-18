@@ -119,7 +119,7 @@ namespace wali {
             XfaContext context;
             Relations lrelations(context.voc, "left");
             Relations rrelations(context.voc, "left");
-            BinaryRelation zero = lrelations.false_;
+            sem_elem_t zero = lrelations.false_;
 
             Xfa lxfa = EmptyByImpossibleDataTransition(zero, lrelations).xfa;
             Xfa rxfa = EmptyByImpossibleDataTransition(zero, rrelations).xfa;
@@ -135,7 +135,7 @@ namespace wali {
 
         std::pair<std::map<std::string, std::vector<Xfa> >,
                   std::map<std::string, std::vector<Xfa> > >
-        produce_xfas(BinaryRelation zero,
+        produce_xfas(sem_elem_t zero,
                      Relations const & left_relations,
                      Relations const & right_relations)
         {
@@ -175,7 +175,7 @@ namespace wali {
             Relations left_relations(context.voc, "left");
             Relations right_relations(context.voc, "right");
 
-            BinaryRelation zero = left_relations.false_;
+            sem_elem_t zero = left_relations.false_;
             ASSERT_TRUE(zero->equal(right_relations.false_.get_ptr()));
 
             std::map<std::string, std::vector<Xfa>> left_xfas, right_xfas;
@@ -232,7 +232,7 @@ namespace wali {
                             SCOPED_TRACE(ss.str());
 
                             Xfa const & intersection = left_xfa->intersect_conjoin(*right_xfa);
-                            EXPECT_TRUE(xfas_same_modulo_words(expected_representative, intersection));
+                            ASSERT_TRUE(xfas_same_modulo_words(expected_representative, intersection));
                         }
                     }
                 }
@@ -251,7 +251,7 @@ namespace wali {
             //std::cerr << "right_relations\n";
             //Relations right_relations(context.voc, "right");
 
-            BinaryRelation zero = left_relations.false_;
+            sem_elem_t zero = left_relations.false_;
             ASSERT_TRUE(zero->equal(right_relations.false_.get_ptr()));
 
             std::map<std::string, std::vector<Xfa>> left_xfas, right_xfas;
@@ -282,7 +282,7 @@ namespace wali {
                                << "Current XFA in that right language: " << (right_xfa - right_some_xfas.begin()) << "\n";
                             SCOPED_TRACE(ss.str());
 
-                            bool actual = language_contains(*left_xfa, *right_xfa, context.voc);
+                            bool actual = language_contains(*left_xfa, *right_xfa);
                             EXPECT_EQ(expected, actual);
                         }
                     }

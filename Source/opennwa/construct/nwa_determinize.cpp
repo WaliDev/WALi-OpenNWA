@@ -84,7 +84,7 @@ namespace opennwa
     typedef  RelationTypedefs<State>::TernaryRelation TernaryRelation;
 
 #if 0
-    typedef  std::tr1::unordered_set<BinaryRelation
+    typedef  wali::util::unordered_set<BinaryRelation
       , terrible_set_hasher<BinaryRelation>
       //, terrible_set_comparer<BinaryRelation>
       >
