@@ -5,6 +5,7 @@
 namespace wali {
     namespace util {
         using boost::unordered_map;
+        using boost::hash;
     }
 }
 

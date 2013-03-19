@@ -483,7 +483,7 @@ namespace wali
       ///
       /// This actually does hash
       size_t hash() const {
-        std::tr1::hash<PositionType> hasher;
+        wali::util::hash<PositionType> hasher;
 
         if (isZero()) {
           return std::numeric_limits<size_t>::max();
