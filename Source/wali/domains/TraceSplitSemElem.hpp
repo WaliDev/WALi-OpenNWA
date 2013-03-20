@@ -42,6 +42,7 @@ namespace wali
 
       virtual size_t hash() const;
       virtual bool equal(Ptr other) const;
+      virtual bool isFalse() const;
     };
 
     /// Represents a domain from a key to a weight.
@@ -69,17 +70,17 @@ namespace wali
       : public wali::SemElem
     {
     public:
-      typedef std::tr1::unordered_map<sem_elem_t, sem_elem_t,
+      typedef std::tr1::unordered_map<Guard::Ptr, sem_elem_t,
                                       SemElemRefPtrHash, SemElemRefPtrEqual>
               BackingMap;
 
       typedef BackingMap::const_iterator const_iterator;
 
-      typedef boost::function<void (sem_elem_t &, sem_elem_t &)> ReduceFunction;
+      typedef boost::function<void (Guard &, sem_elem_t &)> ReduceFunction;
 
       static
       void
-      identity_reducer(sem_elem_t & UNUSED_PARAMETER(key),
+      identity_reducer(Guard & UNUSED_PARAMETER(key),
                        sem_elem_t & UNUSED_PARAMETER(value))
       {
       }
@@ -104,19 +105,17 @@ namespace wali
 
       static
       BackingMap
-      remove_zeroes(ReduceFunction reducer, BackingMap m)
+      normalize(ReduceFunction reducer, sem_elem_t default_value, BackingMap m)
       {
         for (BackingMap::const_iterator it = m.begin();
              it != m.end(); /*nothing*/ )
         {
-          sem_elem_t guard = it->first;
+          Guard::Ptr guard = it->first;
           sem_elem_t weight = it->second;
 
           reducer(guard, weight);
 
-          if (guard->equal(guard->zero())
-              || weight->equal(weight->zero()))
-          {
+          if (guard->isFalse() || weight->equal(default_value)) {
             it = m.erase(it);
           }
           else {
@@ -131,14 +130,20 @@ namespace wali
                            BackingMap const & m,
                            sem_elem_t default_value)
         : reducer_(reducer)
-        , map_(remove_zeroes(reducer, m))
+        , map_(normalize(reducer, default_value, m))
         , default_(default_value)
         , hash_(get_hash(map_))
       {}
 
-      std::pair<const_iterator, const_iterator>
-      equal_range(sem_elem_t key) const {
-        return map_.equal_range(key);
+      sem_elem_t
+      getWeight(Guard::Ptr key) const {
+        const_iterator loc = map_.find(key);
+        if (loc == map_.end()) {
+          return default_;
+        }
+        else {
+          return loc->second;
+        }
       }
 
       const_iterator
@@ -166,63 +171,103 @@ namespace wali
       }
 
       sem_elem_t extend(SemElem * se) {
+        abort(); // this function is not currently used and I don't want to
+                 // write tests for it at the moment
         TraceSplitSemElemSet * that = dynamic_cast<TraceSplitSemElemSet*>(se);
         assert(that);
-
         BackingMap m;
-
-        for (BackingMap::const_iterator this_guard = this->map_.begin();
-             this_guard != this->map_.end(); ++this_guard)
-        {
-          
-        }
         
-        return new TraceSplitSemElemSet(m, one_key_, one_value_);
+        for (BackingMap::const_iterator this_pair = this->map_.begin();
+             this_pair != this->map_.end(); ++this_pair)
+        {
+          Guard::Ptr guard = this_pair->first;
+          sem_elem_t this_weight = this_pair->second;
+          sem_elem_t that_weight = that->getWeight(guard);
+          m[guard] = this_weight->extend(that_weight);
+        }
+
+        for (BackingMap::const_iterator that_pair = that->map_.begin();
+             that_pair != that->map_.end(); ++that_pair)
+        {
+          Guard::Ptr guard = that_pair->first;
+          sem_elem_t that_weight = that_pair->second;
+          if (map_.count(guard) == 0) {
+            sem_elem_t this_weight = this->default_;
+            m[guard] = this_weight->extend(that_weight);
+          }
+        }
+
+        sem_elem_t new_default = this->default_->extend(that->default_);
+
+        return new TraceSplitSemElemSet(reducer_, map_, new_default);
       }
       
       sem_elem_t combine(SemElem * se) {
+        abort(); // this function is not currently used and I don't want to
+                 // write tests for it at the moment
         TraceSplitSemElemSet * that = dynamic_cast<TraceSplitSemElemSet*>(se);
         assert(that);
-
-        BackingMap m(this->map_);
-        for (BackingMap::const_iterator that_guard = that->map_.begin();
-             that_guard != that->map_.end(); ++that_guard)
+        BackingMap m;
+        
+        for (BackingMap::const_iterator this_pair = this->map_.begin();
+             this_pair != this->map_.end(); ++this_pair)
         {
-          BackingMap::iterator new_loc = m.find(that_guard->first);
+          Guard::Ptr guard = this_pair->first;
+          sem_elem_t this_weight = this_pair->second;
+          sem_elem_t that_weight = that->getWeight(guard);
+          m[guard] = this_weight->combine(that_weight);
+        }
 
-          if (new_loc == m.end()) {
-            m.insert(new_loc, *that_guard);
-          }
-          else {
-            sem_elem_t new_weight = new_loc->second->combine(that_guard->second);
-            new_loc->second = new_weight;
+        for (BackingMap::const_iterator that_pair = that->map_.begin();
+             that_pair != that->map_.end(); ++that_pair)
+        {
+          Guard::Ptr guard = that_pair->first;
+          sem_elem_t that_weight = that_pair->second;
+          if (map_.count(guard) == 0) {
+            sem_elem_t this_weight = this->default_;
+            m[guard] = this_weight->combine(that_weight);
           }
         }
 
-        return new TraceSplitSemElemSet(m, one_key_, one_value_);
+        sem_elem_t new_default = this->default_->combine(that->default_);
+
+        return new TraceSplitSemElemSet(reducer_, map_, new_default);
       }
+
 
       bool equal(SemElem * se) const {
         TraceSplitSemElemSet * that = dynamic_cast<TraceSplitSemElemSet*>(se);
         assert(that);
 
         if (this->map_.size() != that->map_.size()
-            || !this->one_key_->equal(that->one_key_)
-            || !this->one_value_->equal(that->one_value_))
+            || !this->default_->equal(that->default_))
         {
           return false;
         }
 
-        for (BackingMap::const_iterator this_guard = this->map_.begin();
-             this_guard != this->map_.end(); ++this_guard)
+        for (BackingMap::const_iterator this_pair = this->map_.begin();
+             this_pair != this->map_.end(); ++this_pair)
         {
-          BackingMap::const_iterator that_loc = that->map_.find(this_guard->first);
-
-          if (that_loc == that->map_.end()
-              || !that_loc->second->equal(this_guard->second))
-          {
+          Guard::Ptr guard = this_pair->first;
+          sem_elem_t this_weight = this_pair->second;
+          sem_elem_t that_weight = that->getWeight(guard);
+          if (!this->weight->equal(that_weight())) {
             return false;
-          }  
+          }
+        }
+
+        for (BackingMap::const_iterator that_pair = that->map_.begin();
+             that_pair != that->map_.end(); ++that_pair)
+        {
+          Guard::Ptr guard = that_pair->first;
+          sem_elem_t that_weight = that_pair->second;
+          if (map_.count(guard) == 0) {
+            sem_elem_t this_weight = this->default_;
+            if (!this->weight->equal(that_weight())) {
+              return false;
+            }
+          }
+          // (else, we checked it above)
         }
 
         return true;
@@ -257,7 +302,7 @@ namespace wali
     private:      
       ReduceFunction reducer_;
       BackingMap map_;
-      sem_elem_t one_key_, one_value_;
+      sem_elem_t default_;
       size_t hash_;
     };
     
