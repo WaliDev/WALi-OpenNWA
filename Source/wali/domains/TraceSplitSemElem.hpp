@@ -1,32 +1,12 @@
-#if 0 // this file currently doesn't compile and this is needed to prevent
-      // the header-compilation tests from failing
-
 #ifndef WALI_TRACESPLIT_SEMELEMSET_HPP
 #define WALI_TRACESPLIT_SEMELEMSET_HPP
 
-#include "wali/SemElem.hpp"
-
-#include <boost/iterator/iterator_facade.hpp>
-#include <boost/optional.hpp>
-#include <tr1/unordered_map>
-#include <tr1/unordered_set>
 #include <limits>
+#include <boost/optional.hpp>
+#include <boost/function.hpp>
 
-#include <iostream>
-
-namespace {
-  std::string
-  clamp(std::string const & str)
-  {
-    const size_t maxlen = 50;
-    if (str.size() < maxlen) {
-      return str;
-    }
-    else {
-      return str.substr(0, maxlen-3) + "...";
-    }
-  }
-}  
+#include "wali/util/unordered_map.hpp"
+#include "wali/SemElem.hpp"
 
 namespace wali
 {
@@ -40,15 +20,30 @@ namespace wali
     public:
       typedef ref_ptr<Guard> Ptr;
 
-      virtual size_t hash() const;
-      virtual bool equal(Ptr other) const;
-      virtual bool isFalse() const;
+      virtual size_t hash() const = 0;
+      virtual bool equal(Ptr other) const = 0;
+      virtual bool isFalse() const = 0;
     };
 
+    struct GuardRefPtrHash
+    {
+      size_t
+      operator() (Guard::Ptr se) const {
+        return se->hash();
+      }
+    };
+
+    struct GuardRefPtrEqual
+    {
+      bool
+      operator() (Guard::Ptr left, Guard::Ptr right) const {
+        return left->equal(right);
+      }
+    };
 
     template <typename ElementType>
     class LiteralGuard
-      : public wali::Guard
+      : public Guard
     {
     public:
       typedef ElementType value_type;
@@ -73,7 +68,7 @@ namespace wali
         }
         else {
           wali::util::hash<value_type> hasher;
-          return hasher(_value);
+          return hasher(*_value);
         }
       }
 
@@ -93,6 +88,16 @@ namespace wali
       virtual bool isFalse() const {
         assert (!_special || *_special == SpecialFalse);
         return _special;
+      }
+
+      virtual std::ostream& print(std::ostream & os) const {
+        if (isFalse()) {
+          os << "[FALSE]";
+        }
+        else {
+          os << "[" << *_value << "]";
+        }
+        return os;
       }
 
     private:
@@ -131,13 +136,13 @@ namespace wali
       : public wali::SemElem
     {
     public:
-      typedef std::tr1::unordered_map<Guard::Ptr, sem_elem_t,
-                                      SemElemRefPtrHash, SemElemRefPtrEqual>
+      typedef wali::util::unordered_map<Guard::Ptr, sem_elem_t,
+                                        GuardRefPtrHash, GuardRefPtrEqual>
               BackingMap;
 
       typedef BackingMap::const_iterator const_iterator;
 
-      typedef boost::function<void (Guard &, sem_elem_t &)> ReduceFunction;
+      typedef boost::function<void (Guard::Ptr &, sem_elem_t &)> ReduceFunction;
 
       static
       void
@@ -187,7 +192,7 @@ namespace wali
       }
       
 
-      TraceSplitSemElemSet(Reducefunction reducer,
+      TraceSplitSemElemSet(ReduceFunction reducer,
                            BackingMap const & m,
                            sem_elem_t default_value)
         : reducer_(reducer)
@@ -312,7 +317,7 @@ namespace wali
           Guard::Ptr guard = this_pair->first;
           sem_elem_t this_weight = this_pair->second;
           sem_elem_t that_weight = that->getWeight(guard);
-          if (!this->weight->equal(that_weight())) {
+          if (!this_weight->equal(that_weight)) {
             return false;
           }
         }
@@ -324,7 +329,7 @@ namespace wali
           sem_elem_t that_weight = that_pair->second;
           if (map_.count(guard) == 0) {
             sem_elem_t this_weight = this->default_;
-            if (!this->weight->equal(that_weight())) {
+            if (!this_weight->equal(that_weight)) {
               return false;
             }
           }
@@ -380,4 +385,3 @@ namespace wali
 
 #endif
 
-#endif
