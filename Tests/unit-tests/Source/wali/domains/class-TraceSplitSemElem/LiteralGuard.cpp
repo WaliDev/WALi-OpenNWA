@@ -2,20 +2,10 @@
 
 #include "wali/domains/TraceSplitSemElem.hpp"
 
+#include "fixtures.hpp"
+
 namespace wali {
   namespace domains {
-
-    typedef LiteralGuard<int> IntGuard;
-
-    struct LiteralGuards {
-      IntGuard::Ptr false_, zero, one;
-
-      LiteralGuards()
-        : false_(new IntGuard())
-        , zero(new IntGuard(0))
-        , one(new IntGuard(1))
-      {}
-    };
 
     TEST(wali$domains$LiteralGuard, DefaultConstructorProducesFalse)
     {
