@@ -45,6 +45,67 @@ namespace wali
       virtual bool isFalse() const;
     };
 
+
+    template <typename ElementType>
+    class LiteralGuard
+      : public wali::Guard
+    {
+    public:
+      typedef ElementType value_type;
+
+      LiteralGuard(value_type const & value)
+        : _value(value)
+      {}
+
+      // creates false
+      LiteralGuard()
+        : _special(SpecialFalse)
+      {}
+
+      LiteralGuard(LiteralGuard const & other)
+        : _value(other._value)
+        , _special(other._special)
+      {}
+
+      virtual size_t hash() const {
+        if (_special) {
+          return std::numeric_limits<size_t>::max();
+        }
+        else {
+          wali::util::hash<value_type> hasher;
+          return hasher(_value);
+        }
+      }
+
+      virtual bool equal(Ptr other) const {
+        LiteralGuard * that = dynamic_cast<LiteralGuard*>(other.get_ptr());
+        if (this->_special && that->_special) {
+          // currently there is only one special value
+          assert (*this->_special == *that->_special);
+          return *this->_special == *that->_special;
+        }
+        if (!this->_special && !that->_special) {
+          return *this->_value == *that->_value;
+        }
+        return false;
+      }
+
+      virtual bool isFalse() const {
+        assert (!_special || *_special == SpecialFalse);
+        return _special;
+      }
+
+    private:
+      bool valid() const {
+        return (_special && !_value) || (!_special && _value);
+      }
+
+      enum Special { SpecialFalse };
+      boost::optional<value_type> _value;
+      boost::optional<Special> _special;
+    };
+    
+
     /// Represents a domain from a key to a weight.
     ///
     /// The "key" acts a bit like a guard, except that keys that are
