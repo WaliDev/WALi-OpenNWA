@@ -20,9 +20,9 @@ namespace wali
     public:
       typedef ref_ptr<Guard> Ptr;
 
-      virtual size_t hash() const;
-      virtual bool equal(Ptr other) const;
-      virtual bool isFalse() const;
+      virtual size_t hash() const = 0;
+      virtual bool equal(Ptr other) const = 0;
+      virtual bool isFalse() const = 0;
     };
 
     struct GuardRefPtrHash
@@ -68,7 +68,7 @@ namespace wali
         }
         else {
           wali::util::hash<value_type> hasher;
-          return hasher(_value);
+          return hasher(*_value);
         }
       }
 
@@ -88,6 +88,16 @@ namespace wali
       virtual bool isFalse() const {
         assert (!_special || *_special == SpecialFalse);
         return _special;
+      }
+
+      virtual std::ostream& print(std::ostream & os) const {
+        if (isFalse()) {
+          os << "[FALSE]";
+        }
+        else {
+          os << "[" << *_value << "]";
+        }
+        return os;
       }
 
     private:
