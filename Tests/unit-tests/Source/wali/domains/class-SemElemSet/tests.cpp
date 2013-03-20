@@ -2,7 +2,10 @@
 
 #include "wali/domains/SemElemSet.hpp"
 #include "wali/SemElemPair.hpp"
-#include "wali/ShortestPathSemiring.hpp"
+
+#include "fixtures/SimpleWeights.hpp"
+
+using testing::ShortestPathWeights;
 
 namespace wali {
     namespace domains {
@@ -58,7 +61,8 @@ namespace wali {
 
         TEST(wali$domains$SemElemSet$$SemElemSet, oneArgConstructorMakesZero)
         {
-            sem_elem_t ten = new ShortestPathSemiring(10);
+            ShortestPathWeights spw;
+            sem_elem_t ten = spw.d10;
             SemElemSet s(SemElemSet::KeepAllNonduplicates, true, ten);
             EXPECT_EQ(0u, s.getElements().size());
         }        
@@ -66,7 +70,8 @@ namespace wali {
         
         TEST(wali$domains$SemElemSet$$SemElemSet, twoArgConstructorRemembersElements)
         {
-            sem_elem_t ten = new ShortestPathSemiring(10);
+            ShortestPathWeights spw;
+            sem_elem_t ten = spw.d10;
             SemElemSet::ElementSet es;
             insert(es, ten);
             
@@ -79,7 +84,8 @@ namespace wali {
         
         TEST(wali$domains$SemElemSet$$SemElemSet, twoArgConstructorRemovesDuplicates)
         {
-            sem_elem_t ten = new ShortestPathSemiring(10);
+            ShortestPathWeights spw;
+            sem_elem_t ten = spw.d10;
             SemElemSet::ElementSet es;
             insert(es, ten);
             insert(es, ten);
@@ -93,7 +99,8 @@ namespace wali {
         
         TEST(wali$domains$SemElemSet$$SemElemSet, twoArgConstructorRemovesDuplicatesEvenIfTheyAreSeparateObjects)
         {
-            sem_elem_t ten1 = new ShortestPathSemiring(10);
+            ShortestPathWeights spw;
+            sem_elem_t ten1 = spw.d10;
             sem_elem_t ten2 = new ShortestPathSemiring(10);
             SemElemSet::ElementSet es;
             insert(es, ten1);
@@ -107,8 +114,9 @@ namespace wali {
         
         TEST(wali$domains$SemElemSet$$SemElemSet, twoArgConstructorDoesNotRemoveNonduplicates)
         {
-            sem_elem_t ten = new ShortestPathSemiring(10);
-            sem_elem_t twenty = new ShortestPathSemiring(20);
+            ShortestPathWeights spw;
+            sem_elem_t ten = spw.d10;
+            sem_elem_t twenty = spw.d20;
             SemElemSet::ElementSet es;
             insert(es, ten);
             insert(es, twenty);
@@ -121,7 +129,8 @@ namespace wali {
         
         TEST(wali$domains$SemElemSet$$zero, zeroProducesZero)
         {
-            sem_elem_t ten = new ShortestPathSemiring(10);
+            ShortestPathWeights spw;
+            sem_elem_t ten = spw.d10;
             SemElemSet::ElementSet es;
             insert(es, ten);
             SemElemSet s(SemElemSet::KeepAllNonduplicates, true, ten, es);
@@ -135,7 +144,8 @@ namespace wali {
         
         TEST(wali$domains$SemElemSet$$one, oneProducesOne)
         {
-            sem_elem_t ten = new ShortestPathSemiring(10);
+            ShortestPathWeights spw;
+            sem_elem_t ten = spw.d10;
             SemElemSet::ElementSet es;
             insert(es, ten);
             SemElemSet s(SemElemSet::KeepAllNonduplicates, true, ten, es);
@@ -151,7 +161,8 @@ namespace wali {
 
         TEST(wali$domains$SemElemSet$$various, waliSemElemTests)
         {
-            sem_elem_t ten = new ShortestPathSemiring(10);
+            ShortestPathWeights spw;
+            sem_elem_t ten = spw.d10;
             SemElemSet::ElementSet es;
             insert(es, ten);
             
@@ -162,9 +173,10 @@ namespace wali {
         
         TEST(wali$domains$SemElemSet$$combine, combineTakesUnion)
         {
-            sem_elem_t ten = new ShortestPathSemiring(10);
-            sem_elem_t twenty = new ShortestPathSemiring(20);
-            sem_elem_t thirty = new ShortestPathSemiring(30);
+            ShortestPathWeights spw;
+            sem_elem_t ten = spw.d10;
+            sem_elem_t twenty = spw.d20;
+            sem_elem_t thirty = spw.d30;
             SemElemSet::ElementSet es1, es2, all;
             insert(es1, ten);
             insert(es1, twenty);
@@ -186,9 +198,10 @@ namespace wali {
 
         TEST(wali$domains$SemElemSet$$combine, combineSetsHash)
         {
-            sem_elem_t ten = new ShortestPathSemiring(10);
-            sem_elem_t twenty = new ShortestPathSemiring(20);
-            sem_elem_t thirtyone = new ShortestPathSemiring(31);
+            ShortestPathWeights spw;
+            sem_elem_t ten = spw.d10;
+            sem_elem_t twenty = spw.d20;
+            sem_elem_t thirtyone = spw.d31;
             SemElemSet::ElementSet es1, es2;
             insert(es1, ten);
             insert(es1, twenty);
@@ -210,9 +223,10 @@ namespace wali {
 
         TEST(wali$domains$SemElemSet$$combine, combineWillNotDuplicateAnElementEvenIfTheyAreSeparateObjects)
         {
-            sem_elem_t ten1 = new ShortestPathSemiring(10);
+            ShortestPathWeights spw;
+            sem_elem_t ten1 = spw.d10;
             sem_elem_t ten2 = new ShortestPathSemiring(10);
-            sem_elem_t thirty = new ShortestPathSemiring(30);
+            sem_elem_t thirty = spw.d30;
             SemElemSet::ElementSet es1, es2, all;
             insert(es1, ten1);
             insert(es2, thirty);
@@ -232,15 +246,16 @@ namespace wali {
         
         TEST(wali$domains$SemElemSet$$extend, extendTakesPairwiseExtend)
         {
+            ShortestPathWeights spw;
             sem_elem_t
-                one        = new ShortestPathSemiring( 1),
-                two        = new ShortestPathSemiring( 2),
-                ten        = new ShortestPathSemiring(10),
-                eleven     = new ShortestPathSemiring(11),
-                twelve     = new ShortestPathSemiring(12),
-                twenty     = new ShortestPathSemiring(20),
-                twenty_one = new ShortestPathSemiring(21),
-                twenty_two = new ShortestPathSemiring(22);
+                one        = spw.d1,
+                two        = spw.d2,
+                ten        = spw.d10,
+                eleven     = spw.d11,
+                twelve     = spw.d12,
+                twenty     = spw.d20,
+                twenty_one = spw.d21,
+                twenty_two = spw.d22;
             
             SemElemSet::ElementSet es1, es2;
             insert(es1, one);
@@ -265,13 +280,14 @@ namespace wali {
 
         TEST(wali$domains$SemElemSet$$extend, extendDoesNotDuplicateElementsEvenIfTheyAreSeparateObjects)
         {
+            ShortestPathWeights spw;
             sem_elem_t
-                ten    = new ShortestPathSemiring(10),
-                twenty = new ShortestPathSemiring(20),
-                thirty = new ShortestPathSemiring(30),
-                fourty = new ShortestPathSemiring(40),
-                fifty  = new ShortestPathSemiring(50),
-                sixty  = new ShortestPathSemiring(60);
+                ten    = spw.d10,
+                twenty = spw.d20,
+                thirty = spw.d30,
+                fourty = spw.d40,
+                fifty  = spw.d50,
+                sixty  = spw.d60;
             
             SemElemSet::ElementSet es1, es2;
             insert(es1, ten);
@@ -295,11 +311,12 @@ namespace wali {
 
         TEST(wali$domains$SemElemSet$$equal, differentSetsAreUnequal)
         {
+            ShortestPathWeights spw;
             sem_elem_t
-                ten    = new ShortestPathSemiring(10),
-                twenty = new ShortestPathSemiring(20),
-                thirty = new ShortestPathSemiring(30),
-                fourty = new ShortestPathSemiring(40);
+                ten    = spw.d10,
+                twenty = spw.d20,
+                thirty = spw.d30,
+                fourty = spw.d40;
             
             SemElemSet::ElementSet es1, es2;
             insert(es1, ten);
@@ -316,9 +333,10 @@ namespace wali {
         
         TEST(wali$domains$SemElemSet$$equal, equalityIsOrderIndependent)
         {
+            ShortestPathWeights spw;
             sem_elem_t
-                ten    = new ShortestPathSemiring(10),
-                twenty = new ShortestPathSemiring(20);
+                ten    = spw.d10,
+                twenty = spw.d20;
             
             SemElemSet::ElementSet es1, es2;
             insert(es1, ten);
@@ -335,8 +353,9 @@ namespace wali {
 
         TEST(wali$domains$SemElemSet$$equal, equalElementsAreEqualEvenIfTheyAreSeparateObjects)
         {
+            ShortestPathWeights spw;
             sem_elem_t
-                ten1 = new ShortestPathSemiring(10),
+                ten1 = spw.d10,
                 ten2 = new ShortestPathSemiring(10);
             
             SemElemSet::ElementSet es1, es2;
@@ -352,9 +371,10 @@ namespace wali {
 
         TEST(wali$domains$SemElemSet, subsumedElementIsRemovedDuringCombine)
         {
+            ShortestPathWeights spw;
             sem_elem_t
-                two = new ShortestPathSemiring(2),
-                ten = new ShortestPathSemiring(10);
+                two = spw.d2,
+                ten = spw.d10;
 
             SemElemSet::ElementSet two_set, ten_set;
             insert(two_set, two);
@@ -394,9 +414,10 @@ namespace wali {
             // ordered.)
 
             // So here we set up the ELEMENTS
+            ShortestPathWeights spw;
             sem_elem_t
-                two = new ShortestPathSemiring(2),
-                six = new ShortestPathSemiring(6);
+                two = spw.d2,
+                six = spw.d6;
 
             SemElemSet::ElementSet empty_set, two_set, six_set, two_six_set;;
             insert(two_set, two);
@@ -550,9 +571,10 @@ namespace wali {
             // ordered.)
 
             // So here we set up the ROOT ELEMENTS
+            ShortestPathWeights spw;
             sem_elem_t
-                sp_two = new ShortestPathSemiring(2),
-                sp_six = new ShortestPathSemiring(6);
+                sp_two = spw.d2,
+                sp_six = spw.d6;
 
             SemElemSet::ElementSet empty_set, two_set, six_set, two_six_set;;
             insert(two_set, sp_two);

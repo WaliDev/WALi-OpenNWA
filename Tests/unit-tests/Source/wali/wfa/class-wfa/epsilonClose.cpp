@@ -1,11 +1,12 @@
 #include "gtest/gtest.h"
 #include "wali/wfa/WFA.hpp"
-#include "wali/ShortestPathSemiring.hpp"
 #include "wali/LongestSaturatingPathSemiring.hpp"
 #include "wali/domains/binrel/ProgramBddContext.hpp"
 #include "wali/domains/binrel/BinRel.hpp"
 
 #include "fixtures.hpp"
+
+#include "fixtures/SimpleWeights.hpp"
 
 namespace wali {
     namespace wfa {
@@ -227,8 +228,9 @@ namespace wali {
         {
             //     eps(d2)
             // -->o-------->(o)
-            sem_elem_t distance_zero = new ShortestPathSemiring(0);
-            sem_elem_t distance_two = new ShortestPathSemiring(2);
+            testing::ShortestPathWeights spw;
+            sem_elem_t distance_zero = spw.d0;
+            sem_elem_t distance_two =  spw.d2;
 
             // Create the automaton
             Key start = getKey("start");
@@ -265,9 +267,10 @@ namespace wali {
         {
             //     eps(d1)   eps(d2)
             // -->o-------->o------->(o)
-            sem_elem_t distance_zero = new ShortestPathSemiring(0);
-            sem_elem_t distance_one = new ShortestPathSemiring(1);
-            sem_elem_t distance_two = new ShortestPathSemiring(2);
+            testing::ShortestPathWeights spw;
+            sem_elem_t distance_zero = spw.d0;
+            sem_elem_t distance_one =  spw.d1;
+            sem_elem_t distance_two =  spw.d2;
 
             // Create the automaton
             Key start = getKey("start");
@@ -323,11 +326,12 @@ namespace wali {
             //    |                   |
             //    \-------->D---------/
             //        1        1
-            sem_elem_t distance_zero = new ShortestPathSemiring(0);
-            sem_elem_t distance_one = new ShortestPathSemiring(1);
-            sem_elem_t distance_two = new ShortestPathSemiring(2);
-            sem_elem_t distance_three = new ShortestPathSemiring(3);
-            sem_elem_t distance_ten = new ShortestPathSemiring(10);
+            testing::ShortestPathWeights spw;
+            sem_elem_t distance_zero =  spw.d0;
+            sem_elem_t distance_one =   spw.d1;
+            sem_elem_t distance_two =   spw.d2;
+            sem_elem_t distance_three = spw.d3;
+            sem_elem_t distance_ten =   spw.d10;
 
             // Create the automaton
             Key A = getKey("A");
