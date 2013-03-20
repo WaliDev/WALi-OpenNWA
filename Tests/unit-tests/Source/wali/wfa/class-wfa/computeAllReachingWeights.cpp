@@ -1,15 +1,16 @@
 #include "gtest/gtest.h"
 #include "wali/wfa/WFA.hpp"
-#include "wali/ShortestPathSemiring.hpp"
 #include "wali/LongestSaturatingPathSemiring.hpp"
 #include "wali/domains/binrel/ProgramBddContext.hpp"
 #include "wali/domains/binrel/BinRel.hpp"
 #include "wali/domains/SemElemSet.hpp"
 
 #include "fixtures.hpp"
+#include "fixtures/SimpleWeights.hpp"
 
 using wali::domains::SemElemSet;
 using wali::sem_elem_t;
+using testing::ShortestPathWeights;
 
 namespace {
     bool
@@ -114,8 +115,8 @@ namespace wali {
         TEST(wali$wfa$WFA$$computeAllReachingWeights, oneStateAutomatonReachedWithWeightOne)
         {
             Key start = getKey("start");
-            sem_elem_t zero = new ShortestPathSemiring(0);
-            zero = zero->zero(); // make the name correct
+            ShortestPathWeights spw;
+            sem_elem_t zero = spw.semiring_zero;
 
             WFA wfa;
             wfa.addState(start, zero);
@@ -133,8 +134,8 @@ namespace wali {
         TEST(wali$wfa$WFA$$computeAllReachingWeights, unreachableStatesAreUnreachable)
         {
             Key start = getKey("start"), other = getKey("other");
-            sem_elem_t zero = new ShortestPathSemiring(0);
-            zero = zero->zero(); // make the name correct
+            ShortestPathWeights spw;
+            sem_elem_t zero = spw.semiring_zero;
 
             WFA wfa;
             wfa.addState(start, zero);
@@ -153,8 +154,8 @@ namespace wali {
         TEST(wali$wfa$WFA$$computeAllReachingWeights, statesReachableWithWeightZeroAreNotReachableWithWeightZero)
         {
             Key start = getKey("start"), other = getKey("other"), sym = getKey("sym");
-            sem_elem_t zero = new ShortestPathSemiring(0);
-            zero = zero->zero(); // make the name correct
+            ShortestPathWeights spw;
+            sem_elem_t zero = spw.semiring_zero;
 
             WFA wfa;
             wfa.addState(start, zero);
@@ -176,8 +177,8 @@ namespace wali {
         TEST(wali$wfa$WFA$$computeAllReachingWeights, statesReachableWithWeightZeroAreReachableWithWeightZero)
         {
             Key start = getKey("start"), other = getKey("other"), sym = getKey("sym");
-            sem_elem_t zero = new ShortestPathSemiring(0);
-            zero = zero->zero(); // make the name correct
+            ShortestPathWeights spw;
+            sem_elem_t zero = spw.d0;
 
             WFA wfa;
             wfa.addState(start, zero);
@@ -199,8 +200,9 @@ namespace wali {
         TEST(wali$wfa$WFA$$computeAllReachingWeights, singleTransitionToOther)
         {
             Key start = getKey("start"), other = getKey("other"), sym = getKey("sym");
-            sem_elem_t zero = new ShortestPathSemiring(0);
-            sem_elem_t distance_one = new ShortestPathSemiring(1);
+            ShortestPathWeights spw;
+            sem_elem_t zero = spw.semiring_zero;
+            sem_elem_t distance_one = spw.d1;
             zero = zero->zero(); // make the name correct
 
             WFA wfa;
@@ -222,9 +224,10 @@ namespace wali {
         TEST(wali$wfa$WFA$$computeAllReachingWeights, veeThenCombine)
         {
             Key start = getKey("start"), other = getKey("other"), final = getKey("final"), sym = getKey("sym");
-            sem_elem_t zero = new ShortestPathSemiring(0);
-            sem_elem_t distance_one = new ShortestPathSemiring(1);
-            sem_elem_t distance_two = new ShortestPathSemiring(2);
+            ShortestPathWeights spw;
+            sem_elem_t zero = spw.semiring_zero;
+            sem_elem_t distance_one = spw.d1;
+            sem_elem_t distance_two = spw.d2;
             zero = zero->zero(); // make the name correct
 
             //   start ------------------------> final
