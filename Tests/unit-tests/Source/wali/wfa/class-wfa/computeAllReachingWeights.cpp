@@ -13,6 +13,10 @@ using wali::sem_elem_t;
 using testing::ShortestPathWeights;
 
 namespace {
+    testing::ShortestPathWeights sh_distance;
+}
+
+namespace {
     bool
     is_present(SemElemSet::ElementSet const & set, sem_elem_t goal)
     {
@@ -115,15 +119,13 @@ namespace wali {
         TEST(wali$wfa$WFA$$computeAllReachingWeights, oneStateAutomatonReachedWithWeightOne)
         {
             Key start = getKey("start");
-            ShortestPathWeights spw;
-            sem_elem_t zero = spw.semiring_zero;
 
             WFA wfa;
-            wfa.addState(start, zero);
+            wfa.addState(start, sh_distance.semiring_zero);
             wfa.setInitialState(start);
 
             WFA::AccessibleStateSetMap expected;
-            expected[start] = make_vector(zero->one());
+            expected[start] = make_vector(sh_distance.semiring_zero->one());
 
             WFA::AccessibleStateSetMap reachable = wfa.computeAllReachingWeights();
 
@@ -134,16 +136,14 @@ namespace wali {
         TEST(wali$wfa$WFA$$computeAllReachingWeights, unreachableStatesAreUnreachable)
         {
             Key start = getKey("start"), other = getKey("other");
-            ShortestPathWeights spw;
-            sem_elem_t zero = spw.semiring_zero;
 
             WFA wfa;
-            wfa.addState(start, zero);
-            wfa.addState(other, zero);
+            wfa.addState(start, sh_distance.semiring_zero);
+            wfa.addState(other, sh_distance.semiring_zero);
             wfa.setInitialState(start);
 
             WFA::AccessibleStateSetMap expected;
-            expected[start] = make_vector(zero->one());
+            expected[start] = make_vector(sh_distance.semiring_zero->one());
 
             WFA::AccessibleStateSetMap reachable = wfa.computeAllReachingWeights();
 
@@ -154,17 +154,15 @@ namespace wali {
         TEST(wali$wfa$WFA$$computeAllReachingWeights, statesReachableWithWeightZeroAreNotReachableWithWeightZero)
         {
             Key start = getKey("start"), other = getKey("other"), sym = getKey("sym");
-            ShortestPathWeights spw;
-            sem_elem_t zero = spw.semiring_zero;
 
             WFA wfa;
-            wfa.addState(start, zero);
-            wfa.addState(other, zero);
+            wfa.addState(start, sh_distance.semiring_zero);
+            wfa.addState(other, sh_distance.semiring_zero);
             wfa.setInitialState(start);
-            wfa.addTrans(start, sym, other, zero);
+            wfa.addTrans(start, sym, other, sh_distance.semiring_zero);
 
             WFA::AccessibleStateSetMap expected;
-            expected[start] = make_vector(zero->one());
+            expected[start] = make_vector(sh_distance.semiring_zero->one());
 
             WFA::AccessibleStateSetMap reachable1 = wfa.computeAllReachingWeights(SemElemSet::KeepAllNonduplicates,
                                                                                   false);
@@ -177,18 +175,16 @@ namespace wali {
         TEST(wali$wfa$WFA$$computeAllReachingWeights, statesReachableWithWeightZeroAreReachableWithWeightZero)
         {
             Key start = getKey("start"), other = getKey("other"), sym = getKey("sym");
-            ShortestPathWeights spw;
-            sem_elem_t zero = spw.d0;
 
             WFA wfa;
-            wfa.addState(start, zero);
-            wfa.addState(other, zero);
+            wfa.addState(start, sh_distance.d0);
+            wfa.addState(other, sh_distance.d0);
             wfa.setInitialState(start);
-            wfa.addTrans(start, sym, other, zero);
+            wfa.addTrans(start, sym, other, sh_distance.d0);
 
             WFA::AccessibleStateSetMap expected;
-            expected[start] = make_vector(zero->one());
-            expected[other] = make_vector(zero);
+            expected[start] = make_vector(sh_distance.d0->one());
+            expected[other] = make_vector(sh_distance.d0);
 
             WFA::AccessibleStateSetMap reachable = wfa.computeAllReachingWeights(SemElemSet::KeepAllNonduplicates,
                                                                                  true);
@@ -200,20 +196,16 @@ namespace wali {
         TEST(wali$wfa$WFA$$computeAllReachingWeights, singleTransitionToOther)
         {
             Key start = getKey("start"), other = getKey("other"), sym = getKey("sym");
-            ShortestPathWeights spw;
-            sem_elem_t zero = spw.semiring_zero;
-            sem_elem_t distance_one = spw.d1;
-            zero = zero->zero(); // make the name correct
 
             WFA wfa;
-            wfa.addState(start, zero);
-            wfa.addState(other, zero);
+            wfa.addState(start, sh_distance.semiring_zero);
+            wfa.addState(other, sh_distance.semiring_zero);
             wfa.setInitialState(start);
-            wfa.addTrans(start, sym, other, distance_one);
+            wfa.addTrans(start, sym, other, sh_distance.d1);
 
             WFA::AccessibleStateSetMap expected;
-            expected[start] = make_vector(zero->one());
-            expected[other] = make_vector(distance_one);
+            expected[start] = make_vector(sh_distance.semiring_zero->one());
+            expected[other] = make_vector(sh_distance.d1);
 
             WFA::AccessibleStateSetMap reachable = wfa.computeAllReachingWeights();
 
@@ -224,27 +216,22 @@ namespace wali {
         TEST(wali$wfa$WFA$$computeAllReachingWeights, veeThenCombine)
         {
             Key start = getKey("start"), other = getKey("other"), final = getKey("final"), sym = getKey("sym");
-            ShortestPathWeights spw;
-            sem_elem_t zero = spw.semiring_zero;
-            sem_elem_t distance_one = spw.d1;
-            sem_elem_t distance_two = spw.d2;
-            zero = zero->zero(); // make the name correct
 
             //   start ------------------------> final
             //     |                              /\         [anti multi-line comment]
             //     +-----------> other -----------+
             WFA wfa;
-            wfa.addState(start, zero);
-            wfa.addState(other, zero);
+            wfa.addState(start, sh_distance.semiring_zero);
+            wfa.addState(other, sh_distance.semiring_zero);
             wfa.setInitialState(start);
-            wfa.addTrans(start, sym, final, distance_one);
-            wfa.addTrans(start, sym, other, distance_one);
-            wfa.addTrans(other, sym, final, distance_one);
+            wfa.addTrans(start, sym, final, sh_distance.d1);
+            wfa.addTrans(start, sym, other, sh_distance.d1);
+            wfa.addTrans(other, sym, final, sh_distance.d1);
 
             WFA::AccessibleStateSetMap expected;
-            expected[start] = make_vector(zero->one());
-            expected[other] = make_vector(distance_one);
-            expected[final] = make_vector(distance_one, distance_two);
+            expected[start] = make_vector(sh_distance.semiring_zero->one());
+            expected[other] = make_vector(sh_distance.d1);
+            expected[final] = make_vector(sh_distance.d1, sh_distance.d2);
 
             WFA::AccessibleStateSetMap reachable = wfa.computeAllReachingWeights();
 

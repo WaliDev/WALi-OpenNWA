@@ -8,6 +8,10 @@
 
 #include "fixtures/SimpleWeights.hpp"
 
+namespace {
+    testing::ShortestPathWeights sh_distance;
+}
+
 namespace wali {
     namespace wfa {
 
@@ -228,9 +232,6 @@ namespace wali {
         {
             //     eps(d2)
             // -->o-------->(o)
-            testing::ShortestPathWeights spw;
-            sem_elem_t distance_zero = spw.d0;
-            sem_elem_t distance_two =  spw.d2;
 
             // Create the automaton
             Key start = getKey("start");
@@ -238,17 +239,17 @@ namespace wali {
 
             WFA wfa;
 
-            wfa.addState(start, distance_zero);
-            wfa.addState(accept, distance_zero);
+            wfa.addState(start, sh_distance.d0);
+            wfa.addState(accept, sh_distance.d0);
 
             wfa.setInitialState(start);
             wfa.addFinalState(accept);
 
-            wfa.addTrans(start, WALI_EPSILON, accept, distance_two);
+            wfa.addTrans(start, WALI_EPSILON, accept, sh_distance.d2);
 
             // Create the queries
             WFA::AccessibleStateMap start_zero, start_ten;
-            start_zero[start] = distance_zero;
+            start_zero[start] = sh_distance.d0;
 
             // Issue queries
             WFA::AccessibleStateMap end_from_zero = checkedEpsilonClose(wfa, start);
@@ -267,10 +268,6 @@ namespace wali {
         {
             //     eps(d1)   eps(d2)
             // -->o-------->o------->(o)
-            testing::ShortestPathWeights spw;
-            sem_elem_t distance_zero = spw.d0;
-            sem_elem_t distance_one =  spw.d1;
-            sem_elem_t distance_two =  spw.d2;
 
             // Create the automaton
             Key start = getKey("start");
@@ -279,19 +276,19 @@ namespace wali {
 
             WFA wfa;
 
-            wfa.addState(start, distance_zero);
-            wfa.addState(middle, distance_zero);
-            wfa.addState(accept, distance_zero);
+            wfa.addState(start, sh_distance.d0);
+            wfa.addState(middle, sh_distance.d0);
+            wfa.addState(accept, sh_distance.d0);
 
             wfa.setInitialState(start);
             wfa.addFinalState(accept);
 
-            wfa.addTrans(start, WALI_EPSILON, middle, distance_one);
-            wfa.addTrans(middle, WALI_EPSILON, accept, distance_two);
+            wfa.addTrans(start, WALI_EPSILON, middle, sh_distance.d1);
+            wfa.addTrans(middle, WALI_EPSILON, accept, sh_distance.d2);
 
             // Create the queries
             WFA::AccessibleStateMap start_zero, start_ten;
-            start_zero[start] = distance_zero;
+            start_zero[start] = sh_distance.d0;
 
             // Issue queries
             WFA::AccessibleStateMap end_from_zero = checkedEpsilonClose(wfa, start);
@@ -326,12 +323,6 @@ namespace wali {
             //    |                   |
             //    \-------->D---------/
             //        1        1
-            testing::ShortestPathWeights spw;
-            sem_elem_t distance_zero =  spw.d0;
-            sem_elem_t distance_one =   spw.d1;
-            sem_elem_t distance_two =   spw.d2;
-            sem_elem_t distance_three = spw.d3;
-            sem_elem_t distance_ten =   spw.d10;
 
             // Create the automaton
             Key A = getKey("A");
@@ -351,24 +342,24 @@ namespace wali {
             
             WFA wfa;
 
-            wfa.addState(A, distance_zero);
-            wfa.addState(B, distance_zero);
-            wfa.addState(C, distance_zero);
-            wfa.addState(D, distance_zero);
-            wfa.addState(E, distance_zero);
+            wfa.addState(A, sh_distance.d0);
+            wfa.addState(B, sh_distance.d0);
+            wfa.addState(C, sh_distance.d0);
+            wfa.addState(D, sh_distance.d0);
+            wfa.addState(E, sh_distance.d0);
 
             wfa.setInitialState(A);
             wfa.addFinalState(E);
 
-            wfa.addTrans(A, WALI_EPSILON, B, distance_one);
-            wfa.addTrans(A, WALI_EPSILON, D, distance_one);            
-            wfa.addTrans(B, WALI_EPSILON, C, distance_ten);
-            wfa.addTrans(D, WALI_EPSILON, C, distance_one);
-            wfa.addTrans(C, WALI_EPSILON, E, distance_one);
+            wfa.addTrans(A, WALI_EPSILON, B, sh_distance.d1);
+            wfa.addTrans(A, WALI_EPSILON, D, sh_distance.d1);            
+            wfa.addTrans(B, WALI_EPSILON, C, sh_distance.d10);
+            wfa.addTrans(D, WALI_EPSILON, C, sh_distance.d1);
+            wfa.addTrans(C, WALI_EPSILON, E, sh_distance.d1);
 
             // Create the queries
             WFA::AccessibleStateMap start_zero;
-            start_zero[A] = distance_zero;
+            start_zero[A] = sh_distance.d0;
 
             // Issue queries
             WFA::AccessibleStateMap end_from_zero = checkedEpsilonClose(wfa, A);
