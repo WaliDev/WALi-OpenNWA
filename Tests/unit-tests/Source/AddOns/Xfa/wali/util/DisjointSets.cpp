@@ -214,6 +214,113 @@ namespace wali {
             EXPECT_TRUE(disjoint_sets_equal_matrix(expected1, sets1));
             EXPECT_TRUE(disjoint_sets_equal_matrix(expected2, sets2));
         }
+
+
+        TEST(wali$util$operatorEquals, EmptyEqualsEmpty)
+        {
+            StringSets empty;
+            EXPECT_EQ(empty, empty);
+        }
+
+
+        TEST(wali$util$operatorEquals, SelfEqualsSelf)
+        {
+            StringSets set;
+            set.insert("a");
+            set.insert("b");
+            set.insert("c");
+            set.merge_sets("a", "b");
+
+            EXPECT_EQ(set, set);
+        }
+        
+
+        TEST(wali$util$operatorEquals, SelfEqualsCopyOfSelf)
+        {
+            StringSets set1;
+            set1.insert("a");
+            set1.insert("b");
+            set1.insert("c");
+            set1.merge_sets("a", "b");
+
+            StringSets set2 = set1;
+
+            EXPECT_EQ(set1, set2);
+        }
+
+
+        TEST(wali$util$operatorEquals, EqualityIsIndependentOfInsertionOrder)
+        {
+            StringSets set1, set2;
+            set1.insert("a");
+            set1.insert("b");
+            set1.insert("c");
+            set1.merge_sets("a", "b");
+
+            set2.insert("b");
+            set2.insert("c");
+            set2.insert("a");
+            set2.merge_sets("a", "b");
+            
+            EXPECT_EQ(set1, set2);
+        }
+        
+
+        TEST(wali$util$operatorEquals, DifferentNumberOfElementsAreUnequal)
+        {
+            StringSets set1, set2;
+            set1.insert("a");
+            set1.insert("b");
+            set1.insert("c");
+            set1.insert("d");
+            set1.merge_sets("a", "b");
+            set1.merge_sets("c", "d");
+
+            set2.insert("b");
+            set2.insert("c");
+            set2.insert("a");
+            set2.merge_sets("a", "b");
+            
+            EXPECT_NE(set1, set2);
+            EXPECT_NE(set2, set1);
+        }
+
+
+        TEST(wali$util$operatorEquals, DifferentSetsAreUnequal)
+        {
+            StringSets set1, set2;
+            set1.insert("a");
+            set1.insert("b");
+            set1.insert("c");
+            set1.merge_sets("a", "b");
+ 
+            set2.insert("b");
+            set2.insert("c");
+            set2.insert("a");
+            set2.merge_sets("b", "c");
+            
+            EXPECT_NE(set1, set2);
+            EXPECT_NE(set2, set1);
+        }
+
+
+        TEST(wali$util$operatorEquals, RefinementsAreUnequal)
+        {
+            StringSets set1, set2;
+            set1.insert("a");
+            set1.insert("b");
+            set1.insert("c");
+ 
+            set2.insert("b");
+            set2.insert("c");
+            set2.insert("a");
+            set2.merge_sets("b", "c");
+            
+            EXPECT_NE(set1, set2);
+            EXPECT_NE(set2, set1);
+        }
+        
+        
     }
 }
 
