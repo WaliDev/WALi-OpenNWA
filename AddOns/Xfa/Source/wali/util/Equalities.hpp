@@ -38,7 +38,7 @@ namespace wali {
       {}
 
       bool valid() const {
-        if (special_) {
+        if (_special) {
           return !_equalities && !_disequalities;
         }
         else {
@@ -54,12 +54,12 @@ namespace wali {
 
       bool isZero() const {
         assert(valid());
-        return special_ && *special_ == SpecialZero;
+        return _special && *_special == SpecialZero;
       }
 
       bool isOne() const {
         assert(valid());
-        return special_ && *special_ == SpecialOne;
+        return _special && *_special == SpecialOne;
       }
 
       sem_elem_t
@@ -76,7 +76,7 @@ namespace wali {
 
       sem_elem_t
       extend(SemElem * other) {
-        Equalities * that = dynamic_cast<SemElem*>(other);
+        Equalities * that = dynamic_cast<Equalities*>(other);
         if (this->isOne()) {
           assert(that->count > 0);
           return that;
@@ -94,7 +94,7 @@ namespace wali {
 
       sem_elem_t
       combine(SemElem * other) {
-        Equalities * that = dynamic_cast<SemElem*>(other);
+        Equalities * that = dynamic_cast<Equalities*>(other);
         if (this->isZero()) {
           assert(that->count > 0);
           return that;
