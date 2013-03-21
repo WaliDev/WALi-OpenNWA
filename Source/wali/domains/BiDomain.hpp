@@ -1,20 +1,24 @@
 #ifndef WALI_DOMAINS_BIDOMAIN_HPP
 #define WALI_DOMAINS_BIDOMAIN_HPP
 
+#include <ostream>
+#include <boost/function.hpp>
+#include "wali/SemElem.hpp"
+
 namespace wali {
   namespace domains {
 
-    template<typename RuleSemElem,
-             typename TransSemElem>
+    template<typename RuleSemElem_,
+             typename TransSemElem_>
     class BiDomain
       : public wali::SemElem
     {
     public:
 
-      typedef RuleSemElem RuleSemElem;
-      typedef TransSemElem WfaSemElem;
+      typedef RuleSemElem_ RuleSemElem;
+      typedef TransSemElem_ WfaSemElem;
 
-      typedef boost::function<ref_ptr<WfaSemElem>(TransSemElem *, RuleSemElem *)>
+      typedef boost::function<ref_ptr<WfaSemElem>(WfaSemElem *, RuleSemElem *)>
               ExtendFunction;
 
       BiDomain(ExtendFunction extend, sem_elem_t val)
@@ -48,13 +52,13 @@ namespace wali {
       }
 
       virtual bool equal( SemElem * se ) const {
-        BiDomain * that = dynamic_cast<BiDomain*>(other);
+        BiDomain * that = dynamic_cast<BiDomain*>(se);
         assert(that);
         return this->_value->equal(that->_value);
       }
 
-      virtual bool underApproximates(SemElem * that) {
-        BiDomain * that = dynamic_cast<BiDomain*>(other);
+      virtual bool underApproximates(SemElem * se) {
+        BiDomain * that = dynamic_cast<BiDomain*>(se);
         assert(that);
         return this->_value->underApproximates(that->_value);
       }
@@ -63,8 +67,8 @@ namespace wali {
         return _value->print(o);
       }
       
-      virtual bool containerLessThan(SemElem * that) {
-        BiDomain * that = dynamic_cast<BiDomain*>(other);
+      virtual bool containerLessThan(SemElem * se) {
+        BiDomain * that = dynamic_cast<BiDomain*>(se);
         assert(that);
         return this->_value->containerLessThan(that->_value);
       }
