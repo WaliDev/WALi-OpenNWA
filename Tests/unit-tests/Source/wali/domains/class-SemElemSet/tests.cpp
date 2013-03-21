@@ -5,11 +5,7 @@
 
 #include "fixtures/SimpleWeights.hpp"
 
-using testing::ShortestPathWeights;
-
-namespace {
-    testing::ShortestPathWeights sh_distance;
-}
+namespace sh_distance = testing::ShortestPathWeights;
 
 namespace wali {
     namespace domains {
@@ -65,7 +61,7 @@ namespace wali {
 
         TEST(wali$domains$SemElemSet$$SemElemSet, oneArgConstructorMakesZero)
         {
-            SemElemSet s(SemElemSet::KeepAllNonduplicates, true, sh_distance.d10);
+            SemElemSet s(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist10);
             EXPECT_EQ(0u, s.getElements().size());
         }        
 
@@ -73,9 +69,9 @@ namespace wali {
         TEST(wali$domains$SemElemSet$$SemElemSet, twoArgConstructorRemembersElements)
         {
             SemElemSet::ElementSet es;
-            insert(es, sh_distance.d10);
+            insert(es, sh_distance::dist10);
             
-            SemElemSet s(SemElemSet::KeepAllNonduplicates, true, sh_distance.d10, es);
+            SemElemSet s(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist10, es);
             //EXPECT_EQ(es, s.getElements());
             EXPECT_EQ(1u, s.getElements().size());
         }    
@@ -85,20 +81,19 @@ namespace wali {
         TEST(wali$domains$SemElemSet$$SemElemSet, twoArgConstructorRemovesDuplicates)
         {
             SemElemSet::ElementSet es;
-            insert(es, sh_distance.d10);
-            insert(es, sh_distance.d10);
+            insert(es, sh_distance::dist10);
+            insert(es, sh_distance::dist10);
             
-            SemElemSet s(SemElemSet::KeepAllNonduplicates, true, sh_distance.d10, es);
+            SemElemSet s(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist10, es);
             ASSERT_EQ(1u, s.getElements().size());
-            //EXPECT_EQ(sh_distance.d10, s.getElements()[0]);
-            EXPECT_CONTAINS(s.getElements(), sh_distance.d10);
+            //EXPECT_EQ(sh_distance::dist10, s.getElements()[0]);
+            EXPECT_CONTAINS(s.getElements(), sh_distance::dist10);
         }    
 
         
         TEST(wali$domains$SemElemSet$$SemElemSet, twoArgConstructorRemovesDuplicatesEvenIfTheyAreSeparateObjects)
         {
-            ShortestPathWeights spw;
-            sem_elem_t ten1 = spw.d10;
+            sem_elem_t ten1 = sh_distance::dist10;
             sem_elem_t ten2 = new ShortestPathSemiring(10);
             SemElemSet::ElementSet es;
             insert(es, ten1);
@@ -113,10 +108,10 @@ namespace wali {
         TEST(wali$domains$SemElemSet$$SemElemSet, twoArgConstructorDoesNotRemoveNonduplicates)
         {
             SemElemSet::ElementSet es;
-            insert(es, sh_distance.d10);
-            insert(es, sh_distance.d20);
+            insert(es, sh_distance::dist10);
+            insert(es, sh_distance::dist20);
             
-            SemElemSet s(SemElemSet::KeepAllNonduplicates, true, sh_distance.d10, es);
+            SemElemSet s(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist10, es);
             //EXPECT_EQ(es, s.getElements());
             EXPECT_EQ(2u, s.getElements().size());
         }    
@@ -125,8 +120,8 @@ namespace wali {
         TEST(wali$domains$SemElemSet$$zero, zeroProducesZero)
         {
             SemElemSet::ElementSet es;
-            insert(es, sh_distance.d10);
-            SemElemSet s(SemElemSet::KeepAllNonduplicates, true, sh_distance.d10, es);
+            insert(es, sh_distance::dist10);
+            SemElemSet s(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist10, es);
 
             sem_elem_t zero_se = s.zero();
             SemElemSet * zero_down = dynamic_cast<SemElemSet *>(zero_se.get_ptr());
@@ -138,24 +133,24 @@ namespace wali {
         TEST(wali$domains$SemElemSet$$one, oneProducesOne)
         {
             SemElemSet::ElementSet es;
-            insert(es, sh_distance.d10);
-            SemElemSet s(SemElemSet::KeepAllNonduplicates, true, sh_distance.d10, es);
+            insert(es, sh_distance::dist10);
+            SemElemSet s(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist10, es);
 
             sem_elem_t one_se = s.one();
             SemElemSet * one_down = dynamic_cast<SemElemSet *>(one_se.get_ptr());
             
             EXPECT_EQ(1u, one_down->getElements().size());
             EXPECT_TRUE((*one_down->getElements().begin())
-                        ->equal(sh_distance.d10->one()));
+                        ->equal(sh_distance::dist10->one()));
         }
 
 
         TEST(wali$domains$SemElemSet$$various, waliSemElemTests)
         {
             SemElemSet::ElementSet es;
-            insert(es, sh_distance.d10);
+            insert(es, sh_distance::dist10);
             
-            sem_elem_t interesting_value = new SemElemSet(SemElemSet::KeepAllNonduplicates, true, sh_distance.d10, es);
+            sem_elem_t interesting_value = new SemElemSet(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist10, es);
             test_semelem_impl(interesting_value);
         }
 
@@ -163,15 +158,15 @@ namespace wali {
         TEST(wali$domains$SemElemSet$$combine, combineTakesUnion)
         {
             SemElemSet::ElementSet es1, es2, all;
-            insert(es1, sh_distance.d10);
-            insert(es1, sh_distance.d20);
-            insert(es2, sh_distance.d30);
-            insert(all, sh_distance.d10);
-            insert(all, sh_distance.d20);
-            insert(all, sh_distance.d30);
+            insert(es1, sh_distance::dist10);
+            insert(es1, sh_distance::dist20);
+            insert(es2, sh_distance::dist30);
+            insert(all, sh_distance::dist10);
+            insert(all, sh_distance::dist20);
+            insert(all, sh_distance::dist30);
             
-            SemElemSet s1(SemElemSet::KeepAllNonduplicates, true, sh_distance.d10, es1);
-            SemElemSet s2(SemElemSet::KeepAllNonduplicates, true, sh_distance.d30, es2);
+            SemElemSet s1(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist10, es1);
+            SemElemSet s2(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist30, es2);
 
             sem_elem_t answer = s1.combine(&s2);
             SemElemSet * answer_down = dynamic_cast<SemElemSet *>(answer.get_ptr());
@@ -184,12 +179,12 @@ namespace wali {
         TEST(wali$domains$SemElemSet$$combine, combineSetsHash)
         {
             SemElemSet::ElementSet es1, es2;
-            insert(es1, sh_distance.d10);
-            insert(es1, sh_distance.d20);
-            insert(es2, sh_distance.d31);
+            insert(es1, sh_distance::dist10);
+            insert(es1, sh_distance::dist20);
+            insert(es2, sh_distance::dist31);
             
-            SemElemSet s1(SemElemSet::KeepAllNonduplicates, true, sh_distance.d10, es1);
-            SemElemSet s2(SemElemSet::KeepAllNonduplicates, true, sh_distance.d31, es2);
+            SemElemSet s1(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist10, es1);
+            SemElemSet s2(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist31, es2);
 
             sem_elem_t answer = s1.combine(&s2);
 
@@ -204,82 +199,81 @@ namespace wali {
 
         TEST(wali$domains$SemElemSet$$combine, combineWillNotDuplicateAnElementEvenIfTheyAreSeparateObjects)
         {
-            ShortestPathWeights spw;
-            sem_elem_t ten1 = spw.d10;
+            sem_elem_t ten1 = sh_distance::dist10;
             sem_elem_t ten2 = new ShortestPathSemiring(10);
 
             SemElemSet::ElementSet es1, es2, all;
             insert(es1, ten1);
-            insert(es2, sh_distance.d30);
+            insert(es2, sh_distance::dist30);
             insert(es2, ten2);
             
             SemElemSet s1(SemElemSet::KeepAllNonduplicates, true, ten1, es1);
-            SemElemSet s2(SemElemSet::KeepAllNonduplicates, true, sh_distance.d30, es2);
+            SemElemSet s2(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist30, es2);
 
             sem_elem_t answer = s1.combine(&s2);
             SemElemSet * answer_down = dynamic_cast<SemElemSet *>(answer.get_ptr());
             
             ASSERT_EQ(2u, answer_down->getElements().size());
             EXPECT_CONTAINS(answer_down->getElements(), ten1);
-            EXPECT_CONTAINS(answer_down->getElements(), sh_distance.d30);
+            EXPECT_CONTAINS(answer_down->getElements(), sh_distance::dist30);
         }
 
         
         TEST(wali$domains$SemElemSet$$extend, extendTakesPairwiseExtend)
         {
             SemElemSet::ElementSet es1, es2;
-            insert(es1, sh_distance.d1);
-            insert(es1, sh_distance.d2);
-            insert(es2, sh_distance.d10);
-            insert(es2, sh_distance.d20);
+            insert(es1, sh_distance::dist1);
+            insert(es1, sh_distance::dist2);
+            insert(es2, sh_distance::dist10);
+            insert(es2, sh_distance::dist20);
             
-            SemElemSet s1(SemElemSet::KeepAllNonduplicates, true, sh_distance.d1, es1);
-            SemElemSet s2(SemElemSet::KeepAllNonduplicates, true, sh_distance.d10, es2);
+            SemElemSet s1(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist1, es1);
+            SemElemSet s2(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist10, es2);
 
             sem_elem_t answer = s1.extend(&s2);
             SemElemSet * answer_down = dynamic_cast<SemElemSet *>(answer.get_ptr());
             
             ASSERT_EQ(4u, answer_down->getElements().size());
             // FIXME
-            //EXPECT_TRUE(sh_distance.d11->equal(answer_down->getElements()[0])); // too strict: enforces order
-            //EXPECT_TRUE(sh_distance.d21->equal(answer_down->getElements()[1]));            
-            //EXPECT_TRUE(sh_distance.d12->equal(answer_down->getElements()[2]));
-            //EXPECT_TRUE(sh_distance.d22->equal(answer_down->getElements()[3]));
+            //EXPECT_TRUE(sh_distance::dist11->equal(answer_down->getElements()[0])); // too strict: enforces order
+            //EXPECT_TRUE(sh_distance::dist21->equal(answer_down->getElements()[1]));            
+            //EXPECT_TRUE(sh_distance::dist12->equal(answer_down->getElements()[2]));
+            //EXPECT_TRUE(sh_distance::dist22->equal(answer_down->getElements()[3]));
         }
 
 
         TEST(wali$domains$SemElemSet$$extend, extendDoesNotDuplicateElementsEvenIfTheyAreSeparateObjects)
         {
             SemElemSet::ElementSet es1, es2;
-            insert(es1, sh_distance.d10);
-            insert(es1, sh_distance.d20);
-            insert(es2, sh_distance.d30);
-            insert(es2, sh_distance.d40);
+            insert(es1, sh_distance::dist10);
+            insert(es1, sh_distance::dist20);
+            insert(es2, sh_distance::dist30);
+            insert(es2, sh_distance::dist40);
             
-            SemElemSet s1(SemElemSet::KeepAllNonduplicates, true, sh_distance.d10, es1);
-            SemElemSet s2(SemElemSet::KeepAllNonduplicates, true, sh_distance.d30, es2);
+            SemElemSet s1(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist10, es1);
+            SemElemSet s2(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist30, es2);
 
             sem_elem_t answer = s1.extend(&s2);
             SemElemSet * answer_down = dynamic_cast<SemElemSet *>(answer.get_ptr());
             
             ASSERT_EQ(3u, answer_down->getElements().size());
             // FIXME
-            //EXPECT_TRUE(sh_distance.d40->equal(answer_down->getElements()[0]));
-            //EXPECT_TRUE(sh_distance.d50->equal(answer_down->getElements()[1]));
-            //EXPECT_TRUE(sh_distance.d60->equal(answer_down->getElements()[2]));
+            //EXPECT_TRUE(sh_distance::dist40->equal(answer_down->getElements()[0]));
+            //EXPECT_TRUE(sh_distance::dist50->equal(answer_down->getElements()[1]));
+            //EXPECT_TRUE(sh_distance::dist60->equal(answer_down->getElements()[2]));
         }
 
 
         TEST(wali$domains$SemElemSet$$equal, differentSetsAreUnequal)
         {
             SemElemSet::ElementSet es1, es2;
-            insert(es1, sh_distance.d10);
-            insert(es1, sh_distance.d20);
-            insert(es2, sh_distance.d30);
-            insert(es2, sh_distance.d40);
+            insert(es1, sh_distance::dist10);
+            insert(es1, sh_distance::dist20);
+            insert(es2, sh_distance::dist30);
+            insert(es2, sh_distance::dist40);
             
-            SemElemSet s1(SemElemSet::KeepAllNonduplicates, true, sh_distance.d10, es1);
-            SemElemSet s2(SemElemSet::KeepAllNonduplicates, true, sh_distance.d30, es2);
+            SemElemSet s1(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist10, es1);
+            SemElemSet s2(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist30, es2);
 
             EXPECT_FALSE(s1.equal(&s2));
         }
@@ -288,14 +282,14 @@ namespace wali {
         TEST(wali$domains$SemElemSet$$equal, equalityIsOrderIndependent)
         {
             SemElemSet::ElementSet es1, es2;
-            insert(es1, sh_distance.d10);
-            insert(es1, sh_distance.d20);
+            insert(es1, sh_distance::dist10);
+            insert(es1, sh_distance::dist20);
             
-            insert(es2, sh_distance.d20);
-            insert(es2, sh_distance.d10);
+            insert(es2, sh_distance::dist20);
+            insert(es2, sh_distance::dist10);
             
-            SemElemSet s1(SemElemSet::KeepAllNonduplicates, true, sh_distance.d10, es1);
-            SemElemSet s2(SemElemSet::KeepAllNonduplicates, true, sh_distance.d10, es2);
+            SemElemSet s1(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist10, es1);
+            SemElemSet s2(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist10, es2);
 
             EXPECT_TRUE(s1.equal(&s2));
         }
@@ -303,9 +297,8 @@ namespace wali {
 
         TEST(wali$domains$SemElemSet$$equal, equalElementsAreEqualEvenIfTheyAreSeparateObjects)
         {
-            ShortestPathWeights spw;
             sem_elem_t
-                ten1 = spw.d10,
+                ten1 = sh_distance::dist10,
                 ten2 = new ShortestPathSemiring(10);
             
             SemElemSet::ElementSet es1, es2;
@@ -322,14 +315,14 @@ namespace wali {
         TEST(wali$domains$SemElemSet, subsumedElementIsRemovedDuringCombine)
         {
             SemElemSet::ElementSet two_set, ten_set;
-            insert(two_set, sh_distance.d2);
-            insert(ten_set, sh_distance.d10);
+            insert(two_set, sh_distance::dist2);
+            insert(ten_set, sh_distance::dist10);
 
             SemElemSet
-                two_keeping_min(SemElemSet::KeepMinimalElements, true, sh_distance.d2, two_set),
-                ten_keeping_min(SemElemSet::KeepMinimalElements, true, sh_distance.d10, ten_set),
-                two_keeping_max(SemElemSet::KeepMaximalElements, true, sh_distance.d2, two_set),
-                ten_keeping_max(SemElemSet::KeepMaximalElements, true, sh_distance.d10, ten_set);
+                two_keeping_min(SemElemSet::KeepMinimalElements, true, sh_distance::dist2, two_set),
+                ten_keeping_min(SemElemSet::KeepMinimalElements, true, sh_distance::dist10, ten_set),
+                two_keeping_max(SemElemSet::KeepMaximalElements, true, sh_distance::dist2, two_set),
+                ten_keeping_max(SemElemSet::KeepMaximalElements, true, sh_distance::dist10, ten_set);
 
             sem_elem_t
                 actual_min1 = two_keeping_min.combine(&ten_keeping_min),
@@ -341,7 +334,7 @@ namespace wali {
             // OPPOSITE of what you think because combine is min:
             //    10 + 2 = 10 min 2 = 2, so 10 <= 2 in the lattice
 
-            ASSERT_TRUE(sh_distance.d10->underApproximates(sh_distance.d2));            
+            ASSERT_TRUE(sh_distance::dist10->underApproximates(sh_distance::dist2));            
             
             EXPECT_TRUE(ten_keeping_min.equal(actual_min1));
             EXPECT_TRUE(ten_keeping_min.equal(actual_min2));
@@ -360,16 +353,16 @@ namespace wali {
 
             // So here we set up the ELEMENTS
             SemElemSet::ElementSet empty_set, two_set, six_set, two_six_set;;
-            insert(two_set, sh_distance.d2);
-            insert(six_set, sh_distance.d6);
-            insert(two_six_set, sh_distance.d2);
-            insert(two_six_set, sh_distance.d6);
+            insert(two_set, sh_distance::dist2);
+            insert(six_set, sh_distance::dist6);
+            insert(two_six_set, sh_distance::dist2);
+            insert(two_six_set, sh_distance::dist6);
 
             sem_elem_t
-                elem   = new SemElemSet(SemElemSet::KeepAllNonduplicates, true, sh_distance.d2, empty_set),
-                elem2  = new SemElemSet(SemElemSet::KeepAllNonduplicates, true, sh_distance.d2, two_set),
-                elem6  = new SemElemSet(SemElemSet::KeepAllNonduplicates, true, sh_distance.d6, six_set),
-                elem26 = new SemElemSet(SemElemSet::KeepAllNonduplicates, true, sh_distance.d6, two_six_set);
+                elem   = new SemElemSet(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist2, empty_set),
+                elem2  = new SemElemSet(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist2, two_set),
+                elem6  = new SemElemSet(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist6, six_set),
+                elem26 = new SemElemSet(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist6, two_six_set);
 
             ASSERT_FALSE(elem2->underApproximates(elem6));
             ASSERT_FALSE(elem6->underApproximates(elem2));
@@ -512,18 +505,18 @@ namespace wali {
 
             // So here we set up the ROOT ELEMENTS
             SemElemSet::ElementSet empty_set, two_set, six_set, two_six_set;;
-            insert(two_set, sh_distance.d2);
-            insert(six_set, sh_distance.d6);
-            insert(two_six_set, sh_distance.d2);
-            insert(two_six_set, sh_distance.d6);
+            insert(two_set, sh_distance::dist2);
+            insert(six_set, sh_distance::dist6);
+            insert(two_six_set, sh_distance::dist2);
+            insert(two_six_set, sh_distance::dist6);
 
             // Here we set up the sets which are ELEMENTS OF EACH PAIR
 
             sem_elem_t
-                elem   = new SemElemSet(SemElemSet::KeepAllNonduplicates, true, sh_distance.d2, empty_set),
-                elem2  = new SemElemSet(SemElemSet::KeepAllNonduplicates, true, sh_distance.d2, two_set),
-                elem6  = new SemElemSet(SemElemSet::KeepAllNonduplicates, true, sh_distance.d6, six_set),
-                elem26 = new SemElemSet(SemElemSet::KeepAllNonduplicates, true, sh_distance.d6, two_six_set);
+                elem   = new SemElemSet(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist2, empty_set),
+                elem2  = new SemElemSet(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist2, two_set),
+                elem6  = new SemElemSet(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist6, six_set),
+                elem26 = new SemElemSet(SemElemSet::KeepAllNonduplicates, true, sh_distance::dist6, two_six_set);
 
             ASSERT_FALSE(elem2->underApproximates(elem6));
             ASSERT_FALSE(elem6->underApproximates(elem2));

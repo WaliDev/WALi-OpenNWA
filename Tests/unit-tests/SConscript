@@ -57,6 +57,7 @@ cpp11_env.AppendUnique(CXXFLAGS=["-std=c++0x"])
 
 test_files = Split("""
     Source/test.cpp
+    Source/fixtures/SimpleWeights.cpp
 
     Source/wali/wali-prereqs.cpp    
     Source/wali/domains/class-SemElemSet/tests.cpp
