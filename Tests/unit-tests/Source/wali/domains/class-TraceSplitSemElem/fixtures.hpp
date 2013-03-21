@@ -37,6 +37,31 @@ namespace {
       guardsF12[guards.two] = dist2;
     }
   };
+
+
+  struct TraceSplitSemElems {
+    wali::sem_elem_t empty_default_dist0, empty_default_infty,
+      guards012_default_dist0, guards012_default_infty,
+      guardsF12_default_dist0;
+
+    TraceSplitSemElems() {
+      using namespace testing::ShortestPathWeights;
+      using wali::domains::TraceSplitSemElem;
+      TraceSplitMaps maps;
+
+#define TSSE(map, default) \
+  TraceSplitSemElem(TraceSplitSemElem::identity_reducer, map, default)
+
+      empty_default_dist0 =     new TSSE(maps.empty, dist0);
+      empty_default_infty =     new TSSE(maps.empty, semiring_zero);
+      guards012_default_dist0 = new TSSE(maps.guards012, dist0);
+      guards012_default_infty = new TSSE(maps.guards012, semiring_zero);
+      guardsF12_default_dist0 = new TSSE(maps.guardsF12, dist0);
+
+#undef TSSE
+    }
+  };
+  
 }
 
 
