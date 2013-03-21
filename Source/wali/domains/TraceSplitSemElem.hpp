@@ -132,7 +132,7 @@ namespace wali
     ///
     /// The key is treated as a sem_elem_t, but it really doesn't have to be
     /// one -- in particular, keys are never either extended or combined.
-    class TraceSplitSemElemSet
+    class TraceSplitSemElem
       : public wali::SemElem
     {
     public:
@@ -192,9 +192,9 @@ namespace wali
       }
       
 
-      TraceSplitSemElemSet(ReduceFunction reducer,
-                           BackingMap const & m,
-                           sem_elem_t default_value)
+      TraceSplitSemElem(ReduceFunction reducer,
+                        BackingMap const & m,
+                        sem_elem_t default_value)
         : reducer_(reducer)
         , map_(normalize(reducer, default_value, m))
         , default_(default_value)
@@ -228,18 +228,18 @@ namespace wali
       
       sem_elem_t one() const {
         BackingMap m;
-        return new TraceSplitSemElemSet(reducer_, m, default_->one());
+        return new TraceSplitSemElem(reducer_, m, default_->one());
       }
       
       sem_elem_t zero() const {
         BackingMap m;
-        return new TraceSplitSemElemSet(reducer_, m, default_->zero());
+        return new TraceSplitSemElem(reducer_, m, default_->zero());
       }
 
       sem_elem_t extend(SemElem * se) {
         abort(); // this function is not currently used and I don't want to
                  // write tests for it at the moment
-        TraceSplitSemElemSet * that = dynamic_cast<TraceSplitSemElemSet*>(se);
+        TraceSplitSemElem * that = dynamic_cast<TraceSplitSemElem*>(se);
         assert(that);
         BackingMap m;
         
@@ -265,13 +265,13 @@ namespace wali
 
         sem_elem_t new_default = this->default_->extend(that->default_);
 
-        return new TraceSplitSemElemSet(reducer_, map_, new_default);
+        return new TraceSplitSemElem(reducer_, map_, new_default);
       }
       
       sem_elem_t combine(SemElem * se) {
         abort(); // this function is not currently used and I don't want to
                  // write tests for it at the moment
-        TraceSplitSemElemSet * that = dynamic_cast<TraceSplitSemElemSet*>(se);
+        TraceSplitSemElem * that = dynamic_cast<TraceSplitSemElem*>(se);
         assert(that);
         BackingMap m;
         
@@ -297,12 +297,12 @@ namespace wali
 
         sem_elem_t new_default = this->default_->combine(that->default_);
 
-        return new TraceSplitSemElemSet(reducer_, map_, new_default);
+        return new TraceSplitSemElem(reducer_, map_, new_default);
       }
 
 
       bool equal(SemElem * se) const {
-        TraceSplitSemElemSet * that = dynamic_cast<TraceSplitSemElemSet*>(se);
+        TraceSplitSemElem * that = dynamic_cast<TraceSplitSemElem*>(se);
         assert(that);
 
         if (this->map_.size() != that->map_.size()
