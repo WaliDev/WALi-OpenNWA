@@ -346,7 +346,7 @@ namespace wali
             // element isn't present at all
             return false;
           }
-          Id first_element_id = this->_id_mapping.left.find(first_element)->second;
+          Id first_element_id = that._id_mapping.left.find(first_element)->second;
           Id that_root = that._partition.FindSet(first_element_id);
 
           for(typename InnerSet::const_iterator inner_iter = outer_iter->begin();
@@ -357,7 +357,7 @@ namespace wali
               // element isn't present at all
               return false;
             }
-            Id element_id = this->_id_mapping.left.find(element)->second;
+            Id element_id = that._id_mapping.left.find(element)->second;
 
             if (that_root != that._partition.FindSet(element_id)) {
               // element is in a different partition in the other set
