@@ -1,9 +1,8 @@
 #ifndef WALI_DOMAINS_EQUALITIES_HPP
 #define WALI_DOMAINS_EQUALITIES_HPP
 
-#include "wali/SemElem.hpp"
-
 #include "wali/util/DisjointSets.hpp"
+#include "wali/domains/TraceSplitSemElem.hpp"
 #include <string>
 #include <map>
 #include <set>
@@ -14,13 +13,13 @@ namespace wali {
     /// This class tracks sets of equalities and disequalities between
     /// variables (represented as strings).
     class Equalities
-      : public wali::SemElem
+      : public wali::domains::Guard
     {
     public:
       typedef std::string Variable;
 
     private:
-      enum Special { SpecialOne, SpecialZero };
+      enum Special { SpecialZero };
       boost::optional<Special> _special;
 
       boost::optional<DisjointSets<Variable> > _equalities;
@@ -62,79 +61,29 @@ namespace wali {
         return new Equalities(*this);
       }
 
-      bool isZero() const {
+      bool isFalse() const {
         assert(valid());
         return _special && *_special == SpecialZero;
       }
 
-      bool isOne() const {
-        assert(valid());
-        return _special && *_special == SpecialOne;
-      }
-
-      sem_elem_t
+      domains::Guard::Ptr
       zero() const {
-        static sem_elem_t z = new Equalities(SpecialZero);
+        static domains::Guard::Ptr z = new Equalities(SpecialZero);
         return z;
       }
 
-      sem_elem_t
-      one() const {
-        static sem_elem_t o = new Equalities(SpecialOne);
-        return o;
+      size_t hash() const {
+        abort();
       }
 
-      sem_elem_t
-      extend(SemElem * other) {
-        Equalities * that = dynamic_cast<Equalities*>(other);
-        if (this->isOne()) {
-          assert(that->count > 0);
-          return that;
-        }
-        if (that->isOne()) {
-          assert(this->count > 0);
-          return this;
-        }
-        if (this->equal(that)) {
-          assert(this->count > 0);
-          return this;
-        }
-        return zero();
-      }
-
-      sem_elem_t
-      combine(SemElem * other) {
-        Equalities * that = dynamic_cast<Equalities*>(other);
-        if (this->isZero()) {
-          assert(that->count > 0);
-          return that;
-        }
-        if (that->isZero()) {
-          assert(this->count > 0);
-          return this;
-        }
-        if (this->equal(that)) {
-          assert(this->count > 0);
-          return this;
-        }
-        return zero();
-      }
-
-      bool equal(SemElem * se) const {
-        Equalities * that = dynamic_cast<Equalities*>(se);
+      bool equal(wali::domains::Guard::Ptr se) const {
+        Equalities * that = dynamic_cast<Equalities*>(se.get_ptr());
         assert(that != NULL);
 
-        if (this->isZero() && that->isZero()) {
+        if (this->isFalse() && that->isFalse()) {
           return true;
         }
-        if (this->isZero() || that->isZero()) {
-          return false;
-        }
-
-        if (this->isOne() && that->isOne()) {
-          return true;
-        }
-        if (this->isOne() || that->isOne()) {
+        if (this->isFalse() || that->isFalse()) {
           return false;
         }
 
@@ -181,11 +130,8 @@ namespace wali {
 
       std::ostream& print( std::ostream & os ) const {
         assert(valid());
-        if (isZero()) {
+        if (isFalse()) {
           os << "[ZERO]";
-        }
-        else if (isOne()) {
-          os << "[ONE]";
         }
         else {
           os << "[stuff]";
