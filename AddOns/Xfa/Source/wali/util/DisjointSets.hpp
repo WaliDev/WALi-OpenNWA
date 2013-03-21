@@ -321,6 +321,76 @@ namespace wali
       }
 
 
+      bool
+      operator==(DisjointSets const & that) const {
+        // Number of elements total
+        if (this->_id_mapping.left.size() != that._id_mapping.right.size()) {
+          return false;
+        }
+        
+        this->update_cache();
+        that.update_cache();
+
+        // Number of partitions
+        if (this->_cached_roots->size() != that._cached_roots->size()) {
+          return false;
+        }
+
+        // For each partition in this, check that it is a partition in that.
+        for(const_iterator outer_iter = this->begin();
+            outer_iter != this->end(); ++outer_iter)
+        {
+          assert(outer_iter->begin() != outer_iter->end());
+          ElementType const & first_element = *outer_iter->begin();
+
+          if (that._id_mapping.left.find(first_element)
+              == that._id_mapping.left.end())
+          {
+            // element isn't present at all
+            return false;
+          }
+          Id first_element_id = that._id_mapping.left.find(first_element)->second;
+          Id that_root = that._partition.FindSet(first_element_id);
+
+          for(typename InnerSet::const_iterator inner_iter = outer_iter->begin();
+              inner_iter != outer_iter->end(); ++inner_iter)
+          {
+            ElementType const & element = *inner_iter;
+            if (that._id_mapping.left.find(element)
+                == that._id_mapping.left.end())
+            {
+              // element isn't present at all
+              return false;
+            }
+            Id element_id = that._id_mapping.left.find(element)->second;
+
+            if (that_root != that._partition.FindSet(element_id)) {
+              // element is in a different partition in the other set
+              return false;
+            }
+          }
+        }
+
+        return true;
+      }
+
+
+      bool
+      operator!=(DisjointSets const & that) const {
+        return !(*this == that);
+      }
+
+
+      const_reference
+      representative(const_reference element) {
+        assert(_id_mapping.left.count(element) > 0);
+        Id element_id = _id_mapping.left.find(element)->second;
+        Id root_id = _partition.FindSet(element_id);
+        assert(_id_mapping.right.count(root_id) > 0);
+        return _id_mapping.right.find(root_id)->second;
+      }
+
+          
     private:
 
       void
