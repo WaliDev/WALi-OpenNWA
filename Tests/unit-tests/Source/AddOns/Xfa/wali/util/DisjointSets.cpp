@@ -216,14 +216,14 @@ namespace wali {
         }
 
 
-        TEST(wali$util$operatorEquals, EmptyEqualsEmpty)
+        TEST(wali$util$DisjointSets$operatorEquals, EmptyEqualsEmpty)
         {
             StringSets empty;
             EXPECT_EQ(empty, empty);
         }
 
 
-        TEST(wali$util$operatorEquals, SelfEqualsSelf)
+        TEST(wali$util$DisjointSets$operatorEquals, SelfEqualsSelf)
         {
             StringSets set;
             set.insert("a");
@@ -235,7 +235,7 @@ namespace wali {
         }
         
 
-        TEST(wali$util$operatorEquals, SelfEqualsCopyOfSelf)
+        TEST(wali$util$DisjointSets$operatorEquals, SelfEqualsCopyOfSelf)
         {
             StringSets set1;
             set1.insert("a");
@@ -249,7 +249,7 @@ namespace wali {
         }
 
 
-        TEST(wali$util$operatorEquals, EqualityIsIndependentOfInsertionOrder)
+        TEST(wali$util$DisjointSets$operatorEquals, EqualityIsIndependentOfInsertionOrder)
         {
             StringSets set1, set2;
             set1.insert("a");
@@ -266,7 +266,7 @@ namespace wali {
         }
         
 
-        TEST(wali$util$operatorEquals, DifferentNumberOfElementsAreUnequal)
+        TEST(wali$util$DisjointSets$operatorEquals, DifferentNumberOfElementsAreUnequal)
         {
             StringSets set1, set2;
             set1.insert("a");
@@ -286,7 +286,7 @@ namespace wali {
         }
 
 
-        TEST(wali$util$operatorEquals, DifferentSetsAreUnequal)
+        TEST(wali$util$DisjointSets$operatorEquals, DifferentSetsAreUnequal)
         {
             StringSets set1, set2;
             set1.insert("a");
@@ -304,7 +304,7 @@ namespace wali {
         }
 
 
-        TEST(wali$util$operatorEquals, RefinementsAreUnequal)
+        TEST(wali$util$DisjointSets$operatorEquals, RefinementsAreUnequal)
         {
             StringSets set1, set2;
             set1.insert("a");
