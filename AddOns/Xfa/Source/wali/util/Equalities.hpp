@@ -9,7 +9,7 @@
 #include <set>
 
 namespace wali {
-  namespace utils {
+  namespace util {
 
     /// This class tracks sets of equalities and disequalities between
     /// variables (represented as strings).
