@@ -421,6 +421,14 @@ namespace wali
           
     };
 
+
+    template<typename ElementType, typename IdMapping>
+    std::ostream &
+    operator<< (std::ostream & os, DisjointSets<ElementType, IdMapping> const & sets) {
+      os << sets.to_string();
+      return os;
+    }
+
   }
 }
 
