@@ -52,6 +52,16 @@ namespace wali {
         , _disequalities(std::map<Variable, std::set<Variable> >())
       {}
 
+      Equalities(Equalities const & that)
+        : _equalities(that._equalities)
+        , _disequalities(that._disequalities)
+      {}
+
+      Equalities *
+      clone() const {
+        return new Equalities(*this);
+      }
+
       bool isZero() const {
         assert(valid());
         return _special && *_special == SpecialZero;
