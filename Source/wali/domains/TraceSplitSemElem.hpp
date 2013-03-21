@@ -146,7 +146,7 @@ namespace wali
 
       static
       void
-      identity_reducer(Guard & UNUSED_PARAMETER(key),
+      identity_reducer(Guard::Ptr & UNUSED_PARAMETER(key),
                        sem_elem_t & UNUSED_PARAMETER(value))
       {
       }
