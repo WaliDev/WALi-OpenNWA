@@ -254,7 +254,7 @@ namespace wali
       virtual
       std::ostream &
       print_typename(std::ostream & os) const {
-          os << "(unknown semiring)";
+          os << typeid(*this).name();
           return os;
       }
 
