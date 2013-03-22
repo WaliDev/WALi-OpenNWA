@@ -12,6 +12,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <string>
+#include <typeinfo>
 
 namespace wali
 {
