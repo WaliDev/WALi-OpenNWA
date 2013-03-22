@@ -302,15 +302,26 @@ namespace wali
     WFA::genericFwpdsPoststar(std::set<Key> const & sources,
                               boost::function<bool (ITrans const *)> trans_accept) const
     {
+      wali::wpds::fwpds::FWPDS wpds;
+      wpds.topDownEval(false);
+      sem_elem_t weight = getSomeWeight();
+      return genericWpdsPoststar(sources, trans_accept, wpds, weight->one(), weight->zero());
+    }
+
+
+    WFA::EpsilonCloseCache
+    WFA::genericWpdsPoststar(std::set<Key> const & sources,
+                             boost::function<bool (ITrans const *)> trans_accept,
+                             wpds::WPDS & wpds,
+                             sem_elem_t query_weight,
+                             sem_elem_t state_weight) const
+    {
       Key p_state = getKey("__p");
       Key query_accept = getKey("__accept");
       Key dummy = getKey("__dummy");
-      sem_elem_t zero = getSomeWeight()->zero();
 
       // Convert this WFA into a WPDS so that we can run poststar
-      wali::wpds::fwpds::FWPDS wpds;
       this->toWpds(p_state, &wpds, trans_accept);
-      wpds.topDownEval(false);
 
       // Add an additional dummy node to pull off the multi-source trick
       for (std::set<Key>::const_iterator source = sources.begin();
@@ -318,7 +329,7 @@ namespace wali
       {
           wpds.add_rule(p_state, dummy,
                         p_state, *source, *source,
-                        zero->one());
+                        getSomeWeight()->one());
       }
 
       // Set up the query automaton:
@@ -326,11 +337,11 @@ namespace wali
       //     p_state -----------> ((query_accept))
       //              weight 1
       WFA query;
-      query.addState(p_state, zero);
-      query.addState(query_accept, zero);
+      query.addState(p_state, state_weight);
+      query.addState(query_accept, state_weight);
       query.setInitialState(p_state);
       query.addFinalState(query_accept);
-      query.addTrans(p_state, dummy, query_accept, zero->one());
+      query.addTrans(p_state, dummy, query_accept, query_weight);
 
       // Issue poststar. Be careful to not force the output a la what Cindy
       // was doing! (Actually I think we look at all the weights anyway so
