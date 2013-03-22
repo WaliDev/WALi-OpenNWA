@@ -74,6 +74,15 @@ namespace wali
       }
       
 
+      virtual
+      std::ostream &
+      print_typename(std::ostream & os) const {
+          os << "pair<";
+          first->print_typename(os) << ", ";
+          second->print_typename(os) << ">";
+          return os;
+      }
+
     protected:
       sem_elem_t first;
       sem_elem_t second;

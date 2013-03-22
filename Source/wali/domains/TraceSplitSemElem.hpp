@@ -359,6 +359,19 @@ namespace wali
 
       virtual size_t hash() const { return hash_; }
 
+      virtual
+      std::ostream &
+      print_typename(std::ostream & os) const {
+        os << "KeyedSemElemSet<";
+        if (size() == 0u) {
+          os << "(empty)";
+        }
+        else {
+          os << "(some guard) -> ";
+          os << begin()->second->print_typename(os);
+        }
+        return os << ">";
+      }
 
       // Pull in the sem_elem_t overloads
       using SemElem::extend;
