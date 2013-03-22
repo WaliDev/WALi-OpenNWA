@@ -254,10 +254,7 @@ namespace wali
 
       virtual
       std::ostream &
-      print_typename(std::ostream & os) const {
-          os << typeid(*this).name();
-          return os;
-      }
+      print_typename(std::ostream & os) const;
 
       std::string
       toStringTypename() const {

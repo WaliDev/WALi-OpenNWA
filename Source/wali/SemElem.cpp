@@ -5,6 +5,10 @@
 
 #include "wali/SemElem.hpp"
 
+#if defined(__GNUC__)
+#include <cxxabi.h>
+#endif
+
 namespace wali
 {
 
@@ -91,6 +95,27 @@ namespace wali
   }
 
 
+#if defined(__GNUC__)
+  std::ostream &
+  SemElem::print_typename(std::ostream & os) const
+  {
+    int out;
+    char* demangled = abi::__cxa_demangle(typeid(*this).name(), NULL, NULL, &out);
+    assert(demangled);
+    os << demangled;
+    free(demangled);
+    return os;
+  }
+#else
+  std::ostream &
+  SemElem::print_typename(std::ostream & os) const
+  {
+    os << typeid(*this).name();
+    return os;
+  }
+#endif
+
+  
   void test_semelem_impl(sem_elem_t x)
   {
     sem_elem_t z = x->zero();
