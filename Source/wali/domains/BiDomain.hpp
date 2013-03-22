@@ -35,7 +35,13 @@ namespace wali {
 
       BiDomain(ExtendFunction extend, sem_elem_t val)
         : _value(val)
-      {}
+      {
+#if !defined(NDEBUG)
+        RuleSemElem * rulep = dynamic_cast<RuleSemElem*>(val.get_ptr());
+        WfaSemElem * wfap = dynamic_cast<WfaSemElem*>(val.get_ptr());
+        assert(rulep != NULL || wfap != NULL);
+#endif
+      }
 
       virtual
       std::ostream &
