@@ -1,12 +1,24 @@
 #ifndef WALI_DOMAINS_BIDOMAIN_HPP
 #define WALI_DOMAINS_BIDOMAIN_HPP
 
+#include <cxxabi.h>
 #include <ostream>
 #include <boost/function.hpp>
 #include "wali/SemElem.hpp"
 
 namespace wali {
   namespace domains {
+
+    inline
+    std::string
+    demangle(std::string const & mangled) {
+      int out;
+      char* demangled = abi::__cxa_demangle(mangled.c_str(), NULL, NULL, &out);
+      assert(demangled);
+      std::string ret = demangled;
+      free(demangled);
+      return ret;
+    }
 
     template<typename RuleSemElem_,
              typename TransSemElem_>
@@ -29,8 +41,8 @@ namespace wali {
       std::ostream &
       print_typename(std::ostream & os) const {
         os << "BiDomain<"
-           << typeid(RuleSemElem).name() << ", "
-           << typeid(WfaSemElem).name() << "; holding ";
+           << demangle(typeid(RuleSemElem).name()) << ", "
+           << demangle(typeid(WfaSemElem).name()) << "; holding ";
         _value->print_typename(os) << ">";
         return os;
       }
