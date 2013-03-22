@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <string>
 #include <typeinfo>
+#include <cxxabi.h>
 
 namespace wali
 {
@@ -254,9 +255,14 @@ namespace wali
 
       virtual
       std::ostream &
-      print_typename(std::ostream & os) const {
-          os << typeid(*this).name();
-          return os;
+      print_typename(std::ostream & os) const
+      {
+        int out;
+        char* demangled = abi::__cxa_demangle(typeid(*this).name(), NULL, NULL, &out);
+        assert(demangled);
+        os << demangled;
+        free(demangled);
+        return os;
       }
 
       std::string
