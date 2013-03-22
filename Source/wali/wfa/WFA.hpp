@@ -655,6 +655,14 @@ namespace wali
         EpsilonCloseCache genericFwpdsPoststar(std::set<Key> const & sources,
                                                boost::function<bool (ITrans const *)> trans_accept) const;
 
+        EpsilonCloseCache
+        genericWpdsPoststar(std::set<Key> const & sources,
+                            boost::function<bool (ITrans const *)> trans_accept,
+                            wpds::WPDS & wpds,
+                            sem_elem_t query_weight,
+                            sem_elem_t state_weight) const;
+        
+
         /// For each state q, compute the set of all possible weights w such
         /// that there is a path from the initial state to q with weight w.
         //
