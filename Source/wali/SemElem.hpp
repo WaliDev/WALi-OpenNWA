@@ -9,6 +9,7 @@
 #include "wali/ref_ptr.hpp"
 #include "wali/Countable.hpp"
 #include "wali/Printable.hpp"
+#include <sstream>
 #include <cstdlib>
 #include <string>
 
@@ -249,6 +250,20 @@ namespace wali
 #if defined(_MSC_VER)
 #  pragma warning(pop)
 #endif
+
+      virtual
+      std::ostream &
+      print_typename(std::ostream & os) const {
+          os << "(unknown semiring)";
+          return os;
+      }
+
+      std::string
+      toStringTypename() const {
+          std::stringstream ss;
+          print_typename(ss);
+          return ss.str();
+      }
   };
 
   /**

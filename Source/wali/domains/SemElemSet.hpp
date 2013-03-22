@@ -35,6 +35,17 @@ namespace wali
       
       typedef ref_ptr<SemElemSet> Ptr;
       typedef ref_ptr<SemElemSet const> ConstPtr;
+
+      virtual
+      std::ostream &
+      print_typename(std::ostream & os) const {
+        // The funky way of writing the following string is to avoid possible
+        // interpretation as trigraphs; these are off in GCC by default, but
+        // it warns about them. Not sure what the MSVC story is.
+        os << "SemElemSet<?""?""?""?""?>";
+        return os;
+      }
+      
       
       /// Constructs a SemElemSet with the given base element, which is only
       /// used to get a handle on base_element->one(). The result is semiring

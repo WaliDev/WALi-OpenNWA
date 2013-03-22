@@ -25,6 +25,16 @@ namespace wali {
         : _value(val)
       {}
 
+      virtual
+      std::ostream &
+      print_typename(std::ostream & os) const {
+        os << "BiDomain<"
+           << typeid(RuleSemElem).name() << ", "
+           << typeid(WfaSemElem).name() << "; holding ";
+        _value->print_typename(os) << ">";
+        return os;
+      }
+      
       sem_elem_t
       zero() const {
         return _value->zero();
