@@ -1674,6 +1674,7 @@ namespace wali {
         delete memBuf;
 #endif
     }
+
     // New Saturation Procedure -- minimize calls to get_weight
     int InterGraph::saturateNewtonNoTensor(multiset<tup> &worklist, unsigned scc_n) {
       // This function is dumb about how it update weights *between* newton rounds
@@ -1761,8 +1762,12 @@ namespace wali {
             }
           }
         }
+        // Linear solve done. 
+        // Update psuedo-constants.
         change = false;
+        std::tr1::unordered_set<int> onodesChanged;
         for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
+          bool onodeChanged = false;
           int inode = it2->tgt;
           int onode1 = it2->src1;
           int onode = it2->src2;
@@ -1771,7 +1776,7 @@ namespace wali {
           sem_elem_t Xwt = nodes[onode].gr->get_weight(nodes[onode].intra_nodeno);
           if(! Cwt->equal(cwt[onode1])){
             cwt[onode1] = Cwt;
-            change = true;
+            onodeChanged = true;
           }
           if(! Xwt->equal(xwt[onode])){
             xwt[onode] = Xwt;
@@ -1782,7 +1787,7 @@ namespace wali {
             }              
             // Update R = C . M(1,x); here, x has changed from the last newton round. So update the intra-edge we had added.
             nodes[inode].gr->updateEdgeWeight(nodes[onode1].intra_nodeno, nodes[inode].intra_nodeno, wt);
-            change = true;
+            onodeChanged = true;
           } 
           if(running_ewpds && it2->mf.get_ptr())
             wt = cwt[onode1]->extend(it2->mf->apply_f(cwt[onode1]->one(), xwt[onode]));
@@ -1790,12 +1795,37 @@ namespace wali {
             wt = cwt[onode1]->extend(it2->weight->extend(xwt[onode]));
           // Update R = c . M(1,x); here, c and/or x might have changed. Update anyway.
           nodes[inode].gr->updateEdgeWeight(0, nodes[inode].intra_nodeno, wt); 
+          if(onodeChanged)
+            onodesChanged.insert(onode);
+          change |= onodeChanged;
+        }
+        // Reinitialize worklist.
+        for(std::tr1::unordered_set<int>::iterator oit = onodesChanged.begin(); oit != onodesChanged.end(); ++oit) {
+          int onode = *oit;
+          // Go through all targets again and insert them into the workist without
+          // seeing if they actually got modified or not
+          std::list<int>::iterator beg = nodes[onode].out_hyper_edges.begin();
+          std::list<int>::iterator end = nodes[onode].out_hyper_edges.end();
+          for(; beg != end; beg++) {
+            int inode = inter_edges[*beg].tgt;
+            IntraGraph *gr = nodes[inode].gr;
+            if(gr->scc_number != scc_n) {
+              assert(gr->scc_number > scc_n);
+              continue;
+            }
+            moutnodes = gr->getOutTransitions();
+            std::list<int>::iterator mbeg = moutnodes->begin();
+            std::list<int>::iterator mend = moutnodes->end();
+            for(; mbeg != mend; mbeg++) {
+              int mnode = (*mbeg);
+              worklist.insert(tup(gr->bfs_number, mnode));
+            }
+          }
         }
       }while(change);
       //DEBUGGING
       //cout << "Kleene saturation # Steps: " << numSteps << endl;
       return numSteps;
-
     }
 
     void InterGraph::update_all_weights() {
