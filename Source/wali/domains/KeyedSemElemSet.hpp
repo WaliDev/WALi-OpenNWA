@@ -264,8 +264,8 @@ namespace wali
           os << "(empty)";
         }
         else {
-          os << begin()->first->print_typename(os) << " -> ";
-          os << begin()->second->print_typename(os);
+          begin()->first->print_typename(os) << " -> ";
+          begin()->second->print_typename(os);
         }
         return os << ">";
       }
