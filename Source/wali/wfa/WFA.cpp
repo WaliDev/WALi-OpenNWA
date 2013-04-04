@@ -405,28 +405,44 @@ namespace wali
     }
 
 
+    namespace details {
+      template<typename FunctorType>
+      void for_each_mutable(WFA::state_map_t & state_map,
+                            FunctorType & func)
+      {
+        WFA::state_map_t::iterator it = state_map.begin();
+        WFA::state_map_t::iterator itEND = state_map.end();
+        for( ; it != itEND ; it++ )
+        {
+          State* st = it->second;
+          TransSet & transSet = st->getTransSet();
+          transSet.each(func);
+        }
+      }
+
+      template<typename FunctorType>
+      void for_each_const(WFA::state_map_t const & state_map,
+                          FunctorType & func)
+      {
+        WFA::state_map_t::const_iterator it = state_map.begin();
+        WFA::state_map_t::const_iterator itEND = state_map.end();
+        for( ; it != itEND ; it++ )
+        {
+          const State* st = it->second;
+          const TransSet & transSet = st->getTransSet();
+          transSet.each(func);
+        }
+      }
+    }
+
     void WFA::for_each( ConstTransFunctor & tf ) const
     {
-      state_map_t::const_iterator it = state_map.begin();
-      state_map_t::const_iterator itEND = state_map.end();
-      for( ; it != itEND ; it++ )
-      {
-        const State* st = it->second;
-        const TransSet & transSet = st->getTransSet();
-        transSet.each(tf);
-      }
+      details::for_each_const(state_map, tf);
     }
 
     void WFA::for_each( TransFunctor& tf )
     {
-      state_map_t::iterator it = state_map.begin();
-      state_map_t::iterator itEND = state_map.end();
-      for( ; it != itEND ; it++ )
-      {
-        State* st = it->second;
-        TransSet & transSet = st->getTransSet();
-        transSet.each(tf);
-      }
+      details::for_each_mutable(state_map, tf);
     }
 
     void WFA::duplicateStates(std::set<Key> &st, WFA &output) const {
