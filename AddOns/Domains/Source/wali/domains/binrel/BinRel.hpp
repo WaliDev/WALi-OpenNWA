@@ -80,16 +80,16 @@
  * The tensor choice is determined by the following macro:
  **/
 //#define TENSOR_MIN_AFFINITY
-//#define TENSOR_MAX_AFFINITY
+#define TENSOR_MAX_AFFINITY
 //#define BASE_MAX_AFFINITY_TENSOR_MIXED
 /*** NOTE: This currently only works correctly with boolean variables.***/
-#define TENSOR_MATCHED_PAREN
+//#define TENSOR_MATCHED_PAREN
 
 
 //#define DETENSOR_TOGETHER
-//#define DETENSOR_BIT_BY_BIT
+#define DETENSOR_BIT_BY_BIT
 
-#define NWA_DETENSOR
+//#define NWA_DETENSOR
 
 
 #if defined(NWA_DETENSOR) && not defined(TENSOR_MATCHED_PAREN)
