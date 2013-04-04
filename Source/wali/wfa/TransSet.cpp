@@ -51,22 +51,27 @@ namespace wali {
       return IMPLFIND(impl,t);
     }
 
+    namespace details {
+      template <typename IteratorType,
+                typename FunctorType>
+      void each(IteratorType it,
+                IteratorType END,
+                FunctorType & tf)
+      {
+        for( ; it != END ; it++ ) {
+          tf(*it);
+        }
+      }
+    }
+        
     void TransSet::each( TransFunctor& tf )
     {
-      iterator it = begin();
-      iterator END = end();
-      for( ; it != END ; it++ ) {
-        tf(*it);
-      }
+      details::each(begin(), end(), tf);
     }
 
     void TransSet::each( ConstTransFunctor& tf ) const
     {
-      const_iterator it = impl.begin();
-      const_iterator itEND = impl.end();
-      for( ; it != itEND ; it++ ) {
-        tf(*it);
-      }
+      details::each(impl.begin(), impl.end(), tf);
     }
 
     bool TransSet::insert( ITrans* t )
