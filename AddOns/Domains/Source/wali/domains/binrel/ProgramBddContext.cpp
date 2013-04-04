@@ -1027,7 +1027,36 @@ unsigned ProgramBddContext::getRegSize(bdd forThis) const
   return 0;
 }
 
+bdd ProgramBddContext::HavocVar(std::string var, bdd current) const
+{
+  bddinfo_t bi;
+  if(this->find(var) == this->end()){
+    LOG(WARNING) << "[ProgramBddContext::Havoc] Unknown Variable: " << var;
+    return bddtrue;
+  } else {
+    bi = this->find(var)->second;
+  }
+
+  bdd h = bdd_exist(current, fdd_ithset(bi->baseRhs));
+  return h;
+}
+
+bdd ProgramBddContext::AssignTrue(std::string var, bdd expr) const
+{
+  return AssignGen(var, expr, bddtrue);
+}
+
 bdd ProgramBddContext::Assign(std::string var, bdd expr) const
+{
+  return AssignGen(var, expr, baseId);
+}
+
+bdd ProgramBddContext::BaseID() const
+{
+  return baseId;
+}
+
+bdd ProgramBddContext::AssignGen(std::string var, bdd expr, bdd aType) const
 {
   bddinfo_t bi;
   if(this->find(var) == this->end()){
@@ -1066,7 +1095,7 @@ bdd ProgramBddContext::Assign(std::string var, bdd expr) const
   expr = bdd_relprod(expr,regA2var,fdd_ithset(regAInfo->baseExtra));
 
   // All transformers are slight perturbations of identity.
-  bdd c = baseId;
+  bdd c = aType;
   c = bdd_exist(c, fdd_ithset(bi->baseLhs));
   c = bdd_exist(c, fdd_ithset(bi->baseRhs));
   return bdd_exist(expr & c, fdd_ithset(sizeInfo));

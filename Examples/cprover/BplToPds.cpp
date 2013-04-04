@@ -833,7 +833,7 @@ namespace wali
             break;
           case AST_ASSIGN:
             assert(s->vl && s->el);
-            b = bddtrue;
+            b = con->BaseID();
             vl = s->vl;
             el = s->el;
             while(vl || el){
@@ -850,7 +850,7 @@ namespace wali
               }
               stringstream ss;
               ss << f << "::" << vl->v;
-              if(con->find(ss.str()) != con->end()){
+	      if(con->find(ss.str()) != con->end()){
                 lhs = ss.str();
               }else{
                 stringstream ss2;
@@ -861,14 +861,37 @@ namespace wali
                 cout << "Unknown variable: [" << vl->v << "]" << endl;
                 assert(0);
               }
-              b = bdd_exist(b, fdd_ithset((*con)[lhs]->baseRhs)) & con->Assign(lhs, expr_as_bdd(el->e, con, f));
+              b = con->HavocVar(lhs, b);
+              vl = vl->n;
+              el = el->n;
+            }
+            vl = s->vl;
+            el = s->el;
+            b1 = bddtrue;
+            while(vl || el){ //Most of the checks for errors were done in the previous loop, no need to do it again.
+              if(strcmp(vl->v,"_") == 0){
+                cout << "Skipped assignment to dummy variable _" << endl;
+                vl = vl->n;
+                el = el->n;
+                continue;
+              }
+              stringstream ss;
+              ss << f << "::" << vl->v;
+              if(con->find(ss.str()) != con->end()){
+                lhs = ss.str();
+              }else{
+                stringstream ss2;
+                ss2 << "::" << vl->v;
+                lhs = string(ss2.str());
+              }
+              b1 = b1 & con->AssignGen(lhs, expr_as_bdd(el->e, con, f), b);
               vl = vl->n;
               el = el->n;
             }
             if(s->e)
-              b = b & xformer_for_constrain(s->e, con, f);
-            pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
-            break;       
+              b1 = b1 & xformer_for_constrain(s->e, con, f);
+            pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b1));
+            break;
           case AST_ITE:   
             assert(s->e && s->sl1);
             if(s->sl1){

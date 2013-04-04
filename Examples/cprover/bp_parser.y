@@ -545,7 +545,7 @@ primary_expression
 	  }
 	| '\'' IDENTIFIER
 	  {
-      $$ = mark_post_expr(make_var_expr($2));
+      $$ = make_post_expr(make_var_expr($2));
 	  }
 	| INTEGER 
 	  { 

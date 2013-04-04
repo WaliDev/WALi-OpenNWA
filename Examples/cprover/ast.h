@@ -185,7 +185,7 @@ inline expr * make_eq_expr(expr * l, expr * r);
 inline expr * make_neq_expr(expr * l, expr * r);
 inline expr * make_imp_expr(expr * l, expr * r);
 
-inline expr * mark_post_expr(expr * l);
+inline expr * make_post_expr(expr * l);
 inline expr * make_deep_copy_expr(expr const * e);
 
 inline stmt * make_clean_stmt();

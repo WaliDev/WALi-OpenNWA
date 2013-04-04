@@ -139,8 +139,12 @@ namespace wali
 
           // //////////////Statement Generators/////////////////////////////////////////////
           // Statements can not be composed.
-          bdd Assign(std::string var, bdd expr) const;
-          bdd Assume(bdd expr1, bdd expr2) const;
+          bdd HavocVar(std::string var, bdd prev) const;
+	  bdd Assign(std::string var, bdd expr) const;
+          bdd AssignGen(std::string var, bdd expr, bdd aType) const;
+	  bdd AssignTrue(std::string var, bdd expr) const;
+	  bdd Assume(bdd expr1, bdd expr2) const;
+          bdd BaseID() const;
 
           // //////////////Generates a random bdd///////////////////////////////////////////
           bdd tGetRandomTransformer(bool isTensored = false, unsigned seed=0) const;

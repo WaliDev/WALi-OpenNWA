@@ -112,12 +112,12 @@ inline expr * make_imp_expr(expr * l, expr * r)
   e->r = r;
   return e;
 }
-inline expr * mark_post_expr(expr *l)
+inline expr * make_post_expr(expr *l)
 {
   if(!l)
-    assert(0 && "mark_post_expr");
+    assert(0 && "make_post_expr");
   if(!(l->op == AST_VAR || l->op == AST_VAR_POST))
-    assert(0 && "mark_post_expr");
+    assert(0 && "make_post_expr");
   l->op = AST_VAR_POST;
   return l;
 }
