@@ -6,6 +6,25 @@
 namespace wali {
     namespace wfa {
 
+        struct NonInheritingTransCounter
+        {
+            int n;
+            void operator() (ITrans * UNUSED_PARAMETER(t)) {
+                ++n;
+            }
+            NonInheritingTransCounter()
+                : n(0)
+            {}
+        };
+
+        TEST(wali$wfa$WFA$$for_each, TransCounterThatDoesNotInheritFromTransFunctor)
+        {
+            LoopReject f;
+            NonInheritingTransCounter counter;
+            f.wfa.for_each(counter);
+            EXPECT_EQ(3, counter.n);
+        }
+            
         TEST(wali$wfa$WFA$$alphabet, battery)
         {
             Letters letters;

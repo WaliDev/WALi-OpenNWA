@@ -445,6 +445,16 @@ namespace wali
       details::for_each_mutable(state_map, tf);
     }
 
+    void WFA::for_each( boost::function<void(ITrans * t)> & tf )
+    {
+      details::for_each_mutable(state_map, tf);
+    }
+
+    void WFA::for_each( boost::function<void(ITrans const * t)> & tf ) const
+    {
+      details::for_each_const(state_map, tf);
+    }
+
     void WFA::duplicateStates(std::set<Key> &st, WFA &output) const {
       // Create a map from state to their renamed counterpart
       std::map< Key, Key > dup;

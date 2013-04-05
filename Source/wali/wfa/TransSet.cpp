@@ -73,6 +73,16 @@ namespace wali {
     {
       details::each(impl.begin(), impl.end(), tf);
     }
+        
+    void TransSet::each( boost::function<void(ITrans * t)> & tf )
+    {
+      details::each(begin(), end(), tf);
+    }
+
+    void TransSet::each( boost::function<void(ITrans const * t)> & tf ) const
+    {
+      details::each(impl.begin(), impl.end(), tf);
+    }
 
     bool TransSet::insert( ITrans* t )
     {
