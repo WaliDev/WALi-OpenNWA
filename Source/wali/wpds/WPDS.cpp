@@ -1158,6 +1158,40 @@ namespace wali
          << "   steps:  " << rules.stepRules.size() << "\n"
          << "   pops:   " << rules.popRules.size() << "\n";
     }
+
+    namespace details {
+      class WfaTransCreator : public ConstRuleFunctor
+      {
+        bool _create_pairs;
+        wfa::WFA & _wfa;
+
+      public:
+        WfaTransCreator(bool create_pairs, wfa::WFA & wfa)
+          : _create_pairs(create_pairs)
+          , _wfa(wfa)
+        {}
+        
+        virtual void operator()( const rule_t & r ) {
+          assert(r->to_stack1() != WALI_EPSILON);
+          assert(r->to_stack2() == WALI_EPSILON);
+
+          Key source = _create_pairs ? getKey(r->from_state(), r->from_stack()) : r->from_stack();
+          Key target = _create_pairs ? getKey(r->to_state(), r->to_stack1()) : r->to_stack1();
+          Key symbol = r->from_stack();
+          sem_elem_t weight = r->weight();
+
+          _wfa.addTrans(source, symbol, target, weight);
+        }
+      };
+      
+    }
+
+    void
+    WPDS::toWfa(wfa::WFA & wfa) const
+    {
+      details::WfaTransCreator func(num_pds_states() != 1, wfa);
+      for_each(func);
+    }
   } // namespace wpds
 
 } // namespace wali
