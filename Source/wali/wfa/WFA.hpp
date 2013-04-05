@@ -6,6 +6,7 @@
  */
 
 #include <boost/function.hpp>
+#include <boost/ref.hpp>
 
 // ::wali
 #include "wali/Common.hpp"
@@ -70,7 +71,7 @@ namespace wali
       virtual ~DotAttributePrinter() {}
     };
 
-    bool is_epsilon_transition(ITrans const * trans);
+      bool is_epsilon_transition(ITrans const * trans);
     
     bool is_any_transition(ITrans const * trans);
       
@@ -315,11 +316,25 @@ namespace wali
          * @brief invoke TransFunctor tf on each Trans
          */
         virtual void for_each( TransFunctor& tf );
+        virtual void for_each( boost::function<void(ITrans * t)> &);
 
         /**
          * @brief invoke ConstTransFunctor on each Trans
          */
         virtual void for_each( ConstTransFunctor& tf ) const;
+        virtual void for_each( boost::function<void(ITrans const * t)> &) const;
+
+        template<typename Functor>
+        void for_each(Functor & func) {
+            boost::function<void(ITrans * t)> wrapper(boost::ref(func));
+            for_each(wrapper);
+        }
+
+        template<typename Functor>
+        void for_each(Functor & func) const {
+            boost::function<void(ITrans const * t)> wrapper(boost::ref(func));
+            for_each(wrapper);
+        }
 
         /**
          * Intersect this with parameter fa. This is a wrapper

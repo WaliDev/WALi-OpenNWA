@@ -9,6 +9,8 @@
 #include "wali/Printable.hpp"
 #include "wali/wfa/ITrans.hpp"
 
+#include <boost/function.hpp>
+
 #define IMPL_LIST 0
 
 #if IMPL_LIST
@@ -63,6 +65,10 @@ namespace wali
         void each( TransFunctor& tf );
 
         void each( ConstTransFunctor& tf ) const;
+
+        void each( boost::function<void(ITrans * t)> & tf );
+
+        void each( boost::function<void(ITrans const * t)> & tf ) const;
 
         bool insert( ITrans* t );
 
