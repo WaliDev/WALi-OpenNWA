@@ -7,6 +7,8 @@
 
 #include <boost/function.hpp>
 #include <boost/ref.hpp>
+#include <boost/type_traits.hpp>
+#include <boost/utility/enable_if.hpp>
 
 // ::wali
 #include "wali/Common.hpp"
@@ -325,13 +327,15 @@ namespace wali
         virtual void for_each( boost::function<void(ITrans const * t)> &) const;
 
         template<typename Functor>
-        void for_each(Functor & func) {
+        typename boost::disable_if<boost::is_base_of<TransFunctor, Functor> >::type
+        for_each(Functor & func) {
             boost::function<void(ITrans * t)> wrapper(boost::ref(func));
             for_each(wrapper);
         }
 
         template<typename Functor>
-        void for_each(Functor & func) const {
+        typename boost::disable_if<boost::is_base_of<TransFunctor, Functor> >::type
+        for_each(Functor & func) const {
             boost::function<void(ITrans const * t)> wrapper(boost::ref(func));
             for_each(wrapper);
         }
