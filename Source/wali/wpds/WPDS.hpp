@@ -315,6 +315,8 @@ namespace wali
 
         void printStatistics(std::ostream & os) const;
         
+        void toWfa(wfa::WFA & wfa) const;
+
       protected:
 
         /** @brief Actually creates the rule, hanldes the mappings,
@@ -547,6 +549,29 @@ namespace wali
         chash_t & config_map() {
           return configs;
         }
+
+
+        /**
+         * Converts the delta-1-only WPDS to a WFA.
+         *
+         * Three possible things can happen:
+         *
+         * 1. If every rule is of the form <p, a> -> <p, b> for a single PDS
+         *    control location p across all rules (i.e. num_pds_states()==1),
+         *    then will produce a WFA where the states are the stack symbols
+         *    a, b, etc. and there is a transition from a to b corresponding
+         *    to the rules. The symbol on the transition will be the symbol
+         *    of the source state a.
+         *
+         * 2. If there are rules of the form <p, a> -> <q, b> and multiple
+         *    PDS control locations, then states of the WFA are pairs
+         *    (p,a). Transitions correspond to rules as above; the symbol is
+         *    just the original stack symbol. For instance, the above rule
+         *    would cause the WFA to have a transition (p,a) --a--> (q,b).
+         *
+         * 3. If there are delta 0 or delta 1 rules in the PDS, this method
+         *    will assert.
+         */
       private: // methods
 
       protected: // data members

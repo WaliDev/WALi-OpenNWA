@@ -12,6 +12,7 @@ namespace opennwa
             , state2(getKey("another state"))
             , state3(getKey("a third state"))
             , symbol(getKey("a symbol!"))
+            , symbol2(getKey("another symbol!"))
             , internal(state, symbol, state2)
             , call(state, symbol, state2)
             , ret(state, state3, symbol, state2)

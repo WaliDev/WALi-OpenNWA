@@ -12,6 +12,7 @@ namespace opennwa
         public:
             State state, state2, state3;
             Symbol symbol;
+            Symbol symbol2;
             Nwa::Internal internal;
             Nwa::Call call;
             Nwa::Return ret;
