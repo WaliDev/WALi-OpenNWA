@@ -324,12 +324,19 @@ namespace wali
       this->toWpds(p_state, &wpds, trans_accept);
 
       // Add an additional dummy node to pull off the multi-source trick
-      for (std::set<Key>::const_iterator source = sources.begin();
-           source != sources.end(); ++source)
-      {
+      if (sources.size() == 1u) {
+        wpds.add_rule(p_state, dummy,
+                      p_state, *sources.begin(),
+                      getSomeWeight()->one());
+      }
+      else {
+        for (std::set<Key>::const_iterator source = sources.begin();
+             source != sources.end(); ++source)
+        {
           wpds.add_rule(p_state, dummy,
                         p_state, *source, *source,
                         getSomeWeight()->one());
+        }
       }
 
       // Set up the query automaton:
@@ -385,26 +392,33 @@ namespace wali
              trans != transitions.end(); ++trans)
         {
           Key to_state = (*trans)->to();
-          if (to_state == query_accept) {
+          if ((*trans)->stack() == dummy) {
             // We are on the (p_state) ---dummy---> ((query_accept))
             // transition, which we don't care about.
             assert (transitions.size() == 1u);
             continue;
           }
 
-          // to_state better be (p_state, source)_g#; we need to extract
-          // 'source'.
-          key_src_t to_state_refptr = getKeySource(to_state);
-          wpds::GenKeySource const * to_state_gen_source =
-            dynamic_cast<wpds::GenKeySource const *>(to_state_refptr.get_ptr());
-          assert(to_state_gen_source);
+          Key source = WALI_BAD_KEY;
+          
+          if (sources.size() == 1u) {
+            source = *sources.begin();
+          }
+          else {
+            // to_state better be (p_state, source)_g#; we need to extract
+            // 'source'.
+            key_src_t to_state_refptr = getKeySource(to_state);
+            wpds::GenKeySource const * to_state_gen_source =
+              dynamic_cast<wpds::GenKeySource const *>(to_state_refptr.get_ptr());
+            assert(to_state_gen_source);
 
-          key_src_t state_pair = getKeySource(to_state_gen_source->getKey());
-          KeyPairSource const * to_state_pair =
-            dynamic_cast<KeyPairSource const *>(state_pair.get_ptr());
-          assert(to_state_pair);
+            key_src_t state_pair = getKeySource(to_state_gen_source->getKey());
+            KeyPairSource const * to_state_pair =
+              dynamic_cast<KeyPairSource const *>(state_pair.get_ptr());
+            assert(to_state_pair);
 
-          Key source = to_state_pair->second();
+            source = to_state_pair->second();
+          }
           assert(this->getState(source) != NULL);
           
           // Now get the weight. That's the net weight from 'source' to
