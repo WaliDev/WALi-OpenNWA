@@ -2279,7 +2279,7 @@ namespace wali
 
       // We only add {} on-demand. If it's not reachable, then we don't want
       // it there.
-      bool added_sink_state = false;
+      bool need_sink_state = false;
 
       // Maps source state to set of outgoing letters. (We don't care where
       // they go, just whether there is any.)
@@ -2293,7 +2293,7 @@ namespace wali
         }
       }
 
-      KeySet const & states = getStates();
+      KeySet states = getStates();
       for (KeySet::const_iterator state = states.begin();
            state != states.end(); ++state)
       {
@@ -2301,14 +2301,18 @@ namespace wali
              symbol != symbols.end(); ++symbol)
         {
           if (outgoing[*state].find(*symbol) == outgoing[*state].end()) {
-            added_sink_state = true;
+            need_sink_state = true;
             addState(sink_state, one->zero());
             addTrans(*state, *symbol, sink_state, one);
           }
         }
       }
 
-      if (added_sink_state) {
+      if (need_sink_state && states.count(sink_state) == 0u)
+      {
+        // If we don't need it, then we don't need to add transitions to and
+        // from it. :-) If sink_state is in 'states', then this was already
+        // handled by the loop above.
         for (kp_map_t::const_iterator kp_iter = kpmap.begin();
              kp_iter != kpmap.end(); ++kp_iter)
         {
