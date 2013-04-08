@@ -1396,9 +1396,9 @@ namespace wali
       return told;
     }
 
-    TransSet WFA::match( Key p, Key y ) {
+    TransSet WFA::match( Key p, Key y ) const {
       KeyPair kp(p,y);
-      kp_map_t::iterator it = kpmap.find(kp);
+      kp_map_t::const_iterator it = kpmap.find(kp);
       return (it != kpmap.end()) ? it->second : TransSet();
     }
 

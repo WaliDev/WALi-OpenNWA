@@ -506,7 +506,7 @@ namespace wali
          *
          * @see TransSet
          */
-        TransSet match( Key p, Key y);
+        TransSet match( Key p, Key y) const;
 
         /** 
          * Create a State * for the key Key
