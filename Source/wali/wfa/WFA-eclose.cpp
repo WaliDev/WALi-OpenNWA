@@ -335,7 +335,7 @@ namespace wali
       // Set up the query automaton:
       //               dummy
       //     p_state -----------> ((query_accept))
-      //              weight 1
+      //             query_weight
       WFA query;
       query.addState(p_state, state_weight);
       query.addState(query_accept, state_weight);
