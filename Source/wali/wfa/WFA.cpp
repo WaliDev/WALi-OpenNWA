@@ -520,6 +520,32 @@ namespace wali
     namespace details
     {
       void
+      maybe_add_state(WFA & dest,
+                      std::vector<KeyPair> & worklist,
+                      WFA const & left,
+                      WFA const & right,
+                      WeightMaker & wmaker,
+                      sem_elem_t zero,
+                      Key target_key,
+                      KeyPair target_pair)
+      {
+        if (dest.getStates().count(target_key) == 0) {
+          sem_elem_t state_weight = wmaker.make_weight(left.getState(target_pair.first)->weight(),
+                                                       right.getState(target_pair.second)->weight());
+          if (state_weight.get_ptr() == NULL) {
+            state_weight = zero;
+          }
+          dest.addState(target_key, state_weight);
+          worklist.push_back(target_pair);
+          if (left.isFinalState(target_pair.first)
+              && right.isFinalState(target_pair.second))
+          {
+            dest.addFinalState(target_key);
+          }
+        }
+      }
+      
+      void
       handle_transition(WFA & dest,
                         std::vector<KeyPair> & worklist,
                         WeightMaker & wmaker,
@@ -553,20 +579,10 @@ namespace wali
             KeyPair target_pair(this_target_iter->first, fa_target_iter->first);
             Key target_key = getKey(target_pair.first, target_pair.second);
 
-            if (dest.getStates().count(target_key) == 0) {
-              sem_elem_t state_weight = wmaker.make_weight(left.getState(target_pair.first)->weight(),
-                                                           right.getState(target_pair.second)->weight());
-              if (state_weight.get_ptr() == NULL) {
-                state_weight = zero;
-              }
-              dest.addState(target_key, state_weight);
-              worklist.push_back(target_pair);
-              if (left.isFinalState(target_pair.first)
-                  && right.isFinalState(target_pair.second))
-              {
-                dest.addFinalState(target_key);
-              }
-            }
+            maybe_add_state(dest, worklist,
+                            left, right,
+                            wmaker, zero,
+                            target_key, target_pair);
 
             sem_elem_t
               left_source_to_target = left_trans->weight()->extend(this_target_iter->second),
