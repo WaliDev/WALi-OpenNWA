@@ -516,13 +516,76 @@ namespace wali
     {
       intersect_worklist(wmaker, fa, dest);
     }
+
+    namespace details
+    {
+      void
+      handle_transition(WFA & dest,
+                        std::vector<KeyPair> & worklist,
+                        WeightMaker & wmaker,
+                        sem_elem_t zero,
+                        ITrans const * left_trans,
+                        ITrans const * right_trans,
+                        WFA const & left,
+                        WFA const & right,
+                        WFA::EpsilonCloseCache this_eclose_cache,
+                        WFA::EpsilonCloseCache fa_eclose_cache)
+      {
+        Key source_key = getKey(left_trans->from(), right_trans->from());
+        Key this_mid = left_trans->to();
+        Key fa_mid = right_trans->to();
+        Key symbol = left_trans->stack();
+        assert(symbol == right_trans->stack());
+
+        WFA::AccessibleStateMap
+          this_eclose = left.epsilonCloseCached(this_mid, this_eclose_cache),
+          fa_eclose = right.epsilonCloseCached(fa_mid, fa_eclose_cache);
+
+        for (WFA::AccessibleStateMap::const_iterator this_target_iter = this_eclose.begin();
+             this_target_iter != this_eclose.end(); ++this_target_iter)
+        {
+          for (WFA::AccessibleStateMap::const_iterator fa_target_iter = fa_eclose.begin();
+               fa_target_iter != fa_eclose.end(); ++fa_target_iter)
+          {
+            //           *sym_iter
+            // - - - > o ---------> o - - - - > o
+            //     source_...    ..._mid     target
+            KeyPair target_pair(this_target_iter->first, fa_target_iter->first);
+            Key target_key = getKey(target_pair.first, target_pair.second);
+
+            if (dest.getStates().count(target_key) == 0) {
+              sem_elem_t state_weight = wmaker.make_weight(left.getState(target_pair.first)->weight(),
+                                                           right.getState(target_pair.second)->weight());
+              if (state_weight.get_ptr() == NULL) {
+                state_weight = zero;
+              }
+              dest.addState(target_key, state_weight);
+              worklist.push_back(target_pair);
+              if (left.isFinalState(target_pair.first)
+                  && right.isFinalState(target_pair.second))
+              {
+                dest.addFinalState(target_key);
+              }
+            }
+
+            sem_elem_t
+              left_source_to_target = left_trans->weight()->extend(this_target_iter->second),
+              right_source_to_target = right_trans->weight()->extend(fa_target_iter->second),
+              final_weight = wmaker.make_weight(left_source_to_target, right_source_to_target);
+
+            dest.addTrans(source_key, symbol, target_key, final_weight);
+                  
+          } // for fa eclose
+        } // for this eclose
+      }
+    }
     
     //
     // Intersect this and fa, storing the result in dest
     // TODO: Note: if this == dest there might be a problem
     //
     void WFA::intersect_worklist(
-        WeightMaker& wmaker
+      WeightMaker& wmaker
         , WFA const & fa
         , WFA& dest ) const
     {
@@ -616,7 +679,6 @@ namespace wali
       // Begin the worklist processing
       while (!worklist.empty()) {
         KeyPair source_pair = worklist.back();
-        Key source_key = getKey(source_pair.first, source_pair.second);
         worklist.pop_back();
 
         for (std::set<Key>::const_iterator sym_iter = alphabet.begin();
@@ -632,48 +694,11 @@ namespace wali
             for (TransSet::const_iterator fa_trans_iter = fa_outgoing.begin();
                  fa_trans_iter != fa_outgoing.end(); ++fa_trans_iter)
             {
-              Key this_mid = (*this_trans_iter)->to();
-              Key fa_mid = (*fa_trans_iter)->to();
-              AccessibleStateMap
-                this_eclose = this->epsilonCloseCached(this_mid, this_eclose_cache),
-                fa_eclose = fa.epsilonCloseCached(fa_mid, fa_eclose_cache);
-
-              for (AccessibleStateMap::const_iterator this_target_iter = this_eclose.begin();
-                   this_target_iter != this_eclose.end(); ++this_target_iter)
-              {
-                for (AccessibleStateMap::const_iterator fa_target_iter = fa_eclose.begin();
-                     fa_target_iter != fa_eclose.end(); ++fa_target_iter)
-                {
-                  //           *sym_iter
-                  // - - - > o ---------> o - - - - > o
-                  //     source_...    ..._mid     target
-                  KeyPair target_pair(this_target_iter->first, fa_target_iter->first);
-                  Key target_key = getKey(target_pair.first, target_pair.second);
-
-                  if (dest.Q.count(target_key) == 0) {
-                    sem_elem_t state_weight = wmaker.make_weight(this->getState(target_pair.first)->weight(),
-                                                                 fa.getState(target_pair.second)->weight());
-                    if (state_weight.get_ptr() == NULL) {
-                      state_weight = zero;
-                    }
-                    dest.addState(target_key, state_weight);
-                    worklist.push_back(target_pair);
-                    if (this->isFinalState(target_pair.first)
-                        && fa.isFinalState(target_pair.second))
-                    {
-                      dest.addFinalState(target_key);
-                    }
-                  }
-
-                  sem_elem_t
-                    this_source_to_target = (*this_trans_iter)->weight()->extend(this_target_iter->second),
-                    fa_source_to_target = (*fa_trans_iter)->weight()->extend(fa_target_iter->second),
-                    final_weight = wmaker.make_weight(this_source_to_target, fa_source_to_target);
-
-                  dest.addTrans(source_key, *sym_iter, target_key, final_weight);
-                  
-                } // for fa eclose
-              } // for this eclose
+              details::handle_transition(dest, worklist,
+                                         wmaker, zero,
+                                         *this_trans_iter, *fa_trans_iter,
+                                         *this, fa,
+                                         this_eclose_cache, fa_eclose_cache);
             } // for each transition in fa_outgoing
           } // for each transition in this_outgoing
         }// for each alphabet
