@@ -563,36 +563,23 @@ namespace wali
         Key symbol = left_trans->stack();
         assert(symbol == right_trans->stack());
 
-        WFA::AccessibleStateMap
-          this_eclose = left.epsilonCloseCached(this_mid, this_eclose_cache),
-          fa_eclose = right.epsilonCloseCached(fa_mid, fa_eclose_cache);
+        //           *sym_iter
+        // - - - > o ---------> o
+        //     source_...    ..._mid
+        KeyPair target_pair(this_mid, fa_mid);
+        Key target_key = getKey(target_pair.first, target_pair.second);
 
-        for (WFA::AccessibleStateMap::const_iterator this_target_iter = this_eclose.begin();
-             this_target_iter != this_eclose.end(); ++this_target_iter)
-        {
-          for (WFA::AccessibleStateMap::const_iterator fa_target_iter = fa_eclose.begin();
-               fa_target_iter != fa_eclose.end(); ++fa_target_iter)
-          {
-            //           *sym_iter
-            // - - - > o ---------> o - - - - > o
-            //     source_...    ..._mid     target
-            KeyPair target_pair(this_target_iter->first, fa_target_iter->first);
-            Key target_key = getKey(target_pair.first, target_pair.second);
+        maybe_add_state(dest, worklist,
+                        left, right,
+                        wmaker, zero,
+                        target_key, target_pair);
 
-            maybe_add_state(dest, worklist,
-                            left, right,
-                            wmaker, zero,
-                            target_key, target_pair);
+        sem_elem_t
+          left_source_to_target = left_trans->weight(),
+          right_source_to_target = right_trans->weight(),
+          final_weight = wmaker.make_weight(left_source_to_target, right_source_to_target);
 
-            sem_elem_t
-              left_source_to_target = left_trans->weight()->extend(this_target_iter->second),
-              right_source_to_target = right_trans->weight()->extend(fa_target_iter->second),
-              final_weight = wmaker.make_weight(left_source_to_target, right_source_to_target);
-
-            dest.addTrans(source_key, symbol, target_key, final_weight);
-                  
-          } // for fa eclose
-        } // for this eclose
+        dest.addTrans(source_key, symbol, target_key, final_weight);
       }
     }
     
@@ -619,6 +606,7 @@ namespace wali
       {
         alphabet.insert(iter->first.second);
       }
+      alphabet.insert(WALI_EPSILON);
 
       // Siiiiiiiigh. (nc = non-const)
       WFA * this_nc = const_cast<WFA*>(this);
@@ -691,7 +679,6 @@ namespace wali
         }
       }
       
-
       // Begin the worklist processing
       while (!worklist.empty()) {
         KeyPair source_pair = worklist.back();
@@ -704,12 +691,38 @@ namespace wali
             this_outgoing = this_nc->match(source_pair.first, *sym_iter),
             fa_outgoing = fa_nc->match(source_pair.second, *sym_iter);
 
+          if (*sym_iter == WALI_EPSILON) {
+            // One automaton or the other can not move
+            ITrans
+              * left_no_motion = new Trans(source_pair.first, WALI_EPSILON,
+                                           source_pair.first, this->getSomeWeight()->one()),
+              * right_no_motion = new Trans(source_pair.second, WALI_EPSILON,
+                                            source_pair.second, fa.getSomeWeight()->one());
+
+            // Will fail if there is already an epsilon self
+            // loop. (Non-trivial cycles should be OK.)
+            assert(this_outgoing.find(left_no_motion) == this_outgoing.end());
+            assert(fa_outgoing.find(right_no_motion) == fa_outgoing.end());
+            
+            this_outgoing.insert(left_no_motion);
+            fa_outgoing.insert(right_no_motion);
+          }
+
           for (TransSet::const_iterator this_trans_iter = this_outgoing.begin();
                this_trans_iter != this_outgoing.end(); ++this_trans_iter)
           {
             for (TransSet::const_iterator fa_trans_iter = fa_outgoing.begin();
                  fa_trans_iter != fa_outgoing.end(); ++fa_trans_iter)
             {
+              if (*sym_iter == WALI_EPSILON
+                  && (*this_trans_iter)->from() == (*this_trans_iter)->to()
+                  && (*fa_trans_iter)->from() == (*fa_trans_iter)->to())
+              {
+                sem_elem_t tw = (*this_trans_iter)->weight(), fw = (*fa_trans_iter)->weight();
+                assert(tw->equal(tw->one()));
+                assert(fw->equal(fw->one()));
+                continue;
+              }
               details::handle_transition(dest, worklist,
                                          wmaker, zero,
                                          *this_trans_iter, *fa_trans_iter,
@@ -1058,7 +1071,6 @@ namespace wali
     //
     void WFA::prune()
     {
-
       // First, remove all transitions with zero weight
       TransZeroWeight tzw;
       for_each(tzw);
