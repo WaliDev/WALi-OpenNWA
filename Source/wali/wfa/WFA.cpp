@@ -530,8 +530,11 @@ namespace wali
                       KeyPair target_pair)
       {
         if (dest.getStates().count(target_key) == 0) {
-          sem_elem_t state_weight = wmaker.make_weight(left.getState(target_pair.first)->weight(),
-                                                       right.getState(target_pair.second)->weight());
+          sem_elem_t
+            state_weight = wmaker.make_weight(left.getState(target_pair.first)->weight(),
+                                              right.getState(target_pair.second)->weight()),
+            accept_weight = wmaker.make_weight(left.getState(target_pair.first)->acceptWeight(),
+                                             right.getState(target_pair.second)->acceptWeight());
           if (state_weight.get_ptr() == NULL) {
             state_weight = zero;
           }
@@ -540,7 +543,7 @@ namespace wali
           if (left.isFinalState(target_pair.first)
               && right.isFinalState(target_pair.second))
           {
-            dest.addFinalState(target_key);
+            dest.addFinalState(target_key, accept_weight);
           }
         }
       }
