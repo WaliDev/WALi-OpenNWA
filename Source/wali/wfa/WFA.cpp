@@ -618,70 +618,14 @@ namespace wali
       // Now start the actual intersection bit.
       std::vector<KeyPair> worklist;
 
-      // Create any state pairs that are reachable from the start states via
-      // only epsilon transitions
-      AccessibleStateMap
-        this_start_eclose = this->epsilonCloseCached(this->getInitialState(), this_eclose_cache),
-        fa_start_eclose = fa.epsilonCloseCached(fa.getInitialState(), fa_eclose_cache);
+      Key initial_key = getKey(this->getInitialState(), fa.getInitialState());
+      KeyPair initial_pair(this->getInitialState(), fa.getInitialState());
+      details::maybe_add_state(dest, worklist,
+                               *this, fa,
+                               wmaker, zero,
+                               initial_key, initial_pair);
+      dest.setInitialState(initial_key);       
 
-
-      if (this_start_eclose.size() != 1 || fa_start_eclose.size() != 1)
-      {
-        // Create the "fake" initial state. This will have epsilon transitions
-        // to any "real" start states.
-        Key initial_key = getKey("WFA__intersect__dummy__start");
-        dest.setInitialState(initial_key);
-      
-        for (AccessibleStateMap::const_iterator this_target_iter = this_start_eclose.begin();
-             this_target_iter != this_start_eclose.end(); ++this_target_iter)
-        {
-          for (AccessibleStateMap::const_iterator fa_target_iter = fa_start_eclose.begin();
-               fa_target_iter != fa_start_eclose.end(); ++fa_target_iter)
-          {
-            // This means that we should have
-            //   initial_key ------->  (p, q)
-            //                epsilon
-            // where p,q are {this,fa}_target_iter->first, and
-            // where the weight is made of {this,fa}_target_iter->second
-         
-            KeyPair real_initial_pair(this_target_iter->first, fa_target_iter->first);
-            worklist.push_back(real_initial_pair);
-            Key real_initial_key = getKey(real_initial_pair.first, real_initial_pair.second);
-            dest.addState(real_initial_key,
-                          wmaker.make_weight(this->getState(real_initial_pair.first)->weight(),
-                                             fa.getState(real_initial_pair.second)->weight()));
-            sem_elem_t weight = wmaker.make_weight(this_target_iter->second, fa_target_iter->second);
-            dest.addTrans(initial_key, WALI_EPSILON, real_initial_key, weight);
-          
-            if (this->isFinalState(real_initial_pair.first)
-                && fa.isFinalState(real_initial_pair.second))
-            {
-              dest.addFinalState(real_initial_key);
-            }
-          }
-        }
-      }
-      else {
-        Key initial_key = getKey(this->getInitialState(), fa.getInitialState());
-        KeyPair initial_pair(this->getInitialState(), fa.getInitialState());
-
-        sem_elem_t state_weight = wmaker.make_weight(this->getState(initial_pair.first)->weight(),
-                                                     fa.getState(initial_pair.second)->weight());
-        if (state_weight.get_ptr() == NULL) {
-          state_weight = zero;
-        }
-        dest.addState(initial_key, state_weight);
-
-        worklist.push_back(initial_pair);
-
-        dest.setInitialState(initial_key);        
-        if (this->isFinalState(initial_pair.first)
-            && fa.isFinalState(initial_pair.second))
-        {
-          dest.addFinalState(initial_key);
-        }
-      }
-      
       // Begin the worklist processing
       while (!worklist.empty()) {
         KeyPair source_pair = worklist.back();
