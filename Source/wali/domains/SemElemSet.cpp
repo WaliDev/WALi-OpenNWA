@@ -188,12 +188,7 @@ namespace wali
       for (ElementSet::const_iterator element = es.begin();
            element != es.end(); ++element)
       {
-        size_t pre_size = this->elements.size();
         add_element_if_appropriate(this->keep_what, this->elements, this->the_hash, *element, include_zeroes);
-        if (pre_size != this->elements.size()) {
-          // Added
-          assert(this->elements.size() == pre_size + 1u);
-        }
       }
     }
 
