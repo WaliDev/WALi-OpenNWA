@@ -644,28 +644,33 @@ namespace wali
 
         map<string, int> vars;
 
+	//Iterate through the global variables and give them unique names
         const str_list * vl = pg->vl;
         while(vl){
           stringstream ss;
           ss << "::" << vl->v;
-          vars[ss.str()] = 2;
+          vars[ss.str()] = 2; //A Boolean type
           vl = vl->n;
         }
+	
+	//For each procedure
         proc_list * pl = pg->pl;
         while(pl){
+	  //Iterate through the arguments to the procedure and give them unique names
           vl = pl->p->al;
           while(vl){
             stringstream ss;
             ss << pl->p->f << "::" << vl->v;
-            vars[ss.str()] = 2;
+            vars[ss.str()] = 2; //A Boolean type
             vl = vl->n;
           }
+	  //Iterate through the local variables of the procedure and give them unique names
           vl = pl->p->vl;
           while(vl){
             stringstream ss;
             ss << pl->p->f << "::" << vl->v;
             //con->addBoolVar(ss.str());
-            vars[ss.str()] = 2;
+            vars[ss.str()] = 2; //A Boolean type
             vl = vl->n;
           }
           pl = pl->n;
@@ -695,6 +700,7 @@ namespace wali
           call_to_callee.clear();
           pl = pl->n;
         }
+	havocLocals(pds,pg,con);
         name_to_proc.clear();
         fprintf(stderr, "Done converting\n");
 
@@ -1053,6 +1059,97 @@ namespace wali
       BddContext * con = dump_pds_from_prog(pds, pg);
       pds->printStatistics(cout);
       return con;
+    }
+
+    BddContext * havocLocals(wpds::WPDS * pds, prog * pg, ProgramBddContext * con)
+    {
+        WpdsRules dr = WpdsRules();
+        pds->for_each(dr);
+        for( std::set<Rule>::iterator it = dr.pushRules.begin();
+	   it != dr.pushRules.end(); ++it ){
+
+        // Find p', y'
+        Key p_prime = it->to_state();
+        Key y_prime = it->to_stack1();
+    	Key y_prime_prime = it->to_stack2();
+
+    	assert(y_prime_prime != WALI_EPSILON);
+   	assert(y_prime != WALI_EPSILON);
+
+    	// Create havoc weight h
+    	bdd h = con->BaseID();
+
+        //For each procedure
+        proc_list * pl = pg->pl;
+        while(pl){
+          //Iterate through the local variables of the procedure and give them unique names
+          const str_list * vl = pl->p->vl;
+          while(vl){
+            stringstream ss;
+            ss << pl->p->f << "::" << vl->v;
+            string lhs = ss.str();
+            h = con->HavocVar(lhs, h);
+            vl = vl->n;
+          }
+          pl = pl->n;
+        }
+
+	BinRel * h_new = new BinRel(con,h);
+	sem_elem_t h_sem = (SemElem *)h_new;
+
+    	// For each rule r_n, if r+n is of the form <p',y'> -w-> <p", y''', y''''>
+    	//                                      <p',y'> -w-> <p",y'''>
+    	//                                      <p',y'> -w-> <p",*>
+    	//    weight w_new = h extend w
+    	//    add_rule(... same rule with w_new ...);
+    	// p", y''', y''''
+	for( std::set<Rule>::iterator sit = dr.stepRules.begin();
+	     sit != dr.stepRules.end(); sit++ )
+	{
+	  Key p_prime2 = sit->from_state();
+	  Key y_prime2 = sit->from_stack();
+	  if ((p_prime2 == p_prime) && (y_prime2 == y_prime))
+	  {
+	    Key p_dprime = sit->to_state();
+	    Key y_prime3 = sit->to_stack1();
+	    Key y_prime4 = sit->to_stack2();
+	    sem_elem_t w_new = h_sem->extend(sit->weight());
+	    pds->replace_rule(p_prime,y_prime,p_dprime,y_prime3,y_prime4,w_new);
+	  }
+	}
+
+                for( std::set<Rule>::iterator sit = dr.popRules.begin();
+             sit != dr.popRules.end(); sit++ )
+        {
+          Key p_prime2 = sit->from_state();
+          Key y_prime2 = sit->from_stack();
+          if ((p_prime2 == p_prime) && (y_prime2 == y_prime))
+          {
+            Key p_dprime = sit->to_state();
+            Key y_prime3 = sit->to_stack1();
+            Key y_prime4 = sit->to_stack2();
+            sem_elem_t w_new = h_sem->extend(sit->weight());
+            pds->replace_rule(p_prime,y_prime,p_dprime,y_prime3,y_prime4,w_new);
+          }
+        }
+
+        for( std::set<Rule>::iterator sit = dr.pushRules.begin();
+             sit != dr.pushRules.end(); sit++ )
+        {
+          Key p_prime2 = sit->from_state();
+          Key y_prime2 = sit->from_stack();
+          if ((p_prime2 == p_prime) && (y_prime2 == y_prime))
+          {
+            Key p_dprime = sit->to_state();
+            Key y_prime3 = sit->to_stack1();
+            Key y_prime4 = sit->to_stack2();
+            sem_elem_t w_new = h_sem->extend(sit->weight());
+            pds->replace_rule(p_prime,y_prime,p_dprime,y_prime3,y_prime4,w_new);
+          }
+        }
+
+	return con;
+      }
     }
 
     void print_prog_stats(prog * pg)

@@ -423,10 +423,39 @@ namespace goals {
     errfa.setInitialState(getPdsState());
     errfa.addFinalState(fin);
 
+    if(dump){
+      cout << "[Newton Compare] Dumping the error automaton in dot format to errfa.dot" << endl;
+      fstream outfile("errfa.dot", fstream::out);
+      errfa.print_dot(outfile, true);
+      outfile.close();
+    }
+    if(dump){
+      cout << "[Newton Compare] Dumping the error automaton to errfa.txt" << endl;
+      fstream outfile("errfa.txt", fstream::out);
+      errfa.print(outfile);
+      outfile.close();
+    }
+
+
     WFA interfa;
-    KeepRight wmaker;
-    interfa = errfa.intersect(wmaker, outfa);
+    KeepLeft wmaker;
+    interfa = outfa.intersect(wmaker, errfa);
     
+
+    if(dump){
+      cout << "[Newton Compare] Dumping the intersected automaton in dot format to intfa.dot" << endl;
+      fstream outfile("intfa.dot", fstream::out);
+      interfa.print_dot(outfile, true);
+      outfile.close();
+    }
+    if(dump){
+      cout << "[Newton Compare] Dumping the error automaton to intfa.txt" << endl;
+      fstream outfile("intfa.txt", fstream::out);
+      interfa.print(outfile);
+      outfile.close();
+    }
+
+
     cout << "[Newton Compare] Computing path summary..." << endl;
     interfa.path_summary(outfa.getSomeWeight()->one());
 
@@ -528,6 +557,8 @@ namespace goals {
     t->measureAndReport =false;
     doPostStar(pds, outfa);
     sem_elem_t wt = computePathSummary(pds, outfa);
+    //wt->print(std::cout);
+
     if(wt->equal(wt->zero()))
       cout << "[Newton Compare] EWPDS ==> error not reachable" << endl;
     else{
@@ -554,6 +585,8 @@ namespace goals {
       pds = new EWPDS();
       con = pds_from_prog(pds, pg);
     }
+
+    //pds->print(std::cout) << endl;
 
 #if defined(BINREL_STATS)
     con->resetStats(); 
