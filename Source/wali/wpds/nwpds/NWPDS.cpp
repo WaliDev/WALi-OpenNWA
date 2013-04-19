@@ -270,16 +270,18 @@ void NWPDS::poststarSetupPds()
     oldCallSite[y] = t;
     oldFuncEntryPair[IntState(p_prime, y_prime)] = IntState(p_prime, t_prime);
     // erase rule from the WPDS
-    erase_rule(p,y,p_prime,y_prime,y_prime_prime);
     ERule * er = boost::polymorphic_downcast<ERule*>(r.get_ptr()); //change to static_cast ? 
+    merge_fn_t rm = er->merge_fn();
+    sem_elem_t rw = er->weight();
+    erase_rule(p,y,p_prime,y_prime,y_prime_prime);
     //Add: <p,t> -> <p',y'y''>
-    add_rule(p,t,p_prime,y_prime,y_prime_prime,er->weight(),er->merge_fn());
+    add_rule(p,t,p_prime,y_prime,y_prime_prime,rw,rm);
     //Add: <p,y> -> <p',t'y''>
-    add_rule(p,y,p_prime,t_prime,y_prime_prime,er->weight(),er->merge_fn());
+    add_rule(p,y,p_prime,t_prime,y_prime_prime,rw,rm);
     // <p,t> -> <p',t'y''>
-    add_rule(p,t,p_prime,t_prime,y_prime_prime,er->weight(),er->merge_fn());
+    add_rule(p,t,p_prime,t_prime,y_prime_prime,rw,rm);
     //Add: <p',t'> -> <p',.>
-    add_rule(p_prime,t_prime,p_prime,er->weight()->zero());
+    add_rule(p_prime,t_prime,p_prime,rw->zero());
     
   }
   if(dbg){
@@ -439,25 +441,61 @@ void NWPDS::prestar(wfa::WFA const &, wfa::WFA &)
 }
 
 /**
- * poststar using newton method
- * This involves --
- *  (1) Change the PDS so that we replace every delta2 rule <p,y> --> <p',y'y''> by 3 rules
- *      (i)   <p,t> --> <p',y'y''> 
- *      (ii)  <p,y> --> <p',t'y''> and <p',t'> --> <p',*> with weight = 0
- *      (iii) <p,t> --> <p',t'y''>  // TODO#1
- *  The idea behind this transformation is as follows:
- *  <p,y> --> <p',y'y''> gives us in the poststar GFA problem, the equation -- 
- *  \Forall{q} (p,y'',q) = (p,y,q) . (p_{y'},*,q)
- *  where p_{y'} is the intermediate state generated during poststar for the entry function y', and * is the epsilon symbol.
- *  Upon linearlzing this equation, we obrain,
- *  \Forall{q} (p,y'',q) = ((p,y,q).(p_{t'},*,q)) + ((p,t,q).(p_{y'},*,q)) + ((p,t,q) . (p_{t'},*,q))
- *  where the values with y (y')replaced by t (t') are constants corresponding to the values obtained in the last newton
- *  round.
- *  We can obtain this linearized GFA problem if we change our PDS as above. Note that (ii) replace the actual function 
- *  body for the call at t' with a 0 weight edge. This ensures that no information flows through the summary call. 
  *
- *  (2) Update the WFA to correctly setup the values on the transitions (p,t,q) and (p_{t'},*,q) between newton rounds.
- *  For this, between newton rounds, we copy values from (p,y,q) to (p,t,q) and (p_{y'},*,q) to (p_{t'},*,q).
+ * Poststar using Newton's method
+ *
+ * The Newton poststar method involves two steps:
+ *
+ *  (1) Change the PDS so that every Delta_2 rule <p,y> -w-> <p',y'y''>
+ *      is replaced by 3 rules,
+ *
+ *      (i) <p,t> -w-> <p',y'y''> 
+ *     (ii) <p,y> -w-> <p',t'y''> and <p',t'> -0-> <p',*>
+ *    (iii) <p,t> -w-> <p',t'y''>
+ *
+ *  The idea behind the transformation is as follows.
+ *  Let "*" denote the epsilon symbol. In a poststar problem,
+ *  a Delta_2 rule <p,y> -w-> <p',y'y''> causes an intermediate state
+ *  q_{p',y'} to be introduced. Because a poststar problem gives
+ *  rise to a backwards WFA, the equations for <p,y> -w-> <p',y'y''>
+ *  in the corresponding GFA problem are expressed as follows:
+ *
+ *  \Forall{q} (p,y'',q) = (q_{p',y'},y'',q)  . (p',*,q_{p',y'}), which corresponds to
+ *             val[ret]  = val[call-site] . w . val[exit], and hence can also be expressed as
+ *  \Forall{q} (p,y'',q) = (p,y,q)        . w . (p',*,q_{p',y'}).
+ *
+ *  After linearizing the latter equations, we obtain the GFA equations
+ *
+ *  \Forall{q} (p,y'',q) =   (p,t,q) . w . (p',*,q_{p',y'})        // (i)
+ *                         + (p,y,q) . w . (p',*,q_{p',t'})        // (ii)
+ *                         + (p,t,q) . w . (p',*,q_{p',t'}),       // (iii)
+ *  \Forall{q} (p,y'',q) =   (q_{p',y'},y'',q) . (p',*,q_{p',y'})  // (i)
+ *                         + (q_{p',t'},y'',q) . (p',*,q_{p',t'}), // (ii) & (iii)
+ *
+ *  where the value of a transition in which y (y') is replaced by t (t')
+ *  is a constant that corresponds to the value of the y-transition
+ *  (y'-transition) that was obtained in the previous Newton round.
+ *
+ *  We can obtain this linearized GFA problem if we change the PDS via
+ *  the transformation given above. Note that transformation (ii)
+ *  replaces the actual function body for the call at t' with a rule
+ *  with weight 0 ("<p',t'> -0-> <p',*>"). By using 0 as the weight,
+ *  no information flows through the summary call.
+ *
+ *  (2) Between Newton rounds, update the WFA to set up the values
+ *      correctly on the transitions (p,t,q) and (p',*,q_{p',t'}).
+ *      To carry this operation out,
+ *
+ *      (a) take the value from (p,y,q) and transfer it to (p,t,q), and
+ *      (b) take the value from (p',*,q_{p',y'}) and transfer it to
+ *          (p',*,q_{p',t'}).
+ *
+ *      In both cases, the former value is added into the latter, as follows:
+ *
+ *      (a) For every transition (p,y,q) where oldCallSite[y] == t,
+ *          wt(p,t,q) += wt(p,y,q)
+ *      (b) For every transition (p',*,q_{p',y'}) where oldFuncEntry[(p',y')] == (p',t'),
+ *          wt(p',*,q_{p',t'}) += wt(p',*,q_{p',y'})
  **/
 void NWPDS::poststar(wfa::WFA const & input, wfa::WFA & output)
 {

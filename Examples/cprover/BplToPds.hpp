@@ -5,6 +5,8 @@
 
 #include "wali/wpds/WPDS.hpp"
 #include "wali/wpds/fwpds/FWPDS.hpp"
+#include "wali/wpds/Rule.hpp"
+#include "wali/wpds/RuleFunctor.hpp"
 
 #include "wali/domains/binrel/BinRel.hpp"
 #include "wali/domains/binrel/ProgramBddContext.hpp"
@@ -123,7 +125,7 @@ namespace wali
     // Same, but generates MergeFns of type wali::domains::binrel::BinRelTensorMerge
     wali::domains::binrel::BddContext * pds_from_prog_with_tensor_merge(wpds::ewpds::EWPDS * pds, prog * pg);
 
-
+    wali::domains::binrel::BddContext * havocLocals(wpds::WPDS * pds, prog * pg, domains::binrel::ProgramBddContext * con);
 
     void print_prog_stats(prog * pg);
 
