@@ -38,6 +38,7 @@ nice_files = Split("""
 ./wali/ShortestPathSemiring.cpp
 ./wali/LongestSaturatingPathSemiring.cpp
 ./wali/domains/SemElemSet.cpp
+./wali/domains/RepresentativeString.cpp
 ./wali/wpds/RuleFunctor.cpp
 ./wali/wpds/Config.cpp
 ./wali/wpds/ewpds/ERule.cpp
