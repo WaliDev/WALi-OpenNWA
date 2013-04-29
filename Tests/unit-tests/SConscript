@@ -65,6 +65,7 @@ test_files = Split("""
     Source/wali/domains/class-KeyedSemElemSet/position-key.cpp
     Source/wali/domains/class-TraceSplitSemElem/LiteralGuard.cpp
     Source/wali/domains/class-TraceSplitSemElem/TraceSplitSemElem.cpp
+    Source/wali/domains/class-RepresentativeString/representative-string.cpp
     Source/wali/witness/calculating-visitor.cpp
     Source/wali/wfa/class-wfa/membership.cpp
     Source/wali/wfa/class-wfa/epsilonClose.cpp
