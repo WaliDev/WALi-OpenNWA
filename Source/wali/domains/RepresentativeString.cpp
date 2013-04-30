@@ -108,7 +108,8 @@ namespace wali {
         boost::hash<std::string> hasher;
         return hasher(*_value);
       }
-      return 0;
+      // A random number. (Not kidding: I got it from random.org!)
+      return 239023451;
     }
 
   
@@ -121,7 +122,7 @@ namespace wali {
         out << "RepresentativeString(" << *_value << ")";
       }
       else {
-        out << "RepresentativeString(zero)";
+        out << "RepresentativeString::zero";
       }
       return out;
     }
