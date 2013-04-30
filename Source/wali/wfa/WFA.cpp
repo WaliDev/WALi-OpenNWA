@@ -576,9 +576,7 @@ namespace wali
                         target_key, target_pair);
 
         sem_elem_t
-          left_source_to_target = left_trans->weight(),
-          right_source_to_target = right_trans->weight(),
-          final_weight = wmaker.make_weight(left_source_to_target, right_source_to_target);
+          final_weight = wmaker.make_weight(left_trans, right_trans);
 
         dest.addTrans(source_key, symbol, target_key, final_weight);
       }
