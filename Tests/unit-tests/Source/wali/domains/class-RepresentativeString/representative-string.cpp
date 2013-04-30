@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -175,5 +176,76 @@ namespace {
         test_semelem_impl(f.a);
         test_semelem_impl(f.b);
         test_semelem_impl(f.abc);
+    }
+
+    TEST(wali$domains$RepresentativeString$$containerLessThan, orderedCorrectly)
+    {
+        RSFixture f;
+        std::vector<sem_elem_t> strings;
+        strings.push_back(f.zero);
+        strings.push_back(f.eps);
+        strings.push_back(f.a);
+        strings.push_back(f.ab);
+        strings.push_back(f.abc);
+        strings.push_back(f.b);
+        strings.push_back(f.c);
+        strings.push_back(f.def);
+
+        for (size_t first = 0; first != strings.size(); ++first) {
+            EXPECT_FALSE(strings.at(first)->containerLessThan(strings.at(first)));
+            for (size_t second = first+1; second != strings.size(); ++second) {
+                std::stringstream ss;
+                ss << "Current test: strings[" << first << "] vs strings[" << second << "]\n";
+                SCOPED_TRACE(ss.str());
+                
+                EXPECT_TRUE(strings.at(first)->containerLessThan(strings.at(second)));
+                EXPECT_FALSE(strings.at(second)->containerLessThan(strings.at(first)));
+            }
+        }
+    }
+
+
+    TEST(wali$domains$RepresentativeString$$containerLessThan, equalElementsNotLessThanEachOther)
+    {
+        RSFixture f;
+        EXPECT_FALSE(f.abc->containerLessThan(f.abc2));
+        EXPECT_FALSE(f.abc2->containerLessThan(f.abc));
+    }
+
+    
+    TEST(wali$domains$RepresentativeString$$hash, hashesOfDifferentElementsDiffer)
+    {
+        // Make sure all elements have different hashes. This is technically
+        // too strict, but whatever, it'll probably work.
+        RSFixture f;
+        std::set<size_t> hashes;
+
+        hashes.insert(f.zero->hash());
+        hashes.insert(f.eps->hash());
+        hashes.insert(f.a->hash());
+        hashes.insert(f.b->hash());
+        hashes.insert(f.c->hash());
+        hashes.insert(f.ab->hash());
+        hashes.insert(f.abc->hash());
+        hashes.insert(f.def->hash());
+
+        EXPECT_EQ(8u, hashes.size());
+    }
+
+    TEST(wali$domains$RepresentativeString$$hash, hashesOfEqualElementsSame)
+    {
+        RSFixture f;
+        EXPECT_EQ(f.abc->hash(), f.abc2->hash());
+    }
+
+
+    TEST(wali$domains$RepresentativeString$$print, printedRepresentations)
+    {
+        RSFixture f;
+        EXPECT_EQ("RepresentativeString::zero", f.zero->toString());
+        EXPECT_EQ("RepresentativeString()", f.eps->toString());
+        EXPECT_EQ("RepresentativeString(a)", f.a->toString());
+        EXPECT_EQ("RepresentativeString(abc)", f.abc->toString());
+        EXPECT_EQ("RepresentativeString(abc)", f.abc2->toString());
     }
 }
