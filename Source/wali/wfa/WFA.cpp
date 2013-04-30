@@ -556,9 +556,7 @@ namespace wali
                         ITrans const * left_trans,
                         ITrans const * right_trans,
                         WFA const & left,
-                        WFA const & right,
-                        WFA::EpsilonCloseCache this_eclose_cache,
-                        WFA::EpsilonCloseCache fa_eclose_cache)
+                        WFA const & right)
       {
         Key source_key = getKey(left_trans->from(), right_trans->from());
         Key this_mid = left_trans->to();
@@ -597,7 +595,6 @@ namespace wali
     {
       dest.clear();
       dest.setQuery(this->getQuery());
-      EpsilonCloseCache this_eclose_cache, fa_eclose_cache;
 
       sem_elem_t zero = wmaker.make_weight(this->getSomeWeight()->one(),
                                            fa.getSomeWeight()->one())->zero();
@@ -673,8 +670,7 @@ namespace wali
               details::handle_transition(dest, worklist,
                                          wmaker, zero,
                                          *this_trans_iter, *fa_trans_iter,
-                                         *this, fa,
-                                         this_eclose_cache, fa_eclose_cache);
+                                         *this, fa);
             } // for each transition in fa_outgoing
           } // for each transition in this_outgoing
         }// for each alphabet
