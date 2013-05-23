@@ -459,6 +459,13 @@ namespace wali
           return make_assign_stmt(tl, fl, NULL);
         }
 
+	void splice_nongoto_into_stmt_list(stmt_list** prev, stmt_list* new_sl, stmt_list* to_come_after)
+	{
+	  new_sl->n = to_come_after;
+	  *prev = new_sl;
+	  new_sl->s->ll = to_come_after->s->ll;
+	  to_come_after->s->ll = NULL;
+	}
 
         static void instrument_call_return_in_prog(prog * pg)
         {
@@ -500,9 +507,8 @@ namespace wali
             if(sl && sl->s->op == AST_RETURN && sl->s->el != NULL){
               stmt * ns = reserved_vars_from_exprs(sl->s->el);
               stmt_list * asl = make_stmt_list_item(ns);
-              asl->n = sl;
               asl->t = sl->t;
-              pl->p->sl = asl;
+	      splice_nongoto_into_stmt_list(&(pl->p->sl),asl,sl);
             }
 
             // Instrumentation to copy values to reserved globals at call
@@ -511,9 +517,8 @@ namespace wali
             if(sl && sl->s->op == AST_CALL && sl->s->el != NULL){
               stmt * ns = reserved_vars_from_exprs(sl->s->el);
               stmt_list * asl = make_stmt_list_item(ns);
-              asl->n = sl;
               asl->t = sl->t;
-              pl->p->sl = asl;
+	      splice_nongoto_into_stmt_list(&(pl->p->sl),asl,sl);
             }
 
             // Instrumentation at the head to copy values back from reserved globals
@@ -544,8 +549,7 @@ namespace wali
               stmt * ns = vars_from_reserved_vars(s->vl);
               if(h->t != sl){
                 stmt_list * nsl = make_stmt_list_item(ns);
-                nsl->n = sl->n;
-                sl->n = nsl;
+		splice_nongoto_into_stmt_list(&(sl->n),nsl,sl->n);
               }else{
                 add_stmt_right(h,ns);
               }
@@ -564,9 +568,8 @@ namespace wali
             if(s->sl1->s->op == AST_RETURN && s->sl1->s->el != NULL){
               stmt * ns = reserved_vars_from_exprs(s->sl1->s->el);
               stmt_list * asl = make_stmt_list_item(ns);
-              asl->n = s->sl1;
               asl->t = s->sl1->t;
-              s->sl1 = asl;
+	      splice_nongoto_into_stmt_list(&(s->sl1),asl,s->sl1);
             }
           }
           if(s->sl2){
@@ -574,9 +577,8 @@ namespace wali
             if(s->sl2->s->op == AST_RETURN && s->sl2->s->el != NULL){
               stmt * ns = reserved_vars_from_exprs(s->sl2->s->el);
               stmt_list * asl = make_stmt_list_item(ns);
-              asl->n = s->sl2;
               asl->t = s->sl1->t;
-              s->sl2 = asl;
+              splice_nongoto_into_stmt_list(&(s->sl2),asl,s->sl2);
             }
           }
           if(!sl->n)
@@ -590,8 +592,7 @@ namespace wali
           if(s->op == AST_RETURN && s->el != NULL){
             stmt * ns = reserved_vars_from_exprs(s->el);
             stmt_list * asl = make_stmt_list_item(ns);
-            asl->n = sl->n;
-            sl->n = asl;
+            splice_nongoto_into_stmt_list(&(sl->n),asl,(sl->n));
           }
         }
       
@@ -605,19 +606,17 @@ namespace wali
             if(s->sl1->s->op == AST_CALL && s->sl1->s->el != NULL){
               stmt * ns = reserved_vars_from_exprs(s->sl1->s->el);
               stmt_list * asl = make_stmt_list_item(ns);
-              asl->n = s->sl1;
               asl->t = s->sl1->t;
-              s->sl1 = asl;
-            }
+              splice_nongoto_into_stmt_list(&(s->sl1),asl,s->sl1);
+	    }
           }
           if(s->sl2){
             instrument_call_args_in_stmt_list(s->sl2);
             if(s->sl2->s->op == AST_CALL && s->sl2->s->el != NULL){
               stmt * ns = reserved_vars_from_exprs(s->sl2->s->el);
               stmt_list * asl = make_stmt_list_item(ns);
-              asl->n = s->sl2;
               asl->t = s->sl1->t;
-              s->sl2 = asl;
+	      splice_nongoto_into_stmt_list(&(s->sl2),asl,s->sl2);
             }
           }
           if(!sl->n)
@@ -631,8 +630,7 @@ namespace wali
           if(s->op == AST_CALL && s->el != NULL){
             stmt * ns = reserved_vars_from_exprs(s->el);
             stmt_list * asl = make_stmt_list_item(ns);
-            asl->n = sl->n;
-            sl->n = asl;
+	    splice_nongoto_into_stmt_list(&(sl->n),asl,sl->n);
           }
         }
       } // namespce resolve_details
@@ -950,17 +948,25 @@ namespace wali
               case TENSOR_MERGE:
                 {
                   vector<string> lvars;
+		  vector<string> lvars2;
                   stringstream ss;
                   ss << s->f << "::";
+		  stringstream st;
+		  st << f << "::";
                   string str = ss.str();
+		  string str2 = st.str();
                   for(ProgramBddContext::const_iterator cit = con->begin(); cit != con->end(); ++cit)
+		  {
                     if(cit->first.find(str) != string::npos)
                       lvars.push_back(cit->first);
-                  merge_fn_t merge;
+		    if(cit->first.find(str2) != string::npos)
+		      lvars2.push_back(cit->first);
+                  }
+		  merge_fn_t merge;
                   if(merge_type == MEET_MERGE)
-                    merge = new MeetMergeFn(con, lvars);
+                    merge = new MeetMergeFn(con, lvars, lvars2);
                   else
-                    merge = new TensorMergeFn(con, lvars);
+                    merge = new TensorMergeFn(con, lvars, lvars2);
                   boost::polymorphic_cast<EWPDS*>(pds)->add_rule(stt(), stk(s), stt(), stk(callee_iter->second), stk(ns), one, merge);
                 }
                 break;

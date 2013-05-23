@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 /*
  * Important common properties of the ast data-structures (Marker for easy search (%*%*%))
  *
