@@ -1432,6 +1432,7 @@ std::ostream& BinRel::print( std::ostream& o ) const
     o << "Base relation: ";
   else
     o << "Tensored relation: ";
+  
   o << fddset << rel;
   return o;
 }

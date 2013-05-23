@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 
 typedef enum {ZERO = 0, ONE = 1} constant;
 
@@ -50,6 +51,7 @@ typedef struct stmt_struct
   stmt_list * sl1;
   stmt_list * sl2;
 } stmt;
+
 
 typedef struct proc_struct
 {

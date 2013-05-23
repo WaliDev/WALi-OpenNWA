@@ -19,7 +19,7 @@ namespace wali
            * @param localVars
            * The set of local variables of the callee function.
            **/
-          MeetMergeFn(wali::domains::binrel::BddContext * con, std::vector<std::string> const& localVars);
+          MeetMergeFn(wali::domains::binrel::BddContext * con, std::vector<std::string> const& localVars, std::vector<std::string> const& localVars2);
 
           virtual ~MeetMergeFn() {}
 
@@ -51,7 +51,7 @@ namespace wali
            * @param localVars
            * The set of local variables of the callee function.
            **/
-          TensorMergeFn(wali::domains::binrel::BddContext * con, std::vector<std::string> const& localVars);
+          TensorMergeFn(wali::domains::binrel::BddContext * con, std::vector<std::string> const& localVars, std::vector<std::string> const& localVars2);
 
           virtual ~TensorMergeFn() {}
 

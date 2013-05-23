@@ -139,6 +139,8 @@ namespace wali
     void instrument_call_return(prog * pg);
     // May be called any time.
     void remove_skip(prog * pg);
+    //Splice non-goto statement into program and give it the successing statements labels
+    void splice_nongo_into_stmt_list(stmt_list** prev, stmt_list* new_sl, stmt_list* to_come_after);
 
     wali::Key getEntryStk(const prog * pg, const char * procname);
     wali::Key getPdsState();

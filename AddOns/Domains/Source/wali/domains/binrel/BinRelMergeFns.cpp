@@ -10,7 +10,7 @@ using namespace wali::domains::binrel;
 // //////////////////////////////////////////////////////
 // Class MeetMergeFn
 // //////////////////////////////////////////////////////
-MeetMergeFn::MeetMergeFn(BddContext * con, std::vector<std::string> const& localVars)
+MeetMergeFn::MeetMergeFn(BddContext * con, std::vector<std::string> const& localVars, std::vector<std::string> const& localVars2)
 {
   // start with Id in the base domain
   bdd havocCalleeLocalsBdd = con->getBaseOne()->getBdd();
@@ -25,8 +25,15 @@ MeetMergeFn::MeetMergeFn(BddContext * con, std::vector<std::string> const& local
     // for each local variable:
     // havoc the post vocabulary for that variables
     havocCalleeLocalsBdd = bdd_exist(havocCalleeLocalsBdd, fdd_ithset(vocIter->second->baseRhs));
+  }
+  for (std::vector<std::string>::const_iterator cit2 = localVars2.begin(); cit2 != localVars2.end(); ++cit2){
+    BddContext::const_iterator vocIter2 = con->find(*cit2);
+    if (vocIter2 == con->end()){
+      cerr << "Unknown variable " << *cit2 << endl;
+      assert(0);
+    }
     // enforce id across that variables
-    constrainLocalsBdd = constrainLocalsBdd & bdd_biimp(fdd_ithset(vocIter->second->baseLhs), fdd_ithset(vocIter->second->baseRhs));
+    constrainLocalsBdd = constrainLocalsBdd & bdd_biimp(fdd_ithset(vocIter2->second->baseLhs), fdd_ithset(vocIter2->second->baseRhs));
   }
 
   havocCalleeLocals = new BinRel(con, havocCalleeLocalsBdd);
@@ -71,7 +78,7 @@ sem_elem_t MeetMergeFn::apply_f(sem_elem_t w1, sem_elem_t w2)
 // //////////////////////////////////////////////////////
 // Class MeetMergeFn
 // //////////////////////////////////////////////////////
-TensorMergeFn::TensorMergeFn(BddContext * con, std::vector<std::string> const& localVars)
+TensorMergeFn::TensorMergeFn(BddContext * con, std::vector<std::string> const& localVars, std::vector<std::string> const& localVars2)
 {
   id = con->getBaseOne();
   // start with Id in the base domain
@@ -87,6 +94,13 @@ TensorMergeFn::TensorMergeFn(BddContext * con, std::vector<std::string> const& l
     // for each local variable:
     // havoc the post vocabulary for that variables
     havocCalleeLocalsBdd = bdd_exist(havocCalleeLocalsBdd, fdd_ithset(vocIter->second->baseRhs));
+  }
+  for(std::vector<std::string>::const_iterator cit = localVars2.begin(); cit != localVars2.end(); ++ cit){
+    BddContext::iterator vocIter = con->find(*cit);
+    if(vocIter == con->end()){
+      cerr << "Unkown variable " << *cit << endl;
+      assert(0);
+    }
     // enforce equality across the two tensor levels
     idWithEqualLocalsBdd = idWithEqualLocalsBdd & bdd_biimp(fdd_ithset(vocIter->second->tensor1Lhs), fdd_ithset(vocIter->second->tensor2Lhs));
   }
