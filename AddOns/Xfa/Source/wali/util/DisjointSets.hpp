@@ -342,7 +342,10 @@ namespace wali
         {
           assert(outer_iter->begin() != outer_iter->end());
           ElementType const & first_element = *outer_iter->begin();
-          if (that._id_mapping.left.count(first_element) == 0) {
+
+          if (that._id_mapping.left.find(first_element)
+              == that._id_mapping.left.end())
+          {
             // element isn't present at all
             return false;
           }
@@ -353,7 +356,9 @@ namespace wali
               inner_iter != outer_iter->end(); ++inner_iter)
           {
             ElementType const & element = *inner_iter;
-            if (that._id_mapping.left.count(element) == 0) {
+            if (that._id_mapping.left.find(element)
+                == that._id_mapping.left.end())
+            {
               // element isn't present at all
               return false;
             }
