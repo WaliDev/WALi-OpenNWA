@@ -550,7 +550,7 @@ namespace wali {
                 wfa.addTrans(aeee, l.a, accept, one);
             }
         };
-        
+
     }
 }
 

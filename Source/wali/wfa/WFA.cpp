@@ -2567,6 +2567,55 @@ namespace wali
       this->for_each(x);
       return x.alphabet;
     }
+
+
+    TransSet const *
+    WFA::outgoingTransSet(Key state, Key symbol) const
+    {
+      kp_map_t::const_iterator loc = kpmap.find(KeyPair(state, symbol));
+
+      if (loc == kpmap.end()
+          || loc->second.size() == 0u)
+      {
+        return NULL;
+      }
+
+      return &loc->second;
+    }
+    
+
+    std::pair<Key, sem_elem_t>
+    WFA::endOfEpsilonChain(Key starting_state) const
+    {
+      // Get the set of outgoing epsilon transitions
+      TransSet const * eps_transitions = outgoingTransSet(starting_state, WALI_EPSILON);
+      if (eps_transitions == NULL
+          || eps_transitions->size() != 1u)
+      {
+        return std::make_pair(starting_state,
+                              getSomeWeight()->one());
+      }
+
+      // Now check for non-epsilon transitions...
+      std::set<Key> alpha = alphabet();
+      for (std::set<Key>::const_iterator iter = alpha.begin();
+           iter != alpha.end(); ++iter)
+      {
+        if (outgoingTransSet(starting_state, *iter) != NULL) {
+          return std::make_pair(starting_state,
+                                getSomeWeight()->one());
+        }
+      }
+
+      // OK. Now we can do real work. :-)
+      ITrans * the_only_outgoing_trans = *(eps_transitions->begin());
+      std::pair<Key, sem_elem_t> nexts =
+        endOfEpsilonChain(the_only_outgoing_trans->to());
+
+      return std::make_pair(nexts.first,
+                            the_only_outgoing_trans->weight()
+                            ->extend(nexts.second));
+    }
     
     
   } // namespace wfa

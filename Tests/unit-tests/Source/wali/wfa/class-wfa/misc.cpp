@@ -61,6 +61,7 @@ namespace wali {
             EXPECT_EQ(abc,  AcceptAbOrAcSemiDeterministic().wfa.alphabet());
             EXPECT_EQ(abc,  AcceptAbOrAcDeterministic().wfa.alphabet());
         }
-        
+
+
     }
 }

@@ -821,6 +821,30 @@ namespace wali
         /// alphabet is never stored explicitly, and this function will
         /// recompute it each time.)
         std::set<Key> alphabet() const;
+
+
+        /// Returns the outgoing TransSet for the given state and symbol. If
+        /// there aren't any transitions, returns NULL.
+        ///
+        /// THIS RETURNS NULL EVEN IF THERE IS AN EMPTY TRANSSET. (This
+        /// allows the user to know if there are transitions just by checking
+        /// the size.)
+        TransSet const *
+        outgoingTransSet(Key state, Key symbol) const;
+
+        /// Returns the state and weight to that state which is at the end of
+        /// a chain of single epsilon transitions.
+        ///
+        /// That is, if there are eps transitions from A to B to C to D and
+        /// you call endOfEpsilonChain(A), it will return D and the weight
+        /// from A to D. However, if B has another outgoing transition to E,
+        /// it will only give you B and the weight to B.
+        ///
+        /// If there are no outgoing epsilon transitions or there are
+        /// multiple transitions outgoing from starting_state, returns
+        /// <starting_state, 1>.
+        std::pair<Key, sem_elem_t>
+        endOfEpsilonChain(Key starting_state) const;
     };
 
   } // namespace wfa
