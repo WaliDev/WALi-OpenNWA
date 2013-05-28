@@ -3,12 +3,14 @@
 #include "wali/wfa/State.hpp"
 #include "wali/ShortestPathSemiring.hpp"
 #include "wali/wfa/DeterminizeWeightGen.hpp"
+#include "fixtures/StringWeight.hpp"
 
 #include "fixtures.hpp"
 
 #define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
 
 using namespace wali::wfa;
+using testing::StringWeight;
 
 static const WFA fas[] = {
     LoopReject().wfa,
@@ -251,68 +253,6 @@ namespace wali {
         }
 
 
-        /// NOTE: THIS IS NOT ACTUALLY A VALID SEMIRING
-        struct StringWeight : SemElem
-        {
-            std::string str;
-
-            StringWeight() {}
-            StringWeight(std::string const & s) : str(s) {}
-
-            sem_elem_t one() const {
-                static sem_elem_t r = new StringWeight();
-                return r;
-            }
-
-            sem_elem_t zero() const {
-                static sem_elem_t r;
-                if (r == NULL) {
-                    r = new StringWeight("ZERO");
-                }
-                return r;
-            }
-
-            sem_elem_t extend(SemElem * se) {
-                StringWeight * w = dynamic_cast<StringWeight*>(se);
-                if (w) {
-                    if (this == zero().get_ptr() || w == zero().get_ptr()) {
-                        return zero();
-                    }
-                    return new StringWeight(str + " " + w->str);
-                }
-                assert (false);
-                return NULL;
-            }
-
-            sem_elem_t combine(SemElem * se) {
-                StringWeight * w = dynamic_cast<StringWeight*>(se);
-                if (w) {
-                    if (this == zero().get_ptr()) {
-                        return w;
-                    }
-                    else if (w == zero().get_ptr()) {
-                        return this;
-                    }
-                    return new StringWeight(str + " | " + w->str);
-                }
-                assert (false);
-                return NULL;
-            }
-
-            bool equal(SemElem * se) const {
-                StringWeight * w = dynamic_cast<StringWeight*>(se);
-                if (w) {
-                    return w->str == str;
-                }
-                return false;
-            }
-
-            std::ostream& print( std::ostream & o ) const {
-                o << ("[" + str + "]");
-                return o;
-            }
-
-        };
 
 
         struct TestLifter
