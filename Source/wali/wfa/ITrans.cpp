@@ -37,7 +37,7 @@ namespace wali
 
     bool ITransEq::operator()( const ITrans* a, const ITrans* b ) 
     {
-      return a->equal(b);
+      return a->equalIgnoringWeight(b);
     }
 
     std::ostream & ITrans::print( std::ostream & o ) const
@@ -76,7 +76,7 @@ namespace wali
       return o;
     }
 
-    bool ITrans::equal( const ITrans & rhs ) const
+    bool ITrans::equalIgnoringWeight(const ITrans & rhs) const
     {
       return ((this == &rhs) ||
           (
@@ -87,7 +87,7 @@ namespace wali
           );
     }
 
-    bool ITrans::equal( const ITrans * rhs ) const
+    bool ITrans::equalIgnoringWeight( const ITrans * rhs ) const
     {
       return ((this == rhs) ||
           (

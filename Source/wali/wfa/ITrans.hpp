@@ -245,10 +245,10 @@ namespace wali
         //
 
         /*! @return true if param rhs is equal to this */
-        virtual bool equal( const ITrans & rhs ) const;
+        virtual bool equalIgnoringWeight( const ITrans & rhs ) const;
 
         /*! @return true if param rhs is equal to this */
-        virtual bool equal( const ITrans * rhs ) const;
+        virtual bool equalIgnoringWeight( const ITrans * rhs ) const;
 
         /*!
          * Print this transition to the ostream. Overrides
