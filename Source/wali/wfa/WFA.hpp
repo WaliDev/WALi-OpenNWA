@@ -831,6 +831,8 @@ namespace wali
         /// the size.)
         TransSet const *
         outgoingTransSet(Key state, Key symbol) const;
+        TransSet *
+        outgoingTransSet(Key state, Key symbol);
 
         /// Returns the state and weight to that state which is at the end of
         /// a chain of single epsilon transitions.
@@ -845,6 +847,9 @@ namespace wali
         /// <starting_state, 1>.
         std::pair<Key, sem_elem_t>
         endOfEpsilonChain(Key starting_state) const;
+
+        void
+        collapseTransitionsForwardFrom(Key state);
     };
 
   } // namespace wfa
