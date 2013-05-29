@@ -730,13 +730,21 @@ namespace wali
         /// the extra conditions that (1) start and final states must
         /// correspond, (2) state weights must be the same, (3) edge labels
         /// (symbols) must correspond, and (4) edge weights must be the
-        /// same.)
+        /// same.) (TODO: accepting weights are not checked.)
         bool isIsomorphicTo(WFA const & other) const;
 
         /// Same as isIsomorphicTo(WFA const & other) const, except that
         /// conditions (2) and (4) (those pertaining to the weights on states
-        /// and transitions) are lifted if 'check_weights' is false.
+        /// and transitions) are lifted if 'check_weights' is false. (TODO:
+        /// accepting weights are not checked.)
         bool isIsomorphicTo(WFA const & other, bool check_weights) const;
+
+        /// Returns whether the two automata are the same. That is they have
+        /// the same states, transitions, state weights, transition weights,
+        /// starting states, and accepting states. (TODO: accepting state
+        /// weights are not checked.) IGNORES the query direction and
+        /// generation count.
+        bool equal(WFA const & other) const;
 
         /// Adds transitions so that every state has an outgoing for every
         /// symbol. The overloads allow specification of:

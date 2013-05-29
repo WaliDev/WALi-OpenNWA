@@ -2267,6 +2267,83 @@ namespace wali
     }
     
 
+    bool
+    WFA::equal(WFA const & that) const
+    {
+      if (this->Q.size() != that.Q.size()
+          || this->F.size() != that.F.size()
+          || this->getInitialState() != that.getInitialState())
+      {
+        return false;
+      }
+
+      for (std::set<Key>::const_iterator this_final = this->F.begin();
+           this_final != this->F.end(); ++this_final)
+      {
+        if (!that.isFinalState(*this_final)) {
+          return false;
+        }
+      }
+
+      // Initial and final states are all the same. Check other states.
+      
+      for (state_map_t::const_iterator this_state_iter = this->state_map.begin();
+           this_state_iter != this->state_map.end(); ++this_state_iter)
+      {
+        State const
+          * this_state = this_state_iter->second,
+          * that_state = that.getState(this_state_iter->first);
+
+        if (that_state == NULL                   // state isn't present
+            || ! this_state->weight()->equal(that_state->weight())
+            || ! this_state->acceptWeight()->equal(that_state->acceptWeight())
+            || this_state->getTransSet().size() != that_state->getTransSet().size())
+        {
+          return false;
+        }
+      }
+
+      // All states and state weights are the same. Check transitions.
+
+      for (kp_map_t::const_iterator this_transset_iter = this->kpmap.begin();
+           this_transset_iter != this->kpmap.end(); ++this_transset_iter)
+      {
+        kp_map_t::const_iterator that_transset_iter = that.kpmap.find(this_transset_iter->first);
+
+        if (that_transset_iter == that.kpmap.end()
+            || this_transset_iter->second.size() != that_transset_iter->second.size())
+        {
+          return false;
+        }
+
+        for (TransSet::const_iterator this_trans_iter = this_transset_iter->second.begin();
+             this_trans_iter != this_transset_iter->second.end(); ++this_transset_iter)
+        {
+          // We don't have an easy way of checking presence. Do it a sucky
+          // way.
+          bool found = false;
+          for (TransSet::const_iterator that_trans_iter = that_transset_iter->second.begin();
+               that_trans_iter != that_transset_iter->second.end(); ++that_transset_iter)
+          {
+            if ((*this_trans_iter)->equal(*that_trans_iter)
+                && (*this_trans_iter)->weight()->equal((*that_trans_iter)->weight()))
+            {
+              found = true;
+              break;
+            }
+          }
+
+          if (!found) {
+            return false;
+          }
+        } // for each transition in the current transset
+      } // for each transset
+
+      // All states and transitions are the same!
+      return true;
+    }
+
+
     void WFA::complete(std::set<Key> const & symbols, Key sink_state)
     {
       sem_elem_t one = getSomeWeight()->one();
@@ -2727,6 +2804,7 @@ namespace wali
         }
       } while (removed);
     }
+
     
   } // namespace wfa
 
