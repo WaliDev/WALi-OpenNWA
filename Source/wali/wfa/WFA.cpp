@@ -2582,6 +2582,20 @@ namespace wali
 
       return &loc->second;
     }
+
+    TransSet *
+    WFA::outgoingTransSet(Key state, Key symbol)
+    {
+      kp_map_t::iterator loc = kpmap.find(KeyPair(state, symbol));
+
+      if (loc == kpmap.end()
+          || loc->second.size() == 0u)
+      {
+        return NULL;
+      }
+
+      return &loc->second;
+    }
     
 
     std::pair<Key, sem_elem_t>
@@ -2616,7 +2630,74 @@ namespace wali
                             the_only_outgoing_trans->weight()
                             ->extend(nexts.second));
     }
-    
+
+
+    // This function takes a state like
+    //       a        eps
+    //   st ----> n1 -----> n4
+    //   | \ b
+    //  c|  +---> n2 -----> n5
+    //   V
+    //   n3
+    // and changes it to
+    //       a
+    //   st ---> n4
+    //   | \ b
+    //  c|  +--> n5
+    //   V
+    //   n3
+    //
+    // Note that this collapsing can work with epsilon too:
+    //       eps      eps
+    //   st ----> n1 ----> n2
+    // can collapse to
+    //       eps
+    //   st ----> n2
+    void
+    WFA::collapseTransitionsForwardFrom(Key state)
+    {
+      TransSet to_add, to_remove;
+      
+      std::set<Key> alpha = alphabet();
+      alpha.insert(WALI_EPSILON);
+      for (std::set<Key>::const_iterator symbol = alpha.begin();
+           symbol != alpha.end(); ++symbol)
+      {
+        if (TransSet * transitions = outgoingTransSet(state, *symbol)) {
+          for (TransSet::iterator trans = transitions->begin();
+               trans != transitions->end(); ++trans)
+          {
+            assert((*trans)->from() == state);
+            assert((*trans)->stack() == *symbol);
+
+            std::pair<Key, sem_elem_t>
+              chainEnd = endOfEpsilonChain((*trans)->to());
+
+            if (chainEnd.first != (*trans)->to()) {
+              Trans * newTrans = new Trans(state, *symbol, chainEnd.first,
+                                           (*trans)->weight()->extend(chainEnd.second));
+              to_add.insert(newTrans);
+              to_remove.insert(*trans);
+            }
+          }
+        }
+      }
+
+      for (TransSet::iterator trans = to_remove.begin();
+           trans != to_remove.end(); ++trans)
+      {
+        assert((*trans)->from() == state);
+        erase(state, (*trans)->stack(), (*trans)->to());
+        delete *trans; // ouch
+      }
+      
+      for (TransSet::iterator trans = to_add.begin();
+           trans != to_add.end(); ++trans)
+      {
+        assert((*trans)->from() == state);
+        addTrans(*trans);
+      }
+    }
     
   } // namespace wfa
 
