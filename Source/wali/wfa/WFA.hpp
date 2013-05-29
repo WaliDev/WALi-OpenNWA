@@ -850,6 +850,9 @@ namespace wali
 
         void
         collapseTransitionsForwardFrom(Key state);
+
+        void
+        removeStatesWithInDegree0();
     };
 
   } // namespace wfa
