@@ -1,3 +1,6 @@
+#ifndef WALI_TESTING_KEYS_HPP
+#define WALI_TESTING_KEYS_HPP
+
 #include "wali/Key.hpp"
 
 namespace testing
@@ -24,3 +27,5 @@ namespace testing
 //     c-basic-offset: 2
 //     indent-tabs-mode: nil
 // End:
+
+#endif
