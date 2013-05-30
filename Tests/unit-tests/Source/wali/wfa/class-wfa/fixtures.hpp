@@ -4,6 +4,7 @@
 #include "wali/Key.hpp"
 #include "wali/wfa/WFA.hpp"
 #include "wali/Reach.hpp"
+#include "fixtures/Keys.hpp"
 
 namespace wali {
     namespace wfa {
@@ -550,6 +551,97 @@ namespace wali {
                 wfa.addTrans(aeee, l.a, accept, one);
             }
         };
+
+      //   eps    eps    eps     
+      // 1 ---> 2 ---> 3 ---> 4
+      struct ChainedEpsilonTransitions
+      {
+	WFA wfa;
+	testing::Keys keys;
+
+	ChainedEpsilonTransitions(sem_elem_t first,
+				  sem_elem_t second,
+				  sem_elem_t third)
+	{
+	  sem_elem_t zero = first->zero();
+        
+	  wfa.addState(keys.st1, zero);
+	  wfa.addState(keys.st2, zero);
+	  wfa.addState(keys.st3, zero);
+	  wfa.addState(keys.st4, zero);
+	  wfa.setInitialState(keys.st2);
+
+	  wfa.addTrans(keys.st1, WALI_EPSILON, keys.st2, first);
+	  wfa.addTrans(keys.st2, WALI_EPSILON, keys.st3, second);
+	  wfa.addTrans(keys.st3, WALI_EPSILON, keys.st4, third);
+	}
+      };
+
+
+      //   eps     a
+      // 1 ---> 2 ---> 3
+      struct EpsTransThenNormal
+      {
+	WFA wfa;
+	testing::Keys keys;
+
+	EpsTransThenNormal(sem_elem_t first,
+			   sem_elem_t second)
+	{
+	  sem_elem_t zero = first->zero();
+
+	  wfa.addState(keys.st1, zero);
+	  wfa.addState(keys.st2, zero);
+	  wfa.addState(keys.st3, zero);
+	  wfa.setInitialState(keys.st2);
+
+	  wfa.addTrans(keys.st1, WALI_EPSILON, keys.st2, first);
+	  wfa.addTrans(keys.st2, keys.a, keys.st3, second);
+	}
+      };
+
+      //            eps
+      //            ---> 3
+      //    eps    /
+      //  1 ---> 2
+      //           \                          [anti-line-continuation]
+      //            ---> 4
+      //            eps
+      struct Branching
+      {
+	WFA wfa;
+	testing::Keys keys;
+
+	Branching(sem_elem_t first,
+		  sem_elem_t second,
+		  sem_elem_t third)
+	{
+	  sem_elem_t zero = first->zero();
+        
+	  wfa.addState(keys.st1, zero);
+	  wfa.addState(keys.st2, zero);
+	  wfa.addState(keys.st3, zero);
+	  wfa.addState(keys.st4, zero);
+	  wfa.setInitialState(keys.st2);
+
+	  wfa.addTrans(keys.st1, WALI_EPSILON, keys.st2, first);
+	  wfa.addTrans(keys.st2, WALI_EPSILON, keys.st3, second);
+	  wfa.addTrans(keys.st2, WALI_EPSILON, keys.st4, third);
+	}
+      };
+
+
+      // --> 1
+      struct SingleState
+      {
+	WFA wfa;
+	testing::Keys keys;
+
+	SingleState(sem_elem_t zero) {
+	  wfa.addState(keys.st1, zero->zero());
+	  wfa.setInitialState(keys.st1);
+	}
+      };
 
     }
 }
