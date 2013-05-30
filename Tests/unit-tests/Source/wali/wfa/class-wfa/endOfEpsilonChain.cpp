@@ -95,5 +95,29 @@ namespace wali {
             EXPECT_EQ(wfa.keys.st2, p.first);
             EXPECT_TRUE(dist0->equal(p.second));
         }
+
+	TEST(wali$wfa$$removeStatesWithInDegree0, willNotRemoveStartState)
+	{
+	    SingleState f1(dist0), f2(dist0);
+
+	    f1.wfa.removeStatesWithInDegree0();
+	    EXPECT_TRUE(f1.wfa.equal(f2.wfa));
+	}
+
+	TEST(wali$wfa$$removeStatesWithInDegree0, removeIsolatedState)
+	{
+	    SingleState f1(dist0), f2(dist0);
+	    f1.wfa.addState(f1.keys.st2, dist0->zero());
+
+	    f1.wfa.removeStatesWithInDegree0();
+	    EXPECT_TRUE(f1.wfa.equal(f2.wfa));
+
+	    std::cout << "=================\n";
+	    f1.wfa.print(std::cout);
+	    std::cout << "=================\n";
+	    f2.wfa.print(std::cout);
+	}
+
+	//TEST(wali$wfa$$removeStatesWithInDegree0, 
     }
 }
