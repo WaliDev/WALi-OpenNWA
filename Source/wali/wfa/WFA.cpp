@@ -1616,6 +1616,8 @@ namespace wali
       Q.erase(state->name());
       //F.erase(state->name());
 
+      state_map.erase(state->name());
+
       // Since we are not deleting the State, we need
       // to clear its TransLists
       state->clearTransSet();
@@ -1623,7 +1625,7 @@ namespace wali
       // Do <b>not</b> delete the memory
       // States are left in the state_map of the WFA and
       // reclaimed by ~WFA().
-      //delete state;
+      delete state;
 
       return true;
     }
