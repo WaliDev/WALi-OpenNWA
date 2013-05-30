@@ -1111,13 +1111,19 @@ namespace wali
       // States that have a tag of 2 are forwards and backwards
       // reachable. Erase all other states.
       //
+      std::vector<State*> to_erase;
       FOR_EACH_STATE( eraseMe ) {
         if( eraseMe->tag != 2 ) {
           { // BEGIN DEBUGGING
             //*waliErr << "Erasing State '" << key2str(eraseMe->name()) << "'\n";
           } // END DEBUGGING
-          eraseState(eraseMe);
+          to_erase.push_back(eraseMe);
         }
+      }
+      for (std::vector<State*>::const_iterator eraseMe = to_erase.begin();
+           eraseMe != to_erase.end(); ++eraseMe)
+      {
+        eraseState(*eraseMe);
       }
     }
 
