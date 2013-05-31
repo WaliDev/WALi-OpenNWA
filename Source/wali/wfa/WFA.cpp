@@ -2821,6 +2821,13 @@ namespace wali
         std::set<Key> to_remove;
 
         IncomingTransMap_t preds;
+        for (std::set<Key>::const_iterator state = Q.begin();
+             state != Q.end(); ++state)
+        {
+          preds[*state]; // I am a terrible person.  But so are you if
+                         // you remove this without fixing it. :-)
+                         // -eed
+        }
         for (kp_map_t::const_iterator setiter = kpmap.begin();
              setiter!= kpmap.end(); ++setiter)
         {
