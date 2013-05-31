@@ -558,13 +558,14 @@ namespace wali
       }; // WeightMaker
         
       
+      std::map<int, int>
+      bddRefcountHistogram();
 
       
       namespace details {
         bool bddImplies_using_bdd_imp(bdd left, bdd right);
         bool bddImplies_recursive(bdd left, bdd right);
         bool bddImplies(bdd left, bdd right);
-
         
         std::vector<std::pair<VectorVocabulary, bdd> >
         partition(BddContext const & vars, bdd b);

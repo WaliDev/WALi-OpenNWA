@@ -6,6 +6,7 @@
  
 #include "BinRel.hpp"
 #include "buddy/fdd.h"
+#include "buddy/kernel.h"
 #include "ProgramBddContext.hpp"
 //#include "BuddyExt.hpp"
 #include "combination.hpp"
@@ -1907,6 +1908,17 @@ namespace wali {
 
 
       }
+
+      std::map<int, int>
+      bddRefcountHistogram()
+      {
+        std::map<int, int> histogram;
+        for (int i=0; i<bddnodesize; ++i) {
+          histogram[bddnodes[i].refcou]++;
+        }
+        return histogram;
+      }
+      
       
     }
   }
