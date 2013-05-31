@@ -2723,6 +2723,14 @@ namespace wali
 
       // OK. Now we can do real work. :-)
       ITrans * the_only_outgoing_trans = *(eps_transitions->begin());
+
+      // Maybe.
+      if (the_only_outgoing_trans->to() == starting_state) {
+        // loop
+        return std::make_pair(starting_state,
+                              getSomeWeight()->one());
+      }
+      
       std::pair<Key, sem_elem_t> nexts =
         endOfEpsilonChain(the_only_outgoing_trans->to());
 
@@ -2756,7 +2764,7 @@ namespace wali
     void
     WFA::collapseTransitionsForwardFrom(Key state)
     {
-      TransSet to_add, to_remove;
+      std::vector<ITrans*> to_add, to_remove;
       
       std::set<Key> alpha = alphabet();
       alpha.insert(WALI_EPSILON);
@@ -2776,22 +2784,22 @@ namespace wali
             if (chainEnd.first != (*trans)->to()) {
               Trans * newTrans = new Trans(state, *symbol, chainEnd.first,
                                            (*trans)->weight()->extend(chainEnd.second));
-              to_add.insert(newTrans);
-              to_remove.insert(*trans);
+              to_add.push_back(newTrans);
+              to_remove.push_back(*trans);
             }
           }
         }
       }
 
-      for (TransSet::iterator trans = to_remove.begin();
+      for (std::vector<ITrans*>::iterator trans = to_remove.begin();
            trans != to_remove.end(); ++trans)
       {
         assert((*trans)->from() == state);
         erase(state, (*trans)->stack(), (*trans)->to());
-        delete *trans; // ouch
+        //delete *trans; // ouch
       }
       
-      for (TransSet::iterator trans = to_add.begin();
+      for (std::vector<ITrans*>::iterator trans = to_add.begin();
            trans != to_add.end(); ++trans)
       {
         assert((*trans)->from() == state);
@@ -2803,19 +2811,29 @@ namespace wali
     void
     WFA::removeStatesWithInDegree0()
     {
-      bool removed;
+      bool removed = true;
       do {
         removed = false;
         std::set<Key> to_remove;
-        
-        for (state_map_t::iterator state_iter = state_map.begin();
-             state_iter != state_map.end(); ++state_iter)
+
+        IncomingTransMap_t preds;
+        for (kp_map_t::const_iterator setiter = kpmap.begin();
+             setiter!= kpmap.end(); ++setiter)
         {
-          State * state = state_iter->second;
-          if (state->getTransSet().size() == 0u
-              && state_iter->first != getInitialState())
+          for (TransSet::const_iterator titer = setiter->second.begin();
+               titer != setiter->second.end(); ++titer)
           {
-            to_remove.insert(state_iter->first);
+            preds[(*titer)->to()].push_back(*titer);
+          }
+        }
+
+        for (IncomingTransMap_t::const_iterator iter = preds.begin();
+             iter != preds.end(); ++iter)
+        {
+          if (iter->second.size() == 0u
+              && iter->first != getInitialState())
+          {
+            to_remove.insert(iter->first);
           }
         }
 
@@ -2828,7 +2846,18 @@ namespace wali
       } while (removed);
     }
 
-    
+
+    void
+    WFA::collapseEpsilonChains()
+    {
+      for (std::set<Key>::const_iterator state = Q.begin();
+           state != Q.end(); ++state)
+      {
+        collapseTransitionsForwardFrom(*state);
+      }
+      removeStatesWithInDegree0();
+    }
+
   } // namespace wfa
 
 } // namespace wali
