@@ -270,6 +270,104 @@ namespace wali {
                                sem_elem_t rel);
 
 
+
+        /// Function object that will, given information about a transition
+        /// in an automaton, "lift" that transition so that the new
+        /// transformer also includes the current-state variable that
+        /// respects the given transition.
+        ///
+        /// The values used for the current-state variable in the relation
+        /// are [0,num-states) rather than the actual key values, which in
+        /// most cases will allow it to be represented in fewer bits.
+        struct IntroduceStateToRelationWeightGen
+            : wali::wfa::LiftCombineWeightGen
+        {
+            /// Another "type safety" thing to help confusion between states
+            /// numbered with Keys and states numbered starting from 0.
+            struct SequentialFromZeroState {
+                int index;
+            
+                explicit SequentialFromZeroState(int i)
+                    : index(i)
+                {}
+
+
+                bool operator< (SequentialFromZeroState right) const {
+                    return this->index < right.index;
+                }
+            };
+        
+
+            typedef boost::bimap<State, SequentialFromZeroState> SfzMap;
+
+            /// This map tracks the correspondence between the wali Key value
+            /// that's used for the state and the corresponding number in the
+            /// range [0,num-states).
+            SfzMap sequential_state_map;
+
+            void set_up_sequential_state_map(Xfa const & xfa)
+            {
+                assert(sequential_state_map.size()==0);
+                int next_sequential_state = 0;
+                std::set<wali::Key> const & states = xfa.getStateKeys();
+                for(std::set<wali::Key>::const_iterator state = states.begin();
+                    state != states.end(); ++state)
+                {
+                    sequential_state_map.insert(SfzMap::value_type(State(*state),
+                                                                   SequentialFromZeroState(next_sequential_state++)));
+                }
+            }
+
+
+            State from_sfz_state(SequentialFromZeroState sfz_state) const
+            {
+                return sequential_state_map.right.at(sfz_state);
+            }
+            
+            SequentialFromZeroState from_state(State state) const
+            {
+                return sequential_state_map.left.at(state);
+            }
+            
+
+            
+            wali::domains::binrel::ProgramBddContext const & new_voc;
+            BinaryRelation havoc_current_state;
+
+            /// The name (according to the ProgramBddContext) of the
+            /// current-state variable for this XFA.
+            std::string current_state;
+
+            IntroduceStateToRelationWeightGen(wali::domains::binrel::ProgramBddContext const & v,
+                                              Xfa const & xfa,
+                                              std::string const & current_state_var_prefix)
+                : new_voc(v)
+                , current_state(current_state_var_prefix + "current_state")
+            {
+                set_up_sequential_state_map(xfa);
+
+                using wali::domains::binrel::BinRel;
+                havoc_current_state =
+                    new BinRel(&v, new_voc.Assign(current_state, new_voc.NonDet()));
+            }
+                
+            
+            virtual sem_elem_t liftWeight(wali::wfa::WFA const & original_wfa,
+                                          wali::Key source,
+                                          wali::Key symbol,
+                                          wali::Key target,
+                                          sem_elem_t orig_weight) const;
+
+            virtual sem_elem_t getOne(wali::wfa::WFA const & original_wfa) const;
+
+            virtual
+            sem_elem_t
+            liftAcceptWeight(wali::wfa::WFA const & UNUSED_PARAMETER(original_wfa),
+                             wali::Key state,
+                             sem_elem_t original_accept_weight) const;
+        };
+
+        
         extern
         std::vector<std::map<std::string, int> >
         get_vars(XfaAst const & ast,
