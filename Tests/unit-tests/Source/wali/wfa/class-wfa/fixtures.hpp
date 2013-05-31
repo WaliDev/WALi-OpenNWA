@@ -733,10 +733,9 @@ namespace wali {
             * ad = new StringWeight("a->b b->c c->d "),
             * dg = new StringWeight("d->e e->g "),
             * dh = new StringWeight("d->f f->h "),
-            * gh = new StringWeight("g->h "),
-            * hk = new StringWeight("h->i i->k  | h->j j->k "),
-            * kl = new StringWeight("k->l "),
-            * ll = new StringWeight("l->l ");
+            * gh = new StringWeight("g->h"),
+            * hl = new StringWeight("h->j j->k k->l  | h->i i->k k->l "),
+            * ll = new StringWeight("l->l");
           sem_elem_t zero = ad->zero();          
           Key EPSLN = WALI_EPSILON; // to make spacing prettier
 
@@ -744,7 +743,6 @@ namespace wali {
           expected.addState(d, zero);
           expected.addState(g, zero);
           expected.addState(h, zero);
-          expected.addState(k, zero);
           expected.addState(l, zero);
 
           expected.setInitialState(a);
@@ -753,8 +751,7 @@ namespace wali {
           expected.addTrans(d, EPSLN, g, dg);
           expected.addTrans(d, EPSLN, h, dh);
           expected.addTrans(g, sigma, h, gh);
-          expected.addTrans(h, sigma, k, hk);
-          expected.addTrans(k, EPSLN, l, kl);
+          expected.addTrans(h, sigma, l, hl);
           expected.addTrans(l, EPSLN, l, ll);
         }
       };
