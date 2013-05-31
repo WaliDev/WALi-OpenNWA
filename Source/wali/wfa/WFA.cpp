@@ -2331,6 +2331,10 @@ namespace wali
       for (kp_map_t::const_iterator this_transset_iter = this->kpmap.begin();
            this_transset_iter != this->kpmap.end(); ++this_transset_iter)
       {
+        if(this_transset_iter->second.size() == 0u) {
+          continue;
+        }
+
         kp_map_t::const_iterator that_transset_iter = that.kpmap.find(this_transset_iter->first);
 
         if (that_transset_iter == that.kpmap.end()
