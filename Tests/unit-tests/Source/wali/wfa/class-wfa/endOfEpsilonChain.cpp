@@ -116,9 +116,7 @@ namespace wali {
         TEST(wali$wfa$$collapseEpsilonChains, bigTest)
         {
             BigEpsilonTest f;
-            f.wfa.print_dot(std::cerr,true);
             f.wfa.collapseEpsilonChains();
-            f.wfa.print_dot(std::cerr,true);            
             EXPECT_TRUE(f.wfa.equal(f.expected));
         }
     }
