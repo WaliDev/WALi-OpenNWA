@@ -2344,13 +2344,13 @@ namespace wali
         }
 
         for (TransSet::const_iterator this_trans_iter = this_transset_iter->second.begin();
-             this_trans_iter != this_transset_iter->second.end(); ++this_transset_iter)
+             this_trans_iter != this_transset_iter->second.end(); ++this_trans_iter)
         {
           // We don't have an easy way of checking presence. Do it a sucky
           // way.
           bool found = false;
           for (TransSet::const_iterator that_trans_iter = that_transset_iter->second.begin();
-               that_trans_iter != that_transset_iter->second.end(); ++that_transset_iter)
+               that_trans_iter != that_transset_iter->second.end(); ++that_trans_iter)
           {
             if ((*this_trans_iter)->equalIgnoringWeight(*that_trans_iter)
                 && (*this_trans_iter)->weight()->equal((*that_trans_iter)->weight()))
