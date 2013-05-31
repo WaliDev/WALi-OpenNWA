@@ -168,7 +168,7 @@ namespace wali {
             using wali::domains::binrel::BinRel;
             using wali::domains::binrel::bddinfo_t;
 
-            BinaryRelation orig_rel
+            BinRel * orig_rel
                 = dynamic_cast<BinRel*>(original_accept_weight.get_ptr());
 
             // Now pull out the BDD and vocabulary
@@ -241,7 +241,7 @@ namespace wali {
                 orig_weight->extend(havoc_current_state);
 
             // not really the *original* relation, but close enough
-            BinaryRelation orig_rel
+            BinRel * orig_rel
                 = dynamic_cast<BinRel*>(orig_rel_then_havoc.get_ptr());
 
             // Now pull out the BDD and vocabulary
@@ -390,7 +390,8 @@ namespace wali {
 
 
         bool
-        language_contains(Xfa const & left, Xfa const & right)
+        language_contains(Xfa const & left, Xfa const & right,
+                          wali::domains::binrel::ProgramBddContext const & voc)
         {
             typedef domains::SemElemSet::ElementSet ElementSet;
 

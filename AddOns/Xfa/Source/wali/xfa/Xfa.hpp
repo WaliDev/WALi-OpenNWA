@@ -332,7 +332,7 @@ namespace wali {
 
             
             wali::domains::binrel::ProgramBddContext const & new_voc;
-            BinaryRelation havoc_current_state;
+            wali::domains::binrel::binrel_t havoc_current_state;
 
             /// The name (according to the ProgramBddContext) of the
             /// current-state variable for this XFA.
@@ -416,7 +416,8 @@ namespace wali {
         };
         
         bool
-        language_contains(Xfa const & left, Xfa const & right);
+        language_contains(Xfa const & left, Xfa const & right,
+                          wali::domains::binrel::ProgramBddContext const & voc);
 
     }
 }
