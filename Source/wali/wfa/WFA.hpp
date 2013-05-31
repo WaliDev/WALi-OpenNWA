@@ -642,6 +642,8 @@ namespace wali
         size_t generation;       //! < Each WPDS query increments the generation count.
         progress_t progress;     //! < Provides indication of progress to client.
 
+        std::set<State*> deleted_states;
+
       private:
 
 

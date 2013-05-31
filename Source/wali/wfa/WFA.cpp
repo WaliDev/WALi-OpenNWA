@@ -131,6 +131,13 @@ namespace wali
         it->second = 0;
       }
 
+      for (std::set<State*>::const_iterator s = deleted_states.begin();
+           s != deleted_states.end(); ++s)
+      {
+        delete *s;
+      }
+      deleted_states.clear();
+
       /* Clear all of the maps to release references to stale
        * objects */
       kpmap.clear();
@@ -633,13 +640,16 @@ namespace wali
             this_outgoing = this_nc->match(source_pair.first, *sym_iter),
             fa_outgoing = fa_nc->match(source_pair.second, *sym_iter);
 
+          ITrans
+            * left_no_motion = NULL,
+            * right_no_motion = NULL;
+
           if (*sym_iter == WALI_EPSILON) {
             // One automaton or the other can not move
-            ITrans
-              * left_no_motion = new Trans(source_pair.first, WALI_EPSILON,
-                                           source_pair.first, this->getSomeWeight()->one()),
-              * right_no_motion = new Trans(source_pair.second, WALI_EPSILON,
-                                            source_pair.second, fa.getSomeWeight()->one());
+            left_no_motion = new Trans(source_pair.first, WALI_EPSILON,
+                                       source_pair.first, this->getSomeWeight()->one());
+            right_no_motion = new Trans(source_pair.second, WALI_EPSILON,
+                                        source_pair.second, fa.getSomeWeight()->one());
 
             // Will fail if there is already an epsilon self
             // loop. (Non-trivial cycles should be OK.)
@@ -671,6 +681,9 @@ namespace wali
                                          *this, fa);
             } // for each transition in fa_outgoing
           } // for each transition in this_outgoing
+
+          delete left_no_motion;
+          delete right_no_motion;
         }// for each alphabet
       } // while (worklist)
     }
@@ -1324,6 +1337,7 @@ namespace wali
           told = *tsit;
         }
       }
+
       ////
       // Cases
       //  if 0 == told (told does not exist)
@@ -1623,6 +1637,7 @@ namespace wali
       //F.erase(state->name());
 
       state_map.erase(state->name());
+      deleted_states.insert(state);
 
       // Since we are not deleting the State, we need
       // to clear its TransLists
@@ -1631,7 +1646,7 @@ namespace wali
       // Do <b>not</b> delete the memory
       // States are left in the state_map of the WFA and
       // reclaimed by ~WFA().
-      delete state;
+      //delete state;
 
       return true;
     }
