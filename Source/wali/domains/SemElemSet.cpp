@@ -27,10 +27,12 @@ namespace
 #  pragma warning(disable: 4716) // must return a value
 #endif                           // (std::abort not annotated as noreturn)
   std::pair<sem_elem_t, sem_elem_t>
-  dummy_keep_nonduplicates(sem_elem_t UNUSED_PARAMETER(new_),
-                           sem_elem_t UNUSED_PARAMETER(existing))
+  dummy_keep_nonduplicates(sem_elem_t new_,
+                           sem_elem_t existing)
   {
     std::abort();
+    //TODO: Have this as a pure virtual function.
+    return std::pair<sem_elem_t, sem_elem_t>(new_, existing);
   }
 #if defined(_MSC_VER)
 #  pragma warning(pop)

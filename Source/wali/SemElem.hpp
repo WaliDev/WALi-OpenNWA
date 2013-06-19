@@ -233,6 +233,8 @@ namespace wali
       {
         (void) other;
         std::abort();
+        //TODO: Have this as a pure virtual function.
+        return false;
       }
 
       
@@ -247,6 +249,8 @@ namespace wali
       hash() const
       {
         std::abort();
+        //TODO:Have this as a pure virtual function.
+        return false;
       }
 #if defined(_MSC_VER)
 #  pragma warning(pop)
