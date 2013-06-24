@@ -863,6 +863,9 @@ namespace wali
 
         void
         removeStatesWithInDegree0();
+
+        void
+        collapseEpsilonChains();
     };
 
   } // namespace wfa

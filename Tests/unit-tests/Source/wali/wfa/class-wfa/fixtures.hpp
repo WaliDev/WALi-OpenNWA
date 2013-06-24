@@ -5,6 +5,7 @@
 #include "wali/wfa/WFA.hpp"
 #include "wali/Reach.hpp"
 #include "fixtures/Keys.hpp"
+#include "fixtures/StringWeight.hpp"
 
 namespace wali {
     namespace wfa {
@@ -643,8 +644,131 @@ namespace wali {
 	}
       };
 
+
+      struct BigEpsilonTest
+      {
+        WFA wfa, expected;
+
+        Key a, b, c, d, e, f, g, h, i, j, k, l, sigma;
+
+        BigEpsilonTest()
+          : a(getKey("a"))
+          , b(getKey("b"))
+          , c(getKey("c"))
+          , d(getKey("d"))
+          , e(getKey("e"))
+          , f(getKey("f"))
+          , g(getKey("g"))
+          , h(getKey("h"))
+          , i(getKey("i"))
+          , j(getKey("j"))
+          , k(getKey("k"))
+          , l(getKey("l"))
+          , sigma(getKey("sigma"))
+        {
+          setupWfa();
+          setupExpected();
+        }
+
+        void
+        setupWfa()
+        {
+          using testing::StringWeight;
+          StringWeight
+            * ab = new StringWeight("a->b"),
+            * bc = new StringWeight("b->c"),
+            * cd = new StringWeight("c->d"),
+            * de = new StringWeight("d->e"),
+            * df = new StringWeight("d->f"),
+            * eg = new StringWeight("e->g"),
+            * gh = new StringWeight("g->h"),
+            * fh = new StringWeight("f->h"),
+            * hi = new StringWeight("h->i"),
+            * hj = new StringWeight("h->j"),
+            * ik = new StringWeight("i->k"),
+            * jk = new StringWeight("j->k"),
+            * kl = new StringWeight("k->l"),
+            * ll = new StringWeight("l->l");
+          sem_elem_t zero = ab->zero();
+          Key EPSLN = WALI_EPSILON; // to make spacing prettier
+
+          wfa.addState(a, zero);
+          wfa.addState(b, zero);
+          wfa.addState(c, zero);
+          wfa.addState(d, zero);
+          wfa.addState(e, zero);
+          wfa.addState(f, zero);
+          wfa.addState(g, zero);
+          wfa.addState(h, zero);
+          wfa.addState(i, zero);
+          wfa.addState(j, zero);
+          wfa.addState(k, zero);
+          wfa.addState(l, zero);
+
+          wfa.setInitialState(a);
+
+          wfa.addTrans(a, sigma, b, ab);
+          wfa.addTrans(b, EPSLN, c, bc);
+          wfa.addTrans(c, EPSLN, d, cd);
+          wfa.addTrans(d, EPSLN, e, de);
+          wfa.addTrans(d, EPSLN, f, df);
+          wfa.addTrans(e, EPSLN, g, eg);
+          wfa.addTrans(g, sigma, h, gh);
+          wfa.addTrans(f, EPSLN, h, fh);
+          wfa.addTrans(h, sigma, i, hi);
+          wfa.addTrans(h, sigma, j, hj);
+          wfa.addTrans(i, EPSLN, k, ik);
+          wfa.addTrans(j, EPSLN, k, jk);
+          wfa.addTrans(k, EPSLN, l, kl);
+          wfa.addTrans(l, EPSLN, l, ll);
+        }
+
+          //////////////////////////////////////////////////
+
+        void
+        setupExpected()
+        {
+          using testing::StringWeight;
+          StringWeight
+            * ad = new StringWeight("a->b b->c c->d "),
+            * dg = new StringWeight("d->e e->g "),
+            * dh = new StringWeight("d->f f->h "),
+            * gh = new StringWeight("g->h "),
+            * hk = new StringWeight("h->i i->k  | h->j j->k "),
+            * kl = new StringWeight("k->l "),
+            * ll = new StringWeight("l->l ");
+          sem_elem_t zero = ad->zero();          
+          Key EPSLN = WALI_EPSILON; // to make spacing prettier
+
+          expected.addState(a, zero);
+          expected.addState(d, zero);
+          expected.addState(g, zero);
+          expected.addState(h, zero);
+          expected.addState(k, zero);
+          expected.addState(l, zero);
+
+          expected.setInitialState(a);
+
+          expected.addTrans(a, sigma, d, ad);
+          expected.addTrans(d, EPSLN, g, dg);
+          expected.addTrans(d, EPSLN, h, dh);
+          expected.addTrans(g, sigma, h, gh);
+          expected.addTrans(h, sigma, k, hk);
+          expected.addTrans(k, EPSLN, l, kl);
+          expected.addTrans(l, EPSLN, l, ll);
+        }
+      };
+
     }
 }
+
+
+// Yo emacs!
+// Local Variables:
+//     c-file-style: "ellemtel"
+//     c-basic-offset: 2
+//     indent-tabs-mode: nil
+// End:
 
 
 #endif

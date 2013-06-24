@@ -74,7 +74,6 @@ namespace wali {
             EXPECT_TRUE(dist0->equal(p.second));
         }
 
-
         TEST(wali$wfa$$endOfEpsilonChain, chainStopsAtBranch)
         {
             Branching wfa(dist1, dist10, dist10);
@@ -111,13 +110,16 @@ namespace wali {
 
 	    f1.wfa.removeStatesWithInDegree0();
 	    EXPECT_TRUE(f1.wfa.equal(f2.wfa));
-
-	    std::cout << "=================\n";
-	    f1.wfa.print(std::cout);
-	    std::cout << "=================\n";
-	    f2.wfa.print(std::cout);
 	}
 
-	//TEST(wali$wfa$$removeStatesWithInDegree0, 
+
+        TEST(wali$wfa$$collapseEpsilonChains, bigTest)
+        {
+            BigEpsilonTest f;
+            f.wfa.print_dot(std::cerr,true);
+            f.wfa.collapseEpsilonChains();
+            f.wfa.print_dot(std::cerr,true);            
+            EXPECT_TRUE(f.wfa.equal(f.expected));
+        }
     }
 }
