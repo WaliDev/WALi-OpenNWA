@@ -2800,6 +2800,34 @@ namespace wali
     }
 
 
+    void
+    WFA::removeStatesWithInDegree0()
+    {
+      bool removed;
+      do {
+        removed = false;
+        std::set<Key> to_remove;
+        
+        for (state_map_t::iterator state_iter = state_map.begin();
+             state_iter != state_map.end(); ++state_iter)
+        {
+          State * state = state_iter->second;
+          if (state->getTransSet().size() == 0u
+              && state_iter->first != getInitialState())
+          {
+            to_remove.insert(state_iter->first);
+          }
+        }
+
+        for (std::set<Key>::const_iterator state = to_remove.begin();
+             state != to_remove.end(); ++state)
+        {
+          eraseState(*state);
+          removed = true;
+        }
+      } while (removed);
+    }
+
   } // namespace wfa
 
 } // namespace wali
