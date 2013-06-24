@@ -2,13 +2,9 @@
 
 #include <wali/SemElemPair.hpp>
 #include <wali/domains/SemElemSet.hpp>
-#include <wali/domains/KeyedSemElemSet.hpp>
 #include <wali/wfa/State.hpp>
 
 #include <buddy/fdd.h>
-
-using wali::wfa::CreateKeyedSet;
-using namespace wali::domains;
 
 namespace {
 
@@ -22,8 +18,6 @@ namespace {
     {
         return true;
     }
-
-    
 }
 
 namespace wali {
@@ -163,6 +157,149 @@ namespace wali {
             os << ",onhover=\"<img src='data:image/png;base64," << image_data_base64 << "'>\"";
         }
 
+        
+        sem_elem_t
+        IntroduceStateToRelationWeightGen::liftAcceptWeight(wali::wfa::WFA const & UNUSED_PARAMETER(original_wfa),
+                                                            Key state,
+                                                            sem_elem_t original_accept_weight) const
+        {
+            //std::cout << "Lifting weight.\n";
+            using wali::domains::binrel::BddContext;
+            using wali::domains::binrel::BinRel;
+            using wali::domains::binrel::bddinfo_t;
+
+            BinRel * orig_rel
+                = dynamic_cast<BinRel*>(original_accept_weight.get_ptr());
+
+            // Now pull out the BDD and vocabulary
+            bdd orig_bdd = orig_rel->getBdd();
+            BddContext const & orig_voc = orig_rel->getVocabulary();
+
+            // First step: rename variables to new domain
+            std::vector<int> orig_names, new_names;
+
+            for (BddContext::const_iterator var=orig_voc.begin(); var!=orig_voc.end(); ++var) {
+                bddinfo_t
+                    orig_info = var->second,
+                    new_info = util::map_at(new_voc, var->first);
+
+                assert(new_info.get_ptr());
+
+                //std::cout << "Will rename: " << orig_info->baseLhs << "->" << new_info->baseLhs << "\n";
+                //std::cout << "Will rename: " << orig_info->baseRhs << "->" << new_info->baseRhs << "\n";
+
+                orig_names.push_back(orig_info->baseLhs);
+                orig_names.push_back(orig_info->baseRhs);
+                new_names.push_back(new_info->baseLhs);
+                new_names.push_back(new_info->baseRhs);
+
+            }
+
+            bddPair* rename_pairs = bdd_newpair();
+            assert(orig_names.size() == new_names.size());
+            fdd_setpairs(rename_pairs,
+                         &orig_names[0],
+                         &new_names[0],
+                         static_cast<int>(orig_names.size()));
+
+            bdd renamed_bdd = bdd_replace(orig_bdd, rename_pairs);
+
+            bdd_freepair(rename_pairs);
+
+            // Second step: create a BDD that enforces that the current state
+            // is "state"
+            SequentialFromZeroState sfz_state = from_state(State(state));
+
+            bdd state_change = new_voc.Assume(new_voc.From(current_state), new_voc.Const(sfz_state.index));
+
+            // Third step: combine them together
+            return new BinRel(&new_voc, renamed_bdd & state_change);
+        }
+
+
+        sem_elem_t
+        IntroduceStateToRelationWeightGen::getOne(wali::wfa::WFA const & original_wfa) const
+        {
+            return original_wfa.getSomeWeight()->one();
+        }
+
+
+        sem_elem_t
+        IntroduceStateToRelationWeightGen::liftWeight(wali::wfa::WFA const & UNUSED_PARAMETER(original_wfa),
+                                                      wali::Key source,
+                                                      wali::Key UNUSED_PARAMETER(symbol),
+                                                      wali::Key target,
+                                                      sem_elem_t orig_weight) const
+        {
+            //std::cout << "Lifting weight.\n";
+            using wali::domains::binrel::BddContext;
+            using wali::domains::binrel::BinRel;
+            using wali::domains::binrel::bddinfo_t;
+
+            // Zeroth step: havoc the current state
+            sem_elem_t orig_rel_then_havoc =
+                orig_weight->extend(havoc_current_state);
+
+            // not really the *original* relation, but close enough
+            BinRel * orig_rel
+                = dynamic_cast<BinRel*>(orig_rel_then_havoc.get_ptr());
+
+            // Now pull out the BDD and vocabulary
+            bdd orig_bdd = orig_rel->getBdd();
+            BddContext const & orig_voc = orig_rel->getVocabulary();
+
+            // First step: rename variables to new domain
+            std::vector<int> orig_names, new_names;
+
+            for (BddContext::const_iterator var=orig_voc.begin(); var!=orig_voc.end(); ++var) {
+                bddinfo_t
+                    orig_info = var->second,
+                    new_info = util::map_at(new_voc, var->first);
+
+                assert(new_info.get_ptr());
+
+                //std::cout << "Will rename: " << orig_info->baseLhs << "->" << new_info->baseLhs << "\n";
+                //std::cout << "Will rename: " << orig_info->baseRhs << "->" << new_info->baseRhs << "\n";
+
+                orig_names.push_back(orig_info->baseLhs);
+                orig_names.push_back(orig_info->baseRhs);
+                new_names.push_back(new_info->baseLhs);
+                new_names.push_back(new_info->baseRhs);
+
+            }
+
+            bddPair* rename_pairs = bdd_newpair();
+            assert(orig_names.size() == new_names.size());
+            fdd_setpairs(rename_pairs,
+                         &orig_names[0],
+                         &new_names[0],
+                         static_cast<int>(orig_names.size()));
+
+            bdd renamed_bdd = bdd_replace(orig_bdd, rename_pairs);
+
+            bdd_freepair(rename_pairs);
+
+            // Second step: create a BDD that enforces that the state
+            // changes in the right way.
+            int source_fdd = util::map_at(new_voc, current_state)->baseLhs;
+            int dest_fdd = util::map_at(new_voc, current_state)->baseRhs;
+
+            SequentialFromZeroState
+                sfz_source = from_state(State(source)),
+                sfz_dest = from_state(State(target));
+
+            //std::cout << "Creating state change BDD, setting\n"
+            //          << "    FDD " << source_fdd << " to " << source << " (really " << sfz_source.index << ")\n"
+            //          << "    FDD " << dest_fdd << " to " << dest << " (really " << sfz_dest.index << ")\n";
+
+            bdd state_change = fdd_ithvar(source_fdd, sfz_source.index) & fdd_ithvar(dest_fdd, sfz_dest.index);
+
+            //std::cout << "Created. Returning answer.\n";
+
+            // Third step: combine them together
+            return new BinRel(&new_voc, renamed_bdd & state_change);
+        }
+
 
         bool
         transformer_accepts(sem_elem_t weight, sem_elem_t left_accept, sem_elem_t right_accept)
@@ -253,7 +390,8 @@ namespace wali {
 
 
         bool
-        language_contains(Xfa const & left, Xfa const & right)
+        language_contains(Xfa const & left, Xfa const & right,
+                          wali::domains::binrel::ProgramBddContext const & voc)
         {
             typedef domains::SemElemSet::ElementSet ElementSet;
 
@@ -265,17 +403,15 @@ namespace wali {
             both_alpha.insert(left_alpha.begin(), left_alpha.end());
             both_alpha.insert(right_alpha.begin(), right_alpha.end());
 
-            CreateKeyedSet r_det_weight_gen;
+            IntroduceStateToRelationWeightGen r_det_weight_gen(voc, right, "right_");
             wali::wfa::WFA right_det = right.semideterminize(r_det_weight_gen);
             right_det.complete(both_alpha);
             right_det.complementStates();
             
-            CreateKeyedSet l_det_weight_gen;
+            IntroduceStateToRelationWeightGen l_det_weight_gen(voc, left, "left_");
             wali::wfa::WFA left_det = left.semideterminize(l_det_weight_gen);
             left_det.complete(both_alpha);
 
-            //XfaContainWeightMaker maker;
-            //wali::wfa::WFA intersected = left_det.intersect(maker, right_det);
             wali::wfa::WFA intersected = left_det.intersect(right_det);
 
             wali::wfa::WFA::AccessibleStateSetMap reached_states =

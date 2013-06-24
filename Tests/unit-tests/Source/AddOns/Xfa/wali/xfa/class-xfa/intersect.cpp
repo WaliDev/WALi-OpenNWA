@@ -282,7 +282,7 @@ namespace wali {
                                << "Current XFA in that right language: " << (right_xfa - right_some_xfas.begin()) << "\n";
                             SCOPED_TRACE(ss.str());
 
-                            bool actual = language_contains(*left_xfa, *right_xfa);
+                            bool actual = language_contains(*left_xfa, *right_xfa, context.voc);
                             EXPECT_EQ(expected, actual);
                         }
                     }
