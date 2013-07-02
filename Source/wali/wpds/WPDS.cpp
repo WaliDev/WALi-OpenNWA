@@ -1149,7 +1149,7 @@ namespace wali
 
       sem_elem_t ans = res.first.first;
       sem_elem_t ans_delta = res.first.second;
-      bool is_changed = res.second || told == 0;
+      bool is_changed = res.second || !existold;
 
       // Set the resultant weight and delta to tnew
       wfa::ITrans* tnew = told;
