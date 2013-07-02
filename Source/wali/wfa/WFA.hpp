@@ -562,6 +562,8 @@ namespace wali
           return Q.size();
         }
 
+        size_t numTransitions() const;
+
       protected:
 
         /**

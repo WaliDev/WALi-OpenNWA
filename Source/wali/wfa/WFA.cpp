@@ -2704,7 +2704,14 @@ namespace wali
 
       return result;
     }
-    
+
+    size_t
+    WFA::numTransitions() const
+    {
+      TransCounter counter;
+      for_each(counter);
+      return counter.getNumTrans();
+    }
 
     //// Prints to 'os' statistics about this WFA. 
     void WFA::printStatistics(std::ostream & os) const
