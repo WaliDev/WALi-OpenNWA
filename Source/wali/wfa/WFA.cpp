@@ -261,7 +261,6 @@ namespace wali
     // If the WFA is empty, return NULL
     //
     sem_elem_t WFA::getSomeWeight() const{
-      sem_elem_t ret = getState(getInitialState())->weight();
       kp_map_t::const_iterator it = kpmap.begin();
       while(it != kpmap.end()) {
         const TransSet &tset = it->second;
@@ -271,7 +270,7 @@ namespace wali
         }
         it ++;
       }
-      return ret;
+      return getState(getInitialState())->weight();
     }
 
     //!
