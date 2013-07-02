@@ -211,7 +211,7 @@ namespace wali
         input.for_each(*this);
       }
 
-      sem_elem_t randwgt = input.getSomeWeight();
+      sem_elem_t randwgt = fa.getSomeWeight();
       assert(randwgt != NULL);
 
       // Now copy over initial and final state information
@@ -251,7 +251,7 @@ namespace wali
       setupOutput(input,fa);
       fa.setQuery(WFA::INORDER);
 
-      sem_elem_t randwgt = input.getSomeWeight();
+      sem_elem_t randwgt = fa.getSomeWeight();
       assert(randwgt != NULL);
 
       //
@@ -446,7 +446,7 @@ namespace wali
       setupOutput(input,fa);
       fa.setQuery(WFA::REVERSE);
 
-      sem_elem_t randwgt = input.getSomeWeight();
+      sem_elem_t randwgt = fa.getSomeWeight();
       assert(randwgt != NULL);
 
       // Generate midstates for each rule type two
