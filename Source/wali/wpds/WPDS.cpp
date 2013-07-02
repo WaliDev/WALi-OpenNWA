@@ -188,6 +188,11 @@ namespace wali
 
     void WPDS::prestar( WFA const & input, WFA & fa )
     {
+      if (input.numTransitions() == 0u) {
+        assert(false);
+        fa.clear();
+        return;
+      }
       prestarSetupFixpoint(input,fa);
       prestarComputeFixpoint( fa );
       unlinkOutput(fa);
@@ -435,6 +440,11 @@ namespace wali
 
     void WPDS::poststar( WFA const & input, WFA & fa )
     {
+      if (input.numTransitions() == 0u) {
+        assert(false);
+        fa.clear();
+        return;
+      }
       poststarSetupFixpoint(input,fa);
       poststarComputeFixpoint(fa);
       unlinkOutput(fa);
