@@ -32,6 +32,14 @@ namespace testing
                 if (this == zero().get_ptr() || w == zero().get_ptr()) {
                     return zero();
                 }
+                if (this == one().get_ptr()) {
+                    // This condition is actually needed or we put an extra
+                    // space in.
+                    return w;
+                }
+                if (w == one().get_ptr()) {
+                    return this;
+                }
                 return new StringWeight(str + " " + w->str);
             }
             assert (false);

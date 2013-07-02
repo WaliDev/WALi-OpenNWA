@@ -32,7 +32,7 @@ namespace wali {
                 first = new StringWeight("first"),
                 second = new StringWeight("second"),
                 third = new StringWeight("third"),
-                all = new StringWeight("first second third ");
+                all = new StringWeight("first second third");
             
             ChainedEpsilonTransitions wfa(first, second, third);
             std::pair<Key, sem_elem_t>
