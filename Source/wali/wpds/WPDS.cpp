@@ -214,16 +214,20 @@ namespace wali
         fa.clear();
         input.for_each(*this);
       }
+
+      sem_elem_t randwgt = fa.getSomeWeight();
+      assert(randwgt != NULL);
+
       // Now copy over initial and final state information
       // that was stored before the clear() and adding
       // of transitions.
-      fa.addState(init,this->theZero);
+      fa.addState(init, randwgt->zero());
       fa.setInitialState( init );
       for (std::set<Key>::iterator cit = localF.begin();
           cit != localF.end() ; cit++)
       {
         Key f = *cit;
-        fa.addState(f,this->theZero);
+        fa.addState(f, randwgt->zero());
         fa.addFinalState(f);
       }
       currentOutputWFA->setGeneration(inputGeneration+1);
@@ -251,6 +255,9 @@ namespace wali
       setupOutput(input,fa);
       fa.setQuery(WFA::INORDER);
 
+      sem_elem_t randwgt = fa.getSomeWeight();
+      assert(randwgt != NULL);
+
       //
       // do rules 0
       // rule_zeroes contains Configs of (p,WALI_EPSILON)
@@ -275,8 +282,8 @@ namespace wali
           // Rule 0s generate a transition right away. Because
           // WPDS::update invokes WFA::insert we must make sure
           // that the new states are inserted into the WFA. 
-          fa.addState( r->from_state(),r->weight()->zero() );
-          fa.addState( r->to_state(),r->weight()->zero() );
+          fa.addState( r->from_state(), randwgt->zero() );
+          fa.addState( r->to_state(), randwgt->zero() );
 
           // add transition for rule
           update( r->from_state()
@@ -448,6 +455,9 @@ namespace wali
       setupOutput(input,fa);
       fa.setQuery(WFA::REVERSE);
 
+      sem_elem_t randwgt = fa.getSomeWeight();
+      assert(randwgt != NULL);
+
       // Generate midstates for each rule type two
       r2hash_t::iterator r2it = r2hash.begin();
       for( ; r2it != r2hash.end() ; r2it++ )
@@ -458,7 +468,7 @@ namespace wali
         {
           rule_t & r = *rlsit;
           Key gstate = gen_state( r->to_state(),r->to_stack1() );
-          fa.addState( gstate,r->weight()->zero() );
+          fa.addState( gstate, randwgt->zero() );
         }
         if( fa.progress.is_valid() )
             fa.progress->tick();
@@ -479,6 +489,9 @@ namespace wali
 
     void WPDS::post( wfa::ITrans* t, WFA& fa )
     {
+      sem_elem_t fazero = fa.getSomeWeight();
+      assert(fazero != NULL);
+
       // Get config
       Config * config = t->getConfig();
 
@@ -487,7 +500,7 @@ namespace wali
 
       // Reset delta of t to zero to signify completion
       // of work for that delta
-      t->setDelta(theZero);
+      t->setDelta(fazero);
 
       // For each forward rule of config
       // Apply rule to create new transition
