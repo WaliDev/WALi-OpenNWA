@@ -524,8 +524,8 @@ namespace wali
     }
 
     void WPDS::poststar_handle_trans(
-        wfa::ITrans* t ,
-        WFA & fa   ,
+        wfa::ITrans* t, // t is a non-epsilon transition
+        WFA & fa,
         rule_t & r,
         sem_elem_t delta
         )
