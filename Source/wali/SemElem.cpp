@@ -84,6 +84,15 @@ namespace wali
     return rp;
   }
 
+  sem_elem_t
+  SemElem::extendAndDiff(sem_elem_t next, sem_elem_t subtrahend)
+  {
+    sem_elem_t ext = this->extend(next);
+    std::pair<sem_elem_t , sem_elem_t> t = ext->delta(subtrahend);
+    return t.second;
+  }
+
+    
   sem_elem_t SemElem::star() {
     sem_elem_t w = combine(one());
     sem_elem_t wn = w->extend(w);

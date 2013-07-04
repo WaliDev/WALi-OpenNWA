@@ -1,3 +1,8 @@
+WALi complaints:
+  - Non-const SemElem::extend/combine; sem_elem_t should be ptr to const
+    SemElem. A couple of other functions should also be const.
+
+
 Build things:
   - Some object and library files are generated in directories other than
     _build. See the .gitignore file. Figure out why this is and stop it.
