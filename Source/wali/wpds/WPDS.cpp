@@ -545,9 +545,17 @@ namespace wali
     {
       Key rtstate = r->to_state();
       Key rtstack = r->to_stack1();
-      sem_elem_t wrule_trans = delta->extend( r->weight() );
-
+      
       if( r->to_stack2() == WALI_EPSILON ) {
+        Trans existing;
+        sem_elem_t existing_weight;
+        if (currentOutputWFA->find(rtstate, rtstack, t->to(), existing)) {
+          existing_weight = existing.weight();
+        }
+        else {
+          existing_weight = t->weight()->zero();
+        }
+        sem_elem_t wrule_trans = delta->extendAndDiff(r->weight(), existing_weight);
         // t must be a rule 1 (pop rules handled by poststar_handle_eps_trans)
         update( rtstate, rtstack, t->to(), wrule_trans, r->to() );
       }
@@ -556,6 +564,16 @@ namespace wali
         // Is a rule 2 so we must generate a state
         // and create 2 new transitions
         Key gstate = gen_state( rtstate,rtstack );
+
+        Trans existing;
+        sem_elem_t existing_weight;
+        if (currentOutputWFA->find(gstate, r->to_stack2(), t->to(), existing)) {
+          existing_weight = existing.weight();
+        }
+        else {
+          existing_weight = t->weight()->zero();
+        }
+        sem_elem_t wrule_trans = delta->extendAndDiff(r->weight(), existing_weight);
 
         wfa::ITrans* tprime = 
           update_prime( gstate, t, r, delta, wrule_trans );
