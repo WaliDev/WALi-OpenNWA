@@ -161,6 +161,7 @@ namespace wali
     //
     Key WFA::setInitialState( Key key )
     {
+      assert( getState(key) != NULL ); 
       Key isold = init_state;
       // TODO : Add debug check to verify key exists
       init_state = key;
@@ -173,6 +174,7 @@ namespace wali
     //
     void WFA::add_final_state( Key key )
     {
+      assert( getState(key) != NULL );
       F.insert(key);
     }
 
@@ -181,11 +183,13 @@ namespace wali
     //
     void WFA::addFinalState( Key key )
     {
+      assert( getState(key) != NULL );
       addFinalState(key, getSomeWeight()->one());
     }
 
     void WFA::addFinalState(Key key, sem_elem_t accept_weight)
     {
+      assert( getState(key) != NULL );
       F.insert(key);
       getState(key)->acceptWeight() = accept_weight;
     }
