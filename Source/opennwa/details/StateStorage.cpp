@@ -322,7 +322,7 @@ namespace opennwa
     bool StateStorage::removeState( State state )
     {
       size_t erased = states.erase(state);
-
+      stateInfos.erase(state);
       if (erased == 0) {
         return false;
       }
