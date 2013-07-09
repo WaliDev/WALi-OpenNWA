@@ -9,6 +9,7 @@
 #include "opennwa/query/internals.hpp"
 #include "opennwa/nwa_pds/conversions.hpp"
 #include "wali/wpds/fwpds/FWPDS.hpp"
+#include "wali/wfa/State.hpp"
 
 namespace opennwa
 {
@@ -1254,9 +1255,85 @@ namespace opennwa
   }
 
 
+  wali::wfa::WFA
+  Nwa::poststar(WeightGen const & wg) const
+  {
+    //create query automata
 
+    State program = opennwa::nwa_pds::getProgramControlLocation();
+    State accept = wali::getKey("accept");
 
+    wali::wfa::WFA faIn;         // Query automata
+    faIn.addState(program, wg.getOne()->zero());
+    faIn.addState(accept, wg.getOne()->zero());
 
+    faIn.setInitialState(program);
+    faIn.addFinalState(accept);
+
+    for (opennwa::Nwa::StateIterator sit = beginInitialStates();
+         sit != endInitialStates(); sit++)
+    {
+      faIn.addTrans(program, *sit, accept, wg.getOne());
+    }
+
+    // run poststar on the query automata
+    wali::wfa::WFA output;
+    poststar(faIn, output, wg);
+
+    return output;
+  }
+
+  std::map<State, sem_elem_t>
+  Nwa::readPoststarResult(wali::wfa::WFA poststarredWFA) const
+  {
+    wali::Key const program = opennwa::nwa_pds::getProgramControlLocation();
+    poststarredWFA.path_summary();
+    std::map<State, sem_elem_t> stateWeightMap;
+
+    for (opennwa::Nwa::StateIterator sit = beginStates();
+         sit != endStates(); sit++)
+    {
+      // get the set of transitions matching (program,state,?) in the WFA
+      wali::wfa::TransSet transitionSet = poststarredWFA.match(program, *sit);
+        
+      sem_elem_t weight = poststarredWFA.getSomeWeight()->zero();
+
+      for (wali::wfa::TransSet::iterator tsiter = transitionSet.begin();
+           tsiter != transitionSet.end() ; tsiter++)
+      {
+        wali::wfa::ITrans* t( *tsiter );
+
+        // This is different according to either post or pre
+        sem_elem_t tmp = poststarredWFA.getState(t->to())->weight()->extend(t->weight());
+
+        // combine the weights of all "to" states 
+        weight  =  weight->combine(tmp);
+      }
+
+      stateWeightMap[ *sit ] = weight;
+    }
+    
+    return stateWeightMap;
+  }
+
+  std::map<State, sem_elem_t>
+  Nwa::doForwardAnalysis(WeightGen const &wg)
+  {   
+    // poststar can't be performed if the NWA has no initial states,
+    // in which case return a map with all states mapped to zero
+    if (sizeInitialStates() == 0u) {
+      std::map<State, sem_elem_t> all_zero_map;
+
+      for (opennwa::Nwa::StateIterator sit = beginStates();
+           sit != endStates(); sit++)
+      {
+        all_zero_map[*sit] = wg.getOne()->zero();
+      }
+      return all_zero_map;
+    }
+
+    return readPoststarResult(poststar(wg));
+  }
 
   /**
    *

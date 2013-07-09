@@ -1146,6 +1146,46 @@ namespace opennwa
                            WeightGen const & wg,
                            ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist) const;
 
+    /*
+     *
+     * @brief create a query automata and perform the poststar reachability query defined by it
+     * 
+     * This method creates the query automata and then performs the poststar reachability query defined it.
+     * The result of the query is stored in the 'output' parameter.
+     * Note: Any transitions in output before the query will be there after the query but
+     * will have no effect on the reachability query.
+     *
+     * @param - output: the result of performing the reachability query
+     * @param - wg: the functions to use in generating weights
+     *
+     */
+    wali::wfa::WFA
+    poststar(WeightGen const & wg) const;
+
+    /*
+     *
+     * @brief return the state-weight map of the given "poststarred" automaton
+     * 
+     * This method takes a "poststarred" automaton as input and returns a map of states to weights corresponding to each state
+     *
+     * @param - poststarredWFA: the automaton which is the output of poststar
+     * @return - the map of states to weights
+     */
+    std::map<State, sem_elem_t>
+    readPoststarResult(wali::wfa::WFA poststarredFA) const;
+
+    /*
+     *
+     * @brief return the state-weight map for the given functions for weight generation
+     * 
+     * This method takes functions for weight generation as input and returns a map of states to weights corresponding to each state
+     *
+     * @param - wg: the functions to use in generating weights
+     * @return - the map of states to weights corresponding to each state
+     */
+    std::map<State, sem_elem_t>
+    doForwardAnalysis(WeightGen const &wg);
+
     /**
      *
      * @brief perform the poststar reachability query defined by the given WFA using FWPDS
