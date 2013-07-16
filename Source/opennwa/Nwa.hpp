@@ -1147,80 +1147,74 @@ namespace opennwa
                            ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist) const;
 
     /*
-     *
-     * @brief create a query automata and perform the poststar reachability query defined by it
+     * @brief Perform poststar from the NWA's initial states
      * 
-     * This method creates the query automata and then performs the poststar reachability query defined it.
-     * The result of the query is stored in the 'output' parameter.
-     * Note: Any transitions in output before the query will be there after the query but
-     * will have no effect on the reachability query.
-     *
-     * @param - output: the result of performing the reachability query
      * @param - wg: the functions to use in generating weights
-     *
      */
     wali::wfa::WFA
     poststar(WeightGen const & wg) const;
 
     /*
-     *
-     * @brief return the state-weight map of the given "poststarred" automaton
+     * @brief "Unpacks" the given automaton to determine the overall
+     *        result at each state
      * 
-     * This method takes a "poststarred" automaton as input and returns a map of states to weights corresponding to each state
+     * This method takes an automaton resulting from a poststar query,
+     * and for each state in the NWA returns the combine of all
+     * configurations in the automaton where that state appears at the
+     * top of the stack.
      *
-     * @param - poststarredWFA: the automaton which is the output of poststar
-     * @return - the map of states to weights
+     * @param poststarredWFA: the automaton which is the output of poststar
+     * @return the map of states to weights
      */
     std::map<State, sem_elem_t>
     readPoststarResult(wali::wfa::WFA poststarredFA) const;
 
     /*
+     * Returns the combine-over-all-valid-paths value from the
+     * NWA's initial state to each state
      *
-     * @brief return the state-weight map for the given functions for weight generation
-     * 
-     * This method takes functions for weight generation as input and returns a map of states to weights corresponding to each state
+     * Internally, does a poststar query using FWPDS.
      *
-     * @param - wg: the functions to use in generating weights
-     * @return - the map of states to weights corresponding to each state
+     * @param wg: the functions to use in generating weights
+     * @return the map of states to weights corresponding to each state
      */
     std::map<State, sem_elem_t>
     doForwardAnalysis(WeightGen const &wg);
 
     /**
-     *
-     * @brief perform the poststar reachability query defined by the given WFA using FWPDS
+     * @brief Perform a poststar query from the given automaton,
+     * returning the result
      *
      * This method performs the poststar reachability query defined by the
-     * given WFA by converting the nwa to an FWPDS.
+     * given WFA by converting the NWA to an FWPDS.
      *
-     * @param - input: the starting point of the reachability query
-     * @param - wg: the functions to use in generating weights
+     * @param input: the starting point of the reachability query
+     * @param wg: the functions to use in generating weights
      * @return the WFA resulting from performing the poststar reachability query
-     *
      */
-    wali::wfa::WFA poststarViaFwpds(
-        wali::wfa::WFA const & input,
-        WeightGen const & wg) const;
+    wali::wfa::WFA
+    poststarViaFwpds(wali::wfa::WFA const & input,
+                     WeightGen const & wg) const;
 
     /**
+     * @brief Perform a poststar query from the given configurations,
+     * storing the result in 'output'
      *
-     * @brief perform the poststar reachability query defined by the given WFA using FWPDS
-     * 
      * This method performs the poststar reachability query defined by the
-     * given WFA by converting the nwa to an FWPDS.
-     * The result of the query is stored in the 'output' parameter.
-     * Note: Any transitions in output before the query will be there after the query but
-     * will have no effect on the reachability query.
+     * given WFA by converting the NWA to an FWPDS.
      *
-     * @param - input: the starting point of the reachability query
-     * @param - output: the result of performing the reachability query
-     * @param - wg: the functions to use in generating weights
+     * Any transitions in output before the query will be there after
+     * the query but will have no effect on the reachability query.
      *
+     * @param input: the starting point of the reachability query
+     * @param output: the result of performing the reachability query
+     * @param wg: the functions to use in generating weights
+     * @return the WFA resulting from performing the poststar reachability query
      */
-    void poststarViaFwpds( 
-        wali::wfa::WFA const & input,
-        wali::wfa::WFA & output,
-        WeightGen const & wg) const;
+    void
+    poststarViaFwpds(wali::wfa::WFA const & input,
+                     wali::wfa::WFA & output,
+                     WeightGen const & wg) const;
 
     //Utilities	
 

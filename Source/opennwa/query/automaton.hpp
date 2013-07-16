@@ -10,10 +10,15 @@ namespace opennwa {
       
     /**
      *
-     * @brief tests whether this NWA is deterministic 
+     * @brief Tests whether this NWA is deterministic 
      *
-     * This method tests whether this NWA is deterministic or nondeterministic. If this 
-     * NWA is deterministic, true is returned.  Otherwise, false is returned.
+     * This method tests whether this NWA is deterministic or
+     * nondeterministic. If this NWA is deterministic, true is
+     * returned.  Otherwise, false is returned.
+     *
+     * An NWA that is *incomplete* -- that is, delta(q,a) for some
+     * delta (delta_i, delta_c, or delta_r) is the empty set -- is
+     * still considered deterministic.
      *
      * @return true if this NWA is deterministic, false otherwise
      *
@@ -24,15 +29,18 @@ namespace opennwa {
 
     /**
      * 
-     * @brief determines whether there is any overlap in the states of the given NWAs
+     * @brief determines whether there is any overlap in the states of
+     * the given NWAs
      *
-     * This method tests whether there is any overlap in the states of the given NWAs.
+     * This method tests whether there is any overlap in the states of
+     * the given NWAs.
      *
-     *   first->states()  intersect  second->states()  = {]
+     *   first->states()  intersect  second->states()  = {}
      *
-     * @param - first: one of the NWAs whose states to compare
-     * @param - second: one of the NWAs whose states to compare
-     * @return true if there is some overlap in the states of the given NWAs, false otherwise
+     * @param first: one of the NWAs whose states to compare
+     * @param second: one of the NWAs whose states to compare
+     * @return true if there is some in both 'first' and 'second';
+     *         false otherwise
      *
      */
     bool
