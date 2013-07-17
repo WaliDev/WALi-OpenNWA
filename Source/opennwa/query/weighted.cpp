@@ -126,6 +126,7 @@ namespace opennwa {
                wali::wfa::WFA wfa)
     {
       wali::Key const program = opennwa::nwa_pds::getProgramControlLocation();
+      sem_elem_t weight = wfa.getSomeWeight()->zero();
       wfa.path_summary();
       std::map<State, sem_elem_t> stateWeightMap;
 
@@ -135,8 +136,6 @@ namespace opennwa {
         // get the set of transitions matching (program,state,?) in the WFA
         wali::wfa::TransSet transitionSet = wfa.match(program, *sit);
         
-        sem_elem_t weight = wfa.getSomeWeight()->zero();
-
         for (wali::wfa::TransSet::iterator tsiter = transitionSet.begin();
              tsiter != transitionSet.end() ; tsiter++)
         {
