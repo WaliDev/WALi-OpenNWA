@@ -6,13 +6,11 @@ namespace opennwa {
   namespace query {
 
       
-
     bool
     isDeterministic(Nwa const & nwa)
     {
       return nwa._private_isDeterministic_();
     }
-
 
 
     bool

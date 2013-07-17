@@ -24,6 +24,9 @@
 
 #include "opennwa/WeightGen.hpp"
 
+// TODO: remove include after removing deprecated poststar etc funcs
+#include "opennwa/query/automaton.hpp"
+
 //#define USE_BUDDY
 #ifdef USE_BUDDY
 #  include "opennwa/RelationOpsBuddy.hpp"
@@ -1050,171 +1053,108 @@ namespace opennwa
     const char * toStringGdb() const;
 
 
-    /**
-     *
-     * @brief perform the prestar reachability query defined by the given WFA
-     *
-     * This method performs the prestar reachability query defined by the given WFA.
-     *
-     * @param - input: the starting point of the reachability query
-     * @param - wg: the functions to use in generating weights
-     * @return the WFA resulting from performing the prestar reachability query 
-     *
-     */
+    DEPRECATE("Use version in query/automata.hpp")
     wali::wfa::WFA prestar( wali::wfa::WFA const & input,
                             WeightGen const & wg ) const
     {
-      return prestar(input, wg, NULL);
+      return query::prestar(*this, wg, NULL, input);
     }
 
+    DEPRECATE("Use version in query/automata.hpp")
     virtual wali::wfa::WFA prestar( wali::wfa::WFA const & input,
                                     WeightGen const & wg,
-                                    ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist) const;
+                                    ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist) const
+    {
+      return query::prestar(*this, wg, worklist, input);
+    }
 
-    /**
-     *
-     * @brief perform the prestar reachability query defined by the given WFA
-     *
-     * This method performs the prestar reachability query defined by the given WFA.
-     * The result of the query is stored in the 'output' parameter. 
-     * Note: Any transitions in output before the query will be there after the query but
-     * will have no effect on the reachability query.
-     *
-     * @param - input: the starting point of the reachability query
-     * @param - ouput: the result of performing the reachability query
-     * @param - wg: the functions to use in generating weights
-     *
-     */
+    DEPRECATE("Use version in query/automata.hpp")
     void prestar( wali::wfa::WFA const & input,
                   wali::wfa::WFA & output,
                   WeightGen const & wg ) const
     {
-      prestar(input, output, wg, NULL);
+      query::prestar(*this, wg, NULL, input, output);
     }
 
+    DEPRECATE("Use version in query/automata.hpp")
     virtual void prestar( wali::wfa::WFA const & input,
                           wali::wfa::WFA & output,
                           WeightGen const & wg,
-                          ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist) const;
+                          ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist) const
+    {
+      query::prestar(*this, wg, worklist, input, output);
+    }
 
-    /**
-     *
-     * @brief perform the poststar reachability query defined by the given WFA
-     *
-     * This method performs the poststar reachability query defined by the given WFA.
-     *
-     * @param - input: the starting point of the reachability query
-     * @param - wg: the functions to use in generating weights
-     * @return the WFA resulting from performing the poststar reachability query
-     *
-     */
+    DEPRECATE("Use version in query/automata.hpp")
     wali::wfa::WFA poststar( wali::wfa::WFA const & input,
                              WeightGen const & wg ) const
     {
-      return poststar(input, wg, NULL);
+      return query::poststar(*this, wg, NULL, input);
+    }
+
+    DEPRECATE("Use version in query/automata.hpp")
+    virtual wali::wfa::WFA poststar( wali::wfa::WFA const & input,
+                                     WeightGen const & wg,
+                                     ref_ptr< wali::Worklist<wali::wfa::ITrans> > wl) const
+    {
+      return query::poststar(*this, wg, wl, input);
     }
 
 
-    virtual wali::wfa::WFA poststar( wali::wfa::WFA const & input,
-                                     WeightGen const & wg,
-                                     ref_ptr< wali::Worklist<wali::wfa::ITrans> > wl) const;
-
-
-    /**
-     *
-     * @brief perform the poststar reachability query defined by the given WFA
-     * 
-     * This method performs the poststar reachability query defined by the given WFA.
-     * The result of the query is stored in the 'output' parameter.
-     * Note: Any transitions in output before the query will be there after the query but
-     * will have no effect on the reachability query.
-     *
-     * @param - input: the starting point of the reachability query
-     * @param - output: the result of performing the reachability query
-     * @param - wg: the functions to use in generating weights
-     *
-     */
+    DEPRECATE("Use version in query/automata.hpp")
     void poststar( wali::wfa::WFA const & input,
                    wali::wfa::WFA & output,
                    WeightGen const & wg ) const
     {
-      poststar(input, output, wg, NULL);
+      query::poststar(*this, wg, NULL, input, output);
     }
 
+    DEPRECATE("Use version in query/automata.hpp")
     virtual void poststar( wali::wfa::WFA const & input,
                            wali::wfa::WFA & output,
                            WeightGen const & wg,
-                           ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist) const;
+                           ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist) const
+    {
+      query::poststar(*this, wg, worklist, input, output);
+    }
 
-    /*
-     * @brief Perform poststar from the NWA's initial states
-     * 
-     * @param - wg: the functions to use in generating weights
-     */
+    DEPRECATE("Use version in query/automata.hpp")
     wali::wfa::WFA
-    poststar(WeightGen const & wg) const;
+    poststar(WeightGen const & wg) const
+    {
+      return query::poststar(*this, wg);
+    }
 
-    /*
-     * @brief "Unpacks" the given automaton to determine the overall
-     *        result at each state
-     * 
-     * This method takes an automaton resulting from a poststar query,
-     * and for each state in the NWA returns the combine of all
-     * configurations in the automaton where that state appears at the
-     * top of the stack.
-     *
-     * @param poststarredWFA: the automaton which is the output of poststar
-     * @return the map of states to weights
-     */
+    DEPRECATE("Use version in query/automata.hpp")
     std::map<State, sem_elem_t>
-    readPoststarResult(wali::wfa::WFA poststarredFA) const;
+    readPoststarResult(wali::wfa::WFA poststarredFA) const
+    {
+      return query::readPoststarResult(*this, poststarredFA);
+    }
 
-    /*
-     * Returns the combine-over-all-valid-paths value from the
-     * NWA's initial state to each state
-     *
-     * Internally, does a poststar query using FWPDS.
-     *
-     * @param wg: the functions to use in generating weights
-     * @return the map of states to weights corresponding to each state
-     */
+    DEPRECATE("Use version in query/automata.hpp")
     std::map<State, sem_elem_t>
-    doForwardAnalysis(WeightGen const &wg);
+    doForwardAnalysis(WeightGen const &wg)
+    {
+      return query::doForwardAnalysis(*this, wg);
+    }
 
-    /**
-     * @brief Perform a poststar query from the given automaton,
-     * returning the result
-     *
-     * This method performs the poststar reachability query defined by the
-     * given WFA by converting the NWA to an FWPDS.
-     *
-     * @param input: the starting point of the reachability query
-     * @param wg: the functions to use in generating weights
-     * @return the WFA resulting from performing the poststar reachability query
-     */
+    DEPRECATE("Use version in query/automata.hpp")
     wali::wfa::WFA
     poststarViaFwpds(wali::wfa::WFA const & input,
-                     WeightGen const & wg) const;
+                     WeightGen const & wg) const
+    {
+      return query::poststarViaFwpds(*this, wg, input);
+    }
 
-    /**
-     * @brief Perform a poststar query from the given configurations,
-     * storing the result in 'output'
-     *
-     * This method performs the poststar reachability query defined by the
-     * given WFA by converting the NWA to an FWPDS.
-     *
-     * Any transitions in output before the query will be there after
-     * the query but will have no effect on the reachability query.
-     *
-     * @param input: the starting point of the reachability query
-     * @param output: the result of performing the reachability query
-     * @param wg: the functions to use in generating weights
-     * @return the WFA resulting from performing the poststar reachability query
-     */
+    DEPRECATE("Use version in query/automata.hpp")
     void
     poststarViaFwpds(wali::wfa::WFA const & input,
                      wali::wfa::WFA & output,
-                     WeightGen const & wg) const;
+                     WeightGen const & wg) const
+    {
+      return query::poststarViaFwpds(*this, wg, input, output);
+    }
 
     //Utilities	
 
