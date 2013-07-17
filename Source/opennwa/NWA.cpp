@@ -1757,7 +1757,7 @@ namespace opennwa
     ReachGen reach;
     //Perform poststar to determine reachability.
     //std::cerr << "Before poststar\n";
-    wali::wfa::WFA postInitials = poststar(initials,reach);
+    wali::wfa::WFA postInitials = query::poststar(*this,reach, initials);
     //std::cerr << "After poststar!\n";
 
     //std::cout << "poststar(initials):\n";
