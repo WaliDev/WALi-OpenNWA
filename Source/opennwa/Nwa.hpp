@@ -25,7 +25,7 @@
 #include "opennwa/WeightGen.hpp"
 
 // TODO: remove include after removing deprecated poststar etc funcs
-#include "opennwa/query/automaton.hpp"
+#include "opennwa/query/weighted.hpp"
 
 //#define USE_BUDDY
 #ifdef USE_BUDDY
