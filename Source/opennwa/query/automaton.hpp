@@ -64,9 +64,9 @@ namespace opennwa {
 
     wali::wfa::WFA
     prestar(Nwa const & nwa,
-	    WeightGen const & wg,
-	    ref_ptr<wali::Worklist<wali::wfa::ITrans> > worklist,
-	    wali::wfa::WFA const & input);
+            WeightGen const & wg,
+            ref_ptr<wali::Worklist<wali::wfa::ITrans> > worklist,
+            wali::wfa::WFA const & input);
 
     /**
      * @brief perform the prestar reachability query defined by the
@@ -83,18 +83,18 @@ namespace opennwa {
     inline
     wali::wfa::WFA
     prestar(Nwa const & nwa,
-	    WeightGen const & wg,
-	    wali::wfa::WFA const & input)
+            WeightGen const & wg,
+            wali::wfa::WFA const & input)
     {
       return prestar(nwa, wg, NULL, input);
     }
 
     void
     prestar(Nwa const & nwa,
-	    WeightGen const & wg,
-	    ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist,
-	    wali::wfa::WFA const & input,
-	    wali::wfa::WFA & output);
+            WeightGen const & wg,
+            ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist,
+            wali::wfa::WFA const & input,
+            wali::wfa::WFA & output);
 
     /**
      * @brief perform the prestar reachability query defined by the
@@ -116,9 +116,9 @@ namespace opennwa {
     inline
     void
     prestar(Nwa const & nwa,
-	    WeightGen const & wg,
-	    wali::wfa::WFA const & input,
-	    wali::wfa::WFA & output)
+            WeightGen const & wg,
+            wali::wfa::WFA const & input,
+            wali::wfa::WFA & output)
     {
       prestar(nwa, wg, NULL, input, output);
     }
@@ -126,9 +126,9 @@ namespace opennwa {
 
     wali::wfa::WFA
     poststar(Nwa const & nwa,
-	     WeightGen const & wg,
-	     ref_ptr<wali::Worklist<wali::wfa::ITrans> > wl,
-	     wali::wfa::WFA const & input);
+             WeightGen const & wg,
+             ref_ptr<wali::Worklist<wali::wfa::ITrans> > wl,
+             wali::wfa::WFA const & input);
 
     /**
      * @brief perform the poststar reachability query defined by the
@@ -145,8 +145,8 @@ namespace opennwa {
     inline
     wali::wfa::WFA
     poststar(Nwa const & nwa,
-	     WeightGen const & wg,
-	     wali::wfa::WFA const & input)
+             WeightGen const & wg,
+             wali::wfa::WFA const & input)
     {
       return poststar(nwa, wg, NULL, input);
     }
@@ -154,10 +154,10 @@ namespace opennwa {
 
     void
     poststar(Nwa const & nwa,
-	     WeightGen const & wg,
-	     ref_ptr<wali::Worklist<wali::wfa::ITrans> > worklist,
-	     wali::wfa::WFA const & input,
-	     wali::wfa::WFA & output);
+             WeightGen const & wg,
+             ref_ptr<wali::Worklist<wali::wfa::ITrans> > worklist,
+             wali::wfa::WFA const & input,
+             wali::wfa::WFA & output);
 
 
     /**
@@ -182,9 +182,9 @@ namespace opennwa {
     inline
     void
     poststar(Nwa const & nwa,
-	     WeightGen const & wg,
-	     wali::wfa::WFA const & input,
-	     wali::wfa::WFA & output)
+             WeightGen const & wg,
+             wali::wfa::WFA const & input,
+             wali::wfa::WFA & output)
     {
       poststar(nwa, wg, NULL, input, output);
     }
@@ -197,7 +197,7 @@ namespace opennwa {
      */
     wali::wfa::WFA
     poststar(Nwa const & nwa,
-	     WeightGen const & wg);
+             WeightGen const & wg);
 
     /*
      * @brief "Unpacks" the given automaton to determine the overall
@@ -214,7 +214,7 @@ namespace opennwa {
      */
     std::map<State, sem_elem_t>
     readPoststarResult(Nwa const & nwa,
-		       wali::wfa::WFA poststarredFA);
+                       wali::wfa::WFA poststarredFA);
 
     /*
      * Returns the combine-over-all-valid-paths value from the
@@ -228,7 +228,7 @@ namespace opennwa {
      */
     std::map<State, sem_elem_t>
     doForwardAnalysis(Nwa const & nwa,
-		      WeightGen const & wg);
+                      WeightGen const & wg);
 
     /**
      * @brief Perform a poststar query from the given automaton,
@@ -244,7 +244,7 @@ namespace opennwa {
     wali::wfa::WFA
     poststarViaFwpds(Nwa const & nwa,
                      WeightGen const & wg,
-		     wali::wfa::WFA const & input);
+                     wali::wfa::WFA const & input);
 
     /**
      * @brief Perform a poststar query from the given configurations,
@@ -264,7 +264,7 @@ namespace opennwa {
     void
     poststarViaFwpds(Nwa const & nwa,
                      WeightGen const & wg,
-		     wali::wfa::WFA const & input,
+                     wali::wfa::WFA const & input,
                      wali::wfa::WFA & output);
 
   }
