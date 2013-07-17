@@ -402,6 +402,9 @@
     <ClCompile Include="..\..\..\Source\wali\domains\SemElemSet.cpp">
       <Filter>Source Files\wali</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\query\reachability.cpp">
+      <Filter>Source Files\wali.nwa\query</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\FWPDS.hpp">
