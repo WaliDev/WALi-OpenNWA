@@ -140,16 +140,16 @@ namespace opennwa {
         for (wali::wfa::TransSet::iterator tsiter = transitionSet.begin();
              tsiter != transitionSet.end() ; tsiter++)
         {
-          wali::wfa::ITrans* t( *tsiter );
+          wali::wfa::ITrans * t = *tsiter;
 
           // This is different according to either post or pre
           sem_elem_t tmp = poststarredWFA.getState(t->to())->weight()->extend(t->weight());
 
           // combine the weights of all "to" states 
-          weight  =  weight->combine(tmp);
+          weight = weight->combine(tmp);
         }
 
-        stateWeightMap[ *sit ] = weight;
+        stateWeightMap[*sit] = weight;
       }
     
       return stateWeightMap;
