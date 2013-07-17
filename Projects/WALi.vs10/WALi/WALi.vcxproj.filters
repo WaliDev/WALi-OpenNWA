@@ -336,9 +336,6 @@
     <ClCompile Include="..\..\..\Source\opennwa\query\transitions.cpp">
       <Filter>Source Files\wali.nwa\query</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\opennwa\query\automaton.cpp">
-      <Filter>Source Files\wali.nwa\query</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\opennwa\query\calls.cpp">
       <Filter>Source Files\wali.nwa\query</Filter>
     </ClCompile>
@@ -402,7 +399,10 @@
     <ClCompile Include="..\..\..\Source\wali\domains\SemElemSet.cpp">
       <Filter>Source Files\wali</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\opennwa\query\reachability.cpp">
+    <ClCompile Include="..\..\..\Source\opennwa\query\automaton.cpp">
+      <Filter>Source Files\wali.nwa\query</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\query\weighted.cpp">
       <Filter>Source Files\wali.nwa\query</Filter>
     </ClCompile>
   </ItemGroup>
@@ -781,6 +781,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\wali\domains\SemElemSet.hpp">
       <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\opennwa\query\weighted.hpp">
+      <Filter>Header Files\wali.nwa\query</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

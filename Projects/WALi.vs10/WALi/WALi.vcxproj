@@ -249,9 +249,9 @@
     <ClCompile Include="..\..\..\Source\opennwa\query\getSomeAcceptedWord.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\query\internals.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\query\language.cpp" />
-    <ClCompile Include="..\..\..\Source\opennwa\query\reachability.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\query\returns.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\query\transitions.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\query\weighted.cpp" />
     <ClCompile Include="..\..\..\Source\wali\domains\SemElemSet.cpp" />
     <ClCompile Include="..\..\..\Source\wali\graph\Functional.cpp" />
     <ClCompile Include="..\..\..\Source\wali\Reach.cpp" />
@@ -404,6 +404,7 @@
     <ClInclude Include="..\..\..\Source\opennwa\query\details\iterators.hpp" />
     <ClInclude Include="..\..\..\Source\opennwa\query\details\selectors.hpp" />
     <ClInclude Include="..\..\..\Source\opennwa\query\language.hpp" />
+    <ClInclude Include="..\..\..\Source\opennwa\query\weighted.hpp" />
     <ClInclude Include="..\..\..\Source\wali\domains\SemElemSet.hpp" />
     <ClInclude Include="..\..\..\Source\wali\graph\Functional.hpp" />
     <ClInclude Include="..\..\..\Source\wali\graph\NewtonLogger.hpp" />
