@@ -2,6 +2,7 @@
 #define WALI_NWA_QUERY_WEIGHTED_HPP
 
 #include "opennwa/NwaFwd.hpp"
+#include "opennwa/WeightGen.hpp"
 #include "wali/wfa/WFA.hpp"
 #include "wali/wpds/WPDS.hpp"
 
