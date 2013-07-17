@@ -1129,7 +1129,7 @@ namespace opennwa
     std::map<State, sem_elem_t>
     readPoststarResult(wali::wfa::WFA poststarredFA) const
     {
-      return query::readPoststarResult(*this, poststarredFA);
+      return query::readResult(*this, poststarredFA);
     }
 
     DEPRECATE("Use version in query/automata.hpp")

@@ -151,18 +151,18 @@ namespace opennwa {
      * @brief "Unpacks" the given automaton to determine the overall
      *        result at each state
      * 
-     * This method takes an automaton resulting from a poststar query,
-     * and for each state in the NWA returns the combine of all
-     * configurations in the automaton where that state appears at the
-     * top of the stack.
+     * This method takes an automaton resulting from a prestar or a 
+     * poststar query, and for each state in the NWA returns the combine
+     * of all configurations in the automaton where that state appears 
+     * at the top of the stack.
      *
      * @param nwa: the NWA poststar was performed on
-     * @param poststarredWFA: the automaton which is the output of poststar
+     * @param wfa: the automaton which is the output of the query
      * @return the map of states to weights
      */
     std::map<State, sem_elem_t>
-    readPoststarResult(Nwa const & nwa,
-                       wali::wfa::WFA poststarredFA);
+    readResult(Nwa const & nwa,
+               wali::wfa::WFA wfa);
 
     /*
      * Returns the combine-over-all-valid-paths value from the

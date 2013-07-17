@@ -122,20 +122,20 @@ namespace opennwa {
     }
 
     std::map<State, sem_elem_t>
-    readPoststarResult(Nwa const & nwa,
-                       wali::wfa::WFA poststarredWFA)
+    readResult(Nwa const & nwa,
+               wali::wfa::WFA wfa)
     {
       wali::Key const program = opennwa::nwa_pds::getProgramControlLocation();
-      poststarredWFA.path_summary();
+      wfa.path_summary();
       std::map<State, sem_elem_t> stateWeightMap;
 
       for (opennwa::Nwa::StateIterator sit = nwa.beginStates();
            sit != nwa.endStates(); sit++)
       {
         // get the set of transitions matching (program,state,?) in the WFA
-        wali::wfa::TransSet transitionSet = poststarredWFA.match(program, *sit);
+        wali::wfa::TransSet transitionSet = wfa.match(program, *sit);
         
-        sem_elem_t weight = poststarredWFA.getSomeWeight()->zero();
+        sem_elem_t weight = wfa.getSomeWeight()->zero();
 
         for (wali::wfa::TransSet::iterator tsiter = transitionSet.begin();
              tsiter != transitionSet.end() ; tsiter++)
@@ -143,7 +143,16 @@ namespace opennwa {
           wali::wfa::ITrans * t = *tsiter;
 
           // This is different according to either post or pre
-          sem_elem_t tmp = poststarredWFA.getState(t->to())->weight()->extend(t->weight());
+          sem_elem_t tmp;
+          sem_elem_t target_weight = wfa.getState(t->to())->weight();
+          sem_elem_t trans_weight = t->weight();
+
+          if (wfa.getQuery() == WFA::INORDER) {
+            tmp = trans_weight->extend(target_weight);
+          }
+          else {
+            tmp = target_weight->extend(trans_weight);
+          }
 
           // combine the weights of all "to" states 
           weight = weight->combine(tmp);
@@ -171,7 +180,7 @@ namespace opennwa {
         return all_zero_map;
       }
 
-      return readPoststarResult(nwa, poststar(nwa, wg));
+      return readResult(nwa, poststar(nwa, wg));
     }
 
 
