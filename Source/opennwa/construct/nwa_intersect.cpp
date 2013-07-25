@@ -130,18 +130,19 @@ namespace opennwa
 
           State secondEntry = Trans::getEntry(*sit);
           StatePair entryPair(firstEntry,secondEntry);
-            
-          // If we have already considered tgtPair and found them to be nonintersectable, continue 
-          if( visitedPairs.count(entryPair) != 0 && pairToStMap.count(entryPair) == 0 )
-            continue;
-          visitedPairs.insert(entryPair);
 
-          State resSt;
-          bool newlyCreatedResSt = false;
-          // Have we seen entryPair before?
-          if( pairToStMap.count(entryPair) == 0 ) 
-          { 
-            //We have not seen this pair before
+		  State resSt;
+		  bool newlyCreatedResSt = false;
+
+		  // Have we seen entryPair before?
+		  if( pairToStMap.count(entryPair) == 0 )
+		  {   			  
+			  // If we have already considered tgtPair and found them to be nonintersectable, continue 
+			  if( visitedPairs.count(entryPair) != 0 )
+				  continue;
+			  // We have not seen this pair before 
+			  visitedPairs.insert(entryPair);
+                   
             // Are the entry nodes intersectable?
             ClientInfoRefPtr resCI;
             if(! stateIntersect(first,firstEntry,second,secondEntry,resSt,resCI) ) 
@@ -174,14 +175,17 @@ namespace opennwa
           {
             bool newlycreated = false;
             State st;
-            //If we have already considered this pair and found them nonintersectable, continue
-            if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
-              continue;
-            visitedPairs.insert(*it);
-            //Have we seen this pair before?
-            if( pairToStMap.count(*it) == 0 )
-            {
-              //Check and make sure this intersection makes sense.
+			//Have we seen this pair before?
+			if( pairToStMap.count(*it) == 0 )
+			{
+				//If we have already considered this pair and found them nonintersectable, continue
+				if( visitedPairs.count(*it) != 0 )
+					continue;
+
+				// We have not seen this pair before 
+				visitedPairs.insert(*it);
+
+				//Check and make sure this intersection makes sense.
               ClientInfoRefPtr CI;
               if( stateIntersect(first,it->first,second,it->second,st,CI) )
               {
@@ -257,19 +261,21 @@ namespace opennwa
             continue; // Symbols not intersectable, do nothing
 
           State secondTgt = Trans::getTarget(*sit);
-          StatePair tgtPair(firstTgt,secondTgt);
+		  StatePair tgtPair(firstTgt,secondTgt);
 
-          // If we have already considered tgtPair and found its elements to be nonintersectable, continue 
-          if( visitedPairs.count(tgtPair) != 0 && pairToStMap.count(tgtPair) == 0 )
-            continue;
-          visitedPairs.insert(tgtPair);
+		  State resSt;
+		  bool newlyCreatedResSt = false;
 
-          State resSt;
-          bool newlyCreatedResSt = false;
-          // Have we seen tgtPair before?
-          if( pairToStMap.count(tgtPair) == 0 ) 
-          { 
-            //We have not seen this pair before
+		  // Have we seen tgtPair before?
+		  if( pairToStMap.count(tgtPair) == 0 ) 
+		  { 
+			  // If we have already considered tgtPair and found its elements to be nonintersectable, continue 
+			  if( visitedPairs.count(tgtPair) != 0 && pairToStMap.count(tgtPair) == 0 )
+				  continue;
+
+			  // We have not seen this pair before
+			  visitedPairs.insert(tgtPair);
+
             // Are the tgt nodes intersectable?
             ClientInfoRefPtr resCI;
             if(! stateIntersect(first,firstTgt,second,secondTgt,resSt,resCI) ) 
@@ -301,15 +307,18 @@ namespace opennwa
           {
             State st;
             bool newlyCreatedSt = false;
-            //If we have already considered this pair and found them nonintersectable, continue
-            if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
-              continue;
-            visitedPairs.insert(*it);
-            //Have we seen this pair before?
-            if( pairToStMap.count(*it) == 0 )
-            {
-              //Check and make sure this intersection makes sense.
-              ClientInfoRefPtr CI;
+			 
+			// Have we seen this pair before?
+			if( pairToStMap.count(*it) == 0 )
+			{
+				// If we have already considered this pair and found them nonintersectable, continue
+				if( visitedPairs.count(*it) != 0 )
+					continue;
+				// We have not seen this pair before
+				visitedPairs.insert(*it);
+
+				//Check and make sure this intersection makes sense.
+				ClientInfoRefPtr CI;
               if( stateIntersect(first,it->first,second,it->second,st,CI) )
               {
                 if( first.isFinalState(it->first) && second.isFinalState(it->second) )
@@ -388,7 +397,7 @@ namespace opennwa
           if( visitedPairs.count(callPair) == 0 )
             continue;
           // If we have already considered callPair and found its elements to be nonintersectable, continue 
-          if( visitedPairs.count(callPair) != 0 && pairToStMap.count(callPair) == 0 )
+          if( pairToStMap.count(callPair) == 0 )
             continue;
           State callSt = pairToStMap[callPair];
 
@@ -434,13 +443,17 @@ namespace opennwa
           {
             State st;
             bool newlyCreatedSt = false;
-            //If we have already considered this pair and found them nonintersectable, continue
-            if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
-              continue;
-            visitedPairs.insert(*it);
-            //Have we seen this pair before?
+
+			//Have we seen this pair before?
             if( pairToStMap.count(*it) == 0 )
             {
+            //If we have already considered this pair and found them nonintersectable, continue
+            if( visitedPairs.count(*it) != 0 )
+              continue;
+
+			// We have not seen this pair before
+            visitedPairs.insert(*it);
+            
               //Check and make sure this intersection makes sense.
               ClientInfoRefPtr CI;
               if( stateIntersect(first,it->first,second,it->second,st,CI) )
@@ -516,7 +529,7 @@ namespace opennwa
           if( visitedPairs.count(exitPair) == 0 )
             continue;
           // If we have already considered exitPair and found its elements to be nonintersectable, continue 
-          if( visitedPairs.count(exitPair) != 0 && pairToStMap.count(exitPair) == 0 ) 
+          if( pairToStMap.count(exitPair) == 0 ) 
             continue;
           State exitSt = pairToStMap[exitPair];
 
@@ -562,13 +575,17 @@ namespace opennwa
           {
             State st;
             bool newlyCreatedSt = false;
-            //If we have already considered this pair and found them nonintersectable, continue
-            if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
-              continue;
-            visitedPairs.insert(*it);
-            //Have we seen this pair before?
+
+			 //Have we seen this pair before?
             if( pairToStMap.count(*it) == 0 )
             {
+            //If we have already considered this pair and found them nonintersectable, continue
+            if( visitedPairs.count(*it) != 0 )
+              continue;
+
+			// We have not seen this pair before
+            visitedPairs.insert(*it);
+           
               //Check and make sure this intersection makes sense.
               ClientInfoRefPtr CI;
               if( stateIntersect(first,it->first,second,it->second,st,CI) )
