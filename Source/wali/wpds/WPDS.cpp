@@ -187,6 +187,10 @@ namespace wali
 
     void WPDS::prestar( WFA const & input, WFA & fa )
     {
+      if (count_rules() == 0) {
+        fa = input;
+        return;
+      }
       prestarSetupFixpoint(input,fa);
       prestarComputeFixpoint( fa );
       unlinkOutput(fa);
