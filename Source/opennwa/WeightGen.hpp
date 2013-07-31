@@ -113,6 +113,7 @@ namespace opennwa
      */
     virtual sem_elem_t getWildWeight( Key src, ClientInfoRefPtr srcInfo, Key tgt, ClientInfoRefPtr tgtInfo ) const
     {
+      assert(false);
       (void) src;
       (void) srcInfo;
       (void) tgt;
