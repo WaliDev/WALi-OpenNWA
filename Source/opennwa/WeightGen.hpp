@@ -73,16 +73,7 @@ namespace opennwa
      * @return the weight to put on the rule corresponding to the given edge
      *         
      */
-    virtual sem_elem_t getWeight( Key src, ClientInfoRefPtr srcInfo, Key sym, Kind kind, Key tgt, ClientInfoRefPtr tgtInfo ) const
-    {
-      (void) src;
-      (void) srcInfo;
-      (void) sym;
-      (void) kind;
-      (void) tgt;
-      (void) tgtInfo;
-      return getOne();
-    }
+    virtual sem_elem_t getWeight( Key src, ClientInfoRefPtr srcInfo, Key sym, Kind kind, Key tgt, ClientInfoRefPtr tgtInfo ) const = 0;
         
     /** 
      * 
