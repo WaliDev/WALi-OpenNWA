@@ -143,10 +143,13 @@ namespace opennwa {
      * 
      * @param nwa: The NWA to perform poststar on
      * @param wg: the functions to use in generating weights
+     * @param init_weight: The weight representing initial constraint;
+     *                     If not sure, then pass wg.getOne() as the initial weight.
      */
     wali::wfa::WFA
     poststar(Nwa const & nwa,
-             WeightGen const & wg);
+             WeightGen const & wg,
+             sem_elem_t init_weight);
 
     /*
      * @brief "Unpacks" the given automaton to determine the overall
@@ -173,11 +176,14 @@ namespace opennwa {
      *
      * @param nwa: the NWA to analyze
      * @param wg: the functions to use in generating weights
+     * @param init_weight: The weight representing initial constraint;
+     *                     If not sure, then pass wg.getOne() as the initial weight.
      * @return the map of states to weights corresponding to each state
      */
     std::map<State, sem_elem_t>
     doForwardAnalysis(Nwa const & nwa,
-                      WeightGen const & wg);
+                      WeightGen const & wg,
+                      sem_elem_t init_weight);
 
     /**
      * @brief Perform a poststar query from the given automaton,

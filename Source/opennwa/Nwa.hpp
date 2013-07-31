@@ -1122,7 +1122,7 @@ namespace opennwa
     wali::wfa::WFA
     poststar(WeightGen const & wg) const
     {
-      return query::poststar(*this, wg);
+      return query::poststar(*this, wg, wg.getOne());
     }
 
     DEPRECATE("Use version in query/automata.hpp")
@@ -1136,7 +1136,7 @@ namespace opennwa
     std::map<State, sem_elem_t>
     doForwardAnalysis(WeightGen const &wg)
     {
-      return query::doForwardAnalysis(*this, wg);
+      return query::doForwardAnalysis(*this, wg, wg.getOne());
     }
 
     DEPRECATE("Use version in query/automata.hpp")

@@ -94,7 +94,8 @@ namespace opennwa {
 
     wali::wfa::WFA
     poststar(Nwa const & nwa,
-             WeightGen const & wg)
+             WeightGen const & wg,
+             sem_elem_t init_weight)
     {
       //create query automata
 
@@ -111,7 +112,7 @@ namespace opennwa {
       for (opennwa::Nwa::StateIterator sit = nwa.beginInitialStates();
            sit != nwa.endInitialStates(); sit++)
       {
-        faIn.addTrans(program, *sit, accept, wg.getOne());
+        faIn.addTrans(program, *sit, accept, init_weight);
       }
 
       // run poststar on the query automata
@@ -164,7 +165,9 @@ namespace opennwa {
     }
 
     std::map<State, sem_elem_t>
-    doForwardAnalysis(Nwa const & nwa, WeightGen const &wg)
+    doForwardAnalysis(Nwa const & nwa, 
+                      WeightGen const &wg, 
+                      sem_elem_t init_weight)
     {   
       // poststar can't be performed if the NWA has no initial states,
       // in which case return a map with all states mapped to zero
@@ -179,7 +182,7 @@ namespace opennwa {
         return all_zero_map;
       }
 
-      return readResult(nwa, poststar(nwa, wg));
+      return readResult(nwa, poststar(nwa, wg, init_weight));
     }
 
 
