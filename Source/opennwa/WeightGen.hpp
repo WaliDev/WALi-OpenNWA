@@ -145,6 +145,17 @@ namespace opennwa
       static const Reach r(true);
       return r.one();
     }
+
+    sem_elem_t getWeight( Key src, ClientInfoRefPtr srcInfo, Key sym, Kind kind, Key tgt, ClientInfoRefPtr tgtInfo ) const
+    {
+      (void) src;
+      (void) srcInfo;
+      (void) sym;
+      (void) kind;
+      (void) tgt;
+      (void) tgtInfo;
+      return getOne();
+    }
   };
   
 
