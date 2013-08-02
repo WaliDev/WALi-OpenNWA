@@ -1,5 +1,6 @@
 #define EPSILON_CLOSE_WITH_FWPDS 1
-#define USE_FWPDS_INSTEAD_OF_WPDS 0
+#define USE_FWPDS_INSTEAD_OF_WPDS 1
+#define EPSILON_CLOSE_ALL_INSTEAD_OF_DEMAND 0
 
 /*!
  * @author Evan Driscoll
@@ -91,9 +92,17 @@ namespace wali
     WFA::epsilonCloseCached(Key state, WFA::EpsilonCloseCache & cache) const
     {
 #if EPSILON_CLOSE_WITH_FWPDS
+#  if EPSILON_CLOSE_ALL_INSTEAD_OF_DEMAND
+      return epsilonCloseCached_FwpdsAllMulti(state, cache);
+#  else
       return epsilonCloseCached_FwpdsDemand(state, cache);
+#  endif
 #else
+#  if EPSILON_CLOSE_ALL_INSTEAD_OF_DEMAND
+      return epsilonCloseCached_MohriAll(state, cache);
+#  else
       return epsilonCloseCached_MohriDemand(state, cache);
+#  endif
 #endif
     }
     
