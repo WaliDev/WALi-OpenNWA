@@ -405,14 +405,16 @@ namespace wali {
 
             IntroduceStateToRelationWeightGen r_det_weight_gen(voc, right, "right_");
             wali::wfa::WFA right_pre = right.wfa();
-            right_pre.collapseEpsilonChains();
+            //right_pre.collapseEpsilonChains();
             wali::wfa::WFA right_det = right_pre.semideterminize(r_det_weight_gen);
             right_det.complete(both_alpha);
             right_det.complementStates();
+
+            return false;
             
             IntroduceStateToRelationWeightGen l_det_weight_gen(voc, left, "left_");
             wali::wfa::WFA left_pre = left.wfa();
-            left_pre.collapseEpsilonChains();
+            //left_pre.collapseEpsilonChains();
             wali::wfa::WFA left_det = left_pre.semideterminize(l_det_weight_gen);
             left_det.complete(both_alpha);
 

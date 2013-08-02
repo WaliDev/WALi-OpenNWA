@@ -1,5 +1,5 @@
 #define EPSILON_CLOSE_WITH_FWPDS 1
-#define USE_FWPDS_INSTEAD_OF_WPDS 1
+#define USE_FWPDS_INSTEAD_OF_WPDS 0
 
 /*!
  * @author Evan Driscoll
@@ -90,7 +90,11 @@ namespace wali
     WFA::AccessibleStateMap
     WFA::epsilonCloseCached(Key state, WFA::EpsilonCloseCache & cache) const
     {
+#if EPSILON_CLOSE_WITH_FWPDS
       return epsilonCloseCached_FwpdsDemand(state, cache);
+#else
+      return epsilonCloseCached_MohriDemand(state, cache);
+#endif
     }
     
 
@@ -214,7 +218,11 @@ namespace wali
     WFA::AccessibleStateMap
     WFA::epsilonClose(Key state) const
     {
+#if EPSILON_CLOSE_WITH_FWPDS
       return this->epsilonClose_Fwpds(state);
+#else
+      return this->epsilonClose_Mohri(state);
+#endif
     }
     
     
