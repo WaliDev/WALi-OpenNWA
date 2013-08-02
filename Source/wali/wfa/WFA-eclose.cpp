@@ -1,4 +1,5 @@
 #define EPSILON_CLOSE_WITH_FWPDS 1
+#define USE_FWPDS_INSTEAD_OF_WPDS 1
 
 /*!
  * @author Evan Driscoll
@@ -302,8 +303,12 @@ namespace wali
     WFA::genericFwpdsPoststar(std::set<Key> const & sources,
                               boost::function<bool (ITrans const *)> trans_accept) const
     {
+#if USE_FWPDS_INSTEAD_OF_WPDS
       wali::wpds::fwpds::FWPDS wpds;
       wpds.topDownEval(false);
+#else
+      wali::wpds::WPDS wpds;
+#endif
       sem_elem_t weight = getSomeWeight();
       return genericWpdsPoststar(sources, trans_accept, wpds, weight->one(), weight->zero());
     }
