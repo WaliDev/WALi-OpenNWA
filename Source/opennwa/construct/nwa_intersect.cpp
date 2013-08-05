@@ -1,5 +1,6 @@
 #include "opennwa/Nwa.hpp"
 #include "opennwa/construct/intersect.hpp"
+#include "wali/util/unordered_set.hpp"
 
 namespace opennwa
 {
@@ -50,7 +51,7 @@ namespace opennwa
     //Clear all states(except the stuck state) and transitions from this machine.
     clear();
 
-    std::set<StatePair> visitedPairs; // All the pairs of states we have ever encountered.
+    wali::util::unordered_set<StatePair> visitedPairs; // All the pairs of states we have ever encountered.
     std::deque<StatePair> worklistPairs; // Pairs of states yet to be processed
     typedef std::map<StatePair, Key> PairStMap;
     PairStMap pairToStMap; // The corresponding state in the product 
