@@ -87,6 +87,7 @@ nice_files = Split("""
 ./wali/util/StringUtils.cpp
 ./wali/util/ParseArgv.cpp
 ./wali/util/Timer.cpp
+./wali/util/details/Partition.cpp
 ./opennwa/NWA.cpp
 ./opennwa/details/SymbolStorage.cpp
 ./opennwa/details/StateStorage.cpp
@@ -110,6 +111,7 @@ nice_files = Split("""
 ./opennwa/construct/nwa_union.cpp
 ./opennwa/construct/nwa_determinize.cpp
 ./opennwa/construct/nwa_intersect.cpp
+./opennwa/construct/nwa_quotient.cpp
 ./opennwa/construct/nwa_star.cpp
 ./opennwa/nwa_pds/NwaToPds.cpp
 ./opennwa/nwa_pds/WpdsToNwa.cpp
