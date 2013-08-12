@@ -19,6 +19,7 @@
 #include "wali/wpds/WPDS.hpp"
 #include "wali/wpds/RuleFunctor.hpp"
 #include "wali/wpds/Rule.hpp"
+#include <wali/util/DisjointSets.hpp>
 
 #include "wali/Worklist.hpp"
 
@@ -897,27 +898,39 @@ namespace opennwa
      * @param - resCI: the client info that results from performing the intersection
      *
      */
-    virtual bool stateIntersect( Nwa const & first, State state1, Nwa const & second, State state2,
-                                 State & resSt, ClientInfoRefPtr & resCI );
+	virtual bool stateIntersect( Nwa const & first, State state1, Nwa const & second, State state2,
+		State & resSt, ClientInfoRefPtr & resCI );
 
-    /**
-     * 
-     * @brief Intersect symbols
-     * 
-     * This method performs the intersection of the given symbols and returns the result
-     * in the reference parameter 'resSym'.
-     *
-     * This function is called during the exceution of
-     * 'construct::intersect'. (This is an instance of the "template
-     * method" design pattern.)
-     *
-     * @param - first: the NWA in which to look up information about 'sym1'
-     * @param - sym1: the first symbol to intersect
-     * @param - second: the NWA in which to look up information about 'sym2'
-     * @param - sym2: the second symbol to intersect
-     * @param - resSym: the symbol that results from performing the intersection
-     *
-     */
+	/**
+	* 
+	* @brief quotient states
+	* 
+	* @param - first: the NWA in which to look up information about the states to quotient
+	* @param - {S}: the states belonging to a particular equivalence class
+	* @param - resSt: the resulting state after performing quotient on the states
+	* @param - resCI: the resulting client info after performing quotient on the states
+	*
+	*/
+	virtual bool statesQuotient( Nwa const & nwa, wali::util::DisjointSets<State> partitionMap, wali::util::DisjointSets<State>::const_iterator equivalenceClassPtr, State & resSt, ClientInfoRefPtr & resCI ); 
+
+	/**
+	* 
+	* @brief Intersect symbols
+	* 
+	* This method performs the intersection of the given symbols and returns the result
+	* in the reference parameter 'resSym'.
+	*
+	* This function is called during the exceution of
+	* 'construct::intersect'. (This is an instance of the "template
+	* method" design pattern.)
+	*
+	* @param - first: the NWA in which to look up information about 'sym1'
+	* @param - sym1: the first symbol to intersect
+	* @param - second: the NWA in which to look up information about 'sym2'
+	* @param - sym2: the second symbol to intersect
+	* @param - resSym: the symbol that results from performing the intersection
+	*
+	*/
     virtual bool transitionIntersect( Nwa const & first, Symbol sym1, Nwa const & second, Symbol sym2,
                                       Symbol & resSym );
 

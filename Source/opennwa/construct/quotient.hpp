@@ -28,8 +28,6 @@ namespace opennwa
      *	
      */
     extern NwaRefPtr quotient( Nwa const & nwa, wali::util::DisjointSets<State> partitionMap );
-
-    extern void printPartitionMap(wali::util::DisjointSets<State> const & partitionMap);  
   }
 }
 

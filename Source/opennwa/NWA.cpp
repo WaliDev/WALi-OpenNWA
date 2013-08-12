@@ -1524,6 +1524,33 @@ namespace opennwa
 
   /**
    * 
+   * @brief quotient states
+   * 
+   * @param - first: the NWA in which to look up information about the states to quotient
+   * @param - {S}: the states belonging to a particular equivalence class
+   * @param - resSt: the resulting state after performing quotient on the states
+   * @param - resCI: the resulting client info after performing quotient on the states
+   *
+   */
+    
+  bool Nwa::statesQuotient( Nwa const & nwa, wali::util::DisjointSets<State> partitionMap, 
+	  wali::util::DisjointSets<State>::const_iterator equivalenceClassPtr, State & resSt, ClientInfoRefPtr & resCI ) 
+  {
+    (void) nwa, (void) resCI;
+      
+    //Note: When overriding this method your metric must determine whether the
+    //      given states are compatible and set resSt to the appropriate state.
+	State const & first = *(equivalenceClassPtr->begin());
+    std::stringstream ss;
+    ss << "unique key for " << partitionMap.representative( first ); 
+    resSt = getKey(ss.str()); // generates a fresh unique key corresponding to every representative
+
+    return true;
+  }
+
+
+  /**
+   * 
    * @brief intersect symbols
    * 
    * @param - first: the NWA in which to look up information about 'sym1'

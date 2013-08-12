@@ -16,36 +16,40 @@ namespace opennwa
 
 		void quotient( Nwa & out, Nwa const & nwa, wali::util::DisjointSets<State> partitionMap )
 		{
-			// for each equivalence class {S}
-			//   out.quotientStates(nwa, {S}, resSt, resClientInfo)
-			// out_map[representative of {S}] = resSt;
-			//  out.setClientInfo(resSt, resClientInfo);
+			State resSt;
+			ClientInfoRefPtr resCI;
+			std::map<State, State> repUniqueKeyMap;
 
+			for( wali::util::DisjointSets<State>::const_iterator outer_iterator = partitionMap.begin(); outer_iterator != partitionMap.end(); outer_iterator++ )
+			{   
+				out.statesQuotient(nwa, partitionMap, outer_iterator, resSt, resCI);
+				repUniqueKeyMap[ partitionMap.representative( *(outer_iterator->begin()) ) ] = resSt;
+				//  out.setClientInfo(resSt, resClientInfo);
+			}
 
 			// Add initial states
 			for( StateIterator sit = nwa.beginInitialStates(); sit != nwa.endInitialStates(); sit++ ) {		 
-				//out.addInitialState( out_map[partitionMap.representative(*sit)] );
-				out.addInitialState( partitionMap.representative(*sit) );
+				out.addInitialState( repUniqueKeyMap[ partitionMap.representative(*sit) ] );
 			}
 
 			// Add final states
 			for( StateIterator sit = nwa.beginFinalStates(); sit != nwa.endFinalStates(); sit++ ) {		 
-				out.addFinalState( partitionMap.representative(*sit) );
+				out.addFinalState( repUniqueKeyMap[ partitionMap.representative(*sit) ] );
 			}
 
 			//Add internal transitions
 			for(  InternalIterator iit = nwa.beginInternalTrans(); iit != nwa.endInternalTrans(); iit++ ) {   
-				out.addInternalTrans( partitionMap.representative( iit->first ), iit->second, partitionMap.representative( iit->third) );   
+				out.addInternalTrans( repUniqueKeyMap[ partitionMap.representative( iit->first ) ], iit->second, repUniqueKeyMap[ partitionMap.representative( iit->third) ] );   
 			}
 
 			//Add call transitions
 			for(  CallIterator cit = nwa.beginCallTrans(); cit != nwa.endCallTrans(); cit++ ) {   
-				out.addCallTrans( partitionMap.representative( cit->first ), cit->second, partitionMap.representative( cit->third) );   
+				out.addCallTrans( repUniqueKeyMap[ partitionMap.representative( cit->first ) ], cit->second, repUniqueKeyMap[ partitionMap.representative( cit->third) ] );   
 			}
 
 			//Add return transitions
 			for(  ReturnIterator rit = nwa.beginReturnTrans(); rit != nwa.endReturnTrans(); rit++ ) {   
-				out.addReturnTrans( partitionMap.representative( rit->first ), partitionMap.representative(rit->second), rit->third, partitionMap.representative( rit->fourth) );   
+				out.addReturnTrans( repUniqueKeyMap[ partitionMap.representative( rit->first ) ], repUniqueKeyMap[ partitionMap.representative(rit->second) ], rit->third, repUniqueKeyMap[ partitionMap.representative( rit->fourth) ] );   
 			}
 
 			return;
@@ -58,12 +62,6 @@ namespace opennwa
 			quotient(*out, nwa, partitionMap);
 			return out;
 		}
-
-		void printPartitionMap(wali::util::DisjointSets<State> const & partitionMap) {
-
-			partitionMap.output(std::cout << "Printing partitionMap : " <<std::endl);
-						
-			}
 
 	} // end 'namespace construct'!!!
 
