@@ -12,10 +12,10 @@ namespace opennwa
      *
 	 * @param - out: the quotient NWA of the given NWA
      * @param - nwa: the NWA on which to apply quotient operation
-     * @param - quotientMap: the disjoint set which specifies the equivalence relation on the NWA    
+     * @param - partition: the disjoint set which specifies the equivalence relation on the NWA    
      *	
      */
-    extern void quotient( Nwa & out, Nwa const & nwa, wali::util::DisjointSets<State> partitionMap );
+    extern void quotient( Nwa & out, Nwa const & nwa, wali::util::DisjointSets<State> partition );
 
 
     /**
@@ -23,11 +23,11 @@ namespace opennwa
      * @brief constructs the NWA which is the result of applying the quotient operation on the given NWA
      *
      * @param - nwa: the NWA on which to apply quotient operation
-     * @param - quotientMap: the disjoint set which specifies the equivalence relation on the NWA
+     * @param - partition: the disjoint set which specifies the equivalence relation on the NWA
      * @return - the quotient NWA of the given NWA
      *	
      */
-    extern NwaRefPtr quotient( Nwa const & nwa, wali::util::DisjointSets<State> partitionMap );
+    extern NwaRefPtr quotient( Nwa const & nwa, wali::util::DisjointSets<State> partition );
   }
 }
 

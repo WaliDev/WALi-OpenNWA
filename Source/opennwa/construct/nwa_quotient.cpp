@@ -13,53 +13,57 @@ namespace opennwa
 	namespace construct
 	{   
 		
-
-		void quotient( Nwa & out, Nwa const & nwa, wali::util::DisjointSets<State> partitionMap )
+		void quotient( Nwa & out, Nwa const & nwa, wali::util::DisjointSets<State> partition )
 		{
 			State resSt;
 			ClientInfoRefPtr resCI;
-			std::map<State, State> repUniqueKeyMap;
+			std::map<State, State> repUniqueKeyMap;   // maps a representative to a fresh unique key
 
-			for( wali::util::DisjointSets<State>::const_iterator outer_iterator = partitionMap.begin(); outer_iterator != partitionMap.end(); outer_iterator++ )
+			for( wali::util::DisjointSets<State>::const_iterator outer_iter = partition.begin(); outer_iter != partition.end(); outer_iter++ )
 			{   
-				out.statesQuotient(nwa, partitionMap, outer_iterator, resSt, resCI);
-				repUniqueKeyMap[ partitionMap.representative( *(outer_iterator->begin()) ) ] = resSt;
+				std::set<State> equivalenceClass;    // equivalence class of the partition
+				for( wali::util::DisjointSets<State>::InnerSet::const_iterator inner_iter = outer_iter->begin(); inner_iter != outer_iter->end(); ++inner_iter ) {
+					equivalenceClass.insert(*inner_iter);
+				}
+
+				out.statesQuotient(nwa, equivalenceClass, resSt, resCI);
+				repUniqueKeyMap[ partition.representative( *(equivalenceClass.begin()) ) ] = resSt;
 				//  out.setClientInfo(resSt, resClientInfo);
 			}
 
 			// Add initial states
 			for( StateIterator sit = nwa.beginInitialStates(); sit != nwa.endInitialStates(); sit++ ) {		 
-				out.addInitialState( repUniqueKeyMap[ partitionMap.representative(*sit) ] );
+				out.addInitialState( repUniqueKeyMap[ partition.representative(*sit) ] );
 			}
 
 			// Add final states
 			for( StateIterator sit = nwa.beginFinalStates(); sit != nwa.endFinalStates(); sit++ ) {		 
-				out.addFinalState( repUniqueKeyMap[ partitionMap.representative(*sit) ] );
+				out.addFinalState( repUniqueKeyMap[ partition.representative(*sit) ] );
 			}
 
 			//Add internal transitions
 			for(  InternalIterator iit = nwa.beginInternalTrans(); iit != nwa.endInternalTrans(); iit++ ) {   
-				out.addInternalTrans( repUniqueKeyMap[ partitionMap.representative( iit->first ) ], iit->second, repUniqueKeyMap[ partitionMap.representative( iit->third) ] );   
+				out.addInternalTrans( repUniqueKeyMap[ partition.representative( iit->first ) ], iit->second, repUniqueKeyMap[ partition.representative( iit->third) ] );   
 			}
 
 			//Add call transitions
 			for(  CallIterator cit = nwa.beginCallTrans(); cit != nwa.endCallTrans(); cit++ ) {   
-				out.addCallTrans( repUniqueKeyMap[ partitionMap.representative( cit->first ) ], cit->second, repUniqueKeyMap[ partitionMap.representative( cit->third) ] );   
+				out.addCallTrans( repUniqueKeyMap[ partition.representative( cit->first ) ], cit->second, repUniqueKeyMap[ partition.representative( cit->third) ] );   
 			}
 
 			//Add return transitions
 			for(  ReturnIterator rit = nwa.beginReturnTrans(); rit != nwa.endReturnTrans(); rit++ ) {   
-				out.addReturnTrans( repUniqueKeyMap[ partitionMap.representative( rit->first ) ], repUniqueKeyMap[ partitionMap.representative(rit->second) ], rit->third, repUniqueKeyMap[ partitionMap.representative( rit->fourth) ] );   
+				out.addReturnTrans( repUniqueKeyMap[ partition.representative( rit->first ) ], repUniqueKeyMap[ partition.representative(rit->second) ], rit->third, repUniqueKeyMap[ partition.representative( rit->fourth) ] );   
 			}
 
 			return;
 		}
 
 
-		NwaRefPtr quotient( Nwa const & nwa, wali::util::DisjointSets<State> partitionMap )
+		NwaRefPtr quotient( Nwa const & nwa, wali::util::DisjointSets<State> partition )
 		{
 			NwaRefPtr out(new Nwa());
-			quotient(*out, nwa, partitionMap);
+			quotient(*out, nwa, partition);
 			return out;
 		}
 

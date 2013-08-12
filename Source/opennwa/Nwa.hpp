@@ -911,7 +911,7 @@ namespace opennwa
 	* @param - resCI: the resulting client info after performing quotient on the states
 	*
 	*/
-	virtual bool statesQuotient( Nwa const & nwa, wali::util::DisjointSets<State> partitionMap, wali::util::DisjointSets<State>::const_iterator equivalenceClassPtr, State & resSt, ClientInfoRefPtr & resCI ); 
+	virtual void statesQuotient( Nwa const & nwa, std::set<State> const & equivalenceClass, State & resSt, ClientInfoRefPtr & resCI ); 
 
 	/**
 	* 
