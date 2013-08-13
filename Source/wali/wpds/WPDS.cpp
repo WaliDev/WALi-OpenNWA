@@ -489,7 +489,7 @@ namespace wali
 
     void WPDS::post( wfa::ITrans* t, WFA& fa )
     {
-      sem_elem_t fazero = fa.getSomeWeight();
+      sem_elem_t fazero = fa.getSomeWeight()->zero();
       assert(fazero != NULL);
 
       // Get config
