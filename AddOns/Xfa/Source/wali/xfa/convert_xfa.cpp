@@ -246,30 +246,36 @@ namespace wali {
                     auto name = dynamic_cast<ast::Name*>(sym->get());
                     assert(name->name != "epsilon");
 
-                    // source ---> intermediate_name ---> dest
+                    // source ---> intermediate_name ---> intermediate_2 --> dest
                     //                               <---
-                    std::stringstream intermediate_name;
-                    intermediate_name << trans.source << "__" << name->name;
-                    std::stringstream bit0_name, bit1_name;;
-                    bit0_name << name->name << "__bit_is_0";
-                    bit1_name << name->name << "__bit_is_1";
-                    Symbol startbits = getSymbol("__startbits");
+                    std::stringstream intermediate_name, intermediate2_name;
+                    intermediate_name << trans.source << "__" << name->name << "_1";
+                    intermediate2_name << trans.source << "__" << name->name << "_2";
+                    std::stringstream bit0_name, bit1_name, start_name;
+                    start_name << name->name << "__start";
+                    bit0_name << name->name << "__0";
+                    bit1_name << name->name << "__1";
+                    Symbol startbits = getSymbol(start_name.str());
                     Symbol bit0 = getSymbol(bit0_name.str());
                     Symbol bit1 = getSymbol(bit1_name.str());
                     State intermediate = getState(intermediate_name.str());
+                    State intermediate2 = getState(intermediate2_name.str());
 
                     // source --> intermediate has identity weight, symbol '__startbits'
                     assert (e.init_weight.get_ptr());
                     ret.push_back(WeightedTransition(source, startbits, intermediate, e.init_weight));
 
-                    // intermediate --> dest has two transitions:
+                    // intermediate --> intermediate2 has two transitions:
                     //     '__bit_0' has identity weight
                     //     '__bit_1' has +1 weight
-                    ret.push_back(WeightedTransition(intermediate, bit0, dest, maker.one()));
-                    ret.push_back(WeightedTransition(intermediate, bit1, dest, e.bit1_weight));
+                    ret.push_back(WeightedTransition(intermediate, bit0, intermediate2, maker.one()));
+                    ret.push_back(WeightedTransition(intermediate, bit1, intermediate2, e.bit1_weight));
 
-                    // dest --> intermediate has epsilon and weight *2
-                    ret.push_back(WeightedTransition(dest, eps, intermediate, e.back_weight));
+                    // intermediate2 --> intermediate has epsilon and weight *2
+                    ret.push_back(WeightedTransition(intermediate2, eps, intermediate, e.back_weight));
+
+                    // intermediate2 --> dest has epsilon and weight 1
+                    ret.push_back(WeightedTransition(intermediate2, eps, dest, maker.one()));
                 }
             }
 
