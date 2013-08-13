@@ -229,6 +229,7 @@ namespace wali {
                 }
 
                 auto const & syms = trans.symbols;
+                assert(syms.size() == 1u);
                 for (auto sym = syms.begin(); sym != syms.end(); ++sym) {
                     auto name = dynamic_cast<ast::Name*>(sym->get());
                     assert(name);
@@ -236,6 +237,7 @@ namespace wali {
                         ret.push_back(WeightedTransition(source, eps, dest, rel));
                     }
                     else {
+                        //throw ReadTransitionException(rel, maker.one(), maker.one());
                         ret.push_back(WeightedTransition(source, getSymbol(name->name), dest, rel));
                     }
                 }
