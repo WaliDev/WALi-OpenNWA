@@ -410,8 +410,6 @@ namespace wali {
             right_det.complete(both_alpha);
             right_det.complementStates();
 
-            return false;
-            
             IntroduceStateToRelationWeightGen l_det_weight_gen(voc, left, "left_");
             wali::wfa::WFA left_pre = left.wfa();
             //left_pre.collapseEpsilonChains();
