@@ -274,7 +274,9 @@ namespace wali
         }
         it ++;
       }
-      return getState(getInitialState())->weight();
+      assert(Q.size() > 0u);
+      Key any_state = *Q.begin();
+      return getState(any_state)->weight();
     }
 
     //!
