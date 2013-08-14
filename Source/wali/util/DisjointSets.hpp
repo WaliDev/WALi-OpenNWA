@@ -46,7 +46,7 @@ namespace wali
       {}
 
 
-      bool
+	  bool
       insert(value_type const & value) {
         invalidate_cache();
         Id id = get_create_id(value);
@@ -64,6 +64,9 @@ namespace wali
         Id
           id_first = get_create_id(first),
           id_second = get_create_id(second);
+        // You need to call insert in order to create a singleton partition.
+		// merge_sets(a, a) is not the same as insert(a).
+		assert(id_first != id_second || _partition.elementExists(id_first));
 
         bool changed = _partition.SetEquivalent(id_first, id_second);
         if (changed) {
