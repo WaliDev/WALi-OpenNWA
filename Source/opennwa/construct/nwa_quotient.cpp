@@ -12,7 +12,7 @@ namespace opennwa
 
 	namespace construct
 	{   
-		
+
 		void quotient( Nwa & out, Nwa const & nwa, wali::util::DisjointSets<State> partition )
 		{
 			State resSt;
@@ -26,9 +26,12 @@ namespace opennwa
 					equivalenceClass.insert(*inner_iter);
 				}
 
+				/* equivalenceClass is for the states of first parameter i.e. nwa and 
+				resSt and resCi belong to "this" nwa which is "out"
+				*/
 				out.statesQuotient(nwa, equivalenceClass, resSt, resCI);
 				repUniqueKeyMap[ partition.representative( *(equivalenceClass.begin()) ) ] = resSt;
-				//  out.setClientInfo(resSt, resClientInfo);
+				out.setClientInfo(resSt, resCI);
 			}
 
 			// Add initial states
@@ -43,17 +46,17 @@ namespace opennwa
 
 			//Add internal transitions
 			for(  InternalIterator iit = nwa.beginInternalTrans(); iit != nwa.endInternalTrans(); iit++ ) {   
-				out.addInternalTrans( repUniqueKeyMap[ partition.representative( iit->first ) ], iit->second, repUniqueKeyMap[ partition.representative( iit->third) ] );   
+				out.addInternalTrans( repUniqueKeyMap[ partition.representative( iit->first ) ], iit->second, repUniqueKeyMap[ partition.representative( iit->third) ] );
 			}
 
 			//Add call transitions
 			for(  CallIterator cit = nwa.beginCallTrans(); cit != nwa.endCallTrans(); cit++ ) {   
-				out.addCallTrans( repUniqueKeyMap[ partition.representative( cit->first ) ], cit->second, repUniqueKeyMap[ partition.representative( cit->third) ] );   
+				out.addCallTrans( repUniqueKeyMap[ partition.representative( cit->first ) ], cit->second, repUniqueKeyMap[ partition.representative( cit->third) ] );
 			}
 
 			//Add return transitions
 			for(  ReturnIterator rit = nwa.beginReturnTrans(); rit != nwa.endReturnTrans(); rit++ ) {   
-				out.addReturnTrans( repUniqueKeyMap[ partition.representative( rit->first ) ], repUniqueKeyMap[ partition.representative(rit->second) ], rit->third, repUniqueKeyMap[ partition.representative( rit->fourth) ] );   
+				out.addReturnTrans( repUniqueKeyMap[ partition.representative( rit->first ) ], repUniqueKeyMap[ partition.representative(rit->second) ], rit->third, repUniqueKeyMap[ partition.representative( rit->fourth) ] );
 			}
 
 			return;
