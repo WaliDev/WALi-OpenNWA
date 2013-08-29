@@ -10,7 +10,7 @@ namespace opennwa
         class SomeElements
         {
         public:
-            State state, state2, state3;
+            State state, state2, state3, state4;
             Symbol symbol;
             Symbol symbol2;
             Nwa::Internal internal;

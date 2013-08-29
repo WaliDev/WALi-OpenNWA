@@ -108,6 +108,35 @@ namespace opennwa {
                 EXPECT_TRUE(query::languageContains(*det, word));
             }
 
+            // This test is from Tom
+            TEST(opennwa$construct$$determinize, epsilonCloseCallPredecessors)
+            {
+                //       symbol (as call)         symbol (as return)/state4
+                // state ----------------> state2 -------------------------> ((state3))
+                //  |
+                //  | epsilon
+                //  V
+                // state4
+
+                SomeElements e;
+
+                Nwa nwa;
+
+                nwa.addInitialState(e.state);
+                nwa.addFinalState(e.state3);
+
+                nwa.addCallTrans(e.state, e.symbol, e.state2);
+                nwa.addReturnTrans(e.state2, e.state4, e.symbol, e.state3);
+                nwa.addInternalTrans(e.state, EPSILON, e.state4);
+
+                NwaRefPtr det = determinize(nwa);
+
+                det->print(std::cout);
+
+                EXPECT_TRUE(query::languageIsEmpty(*det));
+            }
+            
+
         }
 }
 
