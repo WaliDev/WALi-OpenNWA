@@ -6,6 +6,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include <iostream>
+#include <fstream>
 #include <vector>
 
 #include "wali/domains/genkill/GenKillXformerTemplate.hpp"
@@ -187,7 +188,7 @@ namespace wali {
             if (cmd.name == "incr") {
                 VarSet saved;
                 saved.insert(var_name(act.operand_id, prefix));
-                sem_elem_t save_weight = makeGKW(empty, saved);
+                sem_elem_t save_weight = makeGKW(/*empty*/saved, saved);
                 return save_weight;
             }
 
@@ -224,6 +225,7 @@ namespace wali {
             TransList ret;
             VarSet empty;
             sem_elem_t rel = makeGKW(empty, empty);
+            sem_elem_t one = rel;
 
             try {
                 if (trans.actions.size() == 0u) {
@@ -244,7 +246,8 @@ namespace wali {
                         ret.push_back(WeightedTransition(source, eps, dest, rel));
                     }
                     else {
-                        ret.push_back(WeightedTransition(source, getKey(name->name), dest, rel));
+                        throw ReadTransitionException(rel, one, one);
+                        //ret.push_back(WeightedTransition(source, getKey(name->name), dest, rel));
                     }
                 }
             }
@@ -254,29 +257,34 @@ namespace wali {
                     auto name = dynamic_cast<ast::Name*>(sym->get());
                     assert(name->name != "epsilon");
 
-                    // source ---> intermediate_name ---> dest
+                    // source ---> intermediate_name ---> intermediate_2 --> dest
                     //                               <---
-                    std::stringstream intermediate_name;
-                    intermediate_name << trans.source << "__" << name->name;
-                    std::stringstream bit0_name, bit1_name;;
+                    std::stringstream intermediate_name, intermediate2_name;
+                    intermediate_name << trans.source << "__" << name->name << "_1";
+                    intermediate2_name << trans.source << "__" << name->name << "_2";
+                    std::stringstream start_name, bit0_name, bit1_name;;
+                    start_name << name->name << "__start";
                     bit0_name << name->name << "__bit_is_0";
                     bit1_name << name->name << "__bit_is_1";
-                    Key startbits = getKey("__startbits");
+                    Key startbits = getKey(start_name.str());
                     Key bit0 = getKey(bit0_name.str());
                     Key bit1 = getKey(bit1_name.str());
                     Key intermediate = getKey(intermediate_name.str());
+                    Key intermediate2 = getKey(intermediate2_name.str());
 
                     // source --> intermediate has identity weight, symbol '__startbits'
                     ret.push_back(WeightedTransition(source, startbits, intermediate, e.init_weight));
 
-                    // intermediate --> dest has two transitions:
+                    // intermediate --> intermediate2 has two transitions:
                     //     '__bit_0' has identity weight
                     //     '__bit_1' has +1 weight
-                                  ret.push_back(WeightedTransition(intermediate, bit0, dest, e.init_weight->one()));
-                    ret.push_back(WeightedTransition(intermediate, bit1, dest, e.bit1_weight));
+                    ret.push_back(WeightedTransition(intermediate, bit0, intermediate2, e.init_weight->one()));
+                    ret.push_back(WeightedTransition(intermediate, bit1, intermediate2, e.bit1_weight));
 
-                    // dest --> intermediate has epsilon and weight *2
-                    ret.push_back(WeightedTransition(dest, eps, intermediate, e.back_weight));
+                    // intermediate2 --> intermediate has epsilon and weight *2
+                    ret.push_back(WeightedTransition(intermediate2, eps, intermediate, e.back_weight));
+
+                    ret.push_back(WeightedTransition(intermediate2, eps, dest, one));
                 }
             }
 
@@ -371,6 +379,9 @@ namespace wali {
                        std::string const & domain_var_name_prefix)
         {
             WFA wfa_genkill = create_live_var_wfa(ast, domain_var_name_prefix);
+
+            std::ofstream f(domain_var_name_prefix + "kill.dot");
+            //wfa_genkill.print_dot(f, true);
 
             // do prestar from the final state
             WFA query;

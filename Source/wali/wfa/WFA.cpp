@@ -1247,7 +1247,7 @@ namespace wali
       {
         Key key = stit->first;
         o << "\t" << key << " [label=\"";
-        o << key2str(key);
+        printKey(o, key, true);
         o << "\"";
         if( isInitialState(key) ) {
           o  << ",color=green,style=filled";

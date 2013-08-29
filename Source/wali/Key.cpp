@@ -56,28 +56,38 @@ namespace wali
 
   Key getKey( const std::string& s )
   {
+      Key ans = getKeySpace()->getKey(s);
+      //std::cerr << "[Key " << ans << "]: " << s << "\n";
     return getKeySpace()->getKey(s);
   }
 
   Key getKey( const char* s )
   {
-    return getKeySpace()->getKey(s);
+      Key ans = getKeySpace()->getKey(s);
+      //std::cerr << "[Key " << ans << "]: " << s << "\n";
+      return ans;
   }
 
   Key getKey( int i )
   {
-    return getKeySpace()->getKey(i);
+      Key ans = getKeySpace()->getKey(i);
+      //std::cerr << "[Key " << ans << "]: <" << i << ">\n";
+      return ans;
   }
 
   Key getKey( Key k1, Key k2 )
   {
-    return getKeySpace()->getKey(k1,k2);
+      Key ans = getKeySpace()->getKey(k1,k2);
+      //std::cerr << "[Key " << ans << "]: <" << k1 << "," << k2 << ">\n";
+      return ans;
   }
 
   // @author Amanda Burton
   Key getKey( std::set<Key> ks )
   {
-    return getKeySpace()->getKey(ks);
+      Key ans = getKeySpace()->getKey(ks);
+      //std::cerr << "[Key " << ans << "]: " << key2str(ans) << "\n";
+      return ans;
   }
 
 

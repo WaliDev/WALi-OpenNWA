@@ -857,7 +857,7 @@ bdd ProgramBddContext::bddPlus(unsigned in1Size, unsigned in2Size) const
   //std::cerr << "bddPlus(" << in1Size << ", " << in2Size << "):\n";
   if(in1Size != in2Size){
     LOG(WARNING) << 
-      "[ProgramBddContext::bddPlus] Different sizes of registers in operation." 
+      "[ProgramBddContext::bddPlus] Different sizes of registers in operation (" << in1Size << " vs " << in2Size << ")." 
       << " Longer register / constant will be clipped.\n";
     if(in1Size < in2Size)
       in2Size = in1Size;

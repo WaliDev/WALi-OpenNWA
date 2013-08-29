@@ -129,7 +129,7 @@ namespace wali {
             vars.push_back(std::map<std::string, int>());
 
             //voc.addIntVar("left_current_state", ast.states.size());
-            vars.back()[prefix + "current_state"] = static_cast<int>(ast.states.size()) * 2;
+            vars.back()[prefix + "current_state"] = static_cast<int>(ast.states.size()) * 4;
             std::cout << "Adding " << prefix << "current_state with size " << vars.back()[prefix + "current_state"];
 
             return vars;
@@ -237,8 +237,8 @@ namespace wali {
                         ret.push_back(WeightedTransition(source, eps, dest, rel));
                     }
                     else {
-                        //throw ReadTransitionException(rel, maker.one(), maker.one());
-                        ret.push_back(WeightedTransition(source, getSymbol(name->name), dest, rel));
+                        throw ReadTransitionException(rel, maker.one(), maker.one());
+                        //ret.push_back(WeightedTransition(source, getSymbol(name->name), dest, rel));
                     }
                 }
             }

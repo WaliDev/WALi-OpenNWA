@@ -97,7 +97,7 @@ namespace wali
         o << "\t";
         o << t->from();
         o << " [label=\"";
-        printKey(o, t->from());
+        printKey(o, t->from(), true);
         o << "\"];\n";
         nodesSeen.insert(t->from());
       }
@@ -105,7 +105,7 @@ namespace wali
         o << "\t";
         o << t->to();
         o << " [label=\"";
-        printKey(o, t->to());
+        printKey(o, t->to(), true);
         o << "\"];\n";
         nodesSeen.insert(t->to());
       }

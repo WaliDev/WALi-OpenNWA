@@ -147,12 +147,13 @@ namespace wali
    */
   std::ostream& KeySpace::printKey( std::ostream& o, Key key, bool abbreviate )
   {
+      //abbreviate = false;
     key_src_t ksrc = getKeySource(key);
     if( ksrc.is_valid() ) {
       std::stringstream str;
       ksrc->print(str);
 
-      if(str.str().length() > 20 && abbreviate) {
+      if(str.str().length() > 25 && abbreviate) {
         o << "[" << key << "]";
       }
       else {

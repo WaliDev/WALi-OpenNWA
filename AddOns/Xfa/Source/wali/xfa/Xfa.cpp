@@ -416,6 +416,11 @@ namespace wali {
             wali::wfa::WFA left_det = left_pre.semideterminize(l_det_weight_gen);
             left_det.complete(both_alpha);
 
+            HoverWeightPrinter p;
+            std::ofstream lof("left_det.dot"), rof("right_det.dot");
+            left_det.print_dot(lof); //,false,&p);
+            right_det.print_dot(rof); //,false,&p);
+
             wali::wfa::WFA intersected = left_det.intersect(right_det);
 
             wali::wfa::WFA::AccessibleStateSetMap reached_states =
