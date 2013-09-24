@@ -159,7 +159,10 @@ elif BaseEnv['compiler'] in ['cl', 'cl.EXE']:
     else:
        BaseEnv.Append(CCFLAGS=' /MT')
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
-BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , '..', 'boost')])
+if os.path.isdir(os.path.join(WaliDir, '..', 'third-party', 'boost')):
+    BaseEnv.Append(CPPPATH = [os.path.join(WaliDir, '..', 'third-party', 'boost')])
+else:
+    BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , '..', 'boost')])
 try:
         BaseEnv.Append(CPPPATH = [os.environ['BOOST_HOME']])
         BaseEnv.Append(LIBPATH = [os.environ['BOOST_LIB']])
