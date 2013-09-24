@@ -54,22 +54,8 @@ namespace wali
       else {
         // Perform the combine here b/c both branches need the combined
         // weight.
-        sem_elem_t combined_se;
-        try {
-          combined_se = user_se->combine(that->weight());
-        } catch (int error_code ) {
-          (void) error_code;
-          std::ofstream thisStream("combine.this.dot");
-          std::ofstream thatStream("combine.that.dot");
-          VisitorDot d1(thisStream);
-          accept(d1,true);
-          VisitorDot d2(thatStream);
-          that->accept(d2,true);
-          thisStream.close();
-          thatStream.close();
-          assert(0);
-        }
-
+        sem_elem_t combined_se = user_se->combine(that->weight());
+        
         if( combined_se->equal( this->user_se ) ) {
           return this;
         }

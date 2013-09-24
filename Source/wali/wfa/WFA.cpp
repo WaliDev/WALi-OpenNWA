@@ -2148,7 +2148,10 @@ namespace wali
     {
       typename MapType::const_iterator place = m.find(key);
       if (place == m.end()) {
-        throw 7;
+        // TODO: this should throw something, conditional on
+        // exceptions being enabled.
+        assert(false);
+        return typename MapType::mapped_type();
       }
       return place->second;
     }

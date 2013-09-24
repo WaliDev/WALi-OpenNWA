@@ -229,7 +229,7 @@ namespace wali
             else {
               *waliErr << "[ERROR] EWPDS :: Cannot add again the same push rule.\n";
               r->print( *waliErr << "    : " ) << std::endl;
-              throw r;
+              assert(false);
             }
           }
           else {
@@ -240,7 +240,7 @@ namespace wali
 	    if(!mf->equal(erule->merge_fn())) {
 	      *waliErr << "[ERROR] EWPDS :: Cannot add again the same push rule.\n";
 	      r->print( *waliErr << "    : " ) << std::endl;
-	      throw r;
+	      assert(false);
 	    }
           }
         }
@@ -278,9 +278,9 @@ namespace wali
             ERule* x = (ERule*)rhash_it->second.get_ptr();
 	    ERule *er = (ERule*)(r.get_ptr());
 	    if(!x->merge_fn()->equal(er->merge_fn())) {
-	      // FIXME: raise exception
 	      *waliErr << "[ERROR] EWPDS :: Cannot give two push rules with same r.h.s.\n";
 	      r->print( *waliErr << "    : " ) << std::endl;
+	      assert(false);
 	    }
           }
         }
