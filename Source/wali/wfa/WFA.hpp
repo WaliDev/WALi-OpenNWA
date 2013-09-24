@@ -326,6 +326,7 @@ namespace wali
         virtual void for_each( ConstTransFunctor& tf ) const;
         virtual void for_each( boost::function<void(ITrans const * t)> &) const;
 
+#ifdef WALI_WFA_FUNCTOR_FOR_EACH
         template<typename Functor>
         typename boost::disable_if<boost::is_base_of<TransFunctor, Functor> >::type
         for_each(Functor & func) {
@@ -339,6 +340,7 @@ namespace wali
             boost::function<void(ITrans const * t)> wrapper(boost::ref(func));
             for_each(wrapper);
         }
+#endif
 
         /**
          * Intersect this with parameter fa. This is a wrapper

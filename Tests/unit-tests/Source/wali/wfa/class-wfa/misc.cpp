@@ -17,6 +17,7 @@ namespace wali {
             {}
         };
 
+#ifdef WALI_WFA_FUNCTOR_FOR_EACH
         TEST(wali$wfa$WFA$$for_each, TransCounterThatDoesNotInheritFromTransFunctor)
         {
             LoopReject f;
@@ -24,6 +25,7 @@ namespace wali {
             f.wfa.for_each(counter);
             EXPECT_EQ(3, counter.n);
         }
+#endif
             
         TEST(wali$wfa$WFA$$alphabet, battery)
         {
