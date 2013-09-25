@@ -111,6 +111,7 @@ namespace wali
         };
 
         static PathSummaryImplementation globalDefaultPathSummaryImplementation;
+        static bool globalDefaultPathSummaryFwpdsTopDown;
 
         typedef wali::HashMap< KeyPair, TransSet > kp_map_t;
         typedef wali::HashMap< Key , State * > state_map_t;
@@ -447,6 +448,7 @@ namespace wali
          * transparent witness propagation.
          */
         virtual void path_summary_tarjan_fwpds();
+        virtual void path_summary_tarjan_fwpds(bool top_down);
 
         virtual void path_summary_crosscheck_all();
 
@@ -668,6 +670,7 @@ namespace wali
         std::set<State*> deleted_states;
 
         PathSummaryImplementation defaultPathSummaryImplementation;
+        bool defaultPathSummaryFwpdsTopDown;
 
       private:
 

@@ -41,6 +41,14 @@ namespace wali
         ("TarjanFwpds",       WFA::TarjanFwpds)
         ("CrossCheckAll",     WFA::CrosscheckAll);
 
+    bool WFA::globalDefaultPathSummaryFwpdsTopDown
+      = wali::util::ConfigurationVar<bool>(
+          "WALI_WFA_PATH_SUMMARY_FWPDS_EVAL",
+          true
+        )
+        ("TopDown", true)
+        ("BottomUp", false);
+
     //
     // Calls path_summary with default Worklist
     //
@@ -203,6 +211,12 @@ namespace wali
     void
     WFA::path_summary_tarjan_fwpds()
     {
+      path_summary_tarjan_fwpds(defaultPathSummaryFwpdsTopDown);
+    }
+    
+    void
+    WFA::path_summary_tarjan_fwpds(bool top_down)
+    {
 #if defined(REGEXP_CACHING) // TODO: && CHECKED_LEVEL >= 2
       // If REGEXP_CACHING is on, there is a gotcha while using the
       // FWPDS-based path_summary. If your weights have the property
@@ -237,7 +251,7 @@ namespace wali
 #endif
 
       fwpds::FWPDS pds;
-      pds.topDownEval(false);
+      pds.topDownEval(top_down);
       pds.useNewton(false);
       path_summary_via_wpds(pds);
     }
