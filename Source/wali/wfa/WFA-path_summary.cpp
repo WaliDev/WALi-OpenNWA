@@ -43,7 +43,8 @@ namespace wali
     //
     // Calls path_summary with default Worklist
     //
-    void WFA::path_summary()
+    void
+    WFA::path_summary()
     {
       DefaultWorklist<State> wl;
       path_summary(wl);
@@ -52,7 +53,8 @@ namespace wali
     //
     // Calls path_summary with default Worklist
     //
-    void WFA::path_summary(sem_elem_t wt)
+    void
+    WFA::path_summary(sem_elem_t wt)
     {
       DefaultWorklist<State> wl;
       path_summary(wl, wt);
@@ -61,7 +63,8 @@ namespace wali
     //
     // Computes path_summary 
     //
-    void WFA::path_summary(Worklist<State> &wl)
+    void
+    WFA::path_summary(Worklist<State> &wl)
     {
       sem_elem_t nullwt; // treated as ONE
       path_summary(wl, nullwt);
@@ -70,22 +73,22 @@ namespace wali
     //
     // Computes path_summary
     //
-    void WFA::path_summary( Worklist<State>& wl, sem_elem_t wt )
+    void
+    WFA::path_summary(Worklist<State>& wl, sem_elem_t wt)
     {
       // BEGIN DEBUGGING
       //int numPops = 0;
       // END DEBUGGING
       IncomingTransMap_t preds;
-      setupFixpoint( wl, &preds, NULL, wt );
-      while( !wl.empty() )
-      {
+      setupFixpoint(wl, &preds, NULL, wt);
+      while(!wl.empty()) {
         State* q = wl.get();
         sem_elem_t the_delta = q->delta();
         q->delta() = the_delta->zero();
 
         { // BEGIN DEBUGGING
           //numPops++;
-          //q->print( *waliErr << "  Popped: " ) << std::endl;
+          //q->print(*waliErr << "  Popped: ") << std::endl;
         } // END DEBUGGING
 
         // Get a handle on ZERO b/c we use it alot
@@ -96,8 +99,7 @@ namespace wali
 
         // Some states may have no predecessors, like
         // the initial state
-        if(  incomingTransIt == preds.end() )
-        {
+        if(incomingTransIt == preds.end()) {
           continue;
         }
 
@@ -105,7 +107,7 @@ namespace wali
         std::vector<ITrans*> & incoming = incomingTransIt->second;
 
         std::vector<ITrans*>::iterator transit = incoming.begin();
-        for( ; transit != incoming.end() ; ++transit )
+        for( ; transit != incoming.end() ; ++transit)
         {
           ITrans* t = *transit;
           
@@ -115,29 +117,30 @@ namespace wali
           sem_elem_t newW = qprime->weight()->zero();
 
           { // BEGIN DEBUGGING
-            //t->print( *waliErr << "\t++ Popped " ) << std::endl;
+            //t->print(*waliErr << "\t++ Popped ") << std::endl;
           } // END DEBUGGING
 
           assert(t->to() == q->name());
 
           sem_elem_t extended;
-          if( query == INORDER )
-            extended = t->weight()->extend( the_delta );
-          else
-            extended = the_delta->extend( t->weight() );
+          if(query == INORDER) {
+            extended = t->weight()->extend(the_delta);
+          }
+          else {
+            extended = the_delta->extend(t->weight());
+          }
           newW = newW->combine(extended);
 
           // delta => (w+se,w-se)
           // Use extended->delta b/c we want the diff b/w the new
           // weight (extended) and what was there before
-          std::pair< sem_elem_t,sem_elem_t > p =
-            newW->delta( qprime->weight() );
+          std::pair<sem_elem_t,sem_elem_t> p = newW->delta(qprime->weight());
 
           { // BEGIN DEBUGGING
-            //qprime->weight()->print( *waliErr << "   oldW " << key2str(qprime->name()) ) << std::endl;
-            //newW->print( *waliErr << "   newW " << key2str(qprime->name()) ) << std::endl;
-            //p.first->print( *waliErr << "\t++ p.first " ) << std::endl;
-            //p.second->print( *waliErr << "\t++ p.second " ) << std::endl;
+            //qprime->weight()->print(*waliErr << "   oldW " << key2str(qprime->name())) << std::endl;
+            //newW->print(*waliErr << "   newW " << key2str(qprime->name())) << std::endl;
+            //p.first->print(*waliErr << "\t++ p.first ") << std::endl;
+            //p.second->print(*waliErr << "\t++ p.second ") << std::endl;
           } // END DEBUGGING
 
           // Sets qprime's new weight
@@ -145,7 +148,7 @@ namespace wali
           qprime->weight() = p.first;
 
           // on the worklist?
-          if( qprime->marked() ) {
+          if(qprime->marked()) {
             qprime->delta() = qprime->delta()->combine(p.second);
           }
           else {
@@ -153,25 +156,27 @@ namespace wali
             qprime->delta() = p.second;
 
             // add to worklist if not zero
-            if( !qprime->delta()->equal(ZERO) ) {
+            if(!qprime->delta()->equal(ZERO)) {
               wl.put(qprime);
             }
           }
         }
-        if( progress.is_valid() )
+        if(progress.is_valid()) {
             progress->tick();
+        }
       }
       { // BEGIN DEBUGGING
         //*waliErr << "\n --- WFA::path_summary needed " << numPops << " pops\n";
         //*waliErr << "WFA state labels:\n";
-        //FOR_EACH_STATE( st ) {
+        //FOR_EACH_STATE(st) {
         //    *waliErr << "\t" << key2str(st->name()) << ": ";
-        //    st->weight()->print( *waliErr ) << std::endl;
+        //    st->weight()->print(*waliErr) << std::endl;
         //}
       } // END DEBUGGING
     }
 
-    void WFA::path_summary_tarjan() {
+    void
+    WFA::path_summary_tarjan() {
       sem_elem_t wt = getSomeWeight()->one();
       Key pkey = getKey("__pstate");
 #ifdef USE_FWPDS
