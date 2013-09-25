@@ -103,6 +103,15 @@ namespace wali
          */
         enum query_t { INORDER,REVERSE,MAX };
 
+        enum PathSummaryImplementation {
+            IterativeOriginal,
+            IterativeWpds,
+            TarjanFwpds,
+            CrossCheckAll
+        };
+
+        static PathSummaryImplementation globalDefaultPathSummaryImplementation;
+
         typedef wali::HashMap< KeyPair, TransSet > kp_map_t;
         typedef wali::HashMap< Key , State * > state_map_t;
         typedef wali::HashMap< Key , TransSet > eps_map_t;
@@ -648,10 +657,19 @@ namespace wali
 
         std::set<State*> deleted_states;
 
+        PathSummaryImplementation defaultPathSummaryImplementation;
+
       private:
 
 
       public:
+
+        void setDefaultPathSummaryImplementation(PathSummaryImplementation i) {
+            defaultPathSummaryImplementation = i;
+        }
+        PathSummaryImplementation getDefaultPathSummaryImplementation() const {
+            return defaultPathSummaryImplementation;
+        }
 
         /// Return the set of states reachable from 'start', along with the
         /// weights gathered by following those paths. Includes the start

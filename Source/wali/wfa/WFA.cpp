@@ -16,6 +16,7 @@
 #include "wali/wpds/fwpds/FWPDS.hpp"
 #include "wali/wpds/fwpds/LazyTrans.hpp"
 #include "wali/graph/RegExp.hpp"
+#include "wali/util/ConfigurationVar.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -49,6 +50,17 @@ namespace wali
     const std::string WFA::XMLInorderTag("INORDER");
     const std::string WFA::XMLReverseTag("REVERSE");
 
+    WFA::PathSummaryImplementation
+      WFA::globalDefaultPathSummaryImplementation
+      = wali::util::ConfigurationVar<WFA::PathSummaryImplementation>(
+          "WALI_WFA_PATH_SUMMARY_IMPLEMENTATION",
+          WFA::IterativeWpds
+        )
+        ("IterativeOriginal", WFA::IterativeOriginal)
+        ("IterativeWpds",     WFA::IterativeWpds)
+        ("TarjanFwpds",       WFA::TarjanFwpds)
+        ("CrossCheckAll",     WFA::CrossCheckAll);
+
     bool is_epsilon_transition(ITrans const * trans)
     {
       return trans->stack() == WALI_EPSILON; 
@@ -61,7 +73,11 @@ namespace wali
     }
 
     WFA::WFA( query_t q, progress_t prog )
-        : init_state( WALI_EPSILON ),query(q),generation(0),progress(prog)
+        : init_state( WALI_EPSILON )
+        , query(q)
+        , generation(0)
+        , progress(prog)
+        , defaultPathSummaryImplementation(globalDefaultPathSummaryImplementation)
     {
       if( query == MAX ) {
         *waliErr << "[WARNING] Invalid WFA::query. Resetting to INORDER.\n";
@@ -102,6 +118,8 @@ namespace wali
         TransCopier copier(*this);
         rhs.for_each( copier );
         generation = rhs.generation;
+
+        defaultPathSummaryImplementation = rhs.defaultPathSummaryImplementation;
       }
       return *this;
     }
