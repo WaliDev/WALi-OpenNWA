@@ -39,7 +39,7 @@ TEST(wali$wpds$WPDS$prestar, canTakePrestarOfEmptyWpds)
     TransCounter counter;
     result.for_each(counter);
     EXPECT_EQ(2u, result.numStates());
-    EXPECT_EQ(1u, counter.getNumTrans());
+    EXPECT_EQ(1, counter.getNumTrans());
 }
 
 TEST(wali$wpds$WPDS$poststar, canTakePoststarOfEmptyWpds)
