@@ -785,6 +785,9 @@
     <ClInclude Include="..\..\..\Source\opennwa\query\weighted.hpp">
       <Filter>Header Files\wali.nwa\query</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\util\ConfigurationVar.hpp">
+      <Filter>Header Files\wali.util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="VTune\WALi.vpj" />

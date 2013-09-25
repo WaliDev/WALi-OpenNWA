@@ -410,6 +410,7 @@
     <ClInclude Include="..\..\..\Source\wali\graph\NewtonLogger.hpp" />
     <ClInclude Include="..\..\..\Source\wali\Progress.hpp" />
     <ClInclude Include="..\..\..\Source\wali\SemElemTensor.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\util\ConfigurationVar.hpp" />
     <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\FWPDS.hpp" />
     <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\LazyTrans.hpp" />
     <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\SWPDS.hpp" />

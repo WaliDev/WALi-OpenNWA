@@ -114,7 +114,9 @@ else:
 BaseEnv['CMAKE'] = os.environ.get('CMAKE', 'cmake')
 
 assert 'CPPDEFINES' not in BaseEnv
-BaseEnv['CPPDEFINES'] = {}
+BaseEnv['CPPDEFINES'] = {
+   'BOOST_NO_DEFAULTED_FUNCTIONS': 1,
+}
 
 
 if 'gcc' == BaseEnv['compiler']:

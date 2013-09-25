@@ -78,6 +78,7 @@ test_files = Split("""
     Source/wali/wpds/class-wpds/toWfa.cpp
     Source/wali/wpds/class-fwpds/poststar.cpp
     Source/wali/wpds/class-fwpds/prestar.cpp
+    Source/wali/util/ConfigurationVar.cpp
 
     Source/opennwa/fixtures.cpp
     Source/opennwa/class-NestedWord/nested-word.cpp
