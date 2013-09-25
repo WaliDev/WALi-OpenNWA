@@ -13,6 +13,8 @@
 #include "wali/wpds/fwpds/LazyTrans.hpp"
 #include "wali/graph/RegExp.hpp"
 #include "wali/util/ConfigurationVar.hpp"
+#include "wali/graph/GraphCommon.hpp"
+#include "wali/witness/Witness.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -21,9 +23,8 @@
 #include <iterator>
 #include <fstream>
 
-//#define USE_FWPDS 1
-//#define JAMDEBUG 1
-
+using namespace wali::witness;
+using namespace wali::wpds;
 
 namespace wali
 {
@@ -38,50 +39,50 @@ namespace wali
         ("IterativeOriginal", WFA::IterativeOriginal)
         ("IterativeWpds",     WFA::IterativeWpds)
         ("TarjanFwpds",       WFA::TarjanFwpds)
-        ("CrossCheckAll",     WFA::CrossCheckAll);
+        ("CrossCheckAll",     WFA::CrosscheckAll);
 
     //
     // Calls path_summary with default Worklist
     //
     void
-    WFA::path_summary()
+    WFA::path_summary_iterative_original()
     {
       DefaultWorklist<State> wl;
-      path_summary(wl);
+      path_summary_iterative_original(wl);
     }
 
     //
-    // Calls path_summary with default Worklist
+    // Calls path_summary_iterative_original with default Worklist
     //
     void
-    WFA::path_summary(sem_elem_t wt)
+    WFA::path_summary_iterative_original(sem_elem_t wt)
     {
       DefaultWorklist<State> wl;
-      path_summary(wl, wt);
+      path_summary_iterative_original(wl, wt);
     }
 
     //
-    // Computes path_summary 
+    // Computes path_summary_iterative_original 
     //
     void
-    WFA::path_summary(Worklist<State> &wl)
+    WFA::path_summary_iterative_original(Worklist<State> &wl)
     {
       sem_elem_t nullwt; // treated as ONE
-      path_summary(wl, nullwt);
+      path_summary_iterative_original(wl, nullwt);
     }
 
     //
-    // Computes path_summary
+    // Computes path_summary_iterative_original
     //
     void
-    WFA::path_summary(Worklist<State>& wl, sem_elem_t wt)
+    WFA::path_summary_iterative_original(Worklist<State>& wl, sem_elem_t wt)
     {
       // BEGIN DEBUGGING
       //int numPops = 0;
       // END DEBUGGING
       IncomingTransMap_t preds;
       setupFixpoint(wl, &preds, NULL, wt);
-      while(!wl.empty()) {
+      while (!wl.empty()) {
         State* q = wl.get();
         sem_elem_t the_delta = q->delta();
         q->delta() = the_delta->zero();
@@ -99,7 +100,7 @@ namespace wali
 
         // Some states may have no predecessors, like
         // the initial state
-        if(incomingTransIt == preds.end()) {
+        if (incomingTransIt == preds.end()) {
           continue;
         }
 
@@ -107,7 +108,7 @@ namespace wali
         std::vector<ITrans*> & incoming = incomingTransIt->second;
 
         std::vector<ITrans*>::iterator transit = incoming.begin();
-        for( ; transit != incoming.end() ; ++transit)
+        for ( ; transit != incoming.end() ; ++transit)
         {
           ITrans* t = *transit;
           
@@ -123,7 +124,7 @@ namespace wali
           assert(t->to() == q->name());
 
           sem_elem_t extended;
-          if(query == INORDER) {
+          if (query == INORDER) {
             extended = t->weight()->extend(the_delta);
           }
           else {
@@ -148,7 +149,7 @@ namespace wali
           qprime->weight() = p.first;
 
           // on the worklist?
-          if(qprime->marked()) {
+          if (qprime->marked()) {
             qprime->delta() = qprime->delta()->combine(p.second);
           }
           else {
@@ -156,17 +157,17 @@ namespace wali
             qprime->delta() = p.second;
 
             // add to worklist if not zero
-            if(!qprime->delta()->equal(ZERO)) {
+            if (!qprime->delta()->equal(ZERO)) {
               wl.put(qprime);
             }
           }
         }
-        if(progress.is_valid()) {
+        if (progress.is_valid()) {
             progress->tick();
         }
       }
       { // BEGIN DEBUGGING
-        //*waliErr << "\n --- WFA::path_summary needed " << numPops << " pops\n";
+        //*waliErr << "\n --- WFA::path_summary_iterative_original needed " << numPops << " pops\n";
         //*waliErr << "WFA state labels:\n";
         //FOR_EACH_STATE(st) {
         //    *waliErr << "\t" << key2str(st->name()) << ": ";
@@ -175,17 +176,121 @@ namespace wali
       } // END DEBUGGING
     }
 
+    namespace details
+    {
+      class WitnessChecker : public TransFunctor
+      {
+        bool found_any;
+
+      public:
+        WitnessChecker()
+          : found_any(false)
+        {}
+
+        bool
+        foundAny() const {
+          return found_any;
+        }
+
+        virtual void operator()(ITrans * t)
+        {
+          SemElem * weight = t->weight().get_ptr();
+          found_any |= (dynamic_cast<Witness*>(weight) != NULL);
+        }
+      };
+    }
+
     void
-    WFA::path_summary_tarjan() {
+    WFA::path_summary_tarjan_fwpds()
+    {
+#if defined(REGEXP_CACHING) // TODO: && CHECKED_LEVEL >= 2
+      // If REGEXP_CACHING is on, there is a gotcha while using the
+      // FWPDS-based path_summary. If your weights have the property
+      // that you can have two weights W1 and W2 that compare equal
+      // (in the sense that W1->equal(W2) is true) but are not
+      // *really* equal, then regexp node caching can cause WALi to
+      // conflate two sort-of-the-same-but-sort-of-different weights
+      // and produce the wrong answer.
+      //
+      // Witnesse weights have this property, but they are the only
+      // ones I know about currently. (Witness weights are
+      // conceptually a pair <weight, witness>, and two witness
+      // weights compare equal if the underlying 'weight' portions are
+      // the same. However, the witnesses can differ, and this can
+      // lead to incorrect witnesses.)
+      //
+      // As a result, here we check that the user is not performing
+      // path_summary on a WFA that has witness weights using FWPDS
+      // while REGEXP_CACHING is on.
+      //
+      // This test is not complete -- there could be other weights
+      // that have the poorly-behaved property described above -- but
+      // I don't know what they are so can't check for them. At the
+      // same time, turning off REGEXP_CACHING really hurts the
+      // performance of FWPDS, but FWPDS-based path_summary could
+      // really be useful, so we want to keep the option around to
+      // allow path_summary_tarjan_fwpds() with REGEXP_CACHING on for
+      // the common case where weights behave "properly."
+      details::WitnessChecker checker;
+      for_each(checker);
+      fast_assert(!checker.foundAny());
+#endif
+
+      fwpds::FWPDS pds;
+      pds.topDownEval(false);
+      pds.useNewton(false);
+      path_summary_via_wpds(pds);
+    }
+
+    void
+    WFA::path_summary_iterative_wpds()
+    {
+      WPDS pds;
+      path_summary_via_wpds(pds);
+    }
+
+    void
+    WFA::path_summary_crosscheck_all()
+    {
+      WFA copy1 = *this;
+      WFA copy2 = *this;
+
+      path_summary_iterative_original();
+      copy1.path_summary_iterative_wpds();
+      copy2.path_summary_tarjan_fwpds();
+
+      assert(this->equal(copy1)); // TODO: slow_assert
+      assert(this->equal(copy2));
+    }
+
+    void
+    WFA::path_summary()
+    {
+      switch (defaultPathSummaryImplementation)
+      {
+      case IterativeOriginal:
+        path_summary_iterative_original();
+        break;
+
+      case IterativeWpds:
+        path_summary_iterative_wpds();
+        break;
+
+      case TarjanFwpds:
+        path_summary_tarjan_fwpds();
+        break;
+
+      case CrosscheckAll:
+        path_summary_crosscheck_all();
+        break;
+      }
+    }
+
+    void
+    WFA::path_summary_via_wpds(WPDS & pds) {
       sem_elem_t wt = getSomeWeight()->one();
       Key pkey = getKey("__pstate");
-#ifdef USE_FWPDS
-      wpds::fwpds::FWPDS pds;
-#else
-      wpds::WPDS pds;
-#endif
-      //pds.useNewton(false);
-      //wpds::fwpds::FWPDS::topDownEval(false);
+
       this->toWpds(pkey, &pds, is_any_transition, true);
 
 #ifdef JAMDEBUG
@@ -221,9 +326,10 @@ namespace wali
       const wali::graph::reg_exp_hash_t& roots = wali::graph::RegExp::getRoots();
       foo << "digraph {\n";
       std::set<long> seen;
-      for(wali::graph::reg_exp_hash_t::const_iterator iter = roots.begin();
-          iter != roots.end();
-          ++iter){
+      for (wali::graph::reg_exp_hash_t::const_iterator iter = roots.begin();
+           iter != roots.end();
+           ++iter)
+      {
         (iter->second)->toDot(foo, seen, true, true);
       }
       foo << "}\n";
@@ -235,7 +341,7 @@ namespace wali
 
 
       for (state_map_t::const_iterator smit=state_map.begin();
-        smit!=state_map.end(); smit++)
+           smit!=state_map.end(); smit++)
       {
         Key stkey = smit->first;
 

@@ -107,7 +107,7 @@ namespace wali
             IterativeOriginal,
             IterativeWpds,
             TarjanFwpds,
-            CrossCheckAll
+            CrosscheckAll
         };
 
         static PathSummaryImplementation globalDefaultPathSummaryImplementation;
@@ -396,12 +396,6 @@ namespace wali
         virtual void intersect_cross(WeightMaker& wmaker, WFA const & fa, WFA& dest ) const;
 
         /**
-         * Performs path summary. Simply calls the path_summary with
-         * the default Worklist provided by WALi.
-         */
-        virtual void path_summary();
-
-        /**
          * Computes a regular expression for the automaton.
          * The regex, when evaluated, produces a weight
          * that is equal to calling path_summary and then
@@ -417,10 +411,18 @@ namespace wali
          */
         virtual regex::regex_t toRegex();
 
+        virtual void path_summary();
+
+        /**
+         * Performs path summary. Simply calls the path_summary with
+         * the default Worklist provided by WALi.
+         */
+        virtual void path_summary_iterative_original();
+
         /**
          * Performs path summary with the specified Worklist
          */
-        virtual void path_summary( Worklist<State>& wl );
+        virtual void path_summary_iterative_original(Worklist<State>& wl);
 
         /**
          * Performs path summary. Simply calls the path_summary with
@@ -428,17 +430,32 @@ namespace wali
          * Initializes the weight on the final state to wt (can be
          * useful for efficiency in some cases)
          */
-        virtual void path_summary(sem_elem_t wt);
+        virtual void path_summary_iterative_original(sem_elem_t wt);
+
+        /**
+         * Performs path summary with the specified Worklist
+         * Initializes the weight on the final state to wt (can be
+         * useful for efficiency in some cases)
+         */
+        virtual void path_summary_iterative_original(Worklist<State>& wl, sem_elem_t wt);
+
+        virtual void path_summary_iterative_wpds();
 
         /**
          * Performs path summary using Tarjan's algorithm. This results
          * in the dual benefits of lazy witness evaluation and
          * transparent witness propagation.
          */
-        // NOTE: This currently does not use FWPDS, and therefore does
-        // not actually use Tarjan's algorithm. The framework is there,
-        // such that a switch from WPDS to FWPDS is all that's needed.
-        virtual void path_summary_tarjan();
+        virtual void path_summary_tarjan_fwpds();
+
+        virtual void path_summary_crosscheck_all();
+
+        /**
+         * Performs path summary by converting to a WPDS.
+         *
+         * This is mostly intended to be an internal structure.
+         */
+        virtual void path_summary_via_wpds(wpds::WPDS & wpds);
 
         /**
          * Prunes the WFA. This removes any transitions that are
@@ -620,13 +637,6 @@ namespace wali
          * @return true
          */
         bool eraseState( State* state );
-
-        /**
-         * Performs path summary with the specified Worklist
-         * Initializes the weight on the final state to wt (can be
-         * useful for efficiency in some cases)
-         */
-        virtual void path_summary( Worklist<State>& wl, sem_elem_t wt );
 
         /**
          * Uses Tarjan's algorithm to build a regular expression
