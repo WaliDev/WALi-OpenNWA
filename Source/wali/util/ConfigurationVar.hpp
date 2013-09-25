@@ -1,6 +1,7 @@
 #ifndef WALI_UTIL_CONFIGURATION_VAR_HPP
 #define WALI_UTIL_CONFIGURATION_VAR_HPP
 
+#include <iostream>
 #include <cstdlib>
 #include <string>
 #include <map>
@@ -56,10 +57,17 @@ namespace wali
         typename std::map<std::string, BackingType>::const_iterator
           iter = options_.find(name);
         if(iter != options_.end()) {
-          // TODO print warning
           return iter->second;
         }
         else {
+          std::cerr << "Warning: Invalid value for environment variable "
+                    << getEnvVarName() << ": " << name << "\n"
+                    << "Warning: possible values:\n";
+          for (typename std::map<std::string, BackingType>::const_iterator iter = options_.begin();
+               iter != options_.end(); ++iter)
+          {
+            std::cerr << "Warning:     " << iter->first << "\n";
+          }
           return getDefault();
         }
       }

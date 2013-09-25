@@ -3,6 +3,8 @@
 
 #include <wali/util/ConfigurationVar.hpp>
 
+namespace
+{
 #ifdef _MSC_VER
   // These are actually untested.
   int
@@ -27,6 +29,28 @@
     return _putenv(s.c_str());
   }
 #endif
+
+  // Somewhat swiped from
+  // http://stackoverflow.com/questions/5419356/redirect-stdout-stderr-to-a-string
+  // but heavily modified.
+  struct OStreamRedirector
+  {
+    OStreamRedirector(std::ostream * redirect_this,
+                 std::streambuf * to_here)
+      : stream(redirect_this)
+      , old_buffer(redirect_this->rdbuf(to_here))
+    {}
+    
+    ~OStreamRedirector() {
+      stream->rdbuf(old_buffer);
+    }
+    
+  private:
+    std::ostream * stream;
+    std::streambuf * old_buffer;
+  };
+}
+
   
 namespace wali
 {
@@ -71,7 +95,17 @@ namespace wali
       ConfigurationVar<int> v("MyVar", 1);
       v("A", 0)("B", 1)("C", 2);
 
-      EXPECT_EQ(1, v.getValueOf("D"));
+      {
+        std::stringstream ss;
+        OStreamRedirector redirector(&std::cerr, ss.rdbuf());
+        EXPECT_EQ(1, v.getValueOf("D"));
+        EXPECT_EQ("Warning: Invalid value for environment variable MyVar: D\n"
+                  "Warning: possible values:\n"
+                  "Warning:     A\n"
+                  "Warning:     B\n"
+                  "Warning:     C\n",
+                  ss.str());
+      }
     }
 
     TEST(wali$util$$ConfigurationVar$constructor$getDefault$getEnvVarName,
@@ -108,7 +142,19 @@ namespace wali
 
       ret = setenv("MyVar", "D", 1);
       ASSERT_EQ(0, ret);
-      int var_was_D = ConfigurationVar<int>("MyVar", 10)("A", 0)("B", 1)("C", 2);
+      int var_was_D;
+      {
+        std::stringstream ss;
+        OStreamRedirector redirector(&std::cerr, ss.rdbuf());
+        var_was_D = ConfigurationVar<int>("MyVar", 10)("A", 0)("B", 1)("C", 2);
+
+        EXPECT_EQ("Warning: Invalid value for environment variable MyVar: D\n"
+                  "Warning: possible values:\n"
+                  "Warning:     A\n"
+                  "Warning:     B\n"
+                  "Warning:     C\n",
+                  ss.str());
+      }
 
       ret = unsetenv("MyVar");
       ASSERT_EQ(0, ret);
