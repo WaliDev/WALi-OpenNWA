@@ -55,7 +55,12 @@ namespace testing
                 else if (w == zero().get_ptr()) {
                     return this;
                 }
-                return new StringWeight(str + " | " + w->str);
+                std::string left = str;
+                std::string right = w->str;
+                if (left > right) {
+                    std::swap(left, right);
+                }
+                return new StringWeight(left + " | " + right);
             }
             assert (false);
             return NULL;

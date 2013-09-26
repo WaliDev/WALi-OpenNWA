@@ -343,8 +343,8 @@ namespace wali {
             StringWeight * w = dynamic_cast<StringWeight*>(det.getState(fin_set_key)->acceptWeight().get_ptr());
             ASSERT_TRUE(w != NULL);
 
-            // Test. This is fragile...
-            EXPECT_EQ("acc1 | acc2 | ", w->str);
+            // Test. This is maybe a fragile (though not as much as before)...
+            EXPECT_EQ(" | acc1 | acc2", w->str);
         }
 
         TEST(wali$wfa$$WFA$$semideterminize, weightGenKnowsAboutEpsilonTransitions)
@@ -446,9 +446,8 @@ namespace wali {
             ASSERT_TRUE(weight_a_ab != NULL);
             ASSERT_TRUE(weight_a_ac != NULL);
 
-            // Finally, check that they are what we expect. Note: the first
-            // test is fragile as the order could change.
-            EXPECT_EQ("start --a--> a (top) | start --a--> a (left)", weight_start_a->str);
+            // Finally, check that they are what we expect.
+            EXPECT_EQ("start --a--> a (left) | start --a--> a (top)", weight_start_a->str);
             EXPECT_EQ("a (top) --b--> ab", weight_a_ab->str);
             EXPECT_EQ("a (left) --c--> ac", weight_a_ac->str);
         }

@@ -734,7 +734,7 @@ namespace wali {
             * dg = new StringWeight("d->e e->g"),
             * dh = new StringWeight("d->f f->h"),
             * gh = new StringWeight("g->h"),
-            * hl = new StringWeight("h->j j->k k->l | h->i i->k k->l"),
+            * hl = new StringWeight("h->i i->k k->l | h->j j->k k->l"),
             * ll = new StringWeight("l->l");
           sem_elem_t zero = ad->zero();          
           Key EPSLN = WALI_EPSILON; // to make spacing prettier
