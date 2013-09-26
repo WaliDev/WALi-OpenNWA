@@ -268,13 +268,16 @@ namespace wali
     {
       WFA copy1 = *this;
       WFA copy2 = *this;
+      WFA copy3 = *this;
 
       path_summary_iterative_original();
       copy1.path_summary_iterative_wpds();
-      copy2.path_summary_tarjan_fwpds();
+      copy2.path_summary_tarjan_fwpds(true);
+      copy3.path_summary_tarjan_fwpds(false);
 
       assert(this->equal(copy1)); // TODO: slow_assert
       assert(this->equal(copy2));
+      assert(this->equal(copy3));
     }
 
     void
