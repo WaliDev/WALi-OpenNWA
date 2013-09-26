@@ -2419,33 +2419,51 @@ namespace wali
       Key p_state;
       wpds::WPDS * wpds;
       boost::function<bool (ITrans const *)> callback;
+      boost::function<sem_elem_t (sem_elem_t)> wrapper;
 
-      RuleAdder(Key st, wpds::WPDS * pds, boost::function<bool (ITrans const *)> cb)
-        : p_state(st), wpds(pds), callback(cb)
+      RuleAdder(Key st,
+                wpds::WPDS * pds,
+                boost::function<bool (ITrans const *)> cb,
+                boost::function<sem_elem_t (sem_elem_t)> weight_wrapper)
+        : p_state(st),
+          wpds(pds),
+          callback(cb),
+          wrapper(weight_wrapper)
       {}
 
       virtual void operator()( ITrans const * t )
       {
+        sem_elem_t weight = t->weight();
+        if (wrapper) {
+          weight = wrapper(weight);
+        }
         if (callback && callback(t)) {
           wpds->add_rule(p_state, t->from(),
                          p_state, t->to(),
-                         t->weight());
+                         weight);
         }
       }
     };
 
     struct ReverseRuleAdder : RuleAdder
     {
-      ReverseRuleAdder(Key st, wpds::WPDS * pds, boost::function<bool (ITrans const *)> cb)
-        : RuleAdder(st, pds, cb)
+      ReverseRuleAdder(Key st,
+                       wpds::WPDS * pds,
+                       boost::function<bool (ITrans const *)> cb,
+                       boost::function<sem_elem_t (sem_elem_t)> weight_wrapper)
+        : RuleAdder(st, pds, cb, weight_wrapper)
       {}
 
       virtual void operator()( ITrans const * t )
       {
+        sem_elem_t weight = t->weight();
+        if (wrapper) {
+          weight = wrapper(weight);
+        }
         if (callback && callback(t)) {
           wpds->add_rule(p_state, t->to(),
                          p_state, t->from(),
-                         t->weight());
+                         weight);
         }
       }
     };
@@ -2454,13 +2472,14 @@ namespace wali
     WFA::toWpds(Key p_state,
                 wpds::WPDS * wpds,
                 boost::function<bool (ITrans const *)> trans_accept,
-                bool reverse) const
+                bool reverse,
+                boost::function<sem_elem_t (sem_elem_t)> weight_wrapper) const
     {
       if (reverse) {
-        ReverseRuleAdder adder(p_state, wpds, trans_accept);
+        ReverseRuleAdder adder(p_state, wpds, trans_accept, weight_wrapper);
         this->for_each(adder);
       } else {
-        RuleAdder adder(p_state, wpds, trans_accept);
+        RuleAdder adder(p_state, wpds, trans_accept, weight_wrapper);
         this->for_each(adder);
       }
     }

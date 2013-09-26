@@ -856,7 +856,8 @@ namespace wali
         void toWpds(Key p_state,
                     wpds::WPDS * wpds,
                     boost::function<bool (ITrans const *)> trans_accept,
-                    bool reverse=false) const;
+                    bool reverse=false,
+                    boost::function<sem_elem_t (sem_elem_t)> weight_wrapper = boost::function<sem_elem_t (sem_elem_t)>()) const;
 
         /// Returns the set of symbols that appear on a transition somewhere
         /// in this WFA. Never includes epsilon.
