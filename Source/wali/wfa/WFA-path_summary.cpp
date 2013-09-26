@@ -305,6 +305,10 @@ namespace wali
 
     void
     WFA::path_summary_via_wpds(WPDS & pds) {
+      if (this->getFinalStates().size() == 0u) {
+        return;
+      }
+
       sem_elem_t wt = getSomeWeight()->one();
       Key pkey = getKey("__pstate");
 
