@@ -5,74 +5,96 @@
 
 namespace opennwa
 {
-	typedef Nwa::StateIterator StateIterator;
-	typedef Nwa::InternalIterator InternalIterator;
-	typedef Nwa::CallIterator CallIterator;
-	typedef Nwa::ReturnIterator ReturnIterator;
+  typedef Nwa::StateIterator StateIterator;
+  typedef Nwa::InternalIterator InternalIterator;
+  typedef Nwa::CallIterator CallIterator;
+  typedef Nwa::ReturnIterator ReturnIterator;
 
-	namespace construct
-	{   
+  namespace construct
+  {   
 
-		void quotient( Nwa & out, Nwa const & nwa, wali::util::DisjointSets<State> partition )
-		{
-			State resSt;
-			ClientInfoRefPtr resCI;
-			std::map<State, State> repUniqueKeyMap;   // maps a representative to a fresh unique key
+    void quotient( Nwa & out, Nwa const & nwa, wali::util::DisjointSets<State> partition )
+    {
 
-			for( wali::util::DisjointSets<State>::const_iterator outer_iter = partition.begin(); outer_iter != partition.end(); outer_iter++ )
-			{   
-				std::set<State> equivalenceClass;    // equivalence class of the partition
-				for( wali::util::DisjointSets<State>::InnerSet::const_iterator inner_iter = outer_iter->begin(); inner_iter != outer_iter->end(); ++inner_iter ) {
-					equivalenceClass.insert(*inner_iter);
-				}
+      //Clear all states(except the stuck state) and transitions from this machine.
+      out.clear();
 
-				/* equivalenceClass is for the states of first parameter i.e. nwa and 
-				resSt and resCi belong to "this" nwa which is "out"
-				*/
-				out.statesQuotient(nwa, equivalenceClass, resSt, resCI);
-				repUniqueKeyMap[ partition.representative( *(equivalenceClass.begin()) ) ] = resSt;
-				out.setClientInfo(resSt, resCI);
-			}
+      // Map from the representative of an equivalence class of states of "nwa" NWA
+      // to the corresponding state in "out" NWA.
+      std::map<State, State> repKeyMap;  
 
-			// Add initial states
-			for( StateIterator sit = nwa.beginInitialStates(); sit != nwa.endInitialStates(); sit++ ) {		 
-				out.addInitialState( repUniqueKeyMap[ partition.representative(*sit) ] );
-			}
+      // For each equivalence class in the given partition...
+      for (wali::util::DisjointSets<State>::const_iterator outer_iter = partition.begin(); 
+	   outer_iter != partition.end(); outer_iter++)
+      {   
+	// Collect the set of states of the "nwa" NWA that are in the same equivalence class
+	// into "equivalenceClass.
+	std::set<State> equivalenceClass; 
+	for (wali::util::DisjointSets<State>::InnerSet::const_iterator inner_iter = outer_iter->begin(); 
+	     inner_iter != outer_iter->end(); ++inner_iter) {
+	  equivalenceClass.insert(*inner_iter);
+	}
 
-			// Add final states
-			for( StateIterator sit = nwa.beginFinalStates(); sit != nwa.endFinalStates(); sit++ ) {		 
-				out.addFinalState( repUniqueKeyMap[ partition.representative(*sit) ] );
-			}
+	// Quotient the states belonging to the same equivalence class.
+	// Note: The states in equivalenceClass consist of states of "nwa" NWA. 
+	//       resSt is a state of the "out" NWA.
+	State resSt;
+	ClientInfoRefPtr resCI;
+	out.statesQuotient(nwa, equivalenceClass, resSt, resCI);
 
-			//Add internal transitions
-			for(  InternalIterator iit = nwa.beginInternalTrans(); iit != nwa.endInternalTrans(); iit++ ) {   
-				out.addInternalTrans( repUniqueKeyMap[ partition.representative( iit->first ) ], iit->second, repUniqueKeyMap[ partition.representative( iit->third) ] );
-			}
+	// Set client info.
+	out.setClientInfo(resSt, resCI);
 
-			//Add call transitions
-			for(  CallIterator cit = nwa.beginCallTrans(); cit != nwa.endCallTrans(); cit++ ) {   
-				out.addCallTrans( repUniqueKeyMap[ partition.representative( cit->first ) ], cit->second, repUniqueKeyMap[ partition.representative( cit->third) ] );
-			}
+	// Map the representative of the equivalence class in "nwa" to the new state in "out".
+	repKeyMap[ partition.representative( *(equivalenceClass.begin()) ) ] = resSt;
+      }
 
-			//Add return transitions
-			for(  ReturnIterator rit = nwa.beginReturnTrans(); rit != nwa.endReturnTrans(); rit++ ) {   
-				out.addReturnTrans( repUniqueKeyMap[ partition.representative( rit->first ) ], repUniqueKeyMap[ partition.representative(rit->second) ], rit->third, repUniqueKeyMap[ partition.representative( rit->fourth) ] );
-			}
+      // Add initial states
+      for (StateIterator sit = nwa.beginInitialStates(); sit != nwa.endInitialStates(); sit++) { 
+	out.addInitialState( repKeyMap[ partition.representative(*sit) ] );
+      }
 
-			return;
-		}
+      // Add final states
+      for (StateIterator sit = nwa.beginFinalStates(); sit != nwa.endFinalStates(); sit++) { 
+	out.addFinalState( repKeyMap[ partition.representative(*sit) ] );
+      }
+
+      //Add internal transitions
+      for (InternalIterator iit = nwa.beginInternalTrans(); iit != nwa.endInternalTrans(); iit++ ) { 
+	out.addInternalTrans( repKeyMap[ partition.representative( iit->first ) ], 
+			      iit->second, 
+			      repKeyMap[ partition.representative( iit->third) ] );
+      }
+
+      //Add call transitions
+      for (CallIterator cit = nwa.beginCallTrans(); cit != nwa.endCallTrans(); cit++) {   
+	out.addCallTrans( repKeyMap[ partition.representative( cit->first ) ], 
+			  cit->second, 
+			  repKeyMap[ partition.representative( cit->third) ] );
+      }
+
+      //Add return transitions
+      for (ReturnIterator rit = nwa.beginReturnTrans(); rit != nwa.endReturnTrans(); rit++) {   
+	out.addReturnTrans( repKeyMap[ partition.representative( rit->first ) ], 
+			    repKeyMap[ partition.representative(rit->second) ], 
+			    rit->third, 
+			    repKeyMap[ partition.representative( rit->fourth) ] );
+      }
+
+      return;
+    }
 
 
-		NwaRefPtr quotient( Nwa const & nwa, wali::util::DisjointSets<State> partition )
-		{
-			NwaRefPtr out(new Nwa());
-			quotient(*out, nwa, partition);
-			return out;
-		}
+    NwaRefPtr quotient( Nwa const & nwa, wali::util::DisjointSets<State> partition )
+    {
+      NwaRefPtr out(new Nwa());
+      quotient(*out, nwa, partition);
+      return out;
+    }
 
-	} // end 'namespace construct'!!!
+  } // end 'namespace construct'
 
-} // end 'namespace opennwa'!!!
+} // end 'namespace opennwa'
 
 
 // Yo, Emacs!
