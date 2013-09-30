@@ -2696,6 +2696,44 @@ namespace wali
       removeStatesWithInDegree0();
     }
 
+
+    namespace delta
+    {
+      WFA
+      simplify(WFA const & input,
+               boost::function<DeltaResult (WFA const &)> tester)
+      {
+        std::cerr << "WFA's delta::simplify: ";
+        
+        WFA minimal = input;
+        bool changed = true;
+
+        while (changed) {
+          changed = false;
+          std::cerr << "!";
+
+          for (std::set<Key>::const_iterator iter = minimal.getStates().begin();
+               iter != minimal.getStates().end(); ++iter)
+          {
+            std::cerr << ".";
+
+            WFA test = minimal;
+            test.eraseState(*iter);
+            if (tester(test) == Interesting) {
+              changed = true;
+              minimal.eraseState(*iter);
+              break;
+            }
+          }
+        }
+
+        std::cerr << "\n";
+
+        return minimal;
+      }
+    }
+
+
   } // namespace wfa
 
 } // namespace wali

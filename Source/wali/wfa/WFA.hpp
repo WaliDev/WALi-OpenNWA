@@ -903,6 +903,21 @@ namespace wali
         collapseEpsilonChains();
     };
 
+    namespace delta
+    {
+      enum DeltaResult {
+        Interesting,
+        Uninteresting,
+        Invalid
+      };
+
+      WFA
+      simplify(WFA const & input,
+               boost::function<DeltaResult (WFA const &)> tester);
+               
+
+    }
+
   } // namespace wfa
 
 } // namespace wali
