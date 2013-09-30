@@ -188,6 +188,8 @@ if os.path.split(BaseEnv['CXX'])[1] == 'pathCC':
 if os.path.split(BaseEnv['CXX'])[1] == 'icpc':
    BaseEnv.Append(RPATH=['/s/intel_cc-11.0/lib/intel64'])
 
+BaseEnv.Append(LIBS=["rt"])
+
 ## Only supporting 32 bit on Darwin to not deal w/ Leopard/Snow Leopard diffs
 if 'Darwin' == Platform and not MkStatic:
    Is64 = False
