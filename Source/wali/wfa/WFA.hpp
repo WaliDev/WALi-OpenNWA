@@ -289,9 +289,8 @@ namespace wali
             Key to );
 
         /**
-         * @brief erase State q and all of its outgoing transitions
-         * It does not remove incoming transitions -- 
-         * <b><i>that has to be done by the client</i></b>. 
+         * @brief erase State q and all of its incoming and outgoing
+         * transitions
          * 
          * This does not delete the wfa::State object. The destructor
          * will take care of reclaiming memory.

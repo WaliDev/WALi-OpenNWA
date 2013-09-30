@@ -355,6 +355,34 @@ namespace wali
       delete t;
     }
 
+    namespace details {
+      class TransRemover
+        : public TransFunctor
+      {
+        std::vector<ITrans*> to_remove_;
+        Key the_state_;
+
+      public:
+        TransRemover(Key the_state)
+          : the_state_(the_state)
+        {}
+
+        virtual void operator() (ITrans* t) {
+          if (t->from() == the_state_ || t->to() == the_state_) {
+            to_remove_.push_back(t);
+          }
+        }
+
+        void removeFrom(WFA * wfa) const {
+          for (std::vector<ITrans*>::const_iterator iter = to_remove_.begin();
+               iter != to_remove_.end(); ++iter)
+          {
+            wfa->erase((*iter)->from(), (*iter)->stack(), (*iter)->to());
+          }
+        }
+      };
+    }
+
     //
     // Removes State q from the WFA and any transitions leading
     // to and from q.
@@ -1399,58 +1427,25 @@ namespace wali
       return tret;
     }
 
-    //
-    // Removes State state from the WFA and any transitions leading
-    // from the state.
-    // Note: This function does not remove incoming transitions to the state -- That 
-    // has to be done by the client
-    //
-    bool WFA::eraseState( State* state )
+
+    bool
+    WFA::eraseState(State* state)
     {
-      State::iterator it = state->begin();
-      State::iterator itEND = state->end();
-      for( ; it != itEND ; it++ )
-      {
-        ITrans* stateTrans = *it;
+      // Remove incoming and outgoing transitions
+      details::TransRemover remover(state->name());
+      this->for_each(remover);
+      remover.removeFrom(this);
 
-        //Key from = stateTrans->from();
-        //Key stack = stateTrans->stack();
-        //Key to = stateTrans->to();
-        //Trans* tKp = eraseTransFromKpMap( from,stack,to );
-
-        ITrans* tKp = eraseTransFromMaps(stateTrans->from(), stateTrans->stack(), stateTrans->to());
-
-        { // BEGIN DEBUGGING
-          if( tKp != NULL && tKp != stateTrans ) {
-            *waliErr << "[ERROR] WFA::eraseState\n";
-            tKp->print( *waliErr << "\tKpMap Trans: " ) << "\n";
-            stateTrans->print( *waliErr << "\tState Trans: " ) << "\n";
-            // Make sure we fail 
-            assert( tKp != NULL && stateTrans == tKp );
-          }
-          else {
-            // Fail if tKp == NULL
-            assert(tKp);
-          }
-        } // END DEBUGGING
-
-        delete tKp;
-      }
-
+      // Remove the state itself
       Q.erase(state->name());
-      //F.erase(state->name());
-
+      F.erase(state->name());
       state_map.erase(state->name());
+
+      // This is because of dumb bookkeeping stuff. I can't actually
+      // delete the state at this point because of some reason, but we
+      // make a note of the fact that we've deleted it so we can
+      // remove it when the WFA is destroyed.
       deleted_states.insert(state);
-
-      // Since we are not deleting the State, we need
-      // to clear its TransLists
-      state->clearTransSet();
-
-      // Do <b>not</b> delete the memory
-      // States are left in the state_map of the WFA and
-      // reclaimed by ~WFA().
-      //delete state;
 
       return true;
     }

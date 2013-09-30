@@ -2,6 +2,10 @@
 #include "wali/wfa/WFA.hpp"
 
 #include "fixtures.hpp"
+#include "fixtures/Keys.hpp"
+#include "fixtures/SimpleWeights.hpp"
+
+using namespace testing;
 
 namespace wali {
     namespace wfa {
@@ -64,6 +68,70 @@ namespace wali {
             EXPECT_EQ(abc,  AcceptAbOrAcDeterministic().wfa.alphabet());
         }
 
+        TEST(wali$wfa$WFA$$eraseState, eraseStateRemovesIncomingTransitions)
+        {
+            Keys keys;
+            using namespace testing::ReachWeights;
 
+            WFA wfa, expected;
+
+            // WFA:
+            //              a
+            // --> (st1) -------> (st2)
+            //
+            //
+            // Expected:
+            //
+            // --> (st1)
+
+            wfa.addState(keys.st1, reachZero);
+            wfa.addState(keys.st2, reachZero);
+            wfa.setInitialState(keys.st1);
+            wfa.addTrans(keys.st1, keys.a, keys.st2, reachOne);
+
+            expected.addState(keys.st1, reachZero);
+            expected.setInitialState(keys.st1);
+
+            ASSERT_FALSE(wfa.equal(expected));
+
+            // Remove st2, test again
+            wfa.eraseState(keys.st2);
+            
+            EXPECT_TRUE(wfa.equal(expected));
+        }
+
+        TEST(wali$wfa$WFA$$eraseState, eraseStateRemovesOutgoingTransitions)
+        {
+            Keys keys;
+            using namespace testing::ReachWeights;
+
+            WFA wfa, expected;
+
+            // WFA:
+            //                          b
+            // --> (st1)      (st2) ---------> (st3)
+            //
+            //
+            // Expected:
+            //
+            // --> (st1)                       (st3)
+
+            wfa.addState(keys.st1, reachZero);
+            wfa.addState(keys.st2, reachZero);
+            wfa.addState(keys.st3, reachZero);
+            wfa.setInitialState(keys.st1);
+            wfa.addTrans(keys.st2, keys.a, keys.st3, reachOne);
+
+            expected.addState(keys.st1, reachZero);
+            expected.addState(keys.st3, reachZero);
+            expected.setInitialState(keys.st1);
+
+            ASSERT_FALSE(wfa.equal(expected));
+
+            // Remove st2, test again
+            wfa.eraseState(keys.st2);
+            
+            EXPECT_TRUE(wfa.equal(expected));
+        }
     }
 }
