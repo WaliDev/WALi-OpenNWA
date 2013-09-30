@@ -15,6 +15,7 @@
 #include "wali/util/ConfigurationVar.hpp"
 #include "wali/graph/GraphCommon.hpp"
 #include "wali/witness/Witness.hpp"
+#include "wali/domains/ReversedSemElem.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -312,7 +313,12 @@ namespace wali
       sem_elem_t wt = getSomeWeight()->one();
       Key pkey = getKey("__pstate");
 
-      this->toWpds(pkey, &pds, is_any_transition, true);
+      if (getQuery() == INORDER) {
+          this->toWpds(pkey, &pds, is_any_transition, true, wali::domains::wrapToReversedSemElem);
+      }
+      else {
+          this->toWpds(pkey, &pds, is_any_transition, true);
+      }
 
 #ifdef JAMDEBUG
       std::cerr << "##### FWPDS" << std::endl;
@@ -325,12 +331,17 @@ namespace wali
       Key fin = getKey("__done");
       query.addState(fin, wt->zero());
       query.addFinalState(fin);
+
+      sem_elem_t one = wt->one();
+      if (getQuery() == INORDER) {
+        one = new domains::ReversedSemElem(one);
+      }
       
       for (std::set<Key>::const_iterator fit = getFinalStates().begin();
         fit!=getFinalStates().end(); fit++)
       {
         Key fkey = *fit;
-        query.addTrans(pkey, fkey, fin, wt->one());
+        query.addTrans(pkey, fkey, fin, one);
       }
 
 #ifdef JAMDEBUG
@@ -371,14 +382,20 @@ namespace wali
 
         State *st = smit->second;
         ITrans *trans = ans.find(initkey, stkey, finkey);
+        sem_elem_t weight;
         if (trans != NULL) {
-          //wpds::fwpds::LazyTrans *ltrans = dynamic_cast<wpds::fwpds::LazyTrans*>(trans);
-          //st->se = ltrans->se;
-          st->weight() = trans->weight();
+          weight = trans->weight();
         } else {
-          //assert (found && "Cannot find transition associated with state.");
-          st->weight() = wt->zero();
+          weight = wt->zero();
         }
+
+        if (getQuery() == INORDER) {
+          domains::ReversedSemElem * rw = dynamic_cast<domains::ReversedSemElem*>(weight.get_ptr());
+          assert(rw);
+          weight = rw->backingSemElem();
+        }
+
+        st->weight() = weight;
       }
     }
 

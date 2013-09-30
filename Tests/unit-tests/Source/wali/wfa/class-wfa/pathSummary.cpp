@@ -125,6 +125,41 @@ namespace wali {
             std::cerr << initial_weight->toString() << "\n";
             ASSERT_TRUE(initial_weight->equal(seq));
         }
+
+        TEST(wali$wfa$$pathSummary, twoSequentialTransitionsForwardQuery)
+        {
+            Letters l;
+            WFA wfa;
+
+            sem_elem_t w1 = new StringWeight("w1");
+            sem_elem_t w2 = new StringWeight("w2");
+            sem_elem_t seq = new StringWeight("w1 w2");
+            sem_elem_t zero = w1->zero();
+
+            Key s1 = getKey("state1");
+            Key s2 = getKey("state2");
+            Key s3 = getKey("state3");
+            Key a = getKey("sym1");
+            
+            wfa.addState(s1, zero);
+            wfa.addState(s2, zero);
+            wfa.addState(s3, zero);
+            wfa.setInitialState(s1);
+            wfa.addFinalState(s3);
+            wfa.addTrans(s1, a, s2, w1);
+            wfa.addTrans(s2, a, s3, w2);
+
+            sem_elem_t initial_weight = wfa.getState(s1)->weight();
+            ASSERT_TRUE(initial_weight->equal(zero));
+
+            wfa.setQuery(WFA::INORDER);
+            wfa.path_summary_crosscheck_all();
+
+            initial_weight = wfa.getState(s1)->weight();
+            std::cerr << initial_weight->toString() << "\n";
+            ASSERT_TRUE(initial_weight->equal(seq));
+        }
+
     }
 }
 
