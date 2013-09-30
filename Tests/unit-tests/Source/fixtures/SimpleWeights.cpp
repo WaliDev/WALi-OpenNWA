@@ -31,6 +31,13 @@ namespace testing
       dist60(new ShortestPathSemiring(60)),
       semiring_zero = dist1->zero();
   }
+
+  namespace ReachWeights
+  {
+    wali::sem_elem_t reach_dummy(new Reach(true)),
+      reachOne = reach_dummy->one(),
+      reachZero = reach_dummy->zero();
+  }
 }
 
 // Yo emacs!
