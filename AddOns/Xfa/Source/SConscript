@@ -19,7 +19,6 @@ sources = Split("""
     ./wali/xfa/xfa_livevar_analysis.cpp
     ./wali/util/read_file.cpp
     ./wali/util/base64.cpp
-    ./wali/util/details/Partition.cpp
 """)
 
 env = BaseEnv.Clone()

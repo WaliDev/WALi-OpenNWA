@@ -1524,6 +1524,32 @@ namespace opennwa
 
   /**
    * 
+   * @brief quotient states
+   * 
+   * @param - nwa: the NWA in which to look up information about the states to quotient
+   * @param - equivalenceClass: the set of states belonging to a particular equivalence class in the partition on nwa
+   * @param - resSt: the resulting state after performing quotient on the states
+   * @param - resCI: the resulting client info after performing quotient on the states
+   *
+   */
+    
+  void Nwa::statesQuotient( Nwa const & nwa, std::set<State> const & equivalenceClass,
+	  State & resSt, ClientInfoRefPtr & resCI ) 
+  {
+	  assert( !equivalenceClass.empty() );
+	  (void) nwa, (void) resCI;
+
+	  State const & first = *(equivalenceClass.begin());
+	  std::stringstream ss;
+	  ss << "(quotient-key#" << first << ")"; 
+	  resSt = getKey(ss.str()); // generates a fresh unique key corresponding to every representative
+
+	  return;
+  }
+
+
+  /**
+   * 
    * @brief intersect symbols
    * 
    * @param - first: the NWA in which to look up information about 'sym1'

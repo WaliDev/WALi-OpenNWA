@@ -48,7 +48,7 @@ namespace opennwa
         }
 
         void
-        expect_present(Nwa const & nwa)
+        SomeElements::expect_present(Nwa const & nwa)
         {
             SomeElements elements;
                 
