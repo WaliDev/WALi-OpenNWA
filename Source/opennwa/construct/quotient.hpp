@@ -10,7 +10,7 @@ namespace opennwa
      *
      * @brief constructs the NWA which is the result of applying the quotient operation on the given NWA	
      *
-	 * @param - out: the quotient NWA of the given NWA
+     * @param - out: the quotient NWA of the given NWA
      * @param - nwa: the NWA on which to apply quotient operation
      * @param - partition: the disjoint set which specifies the equivalence relation on the NWA    
      *	
