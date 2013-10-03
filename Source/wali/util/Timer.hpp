@@ -9,9 +9,10 @@
 #include "wali/Common.hpp"
 #include "wali/Printable.hpp"
 #ifndef _WIN32
-#	include <sys/times.h>
+#  include <sys/times.h>
 #else
-#	include <time.h>
+#  include <windows.h>
+#  include <time.h>
 #endif
 
 /*
@@ -31,16 +32,32 @@ namespace wali {
       inline
       long long
       now() {
+#if defined(CLOCK_MONOTONIC)
         timespec ts;
         int err = clock_gettime(CLOCK_MONOTONIC, &ts);
         assert(err == 0);
         return (static_cast<long long>(ts.tv_sec) * NANO) + ts.tv_nsec;
+#elif defined(_WIN32)
+        LARGE_INTEGER now;
+        BOOL err = QueryPerformanceCounter(&now);
+        assert(err);
+        return now.QuadPart;
+#else
+        return 0;
+#endif
       }
 
       inline
       double
       to_sec(long long ticks) {
+#ifndef _WIN32
         return static_cast<double>(ticks)/NANO;
+#else
+        LARGE_INTEGER now;
+        BOOL err = QueryPerformanceFrequency(&now);
+        assert(err);
+        return static_cast<double>(ticks)/now.QuadPart;
+#endif
       }
     }
 
