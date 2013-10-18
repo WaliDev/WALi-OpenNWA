@@ -405,6 +405,12 @@
     <ClCompile Include="..\..\..\Source\opennwa\query\weighted.cpp">
       <Filter>Source Files\wali.nwa\query</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_quotient.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wfa\WFA-path_summary.cpp">
+      <Filter>Source Files\wali.wfa</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\FWPDS.hpp">
