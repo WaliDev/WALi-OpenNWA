@@ -318,7 +318,7 @@ namespace wali
           BddPairPtr baseRestore;
           //TL3->TL2 TR3->TR2
           BddPairPtr tensorRestore;
-          //B1->LT1 B2->TL2 B3->TL3
+          //B1->TL1 B2->TL2 B3->TL3
           BddPairPtr move2Tensor1;
           //B1->TR1 B2->TR2 B3->TR3
           BddPairPtr move2Tensor2;
@@ -438,7 +438,7 @@ namespace wali
           binrel_t Eq23Project() const;
           binrel_t Eq13Project() const;
         public: 
-          // ////////////////////////////////
+	  // ////////////////////////////////
           // SemElem methods
           sem_elem_t one() const;
           sem_elem_t zero() const;
