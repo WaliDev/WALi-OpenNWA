@@ -117,8 +117,8 @@ sem_elem_tensor_t SemElemFunctional::evaluate(IntraGraph * const gr)
        val = lhs->evaluate(gr);
       return boost::polymorphic_downcast<SemElemTensor*>(val->detensor().get_ptr());
     case DetensorTranspose:
-       val = lhs->evaluate(gr);
-      return boost::polymorphic_downcast<SemElemTensor*>(val->detensorTranspose().get_ptr());
+        val = lhs->evaluate(gr);
+        return boost::polymorphic_downcast<SemElemTensor*>(val->detensorTranspose().get_ptr());
     case Transpose:
        val = lhs->evaluate(gr);
        return boost::polymorphic_downcast<SemElemTensor*>(val->transpose().get_ptr());

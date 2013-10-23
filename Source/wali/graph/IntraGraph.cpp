@@ -1655,6 +1655,9 @@ namespace wali {
         for(int i = 1; i < nnodes; ++i){
           if(nodes[i].weight == NULL || !nodes[i].weight->equal(nodes[i].regexp->get_weight())){
             changedNodes.push_back(&nodes[i]);
+	    /*cout << "\n Node: " << i << key2str(nodes[i].trans.src)
+	              << ", " << key2str(nodes[i].trans.stack) << ", "
+		                << key2str(nodes[i].trans.tgt) << "\n";*/
             nodes[i].weight = nodes[i].regexp->get_weight();
           }
         }
@@ -1669,8 +1672,12 @@ namespace wali {
             int updatable_no = edges[*ei].updatable_no;
             if(updateEdgesSet.find(updatable_no) == updateEdgesSet.end()){
               updateEdges.push_back(updatable_no);
+	      //cout << "Value of the functional at evaluation. \n";
               sem_elem_t wt = edges[*ei].exp->evaluate(this).get_ptr();
-              weights.push_back(wt);
+	      //cout << "Value of functional after evaluation. \n";
+	      //wt->print(cout);
+	      //cout << "\n";
+	      weights.push_back(wt);
               //update the edge anyway. This weight should not be used, except for debugging.
               edges[*ei].weight = weights.back();
               updateEdgesSet.insert(updatable_no);

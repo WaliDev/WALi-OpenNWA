@@ -91,7 +91,11 @@ namespace wali {
             node_no_t nno = nnos[i];
             sem_elem_t se = ses[i];
             updatable(nno,se); // make sure that this node exists
-            if(!updatable_nodes[nno]->value->equal(se)) {
+/*            cout << "\n Node: " << nno << "\n";
+	    cout << "Weight: ";
+	    se->print(cout);
+	    cout << "\n";*/
+	    if(!updatable_nodes[nno]->value->equal(se)) {
 #ifdef DWPDS
               updatable_nodes[nno]->delta[update_count+1] = se->diff(updatable_nodes[nno]->value);
 #endif
@@ -1298,7 +1302,7 @@ namespace wali {
         }
 
         sem_elem_t RegExp::evaluate(sem_elem_t w) {
-          map<sem_elem_t, sem_elem_t,sem_elem_less>::iterator it;
+	  map<sem_elem_t, sem_elem_t,sem_elem_less>::iterator it;
           sem_elem_t ret;
 #if defined(PUSH_EVAL)
           if(dirty){
@@ -1481,14 +1485,14 @@ namespace wali {
 
     sem_elem_t RegExp::get_weight() {
         if(last_seen == dag->satProcesses[satProcess].update_count && last_change != (unsigned)-1)  // evaluate(w) sets last_change to -1
-            return value;
-
+	   return value;
+	
         if(!dag->top_down_eval || !dag->saturation_complete) {
-            evaluate();
+	    evaluate();
             return value;
         }
         if(dag->executing_poststar) {
-            return evaluate(value->one());
+	    return evaluate(value->one());
         }
         // Executing prestar
         evaluate();
@@ -1510,8 +1514,11 @@ namespace wali {
         unsigned int &update_count = dag->satProcesses[dag->currentSatProcess].update_count;
         evaluations.push_back(update_count);
         nevals++;
-        switch(type) {
-            case Constant: 
+	//cout << "Evaluating RegExp :";
+	//this->print(cout);
+	//cout << "\n";
+	switch(type) {
+            case Constant:
             case Updatable: 
                 return;
             case Star: {
@@ -1538,12 +1545,13 @@ namespace wali {
 #endif
                                    value = w;
                                }
+
                            }
                            last_seen = dag->satProcesses[satProcess].update_count;
                            break;
                        }
             case Combine: {
-                              list<reg_exp_t>::iterator ch;
+			      list<reg_exp_t>::iterator ch;
                               sem_elem_t wnew = value;
                               sem_elem_t wchange = value->zero();
                               unsigned max = last_change;
@@ -1553,14 +1561,13 @@ namespace wali {
 #ifdef DWPDS
                                       wchange = wchange->combine((*ch)->get_delta(last_seen));
 #else
-                                      wchange = wchange->combine((*ch)->value);
+				      wchange = wchange->combine((*ch)->value);
 #endif
                                       max = ((*ch)->last_change > max) ? (*ch)->last_change : max;
                                       STAT(dag->stats.ncombine++);
                                   }
                               }
                               wnew = wnew->combine(wchange);
-
                               if(!value->equal(wnew)) {
                                   last_change = max;
 #ifdef DWPDS

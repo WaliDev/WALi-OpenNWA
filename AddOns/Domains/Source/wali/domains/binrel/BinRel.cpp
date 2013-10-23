@@ -1284,7 +1284,6 @@ binrel_t BinRel::Kronecker(binrel_t that) const
     return con->cachedTensorZero;
 #ifdef NWA_DETENSOR
   bdd c = tensorViaDetensor(that->Transpose()->rel); //nwa_detensor.cpp
->>>>>>> Modified Binrel.hpp/cpp to fix bugs in detensor.
 #else
   bdd rel1 = bdd_replace(rel, con->move2Tensor1.get());
   bdd rel2 = bdd_replace(that->rel, con->move2Tensor2.get());

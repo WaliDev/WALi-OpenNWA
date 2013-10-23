@@ -826,7 +826,7 @@ namespace wali {
               // Now add in the myriad edges.
               if(isRecursive){
                 //Do Newton Magic
-                dag->startSatProcess(sem);
+                dag->startSatProcess(sem); //Creates a new context for RegEx
                 while(gr_it != gr_sorted.end() && (*gr_it)->scc_number == scc_n){
                   scc_graph_t gr = *gr_it;
 
@@ -894,6 +894,7 @@ namespace wali {
                       // w' = (wtCallRule x DetTrans(wt(src2)), 1^T)
                       // If it has base weights, then
                       // w' = (wtCallRule x wt(src2), 1^T)
+		      // ET: Merge Functions?
                       sem_elem_t wtsrc2 = nodes[iter->src2].gr->getWeight(nodes[iter->src2].intra_nodeno);
                       sem_elem_tensor_t wt = boost::polymorphic_downcast<SemElemTensor*>(wtsrc2.get_ptr());
                       if(nodes[iter->src2].gr->hasTensoredWeights)
@@ -965,7 +966,7 @@ namespace wali {
                               SemElemFunctional::detensorTranspose(
                                 SemElemFunctional::in(nodes[iter->src2].intra_nodeno))),
                             SemElemFunctional::constant(one));
-                      e = graph->setSource(nodes[iter->tgt].intra_nodeno, zerot, f);
+                      e = graph->setSource(nodes[iter->tgt].intra_nodeno, zerot, f); //ET: What does set source do? Why not add edge like in the two other cases?
                       // Back references in the node to edges that depend on it.
                       graph->addDependentEdge(e, nodes[iter->src1].intra_nodeno);
                       graph->addDependentEdge(e, nodes[iter->src2].intra_nodeno);
@@ -1410,7 +1411,7 @@ namespace wali {
             cout << "Popped ";
             IntraGraph::print_trans(nodes[onode].trans,cout) << "with weight ";
             weight->print(cout) << "\n";
-            );
+           );
 
         // Go through all its targets and modify their weights
         std::list<int>::iterator beg = nodes[onode].out_hyper_edges.begin();
@@ -1421,13 +1422,16 @@ namespace wali {
           sem_elem_t uw;
           if(running_ewpds && inter_edges[*beg].mf.get_ptr()) {
             uw = inter_edges[*beg].mf->apply_f(sem->one(), weight);
-            FWPDSDBGS(
+           FWPDSDBGS(
                 cout << "Apply merge function ";
                 inter_edges[*beg].mf->print(cout) << " to ";
                 weight->print(cout) << "\n";
                 uw->print(cout << "Got ") << "\n";
                 );
           } else {
+	    cout << "Extending weight ";
+	    inter_edges[*beg].weight->print(cout) << " with ";
+	    weight->print(cout) << "\n";
             uw = inter_edges[*beg].weight->extend(weight);
           }
           STAT(stats.nextend++);
