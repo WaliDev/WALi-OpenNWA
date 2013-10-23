@@ -162,6 +162,7 @@ namespace wali {
           bool newton;
           // If set, use InterGraph::setupNewtonNoTensorSolution for poststar
           bool newtonNoTensor;
+	  bool newtonMerge;
           bool topDown;
 
       }; // class FWPDS
