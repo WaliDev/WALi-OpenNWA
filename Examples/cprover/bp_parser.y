@@ -330,8 +330,7 @@ concurrent_statement
 statement
     : dead_statement ';' 
 		{
-			dead_stmt_ctr++;
-			$$ = make_skip_stmt();
+			$$ = $1;
 		}
     | parallel_assign ';' {$$ = $1;}
     | assert ';'{$$ = $1;}

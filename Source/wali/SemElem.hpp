@@ -182,6 +182,7 @@ namespace wali
         return combine( se.get_ptr() ); 
       }
 
+
       /** 
        * Wrapper method for equal that will remove the ref_ptr
        * to make the call to the user's code. 

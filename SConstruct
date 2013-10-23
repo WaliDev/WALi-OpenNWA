@@ -119,6 +119,8 @@ BaseEnv['CPPDEFINES'] = {
 }
 
 
+BaseEnv.Append(LINKFLAGS=['-rdynamic'])
+
 if 'gcc' == BaseEnv['compiler']:
     # -Waddress -Wlogical-op
 

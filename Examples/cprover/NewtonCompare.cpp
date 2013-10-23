@@ -30,6 +30,7 @@
 #include "wali/util/Timer.hpp"
 // ::wali::cprover
 #include "BplToPds.hpp"
+//#include "PtoICFG.hpp"
 
 using namespace std;
 using namespace wali;
@@ -412,8 +413,7 @@ namespace goals {
       fstream outfile("final_outfa.dot", fstream::out);
       outfa.print_dot(outfile, true);
       outfile.close();
-    }
-    if(dump){
+    } if(dump){
       cout << "[Newton Compare] Dumping the output automaton to final_outfa.txt" << endl;
       fstream outfile("final_outfa.txt", fstream::out);
       outfa.print(outfile);
@@ -486,6 +486,7 @@ namespace goals {
       npds = new FWPDS();
       con = pds_from_prog(npds, pg);
     }
+    //npds->print(std::cout) << endl;
     wali::set_verify_fwpds(false);
     npds->useNewton(true);
 
@@ -599,7 +600,7 @@ namespace goals {
       con = pds_from_prog(pds, pg);
     }
 
-    //pds->print(std::cout) << endl;
+    pds->print(std::cout) << endl;
 
 #if defined(BINREL_STATS)
     con->resetStats(); 
@@ -608,6 +609,7 @@ namespace goals {
     t->measureAndReport =false;
     doPostStar(pds, outfa);
     sem_elem_t wt = computePathSummary(pds, outfa);
+    wt->print(std::cout);
     if(wt->equal(wt->zero()))
       cout << "[Newton Compare] WPDS ==> error not reachable" << endl;
     else{
@@ -680,6 +682,44 @@ namespace goals {
       cout << "[Newton Compare] newton_merge_notensor_fwpds ==> error reachable" << endl;
     }
     t->print(std::cout << "[Newton Compare] Time taken by newton_merge_notensor_fwpds poststar: ") << endl;
+    delete t;
+
+#if defined(BINREL_STATS)
+    con->printStats(cout);
+#endif //if defined(BINREL_STATS)
+    delete fpds;
+  }
+
+  void run_newton_merge_tensor_fwpds(WFA& outfa, FWPDS * originalPds = NULL)
+  {
+    cout << "#################################################" << endl;
+    cout << "[Newton Compare] Goal IX: end-to-end newton_merge_tensor_fwpds run" << endl;
+    FWPDS * fpds;
+    if(originalPds != NULL)
+      fpds = new FWPDS(*originalPds);
+    else{
+      fpds = new FWPDS();
+      con = pds_from_prog_with_tensor_merge(fpds, pg);
+    }
+
+    wali::set_verify_fwpds(false);
+    fpds->useNewton(true);
+
+#if defined(BINREL_STATS)
+    con->resetStats();
+#endif
+    wali::util::Timer * t = new wali::util::Timer("newton_merge_tensor_fwpds poststar",cout);
+    t->measureAndReport =false;
+    doPostStar(fpds, outfa);
+    sem_elem_t wt = computePathSummary(fpds, outfa);
+    if(fpds->isOutputTensored())
+      wt = boost::polymorphic_downcast<SemElemTensor*>(wt.get_ptr())->detensorTranspose().get_ptr();
+    if(wt->equal(wt->zero()))
+      cout << "[Newton Compare] newton_merge_tensor_fwpds ==> error not reachable" << endl;
+    else{
+      cout << "[Newton Compare] newton_merge_tensor_fwpds ==> error reachable" << endl;
+    }
+    t->print(std::cout << "[Newton Compare] Time taken by newton_merge_tensor_fwpds poststar: ") << endl;
     delete t;
 
 #if defined(BINREL_STATS)
@@ -774,6 +814,9 @@ void * work(void *)
     case 8:
       run_newton_merge_notensor_fwpds(outfa);
       break;
+    case 9:
+      run_newton_merge_tensor_fwpds(outfa);
+      break;
     default:
       assert(0 && "I don't understand that goal!!!");
   }
@@ -797,7 +840,8 @@ int main(int argc, char ** argv)
       << "Goal: 5 --> Run newton_merge_notensor_ewpds end-to-end." << endl
       << "Goal: 6 --> Run kleene_nomerge_wpds end-to-end." << endl
       << "Goal: 7 --> Run kleene_merge_ewpds end-to-end." << endl
-      << "Goal: 8 --> Run newton_merge_notensor_fwpds end-to-end." << endl;
+      << "Goal: 8 --> Run newton_merge_notensor_fwpds end-to-end." << endl
+      << "Goal: 9 --> Run newton_merge_tensor_fwpds end-to-end." << endl;
     return -1;
   }
 
@@ -841,6 +885,8 @@ int main(int argc, char ** argv)
 
   cout << "[NewtonCompare] Parsing Program..." << endl;
   pg = parse_prog(fname.c_str());
+  //BPCFG::ICFG * icfg = BPCFG::createICFG(pg);
+  //BPCFG::ICFGtoBP(icfg);
 
   if(!mainProc) mainProc = strdup("main");
   if(!errLbl) errLbl = strdup("error");

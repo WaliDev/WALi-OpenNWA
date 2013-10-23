@@ -274,6 +274,7 @@ bdd BinRel::detensorViaNwa()
   DetensorWeightGen wts(DetensorWeight::detensor_weight_one); 
   populateNwa(inwa, wts);
   setupConstraintNwa(cnwa);
+
   opennwa::construct::intersect(nwa, inwa, cnwa);
 
   // Create the query automaton
@@ -364,13 +365,11 @@ void BinRel::populateNwa(DetensorNwa& nwa, DetensorWeightGen& wts)
   for(unsigned i=0; i<con->numVars(); ++i)
     lTable.push_back(vector< State >());
 
-  // Transpose tensor1 levels.
-  bdd relt = bdd_replace(rel, con->tensor1Swap.get()); 
-  
-  tabulateStates(nwa, 0, relt);
+
+  tabulateStates(nwa, 0, rel);
   //cout << "#Nwa State created: " << tTable.size() << endl;
   visited.clear();
-  generateTransitions(nwa, wts, 0, relt); 
+  generateTransitions(nwa, wts, 0, rel); 
 }
 
 void BinRel::setupConstraintNwa(DetensorNwa& nwa)
