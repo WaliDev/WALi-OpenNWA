@@ -170,13 +170,11 @@ std::ostream& graphPrintKey(std::ostream& o, int k) {
 
 void FWPDS::useNewton(bool set){
   newtonNoTensor = false;
-  newtonMerge = false;
   newton = set;
 }
 
 void FWPDS::useNewtonNoTensor(bool set){
   newton = false;
-  newtonMerge = false;
   newtonNoTensor = set;
 }
 

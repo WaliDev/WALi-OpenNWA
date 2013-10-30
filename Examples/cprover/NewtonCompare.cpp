@@ -407,7 +407,6 @@ namespace goals {
     }else{
       fpds->poststarIGR(fa,outfa);
     }
-
     if(dump){
       cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
       fstream outfile("final_outfa.dot", fstream::out);
@@ -600,7 +599,7 @@ namespace goals {
       con = pds_from_prog(pds, pg);
     }
 
-    pds->print(std::cout) << endl;
+    //pds->print(std::cout) << endl;
 
 #if defined(BINREL_STATS)
     con->resetStats(); 
