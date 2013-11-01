@@ -469,7 +469,7 @@ namespace goals {
 
 
     cout << "[Newton Compare] Computing path summary..." << endl;
-    interfa.path_summary_iterative_original(outfa.getSomeWeight()->one());
+    interfa.path_summary(outfa.getSomeWeight()->one());
 
     return interfa.getState(interfa.getInitialState())->weight();
   }
@@ -662,18 +662,10 @@ namespace goals {
     else{
       fpds = new FWPDS();
       //con = pds_from_prog_with_tensor_merge(fpds, pg);
-      con = pds_from_prog(fpds, pg);
+      con = pds_from_prog_with_meet_merge(fpds, pg);
     }
 
     wali::set_verify_fwpds(false);
-    
-    //regexps r = fpds->createRegExps();
-    //E = convertToTSLRegExps(r);
-    //D = createDifferentials(D);
-    //fnew = fwpdsFromDiffs(D);
-    //regexps rnew = fnew->createRegExps();
-    //M = convertToRegExpT(rnew,D,E);
-    //assignment = runNewton(M);
     fpds->useNewtonNoTensor(true);
 
 #if defined(BINREL_STATS)
@@ -822,7 +814,7 @@ void * work(void *)
       run_newton_merge_notensor_fwpds(outfa);
       break;
     case 9:
-      run_newton_nomerge_tensor_fwpds(outfa);
+      run_newton_merge_tensor_fwpds(outfa);
       break;
     default:
       assert(0 && "I don't understand that goal!!!");
