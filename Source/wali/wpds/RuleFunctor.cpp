@@ -20,7 +20,7 @@ namespace wali
 
     void RulePrinter::operator()( const rule_t & r )
     {
-      r->print( os ) << std::endl << std::endl;
+      r->print( os ) << std::endl;
     }
 
     /////////////////////////////////////////////////////////////////

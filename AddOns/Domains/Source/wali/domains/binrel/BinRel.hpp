@@ -37,7 +37,6 @@
 #include "buddy/fdd.h"
 #include "wali/Key.hpp"
 
-
 /**
  *
  * The following describes how to control how the bdd variables are setup in buddy
@@ -347,7 +346,7 @@ namespace wali
           binrel_t cachedTensorZero;
           binrel_t cachedBaseTop;
           binrel_t cachedTensorTop;
-#ifdef NWA_DETENSOR
+#if (NWA_DETENSOR == 1)
           VocLevelArray tensorVocLevels;
           VocLevelArray baseLhsVocLevels;
           VocLevelArray baseRhsVocLevels;
