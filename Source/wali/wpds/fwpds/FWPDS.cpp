@@ -39,8 +39,6 @@
 #include "wali/graph/RegExp.hpp"
 #include "wali/graph/InterGraph.hpp"
 
-#include <fstream>
-
 using namespace wali;
 using namespace wali::graph;
 using namespace wali::wpds;
@@ -48,7 +46,7 @@ using namespace wali::wpds::fwpds;
 using namespace wali::wpds::ewpds;
 
 #define FWPDS_DYN_CAST 0
-int first = 0;
+
 const std::string FWPDS::XMLTag("FWPDS");
 
 FWPDS::FWPDS() : EWPDS(), interGr(NULL), checkingPhase(false), newton(false), newtonNoTensor(false), topDown(true)
@@ -407,17 +405,6 @@ void FWPDS::poststarIGR( wfa::WFA const & input, wfa::WFA& output )
 
   // Build the InterGraph using EWPDS saturation without weights
   EWPDS::poststarComputeFixpoint(output);
-  /*if (first == 5){
-        cout << "[Newton Compare] Dumping the inter output automaton in dot format to inter2_outfa.dot" << endl;
-      fstream outfile("inter_final_outfa.dot", fstream::out);
-      output.print_dot(outfile, true);
-      outfile.close();
-    cout << "[Newton Compare] Dumping the inter output automaton to inter_final_outfa.txt" << endl;
-    fstream outfile2("inter_final_outfa.txt", fstream::out);
-    output.print(outfile2);
-    outfile2.close();
-  }
-  first++;*/
 
   {
     std::string msg = (get_verify_fwpds()) ? "FWPDS Saturation" : "";
