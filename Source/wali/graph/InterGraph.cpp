@@ -1152,6 +1152,85 @@ namespace wali {
 #endif 
         }
 
+	vector<reg_exp_t> InterGraph::getOutnodeRegExps()
+	{
+           // First, find the IntraGraphs
+          int n = nodes.size();
+          int i;
+          intra_graph_uf = new UnionFind(n);
+
+          vector<GraphEdge>::iterator it;
+          vector<HyperEdge>::iterator it2;
+          std::list<IntraGraph *>::iterator gr_it;
+          multiset<tup > worklist;
+
+
+          //These two takeUnions Group together all the nodes in a single procedure
+          for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
+            intra_graph_uf->takeUnion((*it).src,(*it).tgt);
+          }
+          for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
+            intra_graph_uf->takeUnion((*it2).src1,(*it2).tgt);
+          }
+          IntraGraph::SharedMemBuffer * memBuf = NULL;
+#ifdef INTRAGRAPH_SHARED_MEMORY
+          // Before creating IntraGraphs, create a CommonBuffer, if needed.
+          int max_size = 0;
+          for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
+            max_size = (max_size > (*gr_it)->getSize()) ? max_size : (*gr_it)->getSize();
+          }
+          memBuf  = new IntraGraph::SharedMemBuffer(max_size);
+#endif
+
+          for(i = 0; i < n;i++) {
+            int j = intra_graph_uf->find(i);
+            if(nodes[j].gr == NULL) {
+              nodes[j].gr = new IntraGraph(dag, running_prestar,sem, memBuf);
+              gr_list.push_back(nodes[j].gr);
+            }
+            nodes[i].gr = nodes[j].gr;
+            nodes[i].intra_nodeno = nodes[i].gr->makeNode(nodes[i].trans);
+            if(is_source_type(nodes[i].type)) {
+              nodes[i].gr->setSource(nodes[i].intra_nodeno, nodes[i].weight);
+            }
+            // zero all weights (some are set by setSource() )
+            if(nodes[i].weight.get_ptr() != NULL)
+              nodes[i].weight = nodes[i].weight->zero();
+          }
+          // Now fill up the IntraGraphs
+          for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
+            int s = (*it).src;
+            int t = (*it).tgt;
+            nodes[s].gr->addEdge(nodes[s].intra_nodeno, nodes[t].intra_nodeno, (*it).weight);
+          }
+
+          for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
+            IntraGraph *gr = nodes[(*it2).tgt].gr;
+            gr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, sem->zero(), true);
+            IntraGraph *gr2 = nodes[(*it2).src2].gr;
+            gr2->setOutNode(nodes[(*it2).src2].intra_nodeno, (*it2).src2);
+          }
+
+          // For SWPDS
+          vector<call_edge_t>::iterator it3;
+          for(it3 = call_edges.begin(); it3 != call_edges.end(); it3++) {
+            IntraGraph *gr1 = nodes[(*it3).first].gr;
+            IntraGraph *gr2 = nodes[(*it3).second].gr;
+            gr1->addCallEdge(gr2);
+          }
+
+          // Setup Worklist
+          vector<reg_exp_t> outNodeRegExps;
+          for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
+            (*gr_it)->setupIntraSolution(false);
+            for(list<int>::const_iterator cit = (*gr_it)->out_nodes_intra->begin(); cit != (*gr_it)->out_nodes_intra->end(); ++cit)
+              outNodeRegExps.push_back((*gr_it)->nodes[*cit].regexp);
+	  }
+
+	  return outNodeRegExps;
+
+	}
+
         // If an argument is passed in then only weights on those transitions will be available
         // I can fix this (i.e., weights for others will be available on demand), but not right now.
         void InterGraph::setupInterSolution(std::list<Transition> *wt_required) {
@@ -1168,6 +1247,7 @@ namespace wali {
           multiset<tup > worklist;
 
 
+          //These two takeUnions Group together all the nodes in a single procedure
           for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
             intra_graph_uf->takeUnion((*it).src,(*it).tgt);
           }
@@ -1228,6 +1308,7 @@ namespace wali {
 #endif
           for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
             (*gr_it)->setupIntraSolution(false);
+	    cout << "PRINT!";
 #if defined(PPP_DBG) && PPP_DBG >= 0
             for(list<int>::const_iterator cit = (*gr_it)->out_nodes_intra->begin(); cit != (*gr_it)->out_nodes_intra->end(); ++cit)
               outNodeRegExps.push_back((*gr_it)->nodes[*cit].regexp);

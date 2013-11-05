@@ -375,6 +375,41 @@ void FWPDS::poststar( wfa::WFA const & input, wfa::WFA& output ) {
   //interGr->print_stats(*waliErr) << "\n";
 }
 
+
+vector<reg_exp_t> FWPDS::getOutRegExps(wfa::WFA const & input, wfa::WFA& output)
+{
+
+  EWPDS::poststarSetupFixpoint(input,output);
+
+  // If theZero is invalid then no rules have
+  // been added to the WPDS and no saturation
+  // can be done.
+  if(!theZero.is_valid()) {
+    worklist->clear();
+  }
+
+  // cache semiring 1
+  wghtOne = theZero->one();
+
+  // FIXME: Currently FWPDS always assumes that the
+  // underlying pds is a EWPDS. In the absence of
+  // merge functions, it can be treated as a WPDS.
+  // However, there is no cost benefit in using WPDS
+  interGr = new graph::InterGraph(theZero, true, false);
+  interGr->dag->topDownEval(topDown);
+  interGrs.push_back(interGr);
+
+  // Input transitions become source nodes in FWPDS
+  FWPDSSourceFunctor sources(*interGr.get_ptr(), true);
+  output.for_each(sources);
+
+  // Build the InterGraph using EWPDS saturation without weights
+  EWPDS::poststarComputeFixpoint(output);
+
+  vector<reg_exp_t> regE = interGr->getOutnodeRegExps();
+  return regE;
+}
+
 void FWPDS::poststarIGR( wfa::WFA const & input, wfa::WFA& output )
 {
 

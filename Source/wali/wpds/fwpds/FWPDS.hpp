@@ -15,7 +15,7 @@
 
 #include "wali/graph/GraphCommon.hpp"
 #include "wali/graph/InterGraph.hpp"
-
+#include "wali/graph/RegExp.hpp"
 namespace wali {
 
   namespace wfa {
@@ -25,6 +25,7 @@ namespace wali {
 
   namespace graph {
     class InterGraph;
+    class RegExp;
   }
 
   namespace wpds {
@@ -35,9 +36,10 @@ namespace wali {
     namespace fwpds 
     {
 
-
       class FWPDS : public ewpds::EWPDS 
       {
+        typedef ref_ptr<graph::RegExp> reg_exp_t;
+
         public:
           /**
            * For parsing XML FWPDSs.
@@ -89,6 +91,7 @@ namespace wali {
               return this->EWPDS::poststar(input);
           }
 
+          vector<reg_exp_t> getOutRegExps( wfa::WFA const & input, wfa::WFA & output );
           void poststarIGR( wfa::WFA const & input, wfa::WFA & output );
 
           ///////////////////////

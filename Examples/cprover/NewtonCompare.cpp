@@ -31,6 +31,9 @@
 // ::wali::cprover
 #include "BplToPds.hpp"
 //#include "PtoICFG.hpp"
+// TSL
+#include "gtr/src/lang/gtr_config.h"
+#include "tsl/cir/regexp/conc.1level.cir.hpp"
 
 using namespace std;
 using namespace wali;
@@ -59,6 +62,10 @@ extern "C"
 }
 
 namespace{
+
+typedef tsl_regexp::Conc1LevelRTG RTG;
+typedef tsl_regexp::Conc1LevelCIR CIR;
+typedef ref_ptr<graph::RegExp> reg_exp_t;
 
   class WFACompare : public wali::wfa::ConstTransFunctor
   {
@@ -652,6 +659,79 @@ namespace goals {
     delete npds;
   }
 
+/*
+  tslDiffRegMap createDifferentials(tslRegExpMap eMap){
+    tslDiffRegMap DMap = new TSLDiffRegMap();
+    for (tslRegExpMap::iterator it = tslRList.begin(); it!=tslRList.end(); ++it)
+    {
+       RTG::regExpTListRefPtr rtList = Conc1LevelCIR::Differential(it->second);
+       DMap[it->first] = rtList;
+    }
+  }
+
+  tslRegExpMap convertToTSLRegExps(std::map<pPointer,RegExp> rList)
+  {
+    tslRegExpMap EMap = new TSLRegExpMap();
+    for (std::map<pPointer,RegExp>::iterator it=rList.begin(); it!=rList.end(); ++it)
+    {
+      RTG::regExpRefPtr rExp = convertToRegExp(it->second);
+      EMap[it->first] = rExp;
+    }
+    return EMap;
+  }
+
+  RTG::regExpRegPtr convertToRegExp(RegExp exp)
+  {
+    switch(exp->type){
+      case Constant:
+        w = exp->weight();
+        if(w->isOne())
+          return RTG::One::make();
+        else if (w->isZero())
+          return RTG::Zero::make();
+	else {
+	  RTG::sem_elem_wrapper w = exp->weight()*
+          return RTG::Weight::make(w);
+	}
+	break;
+      case Updateable:
+        int node_no = exp->updateable_node_no();
+        return RTG::Var::make(CBTI::INT32(node_no));
+      case Star:
+        RTG::regExpRegPtr c = convertToRegExp(exp->children.front());
+	return RTG::Kleene::make(c);
+        break;
+      case Extend:
+        list<reg_exp_t>::iterator ch;
+	ch = children.begin();
+	rch = convertToRegExp(*ch);
+	ch++;
+	lch = convertToRegExp(*ch);
+	return RTG::Dot::make(lch,rch);
+        break;
+      case Combine:
+        list<reg_exp_t>::iterator ch;
+        ch = children.begin();
+        rch = convertToRegExp(*ch);
+        ch++;
+        lch = convertToRegExp(*ch);
+        return RTG::Plus::make(lch,rch);
+    }
+  }
+
+  FWPDS fwpdsDromDiffer(tslDiffRegMap DMap)
+  {
+    for(tslDiffRegMap::iterator it = DMap.begin(); it!=DMap.end(); ++it)
+    {
+      nodeList = Conc1LevelCIR::convertToNodeLi
+    }
+     for (tslRegExpMap::iterator it = tslRList.begin(); it!=tslRList.end(); ++it)
+         {
+	        RTG::regExpTListRefPtr rtList = Conc1LevelCIR::Differential(it->second);
+		       DMap[it->first] = rtList;
+
+  }
+*/
   void run_newton_merge_notensor_fwpds(WFA& outfa, FWPDS * originalPds = NULL)
   { 
     cout << "#################################################" << endl;
@@ -667,7 +747,14 @@ namespace goals {
 
     wali::set_verify_fwpds(false);
     
-    //regexps r = fpds->createRegExps();
+    WFA fa;
+    wali::Key acc = wali::getKeySpace()->getKey("accept");
+    fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, fpds->get_theZero()->one());
+    fa.setInitialState(getPdsState());
+    fa.addFinalState(acc);
+
+    fpds->poststarIGR(fa,outfa);
+    vector<reg_exp_t> r = fpds->getOutRegExps(fa,outfa);
     //E = convertToTSLRegExps(r);
     //D = createDifferentials(D);
     //fnew = fwpdsFromDiffs(D);
@@ -822,7 +909,7 @@ void * work(void *)
       run_newton_merge_notensor_fwpds(outfa);
       break;
     case 9:
-      run_newton_nomerge_tensor_fwpds(outfa);
+      run_newton_merge_tensor_fwpds(outfa);
       break;
     default:
       assert(0 && "I don't understand that goal!!!");

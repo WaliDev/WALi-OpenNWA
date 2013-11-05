@@ -13,7 +13,8 @@
 #include <iostream>
 #include <map>
 #include <set>
-# include <tr1/unordered_map>
+#include <tr1/unordered_map>
+#include <tr1/unordered_set>
 
 namespace wali {
 
@@ -21,6 +22,7 @@ namespace wali {
 
         class IntraGraph;
         class InterGraph;
+        class RegExp;
 
         class UnionFind {
             friend class InterGraph;
@@ -186,6 +188,7 @@ namespace wali {
             typedef std::ostream & (*PRINT_OP)(std::ostream &, int);
 
 
+
             /**
              * All the regular expressions created in different IntraGraphs
              * belong to a shared regular expression dag. This is the best
@@ -199,6 +202,7 @@ namespace wali {
 
 
             friend class SummaryGraph;
+	    typedef ref_ptr<graph::RegExp> reg_exp_t;
 
             typedef std::vector< int > Int1D;
             typedef std::vector< Int1D > Int2D;
@@ -261,6 +265,7 @@ namespace wali {
             void setESource(Transition t, wali::sem_elem_t wtAtCall, wali::sem_elem_t wtAfterCall);
 
             void setupInterSolution(std::list<Transition> *wt_required = NULL);
+            std::vector<reg_exp_t> getOutnodeRegExps();
 
             /**
              * @brief From the given TDG (The original InterGraph), create linearized TDGs corresponding
