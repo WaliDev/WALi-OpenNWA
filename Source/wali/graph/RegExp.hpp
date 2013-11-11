@@ -302,6 +302,30 @@ namespace wali {
                     return (type == Constant && value->equal(value->one()));
                 }
 
+		bool isConstant(){
+		  return (type == Constant);
+		}
+
+		bool isStar(){
+		  return (type == Star);
+		}
+
+		bool isExtend(){
+		  return (type == Extend);
+		}
+
+		bool isUpdatable(){
+		  return (type == Updatable);
+		}
+
+		bool isCombine(){
+		  return (type == Combine);
+		}
+
+		list<reg_exp_t> getChildren(){
+		  return children;
+		}
+
                 bool isCyclic();
                 sem_elem_t reevaluate();
 

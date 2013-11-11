@@ -23,6 +23,7 @@ walidomains_files = Split("""
 ./wali/domains/reach/Reach.cpp
 ./wali/domains/lh/LH.cpp
 ./wali/domains/lh/PhaseLH.cpp
+./wali/domains/name_weight/nameWeight.cpp
 """)
 
 env = BaseEnv.Clone()

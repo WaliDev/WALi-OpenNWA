@@ -116,6 +116,9 @@ BaseEnv['CMAKE'] = os.environ.get('CMAKE', 'cmake')
 assert 'CPPDEFINES' not in BaseEnv
 BaseEnv['CPPDEFINES'] = {
    'BOOST_NO_DEFAULTED_FUNCTIONS': 1,
+   '__TSL_REGEXP': 1,
+   'REGEXP_TEST': 1,
+   'EXPORT_GTR_SYMBOLS': 0,
 }
 
 
@@ -162,6 +165,8 @@ elif BaseEnv['compiler'] in ['cl', 'cl.EXE']:
        BaseEnv.Append(CCFLAGS=' /MTd')
     else:
        BaseEnv.Append(CCFLAGS=' /MT')
+
+BaseEnv.Append(CPPPATH = [os.path.join(WaliDir, '../../tsl-sandbox')])
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
 if os.path.isdir(os.path.join(WaliDir, '..', 'third-party', 'boost')):
     BaseEnv.Append(CPPPATH = [os.path.join(WaliDir, '..', 'third-party', 'boost')])

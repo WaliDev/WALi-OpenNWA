@@ -30,10 +30,18 @@
 #include "wali/util/Timer.hpp"
 // ::wali::cprover
 #include "BplToPds.hpp"
+#include "wali/domains/name_weight/nameWeight.hpp"
 //#include "PtoICFG.hpp"
 // TSL
 #include "gtr/src/lang/gtr_config.h"
 #include "tsl/cir/regexp/conc.1level.cir.hpp"
+#include "tsl/analysis_components/src/reinterps/emul/conc_extern_types.hpp"
+#include "tsl/analysis_components/src/reinterps/emul/conc_externs.hpp"
+#include "tsl/analysis_components/src/reinterps/emul/conc_extern_types.cpp"
+#include "tsl/analysis_components/src/reinterps/emul/conc_externs.cpp"
+#include "tsl/analysis_components/src/reinterps/emul/concrete_base_type_interp.hpp"
+#include "tsl/analysis_components/src/reinterps/emul/concrete_base_type_interp.cpp"
+#include "tsl/cir/regexp/conc.1level.cir.cpp"
 
 using namespace std;
 using namespace wali;
@@ -44,6 +52,15 @@ using namespace wali::wpds::fwpds;
 using namespace wali::wpds::nwpds;
 using namespace wali::cprover;
 using namespace wali::domains::binrel;
+using namespace wali::domains::name_weight;
+using namespace tsl_regexp;
+
+typedef wali::ref_ptr<graph::RegExp> reg_exp_t;
+typedef tsl_regexp::Conc1LevelRTG RTG;
+typedef tsl_regexp::Conc1LevelCIR CIR;
+typedef std::map<int,RTG::regExpRefPtr> tslRegExpMap;
+typedef std::map<int,RTG::regExpTRefPtr> tslRegExpTMap;
+typedef std::map<int,RTG::regExpTListRefPtr> tslDiffMap;
 
 #include <pthread.h>
 #include <signal.h>
@@ -62,10 +79,6 @@ extern "C"
 }
 
 namespace{
-
-typedef tsl_regexp::Conc1LevelRTG RTG;
-typedef tsl_regexp::Conc1LevelCIR CIR;
-typedef ref_ptr<graph::RegExp> reg_exp_t;
 
   class WFACompare : public wali::wfa::ConstTransFunctor
   {
@@ -367,7 +380,7 @@ typedef ref_ptr<graph::RegExp> reg_exp_t;
 
 
 namespace goals {
-
+  
   short dump = false;
   char * mainProc = NULL, * errLbl = NULL;
   string fname;
@@ -659,79 +672,173 @@ namespace goals {
     delete npds;
   }
 
-/*
-  tslDiffRegMap createDifferentials(tslRegExpMap eMap){
-    tslDiffRegMap DMap = new TSLDiffRegMap();
-    for (tslRegExpMap::iterator it = tslRList.begin(); it!=tslRList.end(); ++it)
+
+  void createDifferentials(tslRegExpMap eMap, tslDiffMap & DMap){
+    for (tslRegExpMap::iterator it = eMap.begin(); it!=eMap.end(); ++it)
     {
-       RTG::regExpTListRefPtr rtList = Conc1LevelCIR::Differential(it->second);
+       RTG::regExpTListRefPtr rtList = CIR::TDifferential(it->second);
        DMap[it->first] = rtList;
     }
   }
 
-  tslRegExpMap convertToTSLRegExps(std::map<pPointer,RegExp> rList)
+  RTG::regExpTRefPtr convertToRegExpT(reg_exp_t exp, tslRegExpMap eMap, tslDiffMap DMap)
   {
-    tslRegExpMap EMap = new TSLRegExpMap();
-    for (std::map<pPointer,RegExp>::iterator it=rList.begin(); it!=rList.end(); ++it)
+    if(exp->isConstant())
     {
-      RTG::regExpRefPtr rExp = convertToRegExp(it->second);
-      EMap[it->first] = rExp;
+      NameWeight * nw = static_cast<wali::domains::name_weight::NameWeight*>(exp->get_weight().get_ptr());
+      int a = nw->getName1();
+      int b = nw->getName2();
+      RTG::regExpTRefPtr d = RTG::OneT::make(); //CIR::getTRegFromList(DMapp[b],a);
+      return RTG::PlusT::make(d, RTG::TensorTranspose::make(RTG::One::make(),eMap[a]));
+    }else if (exp->isUpdatable()){
+      int node_no = exp->updatableNumber();
+      return RTG::VarT::make(CBTI::INT32(node_no));
+   } else if (exp->isStar()){
+        list<reg_exp_t> children = exp->getChildren();
+        RTG::regExpTRefPtr c = convertToRegExpT(children.front(), eMap, DMap);
+        return RTG::KleeneT::make(c);
+    } else if (exp->isExtend()){
+        list<reg_exp_t> children = exp->getChildren();
+        list<reg_exp_t>::iterator ch = children.begin();
+        RTG::regExpTRefPtr rch = convertToRegExpT(*ch, eMap, DMap);
+        ch++;
+        RTG::regExpTRefPtr lch = convertToRegExpT(*ch, eMap, DMap);
+        return RTG::DotT::make(lch,rch);
+    } else if (exp->isCombine()){
+        list<reg_exp_t> children = exp->getChildren();
+        list<reg_exp_t>::iterator ch = children.begin();
+        RTG::regExpTRefPtr rch = convertToRegExpT(*ch, eMap, DMap);
+        ch++;
+        RTG::regExpTRefPtr lch = convertToRegExpT(*ch, eMap, DMap);
+        return RTG::PlusT::make(lch,rch);
     }
-    return EMap;
   }
 
-  RTG::regExpRegPtr convertToRegExp(RegExp exp)
+  RTG::regExpRefPtr convertToRegExp(reg_exp_t exp)
   {
-    switch(exp->type){
-      case Constant:
-        w = exp->weight();
-        if(w->isOne())
-          return RTG::One::make();
-        else if (w->isZero())
-          return RTG::Zero::make();
-	else {
-	  RTG::sem_elem_wrapper w = exp->weight()*
-          return RTG::Weight::make(w);
-	}
-	break;
-      case Updateable:
-        int node_no = exp->updateable_node_no();
+    if(exp->isConstant())
+    {
+      if(exp->isOne())
+        return RTG::One::make();
+      else if (exp->isZero())
+        return RTG::Zero::make();
+      else {
+	sem_elem_t w = exp->get_weight();
+	CONC_EXTERN_TYPES::sem_elem_wrapperRefPtr * wt = new CONC_EXTERN_TYPES::sem_elem_wrapper(w);
+        return RTG::Weight::make(*wt);
+      }
+    } else if (exp->isUpdatable()){
+        int node_no = exp->updatableNumber();
         return RTG::Var::make(CBTI::INT32(node_no));
-      case Star:
-        RTG::regExpRegPtr c = convertToRegExp(exp->children.front());
+    } else if (exp->isStar()){
+        list<reg_exp_t> children = exp->getChildren();
+        RTG::regExpRefPtr c = convertToRegExp(children.front());
 	return RTG::Kleene::make(c);
-        break;
-      case Extend:
-        list<reg_exp_t>::iterator ch;
-	ch = children.begin();
-	rch = convertToRegExp(*ch);
+    } else if (exp->isExtend()){
+        list<reg_exp_t> children = exp->getChildren();
+	list<reg_exp_t>::iterator ch = children.begin();
+	RTG::regExpRefPtr rch = convertToRegExp(*ch);
 	ch++;
-	lch = convertToRegExp(*ch);
+	RTG::regExpRefPtr lch = convertToRegExp(*ch);
 	return RTG::Dot::make(lch,rch);
-        break;
-      case Combine:
-        list<reg_exp_t>::iterator ch;
-        ch = children.begin();
-        rch = convertToRegExp(*ch);
+    } else if (exp->isCombine()){
+        list<reg_exp_t> children = exp->getChildren();
+        list<reg_exp_t>::iterator ch = children.begin();
+        RTG::regExpRefPtr rch = convertToRegExp(*ch);
         ch++;
-        lch = convertToRegExp(*ch);
+        RTG::regExpRefPtr lch = convertToRegExp(*ch);
         return RTG::Plus::make(lch,rch);
     }
   }
 
-  FWPDS fwpdsDromDiffer(tslDiffRegMap DMap)
+
+  void convertToTSLRegExps(std::map<int,reg_exp_t> rList, tslRegExpMap & EMap)
   {
-    for(tslDiffRegMap::iterator it = DMap.begin(); it!=DMap.end(); ++it)
+    for (std::map<int,reg_exp_t>::iterator it=rList.begin(); it!=rList.end(); ++it)
     {
-      nodeList = Conc1LevelCIR::convertToNodeLi
+      RTG::regExpRefPtr rExp = convertToRegExp(it->second);
+      EMap[it->first] = rExp;
     }
-     for (tslRegExpMap::iterator it = tslRList.begin(); it!=tslRList.end(); ++it)
-         {
-	        RTG::regExpTListRefPtr rtList = Conc1LevelCIR::Differential(it->second);
-		       DMap[it->first] = rtList;
+  }
+
+  void convertToTSLRegExpsT(std::map<int,reg_exp_t> rList, tslDiffMap DMap, tslRegExpMap EMap, tslRegExpTMap & MMap)
+  {
+    for (std::map<int,reg_exp_t>::iterator it=rList.begin(); it!=rList.end(); ++it)
+    {
+      RTG::regExpTRefPtr rExp = convertToRegExpT(it->second, EMap, DMap);
+      MMap[it->first] = rExp;
+    }
+  }
+
+  void printTSLRegExps(tslRegExpMap rMap)
+  {
+    for (tslRegExpMap::iterator it = rMap.begin(); it!=rMap.end(); ++it)
+    {
+      cout << it->first << ": ";
+      it->second.print(cout);
+      cout << "\n";
+    }
+  }
+
+  vector<int> getVarList(RTG::regExpTListRefPtr tList)
+  {
+    vector<int> srcList;
+    int listSize = 0; // CIR::getTListLength(tList);
+    for (int i = 0; i < listSize; i++)
+    {
+      int varNum = 0; //CIR::getVar(tList, i);
+      srcList.push_back(varNum);
+    }
+    return srcList;
+  }
+
+  static wali::Key stt()
+  {
+    return getKey("Unique State Name 2");
+  }
+
+  static wali::Key stk(int k)
+  {
+    return getKey(k);
+  }
+
+  void fwpdsFromDifferential(FWPDS * pds, tslDiffMap DMap)
+  {
+    for(tslDiffMap::iterator it = DMap.begin(); it!=DMap.end(); ++it)
+    {
+      int dummy;
+      int tgt = it->first;
+      vector<int> srcList = getVarList(it->second);
+      for(int i = 0; i != srcList.size(); i++)
+      {
+        int src = srcList.at(i);
+        pds->add_rule(stt(), stk(src),stt(),stk(tgt), new NameWeight(src,tgt));
+      }
+      pds->add_rule(stt(), stk(dummy), stt(), stk(tgt), new NameWeight(dummy,tgt));
+    }
 
   }
-*/
+
+  void runNewton(tslRegExpTMap Mmap, RTG::assignmentListRefPtr aList)
+  {
+    bool newton = true;
+    while(newton == true){
+      RTG::assignmentListRefPtr aOld = aList;
+      tslRegExpTMap::iterator agnIt;
+      for(agnIt = Mmap.begin(); agnIt != Mmap.end(); agnIt++)
+      {
+        int var = agnIt->first;
+        CONC_EXTERN_TYPES::sem_elem_wrapperRefPtr newVal = CIR::evalT(agnIt->second, aOld);
+        //aList = CIR::updateAssignmentList(aList, CBTI_INT32(var), newVal);
+      }
+      RTG::_evalRegExpHash().clear();
+      //if(CIR::checkEqual(aOld,aList))
+      //{
+        newton = false;
+      //}
+    }
+  }
+
   void run_newton_merge_notensor_fwpds(WFA& outfa, FWPDS * originalPds = NULL)
   { 
     cout << "#################################################" << endl;
@@ -747,41 +854,63 @@ namespace goals {
 
     wali::set_verify_fwpds(false);
     
+    fpds->useNewton(false);
     WFA fa;
     wali::Key acc = wali::getKeySpace()->getKey("accept");
     fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, fpds->get_theZero()->one());
     fa.setInitialState(getPdsState());
     fa.addFinalState(acc);
 
-    fpds->poststarIGR(fa,outfa);
-    vector<reg_exp_t> r = fpds->getOutRegExps(fa,outfa);
-    //E = convertToTSLRegExps(r);
-    //D = createDifferentials(D);
-    //fnew = fwpdsFromDiffs(D);
-    //regexps rnew = fnew->createRegExps();
-    //M = convertToRegExpT(rnew,D,E);
-    //assignment = runNewton(M);
-    fpds->useNewtonNoTensor(true);
+    int dummy = -1;
+    cout << "Step 0 \n";
+    map<int,reg_exp_t> rMap = fpds->getOutRegExps(fa,outfa,true);
+    cout << "Step 1 \n";
+    vector<reg_exp_t>::iterator ait;
+    tslRegExpMap E;
+    convertToTSLRegExps(rMap,E);
+    printTSLRegExps(E);
+    cout << "Step 2 \n";
+    tslDiffMap D;
+    createDifferentials(E,D);
+    FWPDS * fnew = new FWPDS();
+    fwpdsFromDifferential(fnew, D);
+    WFA fa2;
+    wali::Key acc2 = wali::getKeySpace()->getKey("accept2");
+    fa2.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc2, fnew->get_theZero()->one());
+    fa2.setInitialState(getPdsState());
+    fa2.addFinalState(acc2);
+    WFA outfa2;
+    map<int,reg_exp_t> rNew = fnew->getOutRegExps(fa2,outfa2,false);
+    tslRegExpTMap M;
+    convertToTSLRegExpsT(rNew,D,E,M);
+    RTG::assignmentListRefPtr aList = RTG::aListNull::make();
+    for (tslRegExpTMap::iterator mIt = M.begin(); mIt != M.end(); mIt++)
+    {
+      //RTG::assignmentListRefPtr aList = initAssignmentList(CBTI::INT32(mIt->first),aList);
+    }
+    runNewton(M,aList);
 
 #if defined(BINREL_STATS)
-    con->resetStats(); 
+    //con->resetStats(); 
 #endif
-    wali::util::Timer * t = new wali::util::Timer("newton_merge_notensor_fwpds poststar",cout);
-    t->measureAndReport =false;
-    doPostStar(fpds, outfa);
-    sem_elem_t wt = computePathSummary(fpds, outfa);
+    //wali::util::Timer * t = new wali::util::Timer("newton_merge_notensor_fwpds poststar",cout);
+    //t->measureAndReport =false;
+    //doPostStar(fpds, outfa);
+    //fpds->poststarIGR(fa,outfa);
+    //fpds->getOutRegExps(fa,outfa);
+    /*sem_elem_t wt = computePathSummary(fpds, outfa);
     if(wt->equal(wt->zero()))
       cout << "[Newton Compare] newton_merge_notensor_fwpds ==> error not reachable" << endl;
     else{
       cout << "[Newton Compare] newton_merge_notensor_fwpds ==> error reachable" << endl;
-    }
-    t->print(std::cout << "[Newton Compare] Time taken by newton_merge_notensor_fwpds poststar: ") << endl;
-    delete t;
+    }*/
+    //t->print(std::cout << "[Newton Compare] Time taken by newton_merge_notensor_fwpds poststar: ") << endl;
+    //delete t;
 
 #if defined(BINREL_STATS)
-    con->printStats(cout);
+    //con->printStats(cout);
 #endif //if defined(BINREL_STATS)
-    delete fpds;
+    //delete fpds;
   }
 
   void run_newton_merge_tensor_fwpds(WFA& outfa, FWPDS * originalPds = NULL)

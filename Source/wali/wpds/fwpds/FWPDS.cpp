@@ -376,9 +376,10 @@ void FWPDS::poststar( wfa::WFA const & input, wfa::WFA& output ) {
 }
 
 
-vector<reg_exp_t> FWPDS::getOutRegExps(wfa::WFA const & input, wfa::WFA& output)
+map<int,reg_exp_t> FWPDS::getOutRegExps(wfa::WFA const & input, wfa::WFA& output, bool first)
 {
 
+  map<int,reg_exp_t> regE;
   EWPDS::poststarSetupFixpoint(input,output);
 
   // If theZero is invalid then no rules have
@@ -386,6 +387,7 @@ vector<reg_exp_t> FWPDS::getOutRegExps(wfa::WFA const & input, wfa::WFA& output)
   // can be done.
   if(!theZero.is_valid()) {
     worklist->clear();
+    return regE;
   }
 
   // cache semiring 1
@@ -406,7 +408,10 @@ vector<reg_exp_t> FWPDS::getOutRegExps(wfa::WFA const & input, wfa::WFA& output)
   // Build the InterGraph using EWPDS saturation without weights
   EWPDS::poststarComputeFixpoint(output);
 
-  vector<reg_exp_t> regE = interGr->getOutnodeRegExps();
+  //regE = interGr->getOutnodeRegExps(first);
+  //Get RegExps from wfa
+  
+  map<int,reg_exp_t>::iterator it;
   return regE;
 }
 

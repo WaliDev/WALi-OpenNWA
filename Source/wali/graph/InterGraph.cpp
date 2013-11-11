@@ -1152,8 +1152,9 @@ namespace wali {
 #endif 
         }
 
-	vector<reg_exp_t> InterGraph::getOutnodeRegExps()
+	map<int,reg_exp_t> InterGraph::getOutnodeRegExps(bool first)
 	{
+	  dag->startSatProcess(sem);
            // First, find the IntraGraphs
           int n = nodes.size();
           int i;
@@ -1220,11 +1221,26 @@ namespace wali {
           }
 
           // Setup Worklist
-          vector<reg_exp_t> outNodeRegExps;
+          map <int,reg_exp_t> outNodeRegExps;
           for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
             (*gr_it)->setupIntraSolution(false);
-            for(list<int>::const_iterator cit = (*gr_it)->out_nodes_intra->begin(); cit != (*gr_it)->out_nodes_intra->end(); ++cit)
-              outNodeRegExps.push_back((*gr_it)->nodes[*cit].regexp);
+	    if(first)
+	    {
+	      for(list<int>::const_iterator cit = (*gr_it)->out_nodes_intra->begin(); cit != (*gr_it)->out_nodes_intra->end(); ++cit){
+                int label = (*gr_it)->nodes[*cit].trans.stack;
+		outNodeRegExps[label] = (*gr_it)->nodes[*cit].regexp;
+	      }
+	    }
+	    else
+	    {
+	      for(vector<IntraGraphNode>::const_iterator nit = (*gr_it)->nodes.begin(); nit != (*gr_it)->nodes.end(); ++nit){
+	        if((*nit).node_no != -1)
+		{
+		  int label = (*nit).trans.stack;
+		  outNodeRegExps[label] = (*nit).regexp;
+		}
+	      }
+	    }
 	  }
 
 	  return outNodeRegExps;
@@ -1308,7 +1324,6 @@ namespace wali {
 #endif
           for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
             (*gr_it)->setupIntraSolution(false);
-	    cout << "PRINT!";
 #if defined(PPP_DBG) && PPP_DBG >= 0
             for(list<int>::const_iterator cit = (*gr_it)->out_nodes_intra->begin(); cit != (*gr_it)->out_nodes_intra->end(); ++cit)
               outNodeRegExps.push_back((*gr_it)->nodes[*cit].regexp);

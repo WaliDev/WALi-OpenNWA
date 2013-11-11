@@ -1,5 +1,5 @@
-#ifndef wN_binrel_BINREL_GUARD
-#define wN_binrel_BINREL_GUARD 1
+#ifndef wali_binrel_BINREL_GUARD
+#define wali_binrel_BINREL_GUARD 1
 
 /**
  * @author Nicholas Kidd
