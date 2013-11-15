@@ -1360,8 +1360,10 @@ binrel_t BinRel::Eq13Project() const
     bdd id = fdd_equals(varInfo->tensor1Rhs, varInfo->tensor2Rhs);
     rel1 = rel1 & id;
     rel1 = bdd_exist(rel1, fdd_ithset(varInfo->tensor1Rhs) & fdd_ithset(varInfo->tensor2Rhs));
+    rel1 = bdd_replace(rel1, con->move2BaseTwisted.get());
+    rel1 = bdd_exist(rel1, fdd_ithset(varInfo->tensor1Lhs) & fdd_ithset(varInfo->tensor2Lhs));
   }
-  bdd c = bdd_replace(rel1, con->move2BaseTwisted.get());
+  bdd c = rel1;
 #endif
   binrel_t ret = new BinRel(con,c,false);
   if(ret->isZero())
@@ -1393,8 +1395,10 @@ binrel_t BinRel::Eq24Project() const
     bdd id = fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
     rel1 = rel1 & id;
     rel1 = bdd_exist(rel1, fdd_ithset(varInfo->tensor1Lhs) & fdd_ithset(varInfo->tensor2Lhs));
+    rel1 = bdd_replace(rel1, con->move2BaseTwisted24.get());
+    rel1 = bdd_exist(rel1, fdd_ithset(varInfo->tensor1Rhs) & fdd_ithset(varInfo->tensor2Rhs));
   }
-  bdd c = bdd_replace(rel1, con->move2BaseTwisted24.get());
+  bdd c = rel1;
 #endif
   binrel_t ret = new BinRel(con,c,false);
   if(ret->isZero())

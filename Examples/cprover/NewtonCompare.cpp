@@ -555,7 +555,6 @@ namespace goals {
 #endif
     wali::util::GoodTimer * t = new wali::util::GoodTimer("FWPDS poststar");
     //t->measureAndReport =false;
-    t->start();
     doPostStar(fpds, outfa);
     outfa.path_summary_iterative_original(outfa.getSomeWeight()->one());
     //sem_elem_t wt = computePathSummary(fpds, outfa);
@@ -597,7 +596,6 @@ namespace goals {
 #endif
     wali::util::GoodTimer * t = new wali::util::GoodTimer("EWPDS poststar");
     //t->measureAndReport =false;
-    t->start();
     doPostStar(pds, outfa);
     outfa.path_summary_iterative_original(outfa.getSomeWeight()->one());
     //sem_elem_t wt = computePathSummary(pds, outfa);
@@ -970,7 +968,6 @@ namespace goals {
     //fpds->add_rule(st1(),getKey(mainProc),st1(),fpds->get_theZero()->one());
 
     wali::util::GoodTimer * t = new wali::util::GoodTimer("temp");
-    t->start();
     WFA fa;
     wali::Key acc = wali::getKeySpace()->getKey("accept");
     fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, fpds->get_theZero()->one());

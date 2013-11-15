@@ -86,7 +86,7 @@ namespace wali {
       }
       
       void start() {
-        assert((_current_start == 0) ^ (_depth > 0));
+        assert((_current_start == 0) && (_depth == 0) && "Attempting to start a non-stopped timer");
         ++_depth;
         if (_depth == 1) {
           _current_start = details::now();
