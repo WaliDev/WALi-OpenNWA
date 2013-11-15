@@ -246,6 +246,7 @@ BddContext::BddContext(int bddMemSize, int cacheSize) :
   move2Tensor2 = BddPairPtr(bdd_newpair());
   move2Base = BddPairPtr(bdd_newpair());
   move2BaseTwisted = BddPairPtr(bdd_newpair());
+  move2BaseTwisted24 = BddPairPtr(bdd_newpair());
 #if (NWA_DETENSOR == 1)
   rawMove2Tensor2 = BddPairPtr(bdd_newpair());
 #endif
@@ -293,6 +294,7 @@ BddContext::BddContext(const BddContext& other) :
   move2Tensor2(other.move2Tensor2),
   move2Base(other.move2Base),
   move2BaseTwisted(other.move2BaseTwisted),
+  move2BaseTwisted24(other.move2BaseTwisted24),
   baseSecBddContextSet(other.baseSecBddContextSet),
   tensorSecBddContextSet(other.tensorSecBddContextSet),
   commonBddContextSet23(other.commonBddContextSet23),
@@ -334,6 +336,7 @@ BddContext& BddContext::operator = (const BddContext& other)
     move2Tensor2=other.move2Tensor2;
     move2Base=other.move2Base;
     move2BaseTwisted=other.move2BaseTwisted;
+    move2BaseTwisted24=other.move2BaseTwisted24;
     baseSecBddContextSet=other.baseSecBddContextSet;
     tensorSecBddContextSet=other.tensorSecBddContextSet;
     commonBddContextSet23=other.commonBddContextSet23;
@@ -362,6 +365,7 @@ BddContext::~BddContext()
   move2Tensor2.reset();
   move2Base.reset();
   move2BaseTwisted.reset();
+  move2BaseTwisted24.reset();
 #if (NWA_DETENSOR == 1)
   rawMove2Tensor2.reset();
 #endif
@@ -842,6 +846,8 @@ void BddContext::setupCachedBdds()
   fdd_setpairs(move2Base.get(), tensor2Rhs, baseRhs, this->size());
   fdd_setpairs(move2BaseTwisted.get(), tensor1Lhs, baseLhs, this->size());
   fdd_setpairs(move2BaseTwisted.get(), tensor2Lhs, baseRhs, this->size());
+  fdd_setpairs(move2BaseTwisted24.get(), tensor1Rhs, baseLhs, this->size());
+  fdd_setpairs(move2BaseTwisted24.get(), tensor2Rhs, baseRhs, this->size());
 
   // Update static bdds
   baseSecBddContextSet = fdd_makeset(baseRhs, this->size());
@@ -1004,6 +1010,8 @@ void BddContext::addIntVar(std::string name, unsigned size)
   fdd_setpair(move2Base.get(), varInfo->tensor2Rhs, varInfo->baseRhs);
   fdd_setpair(move2BaseTwisted.get(), varInfo->tensor1Lhs, varInfo->baseLhs);
   fdd_setpair(move2BaseTwisted.get(), varInfo->tensor2Lhs, varInfo->baseRhs);
+  fdd_setpair(move2BaseTwisted24.get(), varInfo->tensor1Rhs, varInfo->baseLhs);
+  fdd_setpair(move2BaseTwisted24.get(), varInfo->tensor2Rhs, varInfo->baseRhs);
   //update static bdds
   baseSecBddContextSet = baseSecBddContextSet & fdd_ithset(varInfo->baseRhs);
   tensorSecBddContextSet = tensorSecBddContextSet & fdd_ithset(varInfo->tensor1Rhs);
@@ -1363,6 +1371,40 @@ binrel_t BinRel::Eq13Project() const
   return ret;
 }
 
+binrel_t BinRel::Eq24Project() const
+{
+#ifndef BINREL_HASTY
+  if(!isTensored){
+    *waliErr << "[WARNING] " << "Attempted to detensor untensored weight."
+      << endl;
+    print(*waliErr) << endl;
+    assert(false);
+    return new BinRel(con,bddfalse, false);
+  }
+#endif
+#if (DETENSOR_TOGETHER == 1)
+  bdd rel1 = rel & con->commonBddContextId13;
+  bdd rel2 = bdd_exist(rel1, con->commonBddContextSet13);
+  bdd c = bdd_replace(rel2, con->move2BaseTwisted24.get());
+#else
+  bdd rel1 = rel;
+  for(std::map<const std::string, bddinfo_t>::const_iterator citer = con->begin(); citer != con->end(); ++citer){
+    bddinfo_t varInfo = (*citer).second;
+    bdd id = fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
+    rel1 = rel1 & id;
+    rel1 = bdd_exist(rel1, fdd_ithset(varInfo->tensor1Lhs) & fdd_ithset(varInfo->tensor2Lhs));
+  }
+  bdd c = bdd_replace(rel1, con->move2BaseTwisted24.get());
+#endif
+  binrel_t ret = new BinRel(con,c,false);
+  if(ret->isZero())
+    return static_cast<BinRel*>(ret->zero().get_ptr());
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  return ret;
+}
+
+
 
 
 // ////////////////////////////
@@ -1470,6 +1512,8 @@ wali::sem_elem_tensor_t BinRel::detensorTranspose()
   if(ret->isOne())
     return static_cast<BinRel*>(ret->one().get_ptr());
   return ret;
+#elif (TSL_DETENSOR == 1)
+  return Eq24Project();
 #else
   return Eq13Project();
 #endif

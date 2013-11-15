@@ -42,6 +42,7 @@
 #include "tsl/analysis_components/src/reinterps/emul/concrete_base_type_interp.hpp"
 #include "tsl/analysis_components/src/reinterps/emul/concrete_base_type_interp.cpp"
 #include "tsl/cir/regexp/conc.1level.cir.cpp"
+#include "NewtonCompare.hpp"
 
 using namespace std;
 using namespace wali;
@@ -77,6 +78,8 @@ extern "C"
     }
   }
 }
+
+BddContext * con = NULL;
 
 namespace{
 
@@ -381,12 +384,11 @@ namespace{
 
 namespace goals {
   
+  std::set<pair<std::pair<int,int>,int> > globalEpsilon;
   short dump = false;
   char * mainProc = NULL, * errLbl = NULL;
   string fname;
   prog * pg;
-  BddContext * con = NULL;
-
   
   void doPostStar(WPDS * pds, WFA& outfa)
   {
@@ -532,7 +534,7 @@ namespace goals {
     delete npds;
   }
 
-  void runFwpds(WFA& outfa, FWPDS * originalPds = NULL)
+  double runFwpds(WFA& outfa, FWPDS * originalPds = NULL)
   { 
     cout << "#################################################" << endl;
     cout << "[Newton Compare] Goal IV: end-to-end FWPDS run" << endl;
@@ -542,7 +544,7 @@ namespace goals {
     else{
       fpds = new FWPDS();
       //con = pds_from_prog_with_tensor_merge(fpds, pg);
-      con = pds_from_prog_with_meet_merge(fpds, pg);
+      con = pds_from_prog(fpds, pg);
     }
 
     wali::set_verify_fwpds(false);
@@ -551,25 +553,32 @@ namespace goals {
 #if defined(BINREL_STATS)
     con->resetStats(); 
 #endif
-    wali::util::Timer * t = new wali::util::Timer("FWPDS poststar",cout);
-    t->measureAndReport =false;
+    wali::util::GoodTimer * t = new wali::util::GoodTimer("FWPDS poststar");
+    //t->measureAndReport =false;
+    t->start();
     doPostStar(fpds, outfa);
-    sem_elem_t wt = computePathSummary(fpds, outfa);
-    if(wt->equal(wt->zero()))
+    outfa.path_summary_iterative_original(outfa.getSomeWeight()->one());
+    //sem_elem_t wt = computePathSummary(fpds, outfa);
+    /*if(wt->equal(wt->zero()))
       cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
     else{
       cout << "[Newton Compare] FWPDS ==> error reachable" << endl;
-    }
-    t->print(std::cout << "[Newton Compare] Time taken by FWPDS poststar: ") << endl;
+    }*/
+    //t->print(std::cout << "[Newton Compare] Time taken by FWPDS poststar: ") << endl;
+    //delete t;
+    t->stop();
+    double totTime = t->total_time();
     delete t;
+    return totTime;
 
 #if defined(BINREL_STATS)
     con->printStats(cout);
 #endif //if defined(BINREL_STATS)
     delete fpds;
+    return totTime; 
   }
 
-  void runEwpds(WFA& outfa, EWPDS * originalPds = NULL)
+  double runEwpds(WFA& outfa, EWPDS * originalPds = NULL)
   {
     cout << "#################################################" << endl;
     cout << "[Newton Compare] Goal VI: end-to-end EWPDS run" << endl;
@@ -578,7 +587,7 @@ namespace goals {
       pds = new EWPDS(*originalPds);
     else{
       pds = new EWPDS();
-      con = pds_from_prog_with_meet_merge(pds, pg);
+      con = pds_from_prog(pds,pg); //_with_meet_merge(pds, pg);
     }
 
     //pds->print(std::cout) << endl;
@@ -586,24 +595,30 @@ namespace goals {
 #if defined(BINREL_STATS)
     con->resetStats();
 #endif
-    wali::util::Timer * t = new wali::util::Timer("EWPDS poststar",cout);
-    t->measureAndReport =false;
+    wali::util::GoodTimer * t = new wali::util::GoodTimer("EWPDS poststar");
+    //t->measureAndReport =false;
+    t->start();
     doPostStar(pds, outfa);
-    sem_elem_t wt = computePathSummary(pds, outfa);
+    outfa.path_summary_iterative_original(outfa.getSomeWeight()->one());
+    //sem_elem_t wt = computePathSummary(pds, outfa);
     //wt->print(std::cout);
-
-    if(wt->equal(wt->zero()))
+    /*if(wt->equal(wt->zero()))
       cout << "[Newton Compare] EWPDS ==> error not reachable" << endl;
     else{
       cout << "[Newton Compare] EWPDS ==> error reachable" << endl;
     }
     t->print(std::cout << "[Newton Compare] Time taken by EWPDS poststar: ") << endl;
-    delete t;
-
+    */
+    //delete t;
+    t->stop();
 #if defined(BINREL_STATS)
     con->printStats(cout);
 #endif //if defined(BINREL_STATS)
+    double totTime = t->total_time();
+    cout << totTime;
+    delete t;
     delete pds;
+    return totTime;
   }
 
 
@@ -688,8 +703,18 @@ namespace goals {
       NameWeight * nw = static_cast<wali::domains::name_weight::NameWeight*>(exp->get_weight().get_ptr());
       int a = nw->getName1();
       int b = nw->getName2();
-      RTG::regExpTRefPtr d = RTG::OneT::make(); //CIR::getTRegFromList(DMapp[b],a);
-      return RTG::PlusT::make(d, RTG::TensorTranspose::make(RTG::One::make(),eMap[a]));
+      if (a == -1){
+        if(b == -1){
+	  return RTG::OneT::make();
+	} else {
+          RTG::regExpRefPtr d = eMap[b];
+	  return RTG::TensorTranspose::make(RTG::One::make(),d);
+	}
+      }
+      else {
+	RTG::regExpTRefPtr d = CIR::getTFromRegList(DMap[b],a);
+        return d;
+      }
     }else if (exp->isUpdatable()){
       int node_no = exp->updatableNumber();
       return RTG::VarT::make(CBTI::INT32(node_no));
@@ -700,21 +725,21 @@ namespace goals {
     } else if (exp->isExtend()){
         list<reg_exp_t> children = exp->getChildren();
         list<reg_exp_t>::iterator ch = children.begin();
-        RTG::regExpTRefPtr rch = convertToRegExpT(*ch, eMap, DMap);
-        ch++;
         RTG::regExpTRefPtr lch = convertToRegExpT(*ch, eMap, DMap);
+        ch++;
+        RTG::regExpTRefPtr rch = convertToRegExpT(*ch, eMap, DMap);
         return RTG::DotT::make(lch,rch);
     } else if (exp->isCombine()){
         list<reg_exp_t> children = exp->getChildren();
         list<reg_exp_t>::iterator ch = children.begin();
-        RTG::regExpTRefPtr rch = convertToRegExpT(*ch, eMap, DMap);
-        ch++;
         RTG::regExpTRefPtr lch = convertToRegExpT(*ch, eMap, DMap);
+        ch++;
+        RTG::regExpTRefPtr rch = convertToRegExpT(*ch, eMap, DMap);
         return RTG::PlusT::make(lch,rch);
     }
   }
 
-  RTG::regExpRefPtr convertToRegExp(reg_exp_t exp)
+  RTG::regExpRefPtr convertToRegExp(reg_exp_t exp, map<int,int> uMap, map<int,int> oMap)
   {
     if(exp->isConstant())
     {
@@ -723,40 +748,43 @@ namespace goals {
       else if (exp->isZero())
         return RTG::Zero::make();
       else {
-	sem_elem_t w = exp->get_weight();
-	CONC_EXTERN_TYPES::sem_elem_wrapperRefPtr * wt = new CONC_EXTERN_TYPES::sem_elem_wrapper(w);
+	binrel_t w = dynamic_cast<BinRel*>(exp->get_weight().get_ptr());
+	EXTERN_TYPES::sem_elem_wrapperRefPtr * wt = new EXTERN_TYPES::sem_elem_wrapper(w);
         return RTG::Weight::make(*wt);
       }
     } else if (exp->isUpdatable()){
         int node_no = exp->updatableNumber();
-        return RTG::Var::make(CBTI::INT32(node_no));
+	int mNum = oMap[uMap[node_no]];
+	return RTG::Var::make(CBTI::INT32(mNum));
     } else if (exp->isStar()){
         list<reg_exp_t> children = exp->getChildren();
-        RTG::regExpRefPtr c = convertToRegExp(children.front());
+        RTG::regExpRefPtr c = convertToRegExp(children.front(),uMap,oMap);
 	return RTG::Kleene::make(c);
     } else if (exp->isExtend()){
         list<reg_exp_t> children = exp->getChildren();
 	list<reg_exp_t>::iterator ch = children.begin();
-	RTG::regExpRefPtr rch = convertToRegExp(*ch);
+	RTG::regExpRefPtr lch = convertToRegExp(*ch, uMap,oMap);
 	ch++;
-	RTG::regExpRefPtr lch = convertToRegExp(*ch);
+	RTG::regExpRefPtr rch = convertToRegExp(*ch, uMap,oMap);
 	return RTG::Dot::make(lch,rch);
     } else if (exp->isCombine()){
         list<reg_exp_t> children = exp->getChildren();
         list<reg_exp_t>::iterator ch = children.begin();
-        RTG::regExpRefPtr rch = convertToRegExp(*ch);
+        RTG::regExpRefPtr lch = convertToRegExp(*ch, uMap,oMap);
         ch++;
-        RTG::regExpRefPtr lch = convertToRegExp(*ch);
+        RTG::regExpRefPtr rch = convertToRegExp(*ch, uMap,oMap);
         return RTG::Plus::make(lch,rch);
     }
   }
 
 
-  void convertToTSLRegExps(std::map<int,reg_exp_t> rList, tslRegExpMap & EMap)
+  void convertToTSLRegExps(std::pair<std::map<int,reg_exp_t>,std::map<int,int> > rPair, std::map<int,int> oMap, tslRegExpMap & EMap)
   {
+    std::map<int,reg_exp_t> rList = rPair.first;
+    std::map<int,int> uMap = rPair.second;
     for (std::map<int,reg_exp_t>::iterator it=rList.begin(); it!=rList.end(); ++it)
     {
-      RTG::regExpRefPtr rExp = convertToRegExp(it->second);
+      RTG::regExpRefPtr rExp = convertToRegExp(it->second, uMap, oMap);
       EMap[it->first] = rExp;
     }
   }
@@ -765,8 +793,10 @@ namespace goals {
   {
     for (std::map<int,reg_exp_t>::iterator it=rList.begin(); it!=rList.end(); ++it)
     {
-      RTG::regExpTRefPtr rExp = convertToRegExpT(it->second, EMap, DMap);
-      MMap[it->first] = rExp;
+      if (it->first != -1){
+        RTG::regExpTRefPtr rExp = convertToRegExpT(it->second, EMap, DMap);
+        MMap[it->first] = rExp;
+      }
     }
   }
 
@@ -780,21 +810,42 @@ namespace goals {
     }
   }
 
-  vector<int> getVarList(RTG::regExpTListRefPtr tList)
+  void printTSLDifferentials(tslDiffMap dMap)
   {
-    vector<int> srcList;
-    int listSize = 0; // CIR::getTListLength(tList);
-    for (int i = 0; i < listSize; i++)
+    for (tslDiffMap::iterator it = dMap.begin(); it!=dMap.end(); ++it)
     {
-      int varNum = 0; //CIR::getVar(tList, i);
-      srcList.push_back(varNum);
+      cout << it->first << ": ";
+      it->second.print(cout);
+      cout << "\n";
+    }
+  }
+
+  void printTSLTExp(tslRegExpTMap tMap)
+  {
+    for (tslRegExpTMap::iterator it = tMap.begin(); it!=tMap.end(); ++it)
+    {
+      cout << it->first << ": ";
+      it->second.print(cout);
+      cout << "\n";
+    }
+  }
+
+
+  set<int> getVarList(RTG::regExpTListRefPtr tList)
+  {
+    set<int> srcList;
+    int listSize = CIR::getTListLength(tList).get_data();
+    for(int i = 0; i < listSize; i++)
+    {
+      int varNum = CIR::getVarNum(tList, i).get_data();;
+      srcList.insert(varNum);
     }
     return srcList;
   }
 
-  static wali::Key stt()
+  static wali::Key st1()
   {
-    return getKey("Unique State Name 2");
+    return getKey("Unique State Name");
   }
 
   static wali::Key stk(int k)
@@ -806,40 +857,101 @@ namespace goals {
   {
     for(tslDiffMap::iterator it = DMap.begin(); it!=DMap.end(); ++it)
     {
-      int dummy;
+      int dummy = -1;
       int tgt = it->first;
-      vector<int> srcList = getVarList(it->second);
-      for(int i = 0; i != srcList.size(); i++)
+      set<int> srcList = getVarList(it->second);
+      for(set<int>::iterator i = srcList.begin(); i != srcList.end(); i++)
       {
-        int src = srcList.at(i);
-        pds->add_rule(stt(), stk(src),stt(),stk(tgt), new NameWeight(src,tgt));
+        int src = *i;
+        pds->add_rule(st1(), stk(src),st1(),stk(tgt), new NameWeight(src,tgt));
       }
-      pds->add_rule(stt(), stk(dummy), stt(), stk(tgt), new NameWeight(dummy,tgt));
+      pds->add_rule(st1(), stk(dummy), st1(), stk(tgt), new NameWeight(dummy,tgt));
     }
 
   }
 
-  void runNewton(tslRegExpTMap Mmap, RTG::assignmentListRefPtr aList)
+  void runNewton(tslRegExpTMap Mmap, tslDiffMap D, RTG::assignmentRefPtr & aList)
   {
     bool newton = true;
-    while(newton == true){
-      RTG::assignmentListRefPtr aOld = aList;
+    std::map<int,std::set<int> > dependenceMap;
+    std::set<int> retPtSet; //C'
+    std::set<int> C;
+    RTG::assignmentRefPtr aPrime = aList;
+    tslDiffMap::iterator mIt;
+    //C' = ProgRetPts
+    //Populate dependence map
+    for(mIt = D.begin(); mIt != D.end(); mIt++)
+    {
+      std::set<int> dInt = getVarList(mIt->second);
+      dependenceMap[mIt->first] = dInt;
+      retPtSet.insert(mIt->first);
+    }
+    bool first = true;
+    //While C' != empty
+    while(retPtSet.size() != 0){
+      std::set<int>::iterator pIt;
+      //aPrime = A
+      for(pIt = retPtSet.begin(); pIt != retPtSet.end(); pIt++)
+      {
+        aPrime = CIR::updateAssignment(aPrime,CBTI_INT32(*pIt),CIR::getAssignment(CBTI_INT32(*pIt),aList));
+      }
+      //C = C'
+      C = retPtSet;
+      //C' = emptyset
+      retPtSet.clear();
       tslRegExpTMap::iterator agnIt;
+      //For each p in ProgRetPt
       for(agnIt = Mmap.begin(); agnIt != Mmap.end(); agnIt++)
       {
         int var = agnIt->first;
-        CONC_EXTERN_TYPES::sem_elem_wrapperRefPtr newVal = CIR::evalT(agnIt->second, aOld);
-        //aList = CIR::updateAssignmentList(aList, CBTI_INT32(var), newVal);
+	std::set<int> varsUsedInP = dependenceMap[var];
+	bool checkIn = false;
+	std::set<int>::iterator sIt1 = C.begin();
+	std::set<int>::iterator sIt2 = varsUsedInP.begin();
+	//Check to see if C intersect VarsUsedIn(p) is empty
+	if(!first){
+	  while((sIt1 != C.end()) && (sIt2 != varsUsedInP.end()) && !checkIn)
+	  {
+	    if(*sIt1<*sIt2) 
+	      ++sIt1;
+	    else if(*sIt2<*sIt1) 
+	      ++sIt2;
+	    else
+	      checkIn = true;
+	  }
+	}
+	else
+	{
+	  checkIn = true;
+	}
+	if(checkIn){
+	  //v = Tdetensor(evalT(Mmap[p],aPrime
+	  EXTERN_TYPES::sem_elem_wrapperRefPtr newVal = CIR::evalT(agnIt->second, aPrime); 
+	  EXTERN_TYPES::sem_elem_wrapperRefPtr rep = EXTERNS::detensorTranspose(newVal);
+	  //if A'[p] != v`
+	  EXTERN_TYPES::sem_elem_wrapperRefPtr oldVal = CIR::getAssignment(CBTI_INT32(var),aPrime);
+	  if(!(oldVal.v->Equal(rep.v))){
+	    retPtSet.insert(var); //C' = C' union {p}
+	    //A[p] = v
+	    aList = CIR::updateAssignment(aList, CBTI_INT32(var), rep);
+	  }
+	}
       }
+      first = false;
       RTG::_evalRegExpHash().clear();
-      //if(CIR::checkEqual(aOld,aList))
-      //{
-        newton = false;
-      //}
     }
   }
 
-  void run_newton_merge_notensor_fwpds(WFA& outfa, FWPDS * originalPds = NULL)
+  void evalRegExps(tslRegExpMap reMap, RTG::assignmentRefPtr aList, map<int,binrel_t> & finWeights)
+  {
+    for(tslRegExpMap::iterator it = reMap.begin(); it != reMap.end(); it++)
+    {
+      EXTERN_TYPES::sem_elem_wrapperRefPtr w = CIR::evalRegExp(it->second,aList);
+      finWeights[it->first] = w.v;
+    }
+  }
+
+  double run_newton_merge_notensor_fwpds(WFA& outfa, FWPDS * originalPds = NULL)
   { 
     cout << "#################################################" << endl;
     cout << "[Newton Compare] Goal VIII: end-to-end newton_merge_notensor_fwpds run" << endl;
@@ -855,6 +967,10 @@ namespace goals {
     wali::set_verify_fwpds(false);
     
     fpds->useNewton(false);
+    //fpds->add_rule(st1(),getKey(mainProc),st1(),fpds->get_theZero()->one());
+
+    wali::util::GoodTimer * t = new wali::util::GoodTimer("temp");
+    t->start();
     WFA fa;
     wali::Key acc = wali::getKeySpace()->getKey("accept");
     fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, fpds->get_theZero()->one());
@@ -862,34 +978,71 @@ namespace goals {
     fa.addFinalState(acc);
 
     int dummy = -1;
-    cout << "Step 0 \n";
-    map<int,reg_exp_t> rMap = fpds->getOutRegExps(fa,outfa,true);
-    cout << "Step 1 \n";
-    vector<reg_exp_t>::iterator ait;
+    map<int,reg_exp_t> r2Map;
+    map<int,int> uMap;
+    map<int,int> oMap;
+    map<int,pair< pair<int,int>,int> > mapBack;
+    vector<int> eps;
+    t->stop();
+    double t1 = fpds->getOutRegExps(fa,outfa, r2Map, uMap, oMap, mapBack, eps, true);
     tslRegExpMap E;
-    convertToTSLRegExps(rMap,E);
-    printTSLRegExps(E);
-    cout << "Step 2 \n";
+    convertToTSLRegExps(std::make_pair(r2Map,uMap),oMap,E);
+    tslRegExpMap epsMap;
+    for(vector<int>::iterator eit = eps.begin(); eit != eps.end(); eit++)
+    {
+      epsMap[(*eit)] = E[(*eit)];
+#if defined(NEWTON_DEBUG)
+      int src = mapBack[(*eit)].first.first;
+      int tgt = mapBack[(*eit)].first.second;
+      int stack = mapBack[(*eit)].second;
+      globalEpsilon.insert(std::make_pair(std::make_pair(src,tgt),stack));
+#endif
+    }
     tslDiffMap D;
-    createDifferentials(E,D);
+    t->start();
+    createDifferentials(epsMap,D);
     FWPDS * fnew = new FWPDS();
     fwpdsFromDifferential(fnew, D);
+    
     WFA fa2;
     wali::Key acc2 = wali::getKeySpace()->getKey("accept2");
-    fa2.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc2, fnew->get_theZero()->one());
+    fa2.addTrans(getPdsState(),stk(dummy), acc2, fnew->get_theZero()->one());
     fa2.setInitialState(getPdsState());
     fa2.addFinalState(acc2);
     WFA outfa2;
-    map<int,reg_exp_t> rNew = fnew->getOutRegExps(fa2,outfa2,false);
+    map<int,reg_exp_t> rNew;
+    map<int,int> uNew;
+    map<int,int> oNew;
+    map<int,pair<pair<int,int>,int> > B2;
+    t->stop();
+    vector<int> eNew;
+    double t2 = fnew->getOutRegExps(fa2,outfa2,rNew,uNew,oNew,B2,eNew,false);
     tslRegExpTMap M;
     convertToTSLRegExpsT(rNew,D,E,M);
-    RTG::assignmentListRefPtr aList = RTG::aListNull::make();
-    for (tslRegExpTMap::iterator mIt = M.begin(); mIt != M.end(); mIt++)
-    {
-      //RTG::assignmentListRefPtr aList = initAssignmentList(CBTI::INT32(mIt->first),aList);
-    }
-    runNewton(M,aList);
+    t->start();
+    RTG::assignmentRefPtr aList = CIR::initializeAssignment();
+    runNewton(M,D,aList);
+    map<int,binrel_t> finWeights;
+    evalRegExps(E,aList,finWeights);
 
+    for(map<int,pair<pair<int,int>,int> >::iterator mbit = mapBack.begin(); mbit != mapBack.end(); mbit++)
+    {
+      int src = mbit->second.first.first;
+      int tgt = mbit->second.first.second;
+      int stck = mbit->second.second;
+      wali::wfa::ITrans * t = outfa.find2(src,stck,tgt);
+      sem_elem_t w = finWeights[mbit->first];
+      t->setWeight(w);
+    }
+
+    outfa.path_summary_iterative_original(outfa.getSomeWeight()->one());
+
+    t->stop();
+   
+    double tTime = t->total_time()+t1+t2;
+    delete t;
+    delete fpds;
+    return tTime;
 #if defined(BINREL_STATS)
     //con->resetStats(); 
 #endif
@@ -951,11 +1104,130 @@ namespace goals {
     delete fpds;
   }
 
+
+  void compareEwpdsFwpdsNewton()
+  {
+    FWPDS * originalPds = new FWPDS();
+    con = pds_from_prog(originalPds, pg);
+    WpdsStackSymbols syms;
+    originalPds->for_each(syms);
+
+
+    wali::util::GoodTimer * eTimer = new wali::util::GoodTimer("EWPDS time");
+    WFA outfaEwpds;
+    double cEtime = runEwpds(outfaEwpds, originalPds);
+    eTimer->stop();
+
+    wali::util::GoodTimer * fTimer = new wali::util::GoodTimer("EWPDS time");
+    WFA outfaFwpds;
+    double cFtime = runFwpds(outfaFwpds, originalPds);
+    fTimer->stop();
+
+    wali::util::GoodTimer * nTimer = new wali::util::GoodTimer("Newton time");
+    WFA outfaNewton;
+    double cNtime = run_newton_merge_notensor_fwpds(outfaNewton, originalPds);
+    nTimer->stop();
+
+#if defined(NEWTON_DEBUG)
+    for(std::set<std::pair<std::pair<int,int>,int> >::iterator git = globalEpsilon.begin(); git != globalEpsilon.end(); git++)
+    {
+      cout << "tete";
+      int src = git->first.first;
+      int tgt = git->first.second;
+      int stack = git->second;
+
+      wali::wfa::Trans tE;
+      wali::wfa::Trans tF;
+      wali::wfa::Trans tN;
+
+      outfaEwpds.find(src,stack,tgt,tE);
+      outfaFwpds.find(src,stack,tgt,tF);
+      outfaNewton.find(src,stack,tgt,tN);
+
+      sem_elem_t wtE = tE.weight();
+      sem_elem_t wtF = tF.weight();
+      sem_elem_t wtN = tN.weight();
+
+      if(!wtE->equal(wtN))
+      {
+        cout << "EWPDS Weight: \n";
+	wtE->print(cout);
+	cout << "\nNewton Weight: \n";
+	wtN->print(cout);
+
+	cout << "Src: " << key2str(src) << " Target: " << key2str(tgt) << " Stack: " << key2str(stack) << "\n";
+      }
+
+    }
+#endif
+
+    nTimer->start();
+    std::map<wali::Key, sem_elem_t> newtonJoinMap = outfaNewton.readOutCombineOverAllPathsValues(syms.gamma);
+    nTimer->stop();
+
+    eTimer->start();
+    std::map<wali::Key, sem_elem_t> ewpdsJoinMap = outfaEwpds.readOutCombineOverAllPathsValues(syms.gamma);
+    eTimer->stop();
+
+    fTimer->start();
+    std::map<wali::Key, sem_elem_t> fwpdsJoinMap = outfaFwpds.readOutCombineOverAllPathsValues(syms.gamma);
+    fTimer->stop();
+
+
+    delete originalPds;
+    
+    bool b1 = false;
+    bool b2 = false;
+    bool b3 = false;
+    for(std::set<Key>::iterator ait = syms.gamma.begin(); ait != syms.gamma.end(); ait++)
+    {
+      sem_elem_t eval = ewpdsJoinMap[*ait];
+      sem_elem_t fval = fwpdsJoinMap[*ait];
+      sem_elem_t nval = newtonJoinMap[*ait];
+      if(!eval->equal(fval))
+      {
+        b1 = true;
+      }
+      if(!eval->equal(nval))
+      {
+        b2 = true; 
+      }
+      if(!fval->equal(nval))
+      {
+        b3 = true; 
+      }
+    }
+
+    if(b1)
+    {
+      cout << "ERROR: Ewpds and Fwpds don't match\n";
+    }
+    if(b2)
+    {
+      cout << "ERROR: Ewpds and Newton don't match\n";
+    }
+    if(b3)
+    {
+      cout << "ERROR: Newton and Fwpds don't match\n";
+    }
+
+    double totalEtime = eTimer->total_time();
+    totalEtime += cEtime;
+    double totalFtime = fTimer->total_time();
+    totalFtime += cFtime;
+    double totalNtime = nTimer->total_time();
+    totalNtime += cNtime;
+
+    cout << "EWPDS TIME: " << totalEtime << "\n";
+    cout << "FWPDS TIME: " << totalFtime << "\n";
+    cout << "Newton Time: " << totalNtime << "\n";
+    
+  }
+
   void compareWpdsNwpds()
-  {    
+  { 
     FWPDS * originalPds = new FWPDS();
     con = pds_from_prog_with_meet_merge(originalPds, pg);
-
     WFACompare fac("WPDS", "NWPDS");
     cout << "#################################################" << endl;
     cout << "[Newton Compare] Goal I: Check Correctness by comparing the result automaton: WPDS vs NWPDS" << endl;
@@ -1014,7 +1286,7 @@ void * work(void *)
   WFA outfa;
   switch(goal){
     case 1:
-      compareWpdsNwpds();
+      compareEwpdsFwpdsNewton();
       break;
     case 2:
       assert(0);
@@ -1048,7 +1320,6 @@ void * work(void *)
 
 int main(int argc, char ** argv)
 {
-
   // register signal handler
   signal(SIGHUP, handle_sighup);
 

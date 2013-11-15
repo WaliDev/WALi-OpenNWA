@@ -376,10 +376,9 @@ void FWPDS::poststar( wfa::WFA const & input, wfa::WFA& output ) {
 }
 
 
-map<int,reg_exp_t> FWPDS::getOutRegExps(wfa::WFA const & input, wfa::WFA& output, bool first)
+double FWPDS::getOutRegExps(wfa::WFA const & input, wfa::WFA& output, map<int,reg_exp_t>& outNodeRegExps, map<int,int>& uMap, map<int,int>& oMap, map<int,std::pair< std::pair<int,int>,int> >& mapBack, vector<int>& eps, bool first)
 {
-
-  map<int,reg_exp_t> regE;
+  wali::util::GoodTimer * t = new wali::util::GoodTimer("tTimer");
   EWPDS::poststarSetupFixpoint(input,output);
 
   // If theZero is invalid then no rules have
@@ -387,7 +386,7 @@ map<int,reg_exp_t> FWPDS::getOutRegExps(wfa::WFA const & input, wfa::WFA& output
   // can be done.
   if(!theZero.is_valid()) {
     worklist->clear();
-    return regE;
+    return 0;
   }
 
   // cache semiring 1
@@ -407,12 +406,11 @@ map<int,reg_exp_t> FWPDS::getOutRegExps(wfa::WFA const & input, wfa::WFA& output
 
   // Build the InterGraph using EWPDS saturation without weights
   EWPDS::poststarComputeFixpoint(output);
-
-  //regE = interGr->getOutnodeRegExps(first);
-  //Get RegExps from wfa
-  
-  map<int,reg_exp_t>::iterator it;
-  return regE;
+  t->stop();
+  double tmpTime = interGr->getOutnodeRegExps(outNodeRegExps, uMap, oMap, mapBack, eps, first);
+  double totTime = tmpTime + t->total_time();
+  delete t;
+  return totTime;
 }
 
 void FWPDS::poststarIGR( wfa::WFA const & input, wfa::WFA& output )

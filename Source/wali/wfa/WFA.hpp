@@ -147,6 +147,7 @@ namespace wali
         WFA( query_t q = INORDER, progress_t prog = NULL );
         WFA( const WFA & rhs );
         WFA & operator=( const WFA & rhs );
+        ITrans * find2(Key p, Key g, Key q);
 
         virtual ~WFA();
 
@@ -458,6 +459,8 @@ namespace wali
          */
         virtual void path_summary_via_wpds(wpds::WPDS & wpds);
 
+	virtual std::map<wali::Key, sem_elem_t>
+	readOutCombineOverAllPathsValues(std::set<Key> alpha);
         /**
          * Prunes the WFA. This removes any transitions that are
          * not in the (getInitialState(),F) chop.
@@ -599,7 +602,7 @@ namespace wali
             Key p,
             Key g,
             Key q) const;
-        
+
         /**
          * Erases the specified Trans(from,stack,to) from the
          * kpmap and epsmap. A null return value means no transition existed.

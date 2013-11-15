@@ -9,6 +9,7 @@
 // ::opennwa
 #include "opennwa/Nwa.hpp"
 #include "opennwa/WeightGen.hpp"
+#include "opennwa/query/weighted.hpp"
 // ::wali
 #include "wali/SemElem.hpp"
 #include "wali/ref_ptr.hpp"
@@ -22,6 +23,8 @@ class bdd;
 void bdd_printdot_levels(bdd r);
 int bdd_fnprintdot_levels(char const * fname, bdd r);
 void bdd_fprintdot_levels(FILE* ofile, bdd r);
+
+using namespace opennwa::query;
 namespace wali
 {
   namespace domains

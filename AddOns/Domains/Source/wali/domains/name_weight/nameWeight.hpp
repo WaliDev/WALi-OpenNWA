@@ -72,7 +72,7 @@ namespace wali
           }
 
           int getName2() const{
-            return nm1;
+            return nm2;
           }
 
           // ////////////////////////////////

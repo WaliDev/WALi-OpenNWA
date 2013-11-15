@@ -81,8 +81,8 @@ namespace wali {
       }
 
       ~GoodTimer() {
-        stop();
-        std::cout << "Timer: " << _name << ": " << total_time() << "\n";
+        //stop();
+        //std::cout << "Timer: " << _name << ": " << total_time() << "\n";
       }
       
       void start() {

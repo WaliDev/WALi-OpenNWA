@@ -416,6 +416,14 @@ namespace wali
       return false;
     }
 
+    ITrans* WFA::find2(
+        Key p,
+	Key g,
+	Key q
+    ){
+      return this->find(p,g,q);
+    }
+
     //
     // Finds Trans(p,g,q) and returns a pointer to it
     // (null if not found)

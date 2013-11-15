@@ -111,11 +111,12 @@
  * The detensor choice is made by setting **exactly one** macro to 1
  **/
 #define DETENSOR_TOGETHER 0
-#define DETENSOR_BIT_BY_BIT 1
+#define DETENSOR_BIT_BY_BIT 0
 #define NWA_DETENSOR 0
+#define TSL_DETENSOR 1
 
 // Make sure exactly one detensor method is chosen
-#if (DETENSOR_TOGETHER + DETENSOR_BIT_BY_BIT + NWA_DETENSOR) != 1
+#if (DETENSOR_TOGETHER + DETENSOR_BIT_BY_BIT + NWA_DETENSOR + TSL_DETENSOR) != 1
 #error "Please choose exactly one method for detensor."
 #endif
 
@@ -325,6 +326,8 @@ namespace wali
           BddPairPtr move2Base;
           //TL1->B1 TR1->B2
           BddPairPtr move2BaseTwisted;
+	  //TL2->B1 TL2->B2
+	  BddPairPtr move2BaseTwisted24;
           //sets for operation
           //Set: B2
           bdd baseSecBddContextSet;
@@ -436,6 +439,7 @@ namespace wali
           binrel_t Kronecker( binrel_t that) const;
           binrel_t Eq23Project() const;
           binrel_t Eq13Project() const;
+	  binrel_t Eq24Project() const;
         public: 
 	  // ////////////////////////////////
           // SemElem methods
@@ -504,7 +508,16 @@ namespace wali
             return static_cast<size_t>(getBdd().id());
           }
 
-          // ////////////////////////////////
+	  bool isWTensored()
+	  {
+	    return isTensored;
+	  }
+
+	  void setTensored(bool tens)
+	  {
+	    isTensored = tens;
+	  }
+	  // ////////////////////////////////
           // Printing functions
           //static void printHandler(FILE *o, int var);
         protected:
@@ -513,7 +526,7 @@ namespace wali
           //manage memory for BddContext. 
           BddContext const * con;
           bdd rel;
-          bool isTensored;
+	  bool isTensored;
 #if(NWA_DETENSOR == 1)
         private:
           //TODO: Cleanup in the destructor for all these

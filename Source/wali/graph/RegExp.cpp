@@ -24,6 +24,11 @@ namespace wali {
         top_down_eval = true;
       }
 
+      reg_exp_t RegExpDag::getUpdatableRegExp(node_no_t nno)
+      {
+        return updatable_nodes[nno];
+      }
+
       reg_exp_t RegExpDag::updatable(node_no_t nno, sem_elem_t se) 
       {
 

@@ -1152,7 +1152,7 @@ namespace opennwa
       return query::doForwardAnalysis(*this, wg, wg.getOne());
     }
 
-    DEPRECATE("Use version in query/automata.hpp")
+    //DEPRECATE("Use version in query/automata.hpp")
     wali::wfa::WFA
     poststarViaFwpds(wali::wfa::WFA const & input,
                      WeightGen const & wg) const

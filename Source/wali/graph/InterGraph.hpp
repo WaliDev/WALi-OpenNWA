@@ -4,7 +4,7 @@
 #include "wali/Countable.hpp"
 #include "wali/ref_ptr.hpp"
 #include "wali/MergeFn.hpp"
-
+#include "wali/util/Timer.hpp"
 #include "wali/graph/GraphCommon.hpp"
 
 
@@ -265,7 +265,7 @@ namespace wali {
             void setESource(Transition t, wali::sem_elem_t wtAtCall, wali::sem_elem_t wtAfterCall);
 
             void setupInterSolution(std::list<Transition> *wt_required = NULL);
-            std::map<int, reg_exp_t> getOutnodeRegExps(bool first);
+            double getOutnodeRegExps(std::map<int,reg_exp_t> & outNodes, std::map<int,int> & uMap, std::map<int,int> & oMap, std::map<int, std::pair< std::pair<int,int>, int> > & mapBack, std::vector<int> & eps, bool first);
 
             /**
              * @brief From the given TDG (The original InterGraph), create linearized TDGs corresponding

@@ -328,7 +328,10 @@ namespace wali {
 
                 bool isCyclic();
                 sem_elem_t reevaluate();
-
+                RegExpDag * getDag()
+		{
+		  return dag;
+		}
                 /**
                  * @author Prathmesh Prabhu
                  * Obtain the hash map that stores the roots in the current
@@ -469,6 +472,7 @@ namespace wali {
             void startSatProcess(const sem_elem_t se);
             void stopSatProcess();
 
+            reg_exp_t getUpdatableRegExp(node_no_t nno);
             reg_exp_t updatable(node_no_t nno, sem_elem_t se);
             reg_exp_t compress(reg_exp_t r, reg_exp_cache_t &cache);
             reg_exp_t minimize_height(reg_exp_t r, reg_exp_cache_t &cache);

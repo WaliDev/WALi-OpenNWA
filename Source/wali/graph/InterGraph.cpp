@@ -1152,8 +1152,10 @@ namespace wali {
 #endif 
         }
 
-	map<int,reg_exp_t> InterGraph::getOutnodeRegExps(bool first)
+	double InterGraph::getOutnodeRegExps(map<int,reg_exp_t>& outNodeRegExps, map<int,int>& uMap, map<int,int> & oMap, map<int,std::pair< std::pair<int,int>,int> >& mapBack, vector<int>& eps, bool first)
 	{
+	  wali::util::GoodTimer * t = new wali::util::GoodTimer("graphTime");
+	  //t->start();
 	  dag->startSatProcess(sem);
            // First, find the IntraGraphs
           int n = nodes.size();
@@ -1166,7 +1168,7 @@ namespace wali {
           multiset<tup > worklist;
 
 
-          //These two takeUnions Group together all the nodes in a single procedure
+          //These two loops Group together all the nodes in each procedure
           for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
             intra_graph_uf->takeUnion((*it).src,(*it).tgt);
           }
@@ -1207,9 +1209,12 @@ namespace wali {
 
           for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
             IntraGraph *gr = nodes[(*it2).tgt].gr;
-            gr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, sem->zero(), true);
-            IntraGraph *gr2 = nodes[(*it2).src2].gr;
+            int eno = gr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, sem->zero(), true);
+            int uno = gr->edges[eno].updatable_no;
+	    uMap[uno] = (*it2).src2;
+	    IntraGraph *gr2 = nodes[(*it2).src2].gr;
             gr2->setOutNode(nodes[(*it2).src2].intra_nodeno, (*it2).src2);
+	    //cout << "Src1: " << (*it2).src1 << "\t Src2: " << (*it2).src2 << "\t Tgt: " << (*it2).tgt << "\n";
           }
 
           // For SWPDS
@@ -1220,31 +1225,56 @@ namespace wali {
             gr1->addCallEdge(gr2);
           }
 
+	  int index = 1;
+
           // Setup Worklist
-          map <int,reg_exp_t> outNodeRegExps;
           for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
             (*gr_it)->setupIntraSolution(false);
-	    if(first)
-	    {
-	      for(list<int>::const_iterator cit = (*gr_it)->out_nodes_intra->begin(); cit != (*gr_it)->out_nodes_intra->end(); ++cit){
-                int label = (*gr_it)->nodes[*cit].trans.stack;
-		outNodeRegExps[label] = (*gr_it)->nodes[*cit].regexp;
-	      }
-	    }
-	    else
-	    {
-	      for(vector<IntraGraphNode>::const_iterator nit = (*gr_it)->nodes.begin(); nit != (*gr_it)->nodes.end(); ++nit){
-	        if((*nit).node_no != -1)
+	    t->stop();
+            for(vector<IntraGraphNode>::const_iterator nit = (*gr_it)->nodes.begin(); nit != (*gr_it)->nodes.end(); ++nit){
+	      if(((*nit).node_no != -1) && ((*nit).node_no != 0))
+              {
+		if(!first)  
 		{
-		  int label = (*nit).trans.stack;
-		  outNodeRegExps[label] = (*nit).regexp;
+                  int label = std::atoi(key2str((*nit).trans.stack).c_str());
+                  if(label != 0) {
+                    outNodeRegExps[label] = (*nit).regexp;
+                  }
+                }
+		else 
+		{
+		  int intraNum = (*nit).node_no;
+		  int tgt = (*nit).trans.tgt;
+		  int stack = (*nit).trans.stack;
+		  int src = (*nit).trans.src;
+		  mapBack[index] = std::make_pair(std::make_pair(src,tgt),stack);
+		  outNodeRegExps[index] = (*nit).regexp;
+		  if(stack == 0 && tgt != 0)
+		  {
+		    eps.push_back(index);
+		    if((*nit).type == 3)
+		    {
+		      list<int>::const_iterator dit = (*gr_it)->out_nodes_intra->begin();
+		      for(list<int>::const_iterator cit = (*gr_it)->out_nodes_inter->begin(); cit != (*gr_it)->out_nodes_inter->end(); cit++)
+		      {
+		        if((*dit) == intraNum)
+			{
+			  oMap[(*cit)] = index;
+			}
+			dit++;
+		      }
+		    }
+		  }
+		  index++;
 		}
 	      }
 	    }
+	    t->start();
 	  }
-
-	  return outNodeRegExps;
-
+	  t->stop();
+	  double totTime = t->total_time();
+	  delete t;
+	  return totTime;
 	}
 
         // If an argument is passed in then only weights on those transitions will be available
