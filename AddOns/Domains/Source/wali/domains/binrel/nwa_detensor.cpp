@@ -28,6 +28,7 @@ using namespace wali::domains::binrel;
 using namespace wali::domains::binrel::details;
 using namespace opennwa;
 
+
 // //////////////////////////////////////////
 // These functions provide a sneak-peek into the buddy bit-level
 // variable ordering.

@@ -1291,7 +1291,7 @@ binrel_t BinRel::Kronecker(binrel_t that) const
   if(rel == bddfalse || that->rel == bddfalse)
     return con->cachedTensorZero;
 #if (NWA_DETENSOR == 1)
-  bdd c = tensorViaDetensor(that->Transpose()->rel); //nwa_detensor.cpp
+  bdd c = tensorViaDetensor(that->rel); //nwa_detensor.cpp
 #else
   bdd rel1 = bdd_replace(rel, con->move2Tensor1.get());
   bdd rel2 = bdd_replace(that->rel, con->move2Tensor2.get());

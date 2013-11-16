@@ -117,8 +117,8 @@ assert 'CPPDEFINES' not in BaseEnv
 BaseEnv['CPPDEFINES'] = {
    'BOOST_NO_DEFAULTED_FUNCTIONS': 1,
    '__TSL_REGEXP': 1,
-   'TSL_DETENSOR': 1,
    'REGEXP_TEST': 1,
+   'NWA_DETENSOR': 1,
    'EXPORT_GTR_SYMBOLS': 0,
 }
 
