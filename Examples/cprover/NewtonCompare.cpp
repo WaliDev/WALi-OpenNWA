@@ -988,6 +988,8 @@ namespace goals {
     for(vector<int>::iterator eit = eps.begin(); eit != eps.end(); eit++)
     {
       epsMap[(*eit)] = E[(*eit)];
+      r2Map[(*eit)]->print(cout);
+      cout << "\n";
 #if defined(NEWTON_DEBUG)
       int src = mapBack[(*eit)].first.first;
       int tgt = mapBack[(*eit)].first.second;
@@ -995,6 +997,7 @@ namespace goals {
       globalEpsilon.insert(std::make_pair(std::make_pair(src,tgt),stack));
 #endif
     }
+    printTSLRegExps(epsMap);
     tslDiffMap D;
     t->start();
     createDifferentials(epsMap,D);
@@ -1122,7 +1125,8 @@ namespace goals {
 
 /*    wali::util::GoodTimer * nTimer = new wali::util::GoodTimer("Newton time");
     WFA outfaNewton;
-    double cNtime = run_newton_merge_notensor_fwpds(outfaNewton, originalPds);
+    double cNtime = 0;
+    run_newton_merge_notensor_fwpds(outfaNewton, originalPds);
     nTimer->stop();
 */
 #if defined(NEWTON_DEBUG)
