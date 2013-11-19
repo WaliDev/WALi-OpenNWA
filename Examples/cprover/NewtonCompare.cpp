@@ -1120,11 +1120,11 @@ namespace goals {
     double cFtime = runFwpds(outfaFwpds, originalPds);
     fTimer->stop();
 
-    wali::util::GoodTimer * nTimer = new wali::util::GoodTimer("Newton time");
+/*    wali::util::GoodTimer * nTimer = new wali::util::GoodTimer("Newton time");
     WFA outfaNewton;
     double cNtime = run_newton_merge_notensor_fwpds(outfaNewton, originalPds);
     nTimer->stop();
-
+*/
 #if defined(NEWTON_DEBUG)
     for(std::set<std::pair<std::pair<int,int>,int> >::iterator git = globalEpsilon.begin(); git != globalEpsilon.end(); git++)
     {
@@ -1135,15 +1135,15 @@ namespace goals {
 
       wali::wfa::Trans tE;
       wali::wfa::Trans tF;
-      wali::wfa::Trans tN;
+//      wali::wfa::Trans tN;
 
       outfaEwpds.find(src,stack,tgt,tE);
       outfaFwpds.find(src,stack,tgt,tF);
-      outfaNewton.find(src,stack,tgt,tN);
+//      outfaNewton.find(src,stack,tgt,tN);
 
       sem_elem_t wtE = tE.weight();
       sem_elem_t wtF = tF.weight();
-      sem_elem_t wtN = tN.weight();
+/*      sem_elem_t wtN = tN.weight();
 
       if(!wtE->equal(wtN))
       {
@@ -1154,14 +1154,14 @@ namespace goals {
 
 	cout << "Src: " << key2str(src) << " Target: " << key2str(tgt) << " Stack: " << key2str(stack) << "\n";
       }
-
+*/
     }
 #endif
-
+/*
     nTimer->start();
     std::map<wali::Key, sem_elem_t> newtonJoinMap = outfaNewton.readOutCombineOverAllPathsValues(syms.gamma);
     nTimer->stop();
-
+*/
     eTimer->start();
     std::map<wali::Key, sem_elem_t> ewpdsJoinMap = outfaEwpds.readOutCombineOverAllPathsValues(syms.gamma);
     eTimer->stop();
@@ -1180,7 +1180,7 @@ namespace goals {
     {
       sem_elem_t eval = ewpdsJoinMap[*ait];
       sem_elem_t fval = fwpdsJoinMap[*ait];
-      sem_elem_t nval = newtonJoinMap[*ait];
+/*      sem_elem_t nval = newtonJoinMap[*ait];
       if(!eval->equal(fval))
       {
         b1 = true;
@@ -1192,7 +1192,7 @@ namespace goals {
       if(!fval->equal(nval))
       {
         b3 = true; 
-      }
+      }*/
     }
 
     if(b1)
@@ -1212,12 +1212,12 @@ namespace goals {
     totalEtime += cEtime;
     double totalFtime = fTimer->total_time();
     totalFtime += cFtime;
-    double totalNtime = nTimer->total_time();
-    totalNtime += cNtime;
+//    double totalNtime = nTimer->total_time();
+//    totalNtime += cNtime;
 
     cout << "EWPDS TIME: " << totalEtime << "\n";
     cout << "FWPDS TIME: " << totalFtime << "\n";
-    cout << "Newton Time: " << totalNtime << "\n";
+//    cout << "Newton Time: " << totalNtime << "\n";
     
   }
 
