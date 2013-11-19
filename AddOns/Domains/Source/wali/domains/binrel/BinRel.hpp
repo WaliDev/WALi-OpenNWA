@@ -85,10 +85,10 @@
  *
  * The tensor choice is determined by setting **exactly one** macro to 1.
  **/
-#define TENSOR_MAX_AFFINITY 0
+#define TENSOR_MAX_AFFINITY 1
 #define TENSOR_MIN_AFFINITY 0
 #define BASE_MAX_AFFINITY_TENSOR_MIXED 0
-#define TENSOR_MATCHED_PAREN 1
+#define TENSOR_MATCHED_PAREN 0
 
 // Make sure exactly one bdd variable order is chosen.
 #if (TENSOR_MAX_AFFINITY + TENSOR_MIN_AFFINITY + BASE_MAX_AFFINITY_TENSOR_MIXED + TENSOR_MATCHED_PAREN) != 1
@@ -112,8 +112,13 @@
  **/
 #define DETENSOR_TOGETHER 0
 #define DETENSOR_BIT_BY_BIT 0
-#define NWA_DETENSOR 1
-#define TSL_DETENSOR 0
+#define NWA_DETENSOR 0
+#define TSL_DETENSOR 1
+
+/**
+ * Set true if using NWA_DETENSOR while running Prathmesh's newton method 
+ **/
+#define PRATHMESH_NWA_DETENSOR 0
 
 // Make sure exactly one detensor method is chosen
 #if (DETENSOR_TOGETHER + DETENSOR_BIT_BY_BIT + NWA_DETENSOR + TSL_DETENSOR) != 1
