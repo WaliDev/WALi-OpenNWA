@@ -46,3 +46,4 @@
 #############
 ## Text editor temporary files
 .*.swp
+*~
