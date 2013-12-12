@@ -400,5 +400,61 @@ namespace wali
     }
 
 
+    std::map<Key, sem_elem_t>
+    WFA::readOutCombineOverAllPathsValues()
+    {
+      return readOutCombineOverAllPathsValues(alphabet());
+    }
+
+    std::map<Key, sem_elem_t>
+    WFA::readOutCombineOverAllPathsValues(std::set<Key> const & alpha)
+    {
+      Key const init = getInitialState();
+      sem_elem_t weight = getSomeWeight()->zero();
+
+      std::map<Key, sem_elem_t> values_map;
+
+      for (std::set<Key>::const_iterator iter = alpha.begin();
+           iter != alpha.end(); iter++)
+      {
+        // Compute Combine_{t = (init,*iter,to)} (weight(t) extend weight(to))
+        // or      Combine_{t = (init,*iter,to)} (weight(to) extend weight(t)),
+        // depending on whether the WFA holds a prestar or poststar
+        // answer.
+        //
+        // Get the set of transitions in the WFA that are of the
+        // form (init,*iter,?)
+        TransSet transitionSet = match(init, *iter);
+        
+        for (TransSet::iterator tsiter = transitionSet.begin();
+             tsiter != transitionSet.end() ; tsiter++)
+        {
+          ITrans * t = *tsiter;
+
+          // Set tmp to (weight(to) extend weight(t)) or
+          // (weight(t) extend weight(to)),
+          // depending on whether the WFA holds a prestar or
+          // poststar answer.
+          sem_elem_t tmp;
+          sem_elem_t target_weight = getState(t->to())->weight();
+          sem_elem_t trans_weight = t->weight();
+          if (getQuery() == WFA::INORDER) {
+            tmp = trans_weight->extend(target_weight);
+          }
+          else {
+            tmp = target_weight->extend(trans_weight);
+          }
+
+          // Combine the value to the accumulated weight of all
+          // "to" states 
+          weight = weight->combine(tmp);
+        }
+
+        values_map[*iter] = weight;
+      }
+      
+      return values_map;
+    }
+
   }
 }

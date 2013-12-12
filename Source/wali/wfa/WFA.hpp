@@ -575,6 +575,28 @@ namespace wali
 
         size_t numTransitions() const;
 
+
+        /** Return the results of an analysis
+         *
+         * Create a map whose domain are the wali::Keys in alpha
+         * Each entry is k |-> CombineOverAllPaths value of k.
+         *
+         * Assumes that path_summary has been called on the WFA
+         */
+        std::map<wali::Key, sem_elem_t>
+        readOutCombineOverAllPathsValues(std::set<Key> const & alpha);
+
+        /** Return the results of an analysis
+         *
+         * Create a map whose domain are the wali::Keys in alpha
+         * Each entry is k |-> CombineOverAllPaths value of k.
+         *
+         * Assumes that path_summary has been called on the WFA
+         */
+        std::map<wali::Key, sem_elem_t>
+        readOutCombineOverAllPathsValues();
+
+
       protected:
 
         /**
