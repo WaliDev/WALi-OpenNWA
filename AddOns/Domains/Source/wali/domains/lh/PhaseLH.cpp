@@ -805,7 +805,7 @@ PhaseLH PhaseLH::Summarize( const PhaseLH& a , const PhaseLH& b)
   return PhaseLH( R6 , a.phaseX );
 }
 
-PhaseLH::PhaseLH( bdd the_R,int the_phaseX ) : R(R),phaseX(the_phaseX)
+PhaseLH::PhaseLH( bdd the_R,int the_phaseX ) : R(the_R),phaseX(the_phaseX)
 {
   invariant_check(the_R,the_phaseX);
 }
