@@ -420,9 +420,9 @@ namespace wali
       class DetensorWeightGen;
 #endif
 
-      class BinRel : public wali::SemElemTensor 
+      class BinRel : public wali::SemElemTensor
       {
-        public:
+	public:
           static void reset();
         public:
           /** @see BinRel::Compose */

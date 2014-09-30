@@ -42,6 +42,7 @@
 #include "tsl/analysis_components/src/reinterps/emul/concrete_base_type_interp.hpp"
 #include "tsl/analysis_components/src/reinterps/emul/concrete_base_type_interp.cpp"
 #include "tsl/cir/regexp/conc.1level.cir.cpp"
+#include "wali/domains/binrel/BinRel.hpp"
 #include "NewtonCompare.hpp"
 
 using namespace std;
@@ -79,6 +80,7 @@ extern "C"
   }
 }
 
+BinRelInterface * ICon = NULL;
 BddContext * con = NULL;
 
 namespace{
@@ -747,7 +749,8 @@ namespace goals {
         return RTG::Zero::make();
       else {
 	binrel_t w = dynamic_cast<BinRel*>(exp->get_weight().get_ptr());
-	EXTERN_TYPES::sem_elem_wrapperRefPtr * wt = new EXTERN_TYPES::sem_elem_wrapper(w);
+	BinRelInterface * bI = new BinRelInterface(w.get_ptr());
+	EXTERN_TYPES::sem_elem_wrapperRefPtr * wt = new EXTERN_TYPES::sem_elem_wrapper(bI);
         return RTG::Weight::make(*wt);
       }
     } else if (exp->isUpdatable()){
@@ -928,7 +931,7 @@ namespace goals {
 	  EXTERN_TYPES::sem_elem_wrapperRefPtr rep = EXTERNS::detensorTranspose(newVal);
 	  //if A'[p] != v`
 	  EXTERN_TYPES::sem_elem_wrapperRefPtr oldVal = CIR::getAssignment(CBTI_INT32(var),aPrime);
-	  if(!(oldVal.v->Equal(rep.v))){
+	  if(!(oldVal.v->n->Equal(rep.v->n))){
 	    retPtSet.insert(var); //C' = C' union {p}
 	    //A[p] = v
 	    aList = CIR::updateAssignment(aList, CBTI_INT32(var), rep);
@@ -940,7 +943,7 @@ namespace goals {
     }
   }
 
-  void evalRegExps(tslRegExpMap reMap, RTG::assignmentRefPtr aList, map<int,binrel_t> & finWeights)
+  void evalRegExps(tslRegExpMap reMap, RTG::assignmentRefPtr aList, map<int,BinRelInterface*> & finWeights)
   {
     for(tslRegExpMap::iterator it = reMap.begin(); it != reMap.end(); it++)
     {
@@ -1022,7 +1025,7 @@ namespace goals {
     t->start();
     RTG::assignmentRefPtr aList = CIR::initializeAssignment();
     runNewton(M,D,aList);
-    map<int,binrel_t> finWeights;
+    map<int,BinRelInterface*> finWeights;
     evalRegExps(E,aList,finWeights);
 
     for(map<int,pair<pair<int,int>,int> >::iterator mbit = mapBack.begin(); mbit != mapBack.end(); mbit++)
@@ -1031,8 +1034,8 @@ namespace goals {
       int tgt = mbit->second.first.second;
       int stck = mbit->second.second;
       wali::wfa::ITrans * t = outfa.find2(src,stck,tgt);
-      sem_elem_t w = finWeights[mbit->first];
-      t->setWeight(w);
+      BinRelInterface * w = finWeights[mbit->first];
+      t->setWeight(w->n);
     }
 
     outfa.path_summary_iterative_original(outfa.getSomeWeight()->one());
