@@ -13,8 +13,7 @@
 #include <iostream>
 #include <map>
 #include <set>
-#include <tr1/unordered_map>
-#include <tr1/unordered_set>
+#include <functional>
 
 namespace wali {
 
@@ -265,8 +264,8 @@ namespace wali {
             void setESource(Transition t, wali::sem_elem_t wtAtCall, wali::sem_elem_t wtAfterCall);
 
             void setupInterSolution(std::list<Transition> *wt_required = NULL);
-            double getOutnodeRegExps(std::map<int,reg_exp_t> & outNodes, std::map<int,int> & uMap, std::map<int,int> & oMap, std::map<int, std::pair< std::pair<int,int>, int> > & mapBack, std::vector<int> & eps, bool first);
-
+            double getOutnodeRegExps(std::map<int,reg_exp_t> & outNodes, std::map<int,int> & uMap, std::map<int, std::pair< std::pair<int,int>, int> > & mapBack, std::vector<int> & eps);
+			double getOutnodeRegExpsSimple(std::map<int, reg_exp_t> & outNodes);
             /**
              * @brief From the given TDG (The original InterGraph), create linearized TDGs corresponding
              * to each step of Newton. Then, solve the poststar problem by executing steps of the newton's 

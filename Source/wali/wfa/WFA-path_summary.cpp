@@ -144,8 +144,9 @@ namespace wali
           // delta => (w+se,w-se)
           // Use extended->delta b/c we want the diff b/w the new
           // weight (extended) and what was there before
-          std::pair<sem_elem_t,sem_elem_t> p = newW->delta(qprime->weight());
 
+          std::pair<sem_elem_t,sem_elem_t> p = newW->delta(qprime->weight());
+		  
           { // BEGIN DEBUGGING
             //qprime->weight()->print(*waliErr << "   oldW " << key2str(qprime->name())) << std::endl;
             //newW->print(*waliErr << "   newW " << key2str(qprime->name())) << std::endl;

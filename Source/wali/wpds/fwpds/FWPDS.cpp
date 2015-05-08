@@ -376,7 +376,7 @@ void FWPDS::poststar( wfa::WFA const & input, wfa::WFA& output ) {
 }
 
 
-double FWPDS::getOutRegExps(wfa::WFA const & input, wfa::WFA& output, map<int,reg_exp_t>& outNodeRegExps, map<int,int>& uMap, map<int,int>& oMap, map<int,std::pair< std::pair<int,int>,int> >& mapBack, vector<int>& eps, bool first)
+double FWPDS::getOutRegExps(wfa::WFA const & input, wfa::WFA& output, map<int,reg_exp_t>& outNodeRegExps, map<int,int>& uMap, map<int,std::pair< std::pair<int,int>,int> >& mapBack, vector<int>& eps)
 {
   wali::util::GoodTimer * t = new wali::util::GoodTimer("tTimer");
   EWPDS::poststarSetupFixpoint(input,output);
@@ -407,11 +407,50 @@ double FWPDS::getOutRegExps(wfa::WFA const & input, wfa::WFA& output, map<int,re
   // Build the InterGraph using EWPDS saturation without weights
   EWPDS::poststarComputeFixpoint(output);
   t->stop();
-  double tmpTime = interGr->getOutnodeRegExps(outNodeRegExps, uMap, oMap, mapBack, eps, first);
+  double tmpTime = interGr->getOutnodeRegExps(outNodeRegExps, uMap, mapBack, eps);
   double totTime = tmpTime + t->total_time();
   delete t;
   return totTime;
 }
+
+double FWPDS::getOutRegExpsSimple(wfa::WFA const & input, wfa::WFA& output, map<int, reg_exp_t>& outNodeRegExps)
+{
+	wali::util::GoodTimer * t = new wali::util::GoodTimer("tTimer");
+	EWPDS::poststarSetupFixpoint(input, output);
+
+	// If theZero is invalid then no rules have
+	// been added to the WPDS and no saturation
+	// can be done.
+	if (!theZero.is_valid()) {
+		worklist->clear();
+		return 0;
+	}
+
+	// cache semiring 1
+	wghtOne = theZero->one();
+
+	// FIXME: Currently FWPDS always assumes that the
+	// underlying pds is a EWPDS. In the absence of
+	// merge functions, it can be treated as a WPDS.
+	// However, there is no cost benefit in using WPDS
+	interGr = new graph::InterGraph(theZero, true, false);
+	interGr->dag->topDownEval(topDown);
+	interGrs.push_back(interGr);
+
+	// Input transitions become source nodes in FWPDS
+	FWPDSSourceFunctor sources(*interGr.get_ptr(), true);
+	output.for_each(sources);
+
+	// Build the InterGraph using EWPDS saturation without weights
+	EWPDS::poststarComputeFixpoint(output);
+	t->stop();
+	double tmpTime = interGr->getOutnodeRegExpsSimple(outNodeRegExps);
+	double totTime = tmpTime + t->total_time();
+	delete t;
+	return totTime;
+}
+
+
 
 void FWPDS::poststarIGR( wfa::WFA const & input, wfa::WFA& output )
 {

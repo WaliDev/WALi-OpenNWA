@@ -278,8 +278,10 @@ namespace wali {
 
                 ~RegExp()
                 {
-                  for(list<reg_exp_t>::iterator it = children.begin(); it != children.end(); ++it)
-                    (*it)->parents.erase(this);
+					for (list<reg_exp_t>::iterator it = children.begin(); it != children.end(); ++it)
+					{
+						(*it)->parents.erase(this);
+					}
                 }
 
                 ostream &print(ostream &out);

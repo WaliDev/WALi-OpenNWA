@@ -14,6 +14,8 @@
 #include <iomanip>
 #include <sstream>
 #include <boost/cast.hpp>
+#include <unordered_map>
+#include <unordered_set>
 
 // ::wali
 #include "wali/SemElemTensor.hpp"
@@ -1151,13 +1153,133 @@ namespace wali {
             foo.close();
 #endif 
         }
+	/* Get the  just the regular expressions for the outgoing nodes
+	*
+	*  outNodeRegExps - A map from an id of the node to the regular expression
+	*/
+	double InterGraph::getOutnodeRegExpsSimple(map<int, reg_exp_t>& outNodeRegExps)
+	{
+		wali::util::GoodTimer * t = new wali::util::GoodTimer("graphTime");
+		//t->start();
+		dag->startSatProcess(sem);
+		// First, find the IntraGraphs in order to get the out nodes
+		int n = nodes.size();
+		int i;
+		intra_graph_uf = new UnionFind(n);
 
-	double InterGraph::getOutnodeRegExps(map<int,reg_exp_t>& outNodeRegExps, map<int,int>& uMap, map<int,int> & oMap, map<int,std::pair< std::pair<int,int>,int> >& mapBack, vector<int>& eps, bool first)
+		vector<GraphEdge>::iterator it;
+		vector<HyperEdge>::iterator it2;
+		std::list<IntraGraph *>::iterator gr_it;
+		multiset<tup > worklist;
+
+
+		//These two loops Group together all the nodes in each procedure
+
+		//Take the union of the src nodes and target nodes of the intra edges in the inter graph
+		for (it = intra_edges.begin(); it != intra_edges.end(); it++) {
+			intra_graph_uf->takeUnion((*it).src, (*it).tgt);
+		}
+
+		//Take the union of the src nodes and the target nodes in inter graph
+		for (it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
+			intra_graph_uf->takeUnion((*it2).src1, (*it2).tgt);
+		}
+		IntraGraph::SharedMemBuffer * memBuf = NULL;
+#ifdef INTRAGRAPH_SHARED_MEMORY
+			// Before creating IntraGraphs, create a CommonBuffer, if needed.
+			int max_size = 0;
+			for (gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
+				max_size = (max_size > (*gr_it)->getSize()) ? max_size : (*gr_it)->getSize();
+			}
+			memBuf = new IntraGraph::SharedMemBuffer(max_size);
+#endif
+
+		//for each node
+		for (i = 0; i < n; i++) {
+			int j = intra_graph_uf->find(i);
+			//If this node isn't associated with a graph, create a graph for it
+			if (nodes[j].gr == NULL) {
+				nodes[j].gr = new IntraGraph(dag, running_prestar, sem, memBuf);
+				gr_list.push_back(nodes[j].gr);
+			}
+			//If the node is a source node, set it to be so
+			nodes[i].gr = nodes[j].gr;
+			nodes[i].intra_nodeno = nodes[i].gr->makeNode(nodes[i].trans);
+			if (is_source_type(nodes[i].type)) {
+				nodes[i].gr->setSource(nodes[i].intra_nodeno, nodes[i].weight);
+			}
+			// zero all weights (some are set by setSource() )
+			if (nodes[i].weight.get_ptr() != NULL)
+				nodes[i].weight = nodes[i].weight->zero();
+		}
+		// Now fill up the IntraGraphs
+		//For each intra edge add an edge to the intra graph associated with it's source node
+		for (it = intra_edges.begin(); it != intra_edges.end(); it++) {
+			int s = (*it).src;
+			int t = (*it).tgt;
+			nodes[s].gr->addEdge(nodes[s].intra_nodeno, nodes[t].intra_nodeno, (*it).weight);
+		}
+
+		//For each inter hyperedge - edge between two graphs
+		for (it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
+			//gr = graph associated with the target edge
+			IntraGraph *gr = nodes[(*it2).tgt].gr;
+			//eno - edgenumber associated with edge in the graph (create a new one if it allready exists)
+			int eno = gr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, sem->zero(), true);
+			//uno - number of the node this edge depends on - it's a hyperedge, so it must
+			// gr2 is the graph associated with the 2nd src of the hyperedge
+			IntraGraph *gr2 = nodes[(*it2).src2].gr;
+			gr2->setOutNode(nodes[(*it2).src2].intra_nodeno, (*it2).src2);
+			//cout << "Src1: " << (*it2).src1 << "\t Src2: " << (*it2).src2 << "\t Tgt: " << (*it2).tgt << "\n";
+		}
+
+		// For SWPDS
+		vector<call_edge_t>::iterator it3;
+		for (it3 = call_edges.begin(); it3 != call_edges.end(); it3++) {
+			IntraGraph *gr1 = nodes[(*it3).first].gr;
+			IntraGraph *gr2 = nodes[(*it3).second].gr;
+			gr1->addCallEdge(gr2);
+		}
+
+		int index = 1;
+
+		// Setup Worklist - for each graph, set up the intra solution
+		for (gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
+			(*gr_it)->setupIntraSolution(false);
+			t->stop();
+			//For each intragraph node
+			for (vector<IntraGraphNode>::const_iterator nit = (*gr_it)->nodes.begin(); nit != (*gr_it)->nodes.end(); ++nit){
+				if (((*nit).node_no != -1) && ((*nit).node_no != 0))
+				{
+					int label = std::atoi(key2str((*nit).trans.stack).c_str());
+					if (label != 0) {
+						outNodeRegExps[label] = (*nit).regexp;
+					}
+				}
+			}
+			t->start();
+		}
+		t->stop();
+		double totTime = t->total_time();
+		delete t;
+		return totTime;
+	}
+	/* Get the regular expressions for the outgoing nodes and the maps associated with them
+	*
+	*  outNodeRegExps - A map from an id of the node to the regular expression
+	*
+	*  uMap - Map from a node ID to the regular expressions which depend on them in the inter edges
+	*  mapBack - A map from the node index to the struct of the <<src,tgt>,stack>
+	*  eps - A list of nodes with epsilon transitions
+	*  first - True if this is the first time this function has been called
+	*  oMap - a map from the outgoing node id associated with the whole intergraph to the new unique id of the node
+	*/
+	double InterGraph::getOutnodeRegExps(map<int,reg_exp_t>& outNodeRegExps, map<int,int>& uMap, map<int,std::pair< std::pair<int,int>,int> >& mapBack, vector<int>& eps)
 	{
 	  wali::util::GoodTimer * t = new wali::util::GoodTimer("graphTime");
 	  //t->start();
 	  dag->startSatProcess(sem);
-           // First, find the IntraGraphs
+           // First, find the IntraGraphs in order to get the out nodes
           int n = nodes.size();
           int i;
           intra_graph_uf = new UnionFind(n);
@@ -1169,9 +1291,13 @@ namespace wali {
 
 
           //These two loops Group together all the nodes in each procedure
+
+		  //Take the union of the src nodes and target nodes of the intra edges in the inter graph
           for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
             intra_graph_uf->takeUnion((*it).src,(*it).tgt);
           }
+
+		  //Take the union of the src nodes and the target nodes in inter graph
           for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
             intra_graph_uf->takeUnion((*it2).src1,(*it2).tgt);
           }
@@ -1185,12 +1311,15 @@ namespace wali {
           memBuf  = new IntraGraph::SharedMemBuffer(max_size);
 #endif
 
+		  //for each node
           for(i = 0; i < n;i++) {
             int j = intra_graph_uf->find(i);
+			//If this node isn't associated with a graph, create a graph for it
             if(nodes[j].gr == NULL) {
               nodes[j].gr = new IntraGraph(dag, running_prestar,sem, memBuf);
               gr_list.push_back(nodes[j].gr);
             }
+			//If the node is a source node, set it to be so
             nodes[i].gr = nodes[j].gr;
             nodes[i].intra_nodeno = nodes[i].gr->makeNode(nodes[i].trans);
             if(is_source_type(nodes[i].type)) {
@@ -1201,20 +1330,26 @@ namespace wali {
               nodes[i].weight = nodes[i].weight->zero();
           }
           // Now fill up the IntraGraphs
+		  //For each intra edge add an edge to the intra graph associated with it's source node
           for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
             int s = (*it).src;
             int t = (*it).tgt;
             nodes[s].gr->addEdge(nodes[s].intra_nodeno, nodes[t].intra_nodeno, (*it).weight);
           }
 
+		  //For each inter hyperedge - edge between two graphs
           for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
+			//gr = graph associated with the target edge
             IntraGraph *gr = nodes[(*it2).tgt].gr;
+			//eno - edgenumber associated with edge in the graph (create a new one if it allready exists)
             int eno = gr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, sem->zero(), true);
+			//uno - number of the node this edge depends on - it's a hyperedge, so it must
             int uno = gr->edges[eno].updatable_no;
-	    uMap[uno] = (*it2).src2;
-	    IntraGraph *gr2 = nodes[(*it2).src2].gr;
+			uMap[uno] = (*it2).src2;
+			// gr2 is the graph associated with the 2nd src of the hyperedge
+			IntraGraph *gr2 = nodes[(*it2).src2].gr;
             gr2->setOutNode(nodes[(*it2).src2].intra_nodeno, (*it2).src2);
-	    //cout << "Src1: " << (*it2).src1 << "\t Src2: " << (*it2).src2 << "\t Tgt: " << (*it2).tgt << "\n";
+	        //cout << "Src1: " << (*it2).src1 << "\t Src2: " << (*it2).src2 << "\t Tgt: " << (*it2).tgt << "\n";
           }
 
           // For SWPDS
@@ -1225,56 +1360,56 @@ namespace wali {
             gr1->addCallEdge(gr2);
           }
 
-	  int index = 1;
+		  int index = 1;
 
-          // Setup Worklist
+          // Setup Worklist - for each graph, set up the intra solution
           for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
             (*gr_it)->setupIntraSolution(false);
-	    t->stop();
+			t->stop();
+			//For each intragraph node
             for(vector<IntraGraphNode>::const_iterator nit = (*gr_it)->nodes.begin(); nit != (*gr_it)->nodes.end(); ++nit){
-	      if(((*nit).node_no != -1) && ((*nit).node_no != 0))
-              {
-		if(!first)  
-		{
-                  int label = std::atoi(key2str((*nit).trans.stack).c_str());
-                  if(label != 0) {
-                    outNodeRegExps[label] = (*nit).regexp;
-                  }
-                }
-		else 
-		{
-		  int intraNum = (*nit).node_no;
-		  int tgt = (*nit).trans.tgt;
-		  int stack = (*nit).trans.stack;
-		  int src = (*nit).trans.src;
-		  mapBack[index] = std::make_pair(std::make_pair(src,tgt),stack);
-		  outNodeRegExps[index] = (*nit).regexp;
-		  if(stack == 0 && tgt != 0)
-		  {
-		    eps.push_back(index);
-		    if((*nit).type == 3)
-		    {
-		      list<int>::const_iterator dit = (*gr_it)->out_nodes_intra->begin();
-		      for(list<int>::const_iterator cit = (*gr_it)->out_nodes_inter->begin(); cit != (*gr_it)->out_nodes_inter->end(); cit++)
-		      {
-		        if((*dit) == intraNum)
-			{
-			  oMap[(*cit)] = index;
+				if(((*nit).node_no != -1) && ((*nit).node_no != 0))
+				{
+					int intraNum = (*nit).node_no;
+					int tgt = (*nit).trans.tgt;
+					int stack = (*nit).trans.stack;
+					int src = (*nit).trans.src;
+					//Put a src, tgt, stack info in the transitions
+					mapBack[index] = std::make_pair(std::make_pair(src,tgt),stack);
+					outNodeRegExps[index] = (*nit).regexp;
+					if (stack == 0 && tgt != 0)
+					{
+						eps.push_back(index);
+						if ((*nit).type == 3)  //It's an outgoing node
+						{
+							list<int>::const_iterator dit = (*gr_it)->out_nodes_intra->begin(); // out nodes numbered as in this IntraGraph
+							for (list<int>::const_iterator cit = (*gr_it)->out_nodes_inter->begin(); cit != (*gr_it)->out_nodes_inter->end(); cit++) // out nodes numbered as in the InterGraph
+							{
+								//Find this node as numbered in the intergraph and associate that with the new unique id of the node
+								if ((*dit) == intraNum)
+								{
+									map<int, int>::iterator uIt;
+									for (uIt = uMap.begin(); uIt != uMap.end(); uIt++)
+									{
+										if (uIt->second == (*cit))
+										{
+											uMap[uIt->first] = index;
+										}
+									}
+								}
+								dit++;
+							}
+						}
+					}
+					index++;
+				}
 			}
-			dit++;
-		      }
-		    }
-		  }
-		  index++;
+			t->start();
 		}
-	      }
-	    }
-	    t->start();
-	  }
-	  t->stop();
-	  double totTime = t->total_time();
-	  delete t;
-	  return totTime;
+		t->stop();
+		double totTime = t->total_time();
+		delete t;
+		return totTime;
 	}
 
         // If an argument is passed in then only weights on those transitions will be available
@@ -1815,7 +1950,7 @@ namespace wali {
       sem_elem_t weight;
       std::list<int> *moutnodes;
 
-      std::tr1::unordered_map<int, sem_elem_t> cwt, xwt;
+      std::unordered_map<int, sem_elem_t> cwt, xwt;
       vector<HyperEdge>::iterator it2;
 
       // Initially store the values of c/x to compare against.
@@ -1895,7 +2030,7 @@ namespace wali {
         // Linear solve done. 
         // Update psuedo-constants.
         change = false;
-        std::tr1::unordered_set<int> onodesChanged;
+        std::unordered_set<int> onodesChanged;
         for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
           bool onodeChanged = false;
           int inode = it2->tgt;

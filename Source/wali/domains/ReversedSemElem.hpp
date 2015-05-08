@@ -142,7 +142,7 @@ namespace wali
       size_t
       hash() const
       {
-        return std::numeric_limits<size_t>::max() - backing_elem_->hash();
+        return (std::numeric_limits<size_t>::max)() - backing_elem_->hash();
       }
 
       std::ostream &
