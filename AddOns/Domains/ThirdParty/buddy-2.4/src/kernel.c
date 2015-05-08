@@ -45,7 +45,7 @@
 #include <math.h>
 #include <time.h>
 #include <assert.h>
-#include <execinfo.h>
+//#include <execinfo>
 
 #include "kernel.h"
 #include "cache.h"
@@ -809,14 +809,6 @@ const char *bdd_errstring(int e)
    e = abs(e);
    if (e<1 || e>BDD_ERRNUM)
       return NULL;
-   void *buffer[100];
-   char **stack_strings;
-   int j;
-   int stack_depth = backtrace(buffer, 100);
-   stack_strings = backtrace_symbols(buffer,stack_depth);
-   for (j=0; j<stack_depth; j++)
-     printf("%s\n", stack_strings[j]);
-   free(stack_strings);
    return errorstrings[e-1];
 }
 
@@ -824,15 +816,6 @@ const char *bdd_errstring(int e)
 void bdd_default_errhandler(int e)
 {
    fprintf(stderr, "BDD error: %s\n", bdd_errstring(e));
-      void *buffer[100];
-   char **stack_strings;
-   int j;
-   int stack_depth = backtrace(buffer, 100);
-   stack_strings = backtrace_symbols(buffer,stack_depth);
-   for (j=0; j<stack_depth; j++)
-     printf("%s\n", stack_strings[j]);
-   free(stack_strings);
-   assert(0);
    exit(1);
 }
 

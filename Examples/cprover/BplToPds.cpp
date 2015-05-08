@@ -6,6 +6,7 @@
 #include "wali/domains/binrel/BinRelMergeFns.hpp"
 #include <boost/cast.hpp>
 #include "wali/wpds/ewpds/EWPDS.hpp"
+#include "../turetsky/svn-repository/nwaobdd.h"
 
 using namespace std;
 using namespace wali;
@@ -13,6 +14,8 @@ using namespace wali::wpds;
 using namespace wali::wpds::ewpds;
 using namespace wali::wpds::fwpds;
 using namespace wali::domains::binrel;
+using namespace wali::domains::nwaobddrel;
+using namespace wali::domains;
 using namespace wali::cprover;
 using namespace wali::cprover::details;
 using namespace wali::cprover::details::resolve_details;
@@ -83,6 +86,71 @@ namespace wali
         }
       }
     }
+
+	namespace nwaobddrel
+	{
+		/*
+		* Create the NWA_OBDD for a contrains statement with the given context
+		*/
+		static NWA_OBDD::NWAOBDD xformer_for_constrain(const expr * e, NWAOBDDContext * con, const char * f) {
+		{
+        int varInfo;
+        string s;
+        if(!e)
+          assert(0 && "xformer_for_constrain");
+		//Our left and right sides of the expression start as falase NWA_OBDDs
+		NWA_OBDD::NWAOBDD l = NWA_OBDD::MkFalse(), r = NWA_OBDD::MkFalse();
+        stringstream ss;
+		//Get the left and right sides of the expression as NWA_OBDDs
+        if(e->l)
+          l = xformer_for_constrain(e->l, con, f);
+        if(e->r)
+          r = xformer_for_constrain(e->r, con, f);
+        switch(e->op){
+          case AST_NOT:
+            return NWA_OBDD::MkNot(l);
+          case AST_XOR:
+            return NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, NWA_OBDD::MkNot(r)), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), r));
+          case AST_OR:
+            return NWA_OBDD::MkOr(l, r);
+          case AST_AND:
+            return NWA_OBDD::MkAnd(l, r);
+          case AST_EQ:
+            return NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, r), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), NWA_OBDD::MkNot(r)));
+          case AST_NEQ:
+			  return NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, NWA_OBDD::MkNot(r)), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), r));
+          case AST_IMP:
+            return NWA_OBDD::MkOr(NWA_OBDD::MkNot(l), r);
+          case AST_SCHOOSE:
+			  return NWA_OBDD::MkOr(l, NWA_OBDD::MkAnd(NWA_OBDD::MkNot(r), NWA_OBDD::MkTrue()));
+          case AST_VAR:
+          case AST_VAR_POST:
+            ss << f << "::" << e->v;
+            s = ss.str();
+            if(con->varMap.find(ss.str()) == con->varMap.end()){
+              stringstream ss2;
+              ss2 << "::" << e->v;
+			  assert(con->varMap.find(ss2.str()) != con->varMap.end());
+              s = ss2.str();
+            }
+			varInfo = con->varMap.find(s)->second;
+            if(e->op == AST_VAR)
+              return con->NWAOBDDTCreate(varInfo,BASE_PRE);
+            else // e->op == AST_VAR_POST
+				return con->NWAOBDDTCreate(varInfo, BASE_POST);
+          case AST_NONDET:
+            return NWA_OBDD::MkTrue();
+          case AST_CONSTANT:
+            if(e->c == ONE)
+				return NWA_OBDD::MkTrue();
+            else
+              return NWA_OBDD::MkFalse();
+          default:
+            assert(0 && "expr_as_nwaobdd: Unknown case");
+        }
+      }
+		}
+	}
   }
   namespace cprover
   {
@@ -635,9 +703,10 @@ namespace wali
         }
       } // namespce resolve_details
 
+
       BddContext * dump_pds_from_prog(wpds::WPDS * pds, prog * pg)
       {
-        ProgramBddContext * con = new ProgramBddContext(100*MILLION, 10*MILLION); 
+        ProgramBddContext * con = new ProgramBddContext(10*MILLION, 1*MILLION); 
         //ProgramBddContext * con = new ProgramBddContext(); 
 
         map<string, int> vars;
@@ -682,14 +751,14 @@ namespace wali
         stmt_ptr_stmt_list_ptr_hash_map goto_to_targets;
         stmt_ptr_proc_ptr_hash_map call_to_callee;
 
-        map_name_to_proc(name_to_proc, pg);
+        resolve_details::map_name_to_proc(name_to_proc, pg);
 
         pl = pg->pl;
         while(pl){
           proc * p = pl->p;
-          map_label_to_stmt(label_to_stmt, p);
-          map_goto_to_targets(goto_to_targets, label_to_stmt, p);
-          map_call_to_callee(call_to_callee, name_to_proc, p);
+		  resolve_details::map_label_to_stmt(label_to_stmt, p);
+		  resolve_details::map_goto_to_targets(goto_to_targets, label_to_stmt, p);
+		  resolve_details::map_call_to_callee(call_to_callee, name_to_proc, p);
 
           dump_pds_from_proc(pds, p, con, goto_to_targets, call_to_callee); 
 
@@ -698,7 +767,8 @@ namespace wali
           call_to_callee.clear();
           pl = pl->n;
         }
-	havocLocals(pds,pg,con);
+		
+		cprover::havocLocals(pds, pg, con);
         name_to_proc.clear();
         fprintf(stderr, "Done converting\n");
 
@@ -758,6 +828,212 @@ namespace wali
             assert(0 && "expr_as_bdd: Unknown case");
         }
       }
+
+
+		  NWAOBDDContext * dump_pds_from_prog_nwa(wpds::WPDS * pds, prog * pg)
+		  {
+
+			  map<string, int> vars;
+
+			  //Iterate through the global variables and give them unique names
+			  const str_list * vl = pg->vl;
+			  while (vl){
+				  stringstream ss;
+				  ss << "::" << vl->v;
+				  vars[ss.str()] = 2; //A Boolean type
+				  vl = vl->n;
+			  }
+
+			  //For each procedure
+			  proc_list * pl = pg->pl;
+			  while (pl){
+				  //Iterate through the arguments to the procedure and give them unique names
+				  vl = pl->p->al;
+				  while (vl){
+					  stringstream ss;
+					  ss << pl->p->f << "::" << vl->v;
+					  vars[ss.str()] = 2; //A Boolean type
+					  vl = vl->n;
+				  }
+				  //Iterate through the local variables of the procedure and give them unique names
+				  vl = pl->p->vl;
+				  while (vl){
+					  stringstream ss;
+					  ss << pl->p->f << "::" << vl->v;
+					  //con->addBoolVar(ss.str());
+					  vars[ss.str()] = 2; //A Boolean type
+					  vl = vl->n;
+				  }
+				  pl = pl->n;
+			  }
+			  fprintf(stderr, "Entering setIntVars\n");
+			  
+			  int numVars;
+			  numVars = vars.size();
+			  unsigned int numSpaces = 12 * numVars;
+			  unsigned int minLevels = ceil(log2(numSpaces + 4) - 2);
+			  if (minLevels % 2)
+			  {
+				  minLevels++;
+			  }
+
+			  
+			  NWA_OBDD::setMaxLevel(minLevels);
+			  NWA_OBDD::NWAOBDDNodeHandle::InitNoDistinctionTable();
+			  NWA_OBDD::NWAOBDDNodeHandle::InitReduceCache();
+			  NWA_OBDD::InitPairProductCache();
+			  NWA_OBDD::InitPathSummaryCache();
+			  NWA_OBDD::InitPairProductMapCaches();
+			  InitModPathSummaryCache();
+			  NWAOBDDContext * con = new NWAOBDDContext(BASE_1ST_TENSOR_ROOT);
+			  con->setIntVars(vars,minLevels);
+			  fprintf(stderr, "Done with setIntVars\n");
+
+			  str_stmt_ptr_hash_map label_to_stmt;
+			  str_proc_ptr_hash_map name_to_proc;
+			  stmt_ptr_stmt_list_ptr_hash_map goto_to_targets;
+			  stmt_ptr_proc_ptr_hash_map call_to_callee;
+
+			  resolve_details::map_name_to_proc(name_to_proc, pg);
+
+			  pl = pg->pl;
+			  while (pl){
+				  proc * p = pl->p;
+				  resolve_details::map_label_to_stmt(label_to_stmt, p);
+				  resolve_details::map_goto_to_targets(goto_to_targets, label_to_stmt, p);
+				  resolve_details::map_call_to_callee(call_to_callee, name_to_proc, p);
+
+				  dump_pds_from_proc(pds, p, con, goto_to_targets, call_to_callee);
+
+				  label_to_stmt.clear();
+				  clear_stmt_ptr_stmt_list_ptr_hash_map(goto_to_targets);
+				  call_to_callee.clear();
+				  pl = pl->n;
+			  }
+
+			  havocLocalsNWA(pds, pg, con);
+			  name_to_proc.clear();
+			  fprintf(stderr, "Done converting\n");
+
+			  return con;
+		  }
+
+
+		  namespace nwaobddrel {
+
+			  static NWA_OBDD::NWAOBDD clearRegA(NWA_OBDD::NWAOBDD n, NWAOBDDContext * con)
+			  {
+				  int vOff2 = con->getVLoc(REG_A_INFO);
+				  int regALoc = con->findVarLoc(0, 0, con->maxLevel, vOff2);
+				  NWA_OBDD::NWAOBDD r = MkExists(n, regALoc);
+				  return r;
+			  }
+
+			  static NWA_OBDD::NWAOBDD expr_as_nwaobdd(const expr * e, NWAOBDDContext *  con, const char * f, std::string lhs)
+			  {
+				  if (!e)
+					  assert(0 && "expr_as_nwaobdd");
+				  NWA_OBDD::NWAOBDD l = NWA_OBDD::MkFalse(), r = NWA_OBDD::MkFalse();
+				  stringstream ss;
+				  if (e->l)
+					  l = expr_as_nwaobdd(e->l, con, f, lhs);
+				  if (e->r)
+					  r = expr_as_nwaobdd(e->r, con, f, lhs);
+				  switch (e->op){
+				  case AST_NOT:
+					  return clearRegA(NWA_OBDD::MkNot(l), con);
+				  case AST_XOR:
+					  return clearRegA(NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, NWA_OBDD::MkNot(r)), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), r)), con);
+				  case AST_OR:
+					  return clearRegA(NWA_OBDD::MkOr(l, r), con);
+				  case AST_AND:
+					  return clearRegA(NWA_OBDD::MkAnd(l, r), con);
+				  case AST_EQ:
+					  return clearRegA(NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, r), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), NWA_OBDD::MkNot(r))), con);
+				  case AST_NEQ:
+					  return clearRegA(NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, NWA_OBDD::MkNot(r)), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), r)), con);
+				  case AST_IMP:
+					  return clearRegA(NWA_OBDD::MkOr(NWA_OBDD::MkNot(l), r), con);
+				  case AST_NONDET:
+					  return NWA_OBDD::MkTrue();
+				  case AST_SCHOOSE:
+					  return clearRegA(NWA_OBDD::MkOr(l, NWA_OBDD::MkAnd(NWA_OBDD::MkNot(r), NWA_OBDD::MkTrue())), con);
+				  case AST_VAR:
+					  ss << f << "::" << e->v;
+					  if (con->varMap.find(ss.str()) != con->varMap.end()){
+						  return con->From(lhs,ss.str());
+					  }
+					  else{
+						  stringstream ss2;
+						  ss2 << "::" << e->v;
+						  assert(con->varMap.find(ss2.str()) != con->varMap.end());
+						  return con->From(lhs,ss2.str());
+					  }
+				  case AST_VAR_POST:
+					  assert(0 && "expr_as_nwaobdd: AST_VAR_POST should not occur in expr_as_nwaobdd");
+				  case AST_CONSTANT:
+					  if (e->c == ONE)
+						  return con->True(lhs);
+					  else
+						  return con->False(lhs);
+				  default:
+					  assert(0 && "expr_as_nwaobdd: Unknown case");
+				  }
+			  }
+
+		  static NWA_OBDD::NWAOBDD expr_as_nwaobdd(const expr * e, NWAOBDDContext *  con, const char * f)
+		  {
+			  if (!e)
+				  assert(0 && "expr_as_nwaobdd");
+			  NWA_OBDD::NWAOBDD l = NWA_OBDD::MkFalse(), r = NWA_OBDD::MkFalse();
+			  stringstream ss;
+			  if (e->l)
+				  l = expr_as_nwaobdd(e->l, con, f);
+			  if (e->r)
+				  r = expr_as_nwaobdd(e->r, con, f);
+			  switch (e->op){
+			  case AST_NOT:
+				  return clearRegA(NWA_OBDD::MkNot(l), con);
+			  case AST_XOR:
+				  return clearRegA(NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, NWA_OBDD::MkNot(r)), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), r)), con);
+			  case AST_OR:
+				  return clearRegA(NWA_OBDD::MkOr(l, r), con);
+			  case AST_AND:
+				  return clearRegA(NWA_OBDD::MkAnd(l, r), con);
+			  case AST_EQ:
+				  return clearRegA(NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, r), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), NWA_OBDD::MkNot(r))), con);
+			  case AST_NEQ:
+				  return clearRegA(NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, NWA_OBDD::MkNot(r)), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), r)), con);
+			  case AST_IMP:
+				  return clearRegA(NWA_OBDD::MkOr(NWA_OBDD::MkNot(l), r), con);
+			  case AST_NONDET:
+				  return NWA_OBDD::MkTrue();
+			  case AST_SCHOOSE:
+				  return clearRegA(NWA_OBDD::MkOr(l, NWA_OBDD::MkAnd(NWA_OBDD::MkNot(r), NWA_OBDD::MkTrue())), con);
+			  case AST_VAR:
+				  ss << f << "::" << e->v;
+				  if (con->varMap.find(ss.str()) != con->varMap.end()){
+					  return con->From(ss.str());
+				  }
+				  else{
+					  stringstream ss2;
+					  ss2 << "::" << e->v;
+					  assert(con->varMap.find(ss2.str()) != con->varMap.end());
+					  return con->From(ss2.str());
+				  }
+			  case AST_VAR_POST:
+				  assert(0 && "expr_as_nwaobdd: AST_VAR_POST should not occur in expr_as_nwaobdd");
+			  case AST_CONSTANT:
+				  if (e->c == ONE)
+					  return con->True();
+				  else
+					  return con->False();
+			  default:
+				  assert(0 && "expr_as_nwaobdd: Unknown case");
+			  }
+		  }
+
+	  }
 
       static wali::Key stt()
       {
@@ -997,6 +1273,218 @@ namespace wali
         dump_pds_from_stmt_list(pds, p->sl, con, goto_to_targets, call_to_callee, p->f, NULL);
       }
 
+	  
+		  void dump_pds_from_proc(WPDS * pds, proc * p, NWAOBDDContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const stmt_ptr_proc_ptr_hash_map& call_to_callee)
+		  {
+			  // Create a lead-in edge from the proc itself to the first statment.
+			  pds->add_rule(stt(), stk(p), stt(), stk(p->sl->s), con->getBaseOne());
+			  dump_pds_from_stmt_list(pds, p->sl, con, goto_to_targets, call_to_callee, p->f, NULL);
+		  }
+
+		  void dump_pds_from_stmt(WPDS * pds, stmt * s, NWAOBDDContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const
+			  stmt_ptr_proc_ptr_hash_map& call_to_callee, const char * f, stmt * ns)
+		  {
+			  nwaobdd_t one = con->getBaseOne();
+			  NWA_OBDD::NWAOBDD b, b1;
+			  str_list * vl;
+			  expr_list * el;
+			  stmt_list * sl;
+			  stmt_ptr_stmt_list_ptr_hash_map::const_iterator goto_iter;
+			  stmt_ptr_proc_ptr_hash_map::const_iterator callee_iter;
+			  string lhs;
+
+			  if (!s)
+				  assert(0 && "dump_pds_from_stmt");
+			  switch (s->op){
+			  case AST_SKIP:
+				  pds->add_rule(stt(), stk(s), stt(), stk(ns), one);
+				  break;
+			  case AST_GOTO:
+				  goto_iter = goto_to_targets.find(s);
+				  assert(goto_iter != goto_to_targets.end());
+				  sl = goto_iter->second;
+				  while (sl){
+					  pds->add_rule(stt(), stk(s), stt(), stk(sl->s), one);
+					  sl = sl->n;
+				  }
+				  break;
+			  case AST_RETURN:
+				  if (merge_type == NO_MERGE){
+					  b = one->getNWAOBDD();
+					  // havoc all local variables because there is no merge function.
+					  stringstream ss;
+					  ss << f << "::";
+					  string str = ss.str();
+					  for (std::map<string, int>::const_iterator cit = con->varMap.begin(); cit != con->varMap.end(); ++cit)
+						  if (cit->first.find(str) != string::npos)
+							  b = con->HavocVar(cit->first, b);
+				  }
+				  else b = one->getNWAOBDD();
+				  pds->add_rule(stt(), stk(s), stt(), new NWAOBDDRel(con, b));
+				  break;
+			  case AST_ASSIGN:
+				  assert(s->vl && s->el);
+				  b = con->BaseID();
+				  vl = s->vl;
+				  el = s->el;
+				  while (vl || el){
+					  if (!vl || !el)
+						  assert(0 && "[dump_pds_from_stmt] Assignment should have the same number of lhs/rhs");
+					  // Special case added after correspondance with Tom Ball.
+					  // Assignments of the type _ = <exp> are dummy assignments 
+					  // that we don't care about.
+					  if (strcmp(vl->v, "_") == 0){
+						  cout << "Skipped assignment to dummy variable _" << endl;
+						  vl = vl->n;
+						  el = el->n;
+						  continue;
+					  }
+					  stringstream ss;
+					  ss << f << "::" << vl->v;
+					  if (con->varMap.find(ss.str()) != con->varMap.end()){
+						  lhs = ss.str();
+					  }
+					  else{
+						  stringstream ss2;
+						  ss2 << "::" << vl->v;
+						  lhs = string(ss2.str());
+					  }
+					  if (con->varMap.find(lhs) == con->varMap.end()){
+						  cout << "Unknown variable: [" << vl->v << "]" << endl;
+						  assert(0);
+					  }
+					  b = con->HavocVar(lhs, b);
+					  vl = vl->n;
+					  el = el->n;
+				  }
+				  vl = s->vl;
+				  el = s->el;
+				  b1 = NWA_OBDD::MkTrue();
+				  while (vl || el){ //Most of the checks for errors were done in the previous loop, no need to do it again.
+					  if (strcmp(vl->v, "_") == 0){
+						  cout << "Skipped assignment to dummy variable _" << endl;
+						  vl = vl->n;
+						  el = el->n;
+						  continue;
+					  }
+					  stringstream ss;
+					  ss << f << "::" << vl->v;
+					  if (con->varMap.find(ss.str()) != con->varMap.end()){
+						  lhs = ss.str();
+					  }
+					  else{
+						  stringstream ss2;
+						  ss2 << "::" << vl->v;
+						  lhs = string(ss2.str());
+					  }
+					  b1 = NWA_OBDD::MkAnd(b1, con->AssignGen(lhs,nwaobddrel::expr_as_nwaobdd(el->e, con, f, lhs), b));
+					  vl = vl->n;
+					  el = el->n;
+				  }
+				  if (s->e)
+					  b1 = NWA_OBDD::MkAnd(b1,xformer_for_constrain(s->e, con, f));
+				  pds->add_rule(stt(), stk(s), stt(), stk(ns), new NWAOBDDRel(con, b1));
+				  break;
+			  case AST_ITE:
+				  assert(s->e && s->sl1);
+				  if (s->sl1){
+					  assert(s->sl1->s);
+					  //Create a rule that makes s->e true in pre and post
+					  b = NWA_OBDD::MkAnd(nwaobddrel::expr_as_nwaobdd(s->e, con, f), con->BaseID());
+					  pds->add_rule(stt(), stk(s), stt(), stk(s->sl1->s), new NWAOBDDRel(con, b));
+				  }
+				  if (s->sl2){
+					  //Create a rule that makes s->e false in pre and post
+					  assert(s->sl2->s);
+					  b = NWA_OBDD::MkAnd(NWA_OBDD::MkNot(nwaobddrel::expr_as_nwaobdd(s->e, con, f)), con->BaseID());
+					  pds->add_rule(stt(), stk(s), stt(), stk(s->sl2->s), new NWAOBDDRel(con, b));
+				  }
+				  else{
+					  // fall through edge.
+					  b = NWA_OBDD::MkAnd(NWA_OBDD::MkNot(nwaobddrel::expr_as_nwaobdd(s->e, con, f)), con->BaseID());
+					  pds->add_rule(stt(), stk(s), stt(), stk(ns), new NWAOBDDRel(con, b));
+				  }
+				  if (s->sl1)
+					  dump_pds_from_stmt_list(pds, s->sl1, con, goto_to_targets, call_to_callee, f, ns);
+				  if (s->sl2)
+					  dump_pds_from_stmt_list(pds, s->sl2, con, goto_to_targets, call_to_callee, f, ns);
+				  break;
+			  case AST_WHILE:
+				  assert(s->e && s->sl1);
+				  b = NWA_OBDD::MkIff(nwaobddrel::expr_as_nwaobdd(s->e, con, f), con->True());
+				  pds->add_rule(stt(), stk(s), stt(), stk(s->sl1->s), new NWAOBDDRel(con, b));
+				  dump_pds_from_stmt_list(pds, s->sl1, con, goto_to_targets, call_to_callee, f, s);
+				  b = NWA_OBDD::MkIff(nwaobddrel::expr_as_nwaobdd(s->e, con, f), con->False());
+				  pds->add_rule(stt(), stk(s), stt(), stk(ns), new NWAOBDDRel(con, b));
+				  break;
+			  case AST_ASSERT:
+				  assert(0 && "assert statements can't be dumped to PDS. Use instrument_asserts");
+				  break;
+			  case AST_ASSUME:
+				  assert(s->e);
+				  b = NWA_OBDD::MkIff(nwaobddrel::expr_as_nwaobdd(s->e, con, f), con->True());
+				  pds->add_rule(stt(), stk(s), stt(), stk(ns), new NWAOBDDRel(con, b));
+				  break;
+			  case AST_CALL:
+				  callee_iter = call_to_callee.find(s);
+				  assert(callee_iter != call_to_callee.end());
+				  assert(callee_iter->second->sl);
+				  assert(callee_iter->second->sl->s);
+				  // Make a call rule to the callee.
+				  // The stack symbol for callee is derived from the proc itself (not the first statement in the proc)
+				  switch (merge_type){
+				  case NO_MERGE:
+					  pds->add_rule(stt(), stk(s), stt(), stk(callee_iter->second), stk(ns), one);
+					  break;
+				  case MEET_MERGE:
+				  case TENSOR_MERGE:
+				  {
+					  vector<string> lvars;
+					  vector<string> lvars2;
+					  stringstream ss;
+					  ss << s->f << "::";
+					  stringstream st;
+					  st << f << "::";
+					  string str = ss.str();
+					  string str2 = st.str();
+					  for (std::map<string,int>::const_iterator cit = con->varMap.begin(); cit != con->varMap.end(); ++cit)
+					  {
+						  if (cit->first.find(str) != string::npos)
+							  lvars.push_back(cit->first);
+						  if (cit->first.find(str2) != string::npos)
+							  lvars2.push_back(cit->first);
+					  }
+					  merge_fn_t merge;
+					  //ETTODO - implement Merge
+					  /*if (merge_type == MEET_MERGE)
+						  merge = new MeetMergeFn(con, lvars, lvars2);
+					  else
+						  merge = new TensorMergeFn(con, lvars, lvars2);
+					  */
+					  boost::polymorphic_cast<EWPDS*>(pds)->add_rule(stt(), stk(s), stt(), stk(callee_iter->second), stk(ns), one, merge);
+				  }
+					  break;
+				  default:
+					  cerr << "Unknown merge_type\n";
+					  assert(0);
+				  }
+				  break;
+			  }
+		  }
+
+
+		  void dump_pds_from_stmt_list(WPDS * pds, stmt_list * sl, NWAOBDDContext * con, const stmt_ptr_stmt_list_ptr_hash_map&
+			  goto_to_targets, const stmt_ptr_proc_ptr_hash_map& call_to_callee, const char * f, stmt * es)
+		  {
+			  while (sl){
+				  if (sl->n)
+					  dump_pds_from_stmt(pds, sl->s, con, goto_to_targets, call_to_callee, f, sl->n->s);
+				  else
+					  dump_pds_from_stmt(pds, sl->s, con, goto_to_targets, call_to_callee, f, es);
+				  sl = sl->n;
+			  }
+		  }
+
 
       static unsigned loc(stmt_list * sl)
       {
@@ -1158,6 +1646,140 @@ namespace wali
       }
     }
 
+	namespace nwaobddrel {
+		NWAOBDDContext * read_prog(WPDS * pds, const char * fname, bool dbg)
+		{
+			FILE * fin;
+			fin = fopen(fname, "r");
+			parse(fin);
+			prog * pg = parsing_result;
+			parsing_result = NULL;
+			if (dbg)
+				emit_prog(stdout, pg);
+			NWAOBDDContext * con = dump_pds_from_prog_nwa(pds, pg);
+			deep_erase_prog(&pg);
+			return con;
+		}
+	}
+		NWAOBDDContext * pds_from_prog_nwa(wpds::WPDS * pds, prog * pg)
+		{
+			assert(pg);
+			set_merge_type(wali::cprover::details::NO_MERGE);
+			NWAOBDDContext * con = dump_pds_from_prog_nwa(pds, pg);
+			pds->printStatistics(cout);
+			return con;
+		}
+		namespace nwaobddrel {
+		NWAOBDDContext * pds_from_prog_with_meet_merge(wpds::ewpds::EWPDS * pds, prog *pg)
+		{
+			assert(pg);
+			set_merge_type(wali::cprover::details::MEET_MERGE);
+			NWAOBDDContext * con = dump_pds_from_prog_nwa(pds, pg);
+			pds->printStatistics(cout);
+			return con;
+		}
+
+		NWAOBDDContext * pds_from_prog_with_tensor_merge(wpds::ewpds::EWPDS * pds, prog *pg)
+		{
+			assert(pg);
+			set_merge_type(wali::cprover::details::TENSOR_MERGE);
+			NWAOBDDContext * con = dump_pds_from_prog_nwa(pds, pg);
+			pds->printStatistics(cout);
+			return con;
+		}
+	}
+	
+		NWAOBDDContext * havocLocalsNWA(wpds::WPDS * pds, prog * pg, NWAOBDDContext * con)
+		{
+			WpdsRules dr = WpdsRules();
+			pds->for_each(dr);
+			for (std::set<Rule>::iterator it = dr.pushRules.begin();
+				it != dr.pushRules.end(); ++it){
+
+				// Find p', y'
+				Key p_prime = it->to_state();
+				Key y_prime = it->to_stack1();
+				Key y_prime_prime = it->to_stack2();
+
+				assert(y_prime_prime != WALI_EPSILON);
+				assert(y_prime != WALI_EPSILON);
+
+				// Create havoc weight h
+				NWA_OBDD::NWAOBDD h = con->BaseID();
+
+				//For each procedure
+				proc_list * pl = pg->pl;
+				while (pl){
+					//Iterate through the local variables of the procedure and give them unique names
+					const str_list * vl = pl->p->vl;
+					while (vl){
+						stringstream ss;
+						ss << pl->p->f << "::" << vl->v;
+						string lhs = ss.str();
+						h = con->HavocVar(lhs, h);
+						vl = vl->n;
+					}
+					pl = pl->n;
+				}
+
+				NWAOBDDRel * h_new = new NWAOBDDRel(con, h);
+				sem_elem_t h_sem = (SemElem *)h_new;
+
+				// For each rule r_n, if r+n is of the form <p',y'> -w-> <p", y''', y''''>
+				//                                      <p',y'> -w-> <p",y'''>
+				//                                      <p',y'> -w-> <p",*>
+				//    weight w_new = h extend w
+				//    add_rule(... same rule with w_new ...);
+				// p", y''', y''''
+				for (std::set<Rule>::iterator sit = dr.stepRules.begin();
+					sit != dr.stepRules.end(); sit++)
+				{
+					Key p_prime2 = sit->from_state();
+					Key y_prime2 = sit->from_stack();
+					if ((p_prime2 == p_prime) && (y_prime2 == y_prime))
+					{
+						Key p_dprime = sit->to_state();
+						Key y_prime3 = sit->to_stack1();
+						Key y_prime4 = sit->to_stack2();
+						sem_elem_t w_new = h_sem->extend(sit->weight());
+						pds->replace_rule(p_prime, y_prime, p_dprime, y_prime3, y_prime4, w_new);
+					}
+				}
+
+				for (std::set<Rule>::iterator sit = dr.popRules.begin();
+					sit != dr.popRules.end(); sit++)
+				{
+					Key p_prime2 = sit->from_state();
+					Key y_prime2 = sit->from_stack();
+					if ((p_prime2 == p_prime) && (y_prime2 == y_prime))
+					{
+						Key p_dprime = sit->to_state();
+						Key y_prime3 = sit->to_stack1();
+						Key y_prime4 = sit->to_stack2();
+						sem_elem_t w_new = h_sem->extend(sit->weight());
+						pds->replace_rule(p_prime, y_prime, p_dprime, y_prime3, y_prime4, w_new);
+					}
+				}
+
+				for (std::set<Rule>::iterator sit = dr.pushRules.begin();
+					sit != dr.pushRules.end(); sit++)
+				{
+					Key p_prime2 = sit->from_state();
+					Key y_prime2 = sit->from_stack();
+					if ((p_prime2 == p_prime) && (y_prime2 == y_prime))
+					{
+						Key p_dprime = sit->to_state();
+						Key y_prime3 = sit->to_stack1();
+						Key y_prime4 = sit->to_stack2();
+						sem_elem_t w_new = h_sem->extend(sit->weight());
+						pds->replace_rule(p_prime, y_prime, p_dprime, y_prime3, y_prime4, w_new);
+					}
+				}
+
+				return con;
+			}
+		}
+
     void print_prog_stats(prog * pg)
     {
       assert(pg);
@@ -1205,27 +1827,27 @@ namespace wali
     // May be called any time.
     void remove_skip(prog * pg)
     {
-      remove_skip_in_prog(pg);
+		resolve_details::remove_skip_in_prog(pg);
     }
 
     void instrument_enforce(prog * pg)
     {
-      instrument_enforce_in_prog(pg);
+		resolve_details::instrument_enforce_in_prog(pg);
     }
 
     void instrument_asserts(prog * pg, const char * errLbl)
     {
-      instrument_asserts_prog(pg, errLbl);
+		resolve_details::instrument_asserts_prog(pg, errLbl);
     }
 
     void instrument_call_return(prog * pg)
     {
-      instrument_call_return_in_prog(pg);
+		resolve_details::instrument_call_return_in_prog(pg);
     }
 
     void make_void_returns_explicit(prog * pg)
     {
-      make_void_returns_explicit_in_prog(pg);  
+		resolve_details::make_void_returns_explicit_in_prog(pg);
     }
 
     Key getEntryStk(const prog * pg, const char * f)

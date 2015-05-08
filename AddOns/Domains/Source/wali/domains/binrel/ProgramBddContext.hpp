@@ -7,7 +7,7 @@
 #include "wali/ref_ptr.hpp"
 #include "wali/Countable.hpp"
 
-#include "buddy/fdd.h"
+#include "fdd.h"
 
 #include "boost/serialization/access.hpp"
 

@@ -390,6 +390,7 @@
     <ClCompile Include="..\..\..\Source\wali\wfa\epr\FunctionalWeightMaker.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\AddOns\Domains\Source\wali\domains\binrel\BinRel.hpp" />
     <ClInclude Include="..\..\..\Source\opennwa\construct\complement.hpp" />
     <ClInclude Include="..\..\..\Source\opennwa\construct\concat.hpp" />
     <ClInclude Include="..\..\..\Source\opennwa\construct\constructions.hpp" />

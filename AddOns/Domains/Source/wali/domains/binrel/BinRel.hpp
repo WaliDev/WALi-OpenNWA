@@ -34,7 +34,8 @@
 #include "wali/Countable.hpp"
 #include "wali/ref_ptr.hpp"
 #include "wali/SemElemTensor.hpp"
-#include "buddy/fdd.h"
+#include "fdd.h"
+#include "bdd.h"
 #include "wali/Key.hpp"
 
 /**

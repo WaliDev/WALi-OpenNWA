@@ -5,7 +5,7 @@
  */
  
 #include "BinRel.hpp"
-#include "buddy/fdd.h"
+#include "fdd.h"
 #include "ProgramBddContext.hpp"
 //#include "BuddyExt.hpp"
 #include "combination.hpp"
@@ -16,7 +16,7 @@
 
 #include <boost/algorithm/string/predicate.hpp>
 
-#include <tr1/unordered_map>
+#include <unordered_map>
 
 using namespace wali::domains::binrel;
 using std::endl;

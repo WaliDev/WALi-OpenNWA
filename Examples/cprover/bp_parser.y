@@ -416,7 +416,7 @@ asgn_id
 
 assert	
 	: ASSERT expression
-	  {
+	  {list
 	  	$$ = make_assert_stmt($2);
 	  };
 	  

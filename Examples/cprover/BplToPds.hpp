@@ -10,6 +10,7 @@
 
 #include "wali/domains/binrel/BinRel.hpp"
 #include "wali/domains/binrel/ProgramBddContext.hpp"
+#include "../turetsky/svn-repository/NWAOBDDRel.hpp"
 
 extern "C" {
 #include "ast.h"
@@ -87,12 +88,20 @@ namespace wali
       }
 
       wali::domains::binrel::BddContext * dump_pds_from_prog(wpds::WPDS * pds, prog * pg);
-      void dump_pds_from_proc(
+	  wali::domains::nwaobddrel::NWAOBDDContext * dump_pds_from_prog_nwa(wpds::WPDS * pds, prog * pg);
+	  
+	  void dump_pds_from_proc(
           wpds::WPDS * pds, 
           proc * p, 
           domains::binrel::ProgramBddContext * con, 
           const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
           const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee);
+	  void dump_pds_from_proc(
+		  wpds::WPDS * pds,
+		  proc * p,
+		  domains::nwaobddrel::NWAOBDDContext * con,
+		  const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
+		  const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee);
       void dump_pds_from_stmt(
           wpds::WPDS * pds, 
           stmt * s, 
@@ -110,6 +119,23 @@ namespace wali
           const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee, 
           const char * f, 
           stmt * es);
+	  void dump_pds_from_stmt(
+		  wpds::WPDS * pds,
+		  stmt * s,
+		  domains::nwaobddrel::NWAOBDDContext * con,
+		  const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
+		  const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee,
+		  const char * f,
+		  stmt * ns);
+
+	  void dump_pds_from_stmt_list(
+		  wpds::WPDS * pds,
+		  stmt_list * sl,
+		  domains::nwaobddrel::NWAOBDDContext * con,
+		  const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
+		  const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee,
+		  const char * f,
+		  stmt * es);
     }
 
     // Parses the program in file fname and generates the PDS in pds. pds must be preallocated.
@@ -126,7 +152,8 @@ namespace wali
     wali::domains::binrel::BddContext * pds_from_prog_with_tensor_merge(wpds::ewpds::EWPDS * pds, prog * pg);
 
     wali::domains::binrel::BddContext * havocLocals(wpds::WPDS * pds, prog * pg, domains::binrel::ProgramBddContext * con);
-
+	wali::domains::nwaobddrel::NWAOBDDContext * havocLocalsNWA(wpds::WPDS * pds, prog * pg, domains::nwaobddrel::NWAOBDDContext * con);
+	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_nwa(wpds::WPDS * pds, prog * pg);
     void print_prog_stats(prog * pg);
 
     // Must be called to fix fall-through returns *before* dumping PDS

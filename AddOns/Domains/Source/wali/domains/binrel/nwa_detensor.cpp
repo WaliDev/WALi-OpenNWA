@@ -6,8 +6,8 @@
 #include <sstream>
 
 
-#include "buddy/kernel.h"
-#include "buddy/bdd.h"
+#include "kernel.h"
+#include "bdd.h"
 #include "nwa_detensor.hpp"
 // ::wali
 #include "wali/KeyPairSource.hpp"

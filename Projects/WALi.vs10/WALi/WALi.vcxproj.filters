@@ -794,6 +794,9 @@
     <ClInclude Include="..\..\..\Source\wali\util\ConfigurationVar.hpp">
       <Filter>Header Files\wali.util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\AddOns\Domains\Source\wali\domains\binrel\BinRel.hpp">
+      <Filter>Source Files\wali.domains</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="VTune\WALi.vpj" />
