@@ -108,23 +108,23 @@ namespace wali
           r = xformer_for_constrain(e->r, con, f);
         switch(e->op){
           case AST_NOT:
-            return NWA_OBDD::MkNot(l);
+            return con->Not(l);
           case AST_XOR:
-            return NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, NWA_OBDD::MkNot(r)), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), r));
+			  return con->Or(con->And(l, con->Not(r)), con->And(con->Not(l), r));
           case AST_OR:
-            return NWA_OBDD::MkOr(l, r);
+			  return con->Or(l, r);
           case AST_AND:
-            return NWA_OBDD::MkAnd(l, r);
+			  return con->And(l, r);
           case AST_EQ:
-            return NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, r), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), NWA_OBDD::MkNot(r)));
+			  return con->Or(con->And(l, r), con->And(con->Not(l), con->Not(r)));
           case AST_NEQ:
-			  return NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, NWA_OBDD::MkNot(r)), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), r));
+			  return con->Or(con->And(l, con->Not(r)), con->And(con->Not(l), r));
           case AST_IMP:
-            return NWA_OBDD::MkOr(NWA_OBDD::MkNot(l), r);
+			  return con->Or(con->Not(l), r);
           case AST_SCHOOSE:
-			  return NWA_OBDD::MkOr(l, NWA_OBDD::MkAnd(NWA_OBDD::MkNot(r), NWA_OBDD::MkTrue()));
+			  return con->Or(l, con->And(con->Not(r), NWA_OBDD::MkTrue()));
           case AST_VAR:
-          case AST_VAR_POST:
+		  case AST_VAR_POST:
             ss << f << "::" << e->v;
             s = ss.str();
             if(con->varMap.find(ss.str()) == con->varMap.end()){
@@ -921,65 +921,6 @@ namespace wali
 
 		  namespace nwaobddrel {
 
-			  static NWA_OBDD::NWAOBDD clearRegA(NWA_OBDD::NWAOBDD n, NWAOBDDContext * con)
-			  {
-				  int vOff2 = con->getVLoc(REG_A_INFO);
-				  int regALoc = con->findVarLoc(0, 0, con->maxLevel, vOff2);
-				  NWA_OBDD::NWAOBDD r = MkExists(n, regALoc);
-				  return r;
-			  }
-
-			  static NWA_OBDD::NWAOBDD expr_as_nwaobdd(const expr * e, NWAOBDDContext *  con, const char * f, std::string lhs)
-			  {
-				  if (!e)
-					  assert(0 && "expr_as_nwaobdd");
-				  NWA_OBDD::NWAOBDD l = NWA_OBDD::MkFalse(), r = NWA_OBDD::MkFalse();
-				  stringstream ss;
-				  if (e->l)
-					  l = expr_as_nwaobdd(e->l, con, f, lhs);
-				  if (e->r)
-					  r = expr_as_nwaobdd(e->r, con, f, lhs);
-				  switch (e->op){
-				  case AST_NOT:
-					  return clearRegA(NWA_OBDD::MkNot(l), con);
-				  case AST_XOR:
-					  return clearRegA(NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, NWA_OBDD::MkNot(r)), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), r)), con);
-				  case AST_OR:
-					  return clearRegA(NWA_OBDD::MkOr(l, r), con);
-				  case AST_AND:
-					  return clearRegA(NWA_OBDD::MkAnd(l, r), con);
-				  case AST_EQ:
-					  return clearRegA(NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, r), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), NWA_OBDD::MkNot(r))), con);
-				  case AST_NEQ:
-					  return clearRegA(NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, NWA_OBDD::MkNot(r)), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), r)), con);
-				  case AST_IMP:
-					  return clearRegA(NWA_OBDD::MkOr(NWA_OBDD::MkNot(l), r), con);
-				  case AST_NONDET:
-					  return NWA_OBDD::MkTrue();
-				  case AST_SCHOOSE:
-					  return clearRegA(NWA_OBDD::MkOr(l, NWA_OBDD::MkAnd(NWA_OBDD::MkNot(r), NWA_OBDD::MkTrue())), con);
-				  case AST_VAR:
-					  ss << f << "::" << e->v;
-					  if (con->varMap.find(ss.str()) != con->varMap.end()){
-						  return con->From(lhs,ss.str());
-					  }
-					  else{
-						  stringstream ss2;
-						  ss2 << "::" << e->v;
-						  assert(con->varMap.find(ss2.str()) != con->varMap.end());
-						  return con->From(lhs,ss2.str());
-					  }
-				  case AST_VAR_POST:
-					  assert(0 && "expr_as_nwaobdd: AST_VAR_POST should not occur in expr_as_nwaobdd");
-				  case AST_CONSTANT:
-					  if (e->c == ONE)
-						  return con->True(lhs);
-					  else
-						  return con->False(lhs);
-				  default:
-					  assert(0 && "expr_as_nwaobdd: Unknown case");
-				  }
-			  }
 
 		  static NWA_OBDD::NWAOBDD expr_as_nwaobdd(const expr * e, NWAOBDDContext *  con, const char * f)
 		  {
@@ -993,23 +934,23 @@ namespace wali
 				  r = expr_as_nwaobdd(e->r, con, f);
 			  switch (e->op){
 			  case AST_NOT:
-				  return clearRegA(NWA_OBDD::MkNot(l), con);
+				  return con->Not(l);
 			  case AST_XOR:
-				  return clearRegA(NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, NWA_OBDD::MkNot(r)), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), r)), con);
+				  return con->Or(con->And(l, con->Not(r)), con->And(con->Not(l), r));
 			  case AST_OR:
-				  return clearRegA(NWA_OBDD::MkOr(l, r), con);
+				  return con->Or(l, r);
 			  case AST_AND:
-				  return clearRegA(NWA_OBDD::MkAnd(l, r), con);
+				  return con->And(l, r);
 			  case AST_EQ:
-				  return clearRegA(NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, r), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), NWA_OBDD::MkNot(r))), con);
+				  return con->Or(con->And(l, r), con->And(con->Not(l), con->Not(r)));
 			  case AST_NEQ:
-				  return clearRegA(NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, NWA_OBDD::MkNot(r)), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), r)), con);
+				  return con->Or(con->And(l, con->Not(r)), con->And(con->Not(l), r));
 			  case AST_IMP:
-				  return clearRegA(NWA_OBDD::MkOr(NWA_OBDD::MkNot(l), r), con);
+				  return con->Or(con->Not(l), r);
 			  case AST_NONDET:
 				  return NWA_OBDD::MkTrue();
 			  case AST_SCHOOSE:
-				  return clearRegA(NWA_OBDD::MkOr(l, NWA_OBDD::MkAnd(NWA_OBDD::MkNot(r), NWA_OBDD::MkTrue())), con);
+				  return con->Or(l, con->And(con->Not(r), NWA_OBDD::MkTrue()));
 			  case AST_VAR:
 				  ss << f << "::" << e->v;
 				  if (con->varMap.find(ss.str()) != con->varMap.end()){
@@ -1377,7 +1318,7 @@ namespace wali
 						  ss2 << "::" << vl->v;
 						  lhs = string(ss2.str());
 					  }
-					  b1 = NWA_OBDD::MkAnd(b1, con->AssignGen(lhs,nwaobddrel::expr_as_nwaobdd(el->e, con, f, lhs), b));
+					  b1 = NWA_OBDD::MkAnd(b1, con->AssignGen(lhs,nwaobddrel::expr_as_nwaobdd(el->e, con, f), b));
 					  vl = vl->n;
 					  el = el->n;
 				  }
@@ -1390,18 +1331,18 @@ namespace wali
 				  if (s->sl1){
 					  assert(s->sl1->s);
 					  //Create a rule that makes s->e true in pre and post
-					  b = NWA_OBDD::MkAnd(nwaobddrel::expr_as_nwaobdd(s->e, con, f), con->BaseID());
+					  b = con->Assume(nwaobddrel::expr_as_nwaobdd(s->e, con, f), con->True());
 					  pds->add_rule(stt(), stk(s), stt(), stk(s->sl1->s), new NWAOBDDRel(con, b));
 				  }
 				  if (s->sl2){
 					  //Create a rule that makes s->e false in pre and post
 					  assert(s->sl2->s);
-					  b = NWA_OBDD::MkAnd(NWA_OBDD::MkNot(nwaobddrel::expr_as_nwaobdd(s->e, con, f)), con->BaseID());
+					  b = con->Assume(nwaobddrel::expr_as_nwaobdd(s->e, con, f), con->False());
 					  pds->add_rule(stt(), stk(s), stt(), stk(s->sl2->s), new NWAOBDDRel(con, b));
 				  }
 				  else{
 					  // fall through edge.
-					  b = NWA_OBDD::MkAnd(NWA_OBDD::MkNot(nwaobddrel::expr_as_nwaobdd(s->e, con, f)), con->BaseID());
+					  b = con->Assume(nwaobddrel::expr_as_nwaobdd(s->e, con, f), con->False());
 					  pds->add_rule(stt(), stk(s), stt(), stk(ns), new NWAOBDDRel(con, b));
 				  }
 				  if (s->sl1)
@@ -1411,10 +1352,10 @@ namespace wali
 				  break;
 			  case AST_WHILE:
 				  assert(s->e && s->sl1);
-				  b = NWA_OBDD::MkIff(nwaobddrel::expr_as_nwaobdd(s->e, con, f), con->True());
+				  b = con->Assume(nwaobddrel::expr_as_nwaobdd(s->e, con, f), con->True());
 				  pds->add_rule(stt(), stk(s), stt(), stk(s->sl1->s), new NWAOBDDRel(con, b));
 				  dump_pds_from_stmt_list(pds, s->sl1, con, goto_to_targets, call_to_callee, f, s);
-				  b = NWA_OBDD::MkIff(nwaobddrel::expr_as_nwaobdd(s->e, con, f), con->False());
+				  b = con->Assume(nwaobddrel::expr_as_nwaobdd(s->e, con, f), con->False());
 				  pds->add_rule(stt(), stk(s), stt(), stk(ns), new NWAOBDDRel(con, b));
 				  break;
 			  case AST_ASSERT:
@@ -1422,7 +1363,7 @@ namespace wali
 				  break;
 			  case AST_ASSUME:
 				  assert(s->e);
-				  b = NWA_OBDD::MkIff(nwaobddrel::expr_as_nwaobdd(s->e, con, f), con->True());
+				  b = con->Assume(nwaobddrel::expr_as_nwaobdd(s->e, con, f), con->True());
 				  pds->add_rule(stt(), stk(s), stt(), stk(ns), new NWAOBDDRel(con, b));
 				  break;
 			  case AST_CALL:
