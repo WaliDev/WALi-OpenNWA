@@ -265,6 +265,8 @@ namespace wali
            **/
           virtual void setIntVars(const std::map<std::string, int>& vars);
           virtual void setIntVars(const std::vector<std::map<std::string, int> >& vars);
+		  void addVarList(std::pair<int, int> loc, std::vector<std::string> lVars1, std::vector<std::string> lVars2);
+		  std::pair<std::vector<std::string>, std::vector<std::string>> getLocalVars(std::pair<int, int> loc) const;
 
 #if (NWA_DETENSOR == 1)
           /**
@@ -306,6 +308,9 @@ namespace wali
         private:
           /** caches zero/one binrel objects for this context **/
           void populateCache();
+
+
+		  std::map<std::pair<int, int>, std::pair<std::vector<std::string>, std::vector<std::string>>> mergeVars;
           
         private:
           // ///////////////////////////////
@@ -443,6 +448,8 @@ namespace wali
           bool Equal(binrel_t se) const;
           binrel_t Transpose() const;
           binrel_t Kronecker( binrel_t that) const;
+		  binrel_t Merge(int v, int c) const;
+		  binrel_t TensorMerge(int v, int c) const;
           binrel_t Eq23Project() const;
           binrel_t Eq13Project() const;
 	  binrel_t Eq24Project() const;

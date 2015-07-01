@@ -866,14 +866,14 @@ namespace wali
     void WFA::prune()
     {
       // First, remove all transitions with zero weight
-      TransZeroWeight tzw;
-      for_each(tzw);
-      TransSet::iterator transit = tzw.zeroWeightTrans.begin();
-      for(; transit != tzw.zeroWeightTrans.end(); transit++) {
-        ITrans *t = *transit;
-        erase(t->from(), t->stack(), t->to());
-      }
-      tzw.zeroWeightTrans.clear();
+     // TransZeroWeight tzw;
+     // for_each(tzw);
+     // TransSet::iterator transit = tzw.zeroWeightTrans.begin();
+     // for(; transit != tzw.zeroWeightTrans.end(); transit++) {
+     //   ITrans *t = *transit;
+     //   erase(t->from(), t->stack(), t->to());
+     // }
+     // tzw.zeroWeightTrans.clear();
 
       // Now, do the (init_state, F) chop
       DefaultWorklist<State> wl;

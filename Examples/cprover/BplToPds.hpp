@@ -88,7 +88,7 @@ namespace wali
       }
 
       wali::domains::binrel::BddContext * dump_pds_from_prog(wpds::WPDS * pds, prog * pg);
-	  wali::domains::nwaobddrel::NWAOBDDContext * dump_pds_from_prog_nwa(wpds::WPDS * pds, prog * pg);
+	  wali::domains::nwaobddrel::NWAOBDDContext * dump_pds_from_prog_nwa(wpds::WPDS * pds, prog * pg, bool first);
 	  
 	  void dump_pds_from_proc(
           wpds::WPDS * pds, 
@@ -150,10 +150,21 @@ namespace wali
     wali::domains::binrel::BddContext * pds_from_prog_with_meet_merge(wpds::ewpds::EWPDS * pds, prog * pg);
     // Same, but generates MergeFns of type wali::domains::binrel::BinRelTensorMerge
     wali::domains::binrel::BddContext * pds_from_prog_with_tensor_merge(wpds::ewpds::EWPDS * pds, prog * pg);
+	wali::domains::binrel::BddContext * pds_from_prog_with_newton_merge(wpds::ewpds::EWPDS * pds, prog * pg);
+
+
+	// Dumps the program as a PDS into pds. pds must be preallocated.
+	// Returns the vocabulary generated when creating the pds.
+	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_nwa(wpds::WPDS * pds, prog * pg, bool first);
+	// Same, but generates MergeFns of type wali::domains::binrel::BinRelMeetMerge
+	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_with_meet_merge_nwa(wpds::ewpds::EWPDS * pds, prog * pg, bool first);
+	// Same, but generates MergeFns of type wali::domains::binrel::BinRelTensorMerge
+	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_with_tensor_merge_nwa(wpds::ewpds::EWPDS * pds, prog * pg, bool first);
+	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_with_newton_merge_nwa(wpds::ewpds::EWPDS * pds, prog * pg, bool first);
 
     wali::domains::binrel::BddContext * havocLocals(wpds::WPDS * pds, prog * pg, domains::binrel::ProgramBddContext * con);
 	wali::domains::nwaobddrel::NWAOBDDContext * havocLocalsNWA(wpds::WPDS * pds, prog * pg, domains::nwaobddrel::NWAOBDDContext * con);
-	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_nwa(wpds::WPDS * pds, prog * pg);
+	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_nwa(wpds::WPDS * pds, prog * pg, bool first);
     void print_prog_stats(prog * pg);
 
     // Must be called to fix fall-through returns *before* dumping PDS

@@ -1274,7 +1274,7 @@ namespace wali {
 	*  first - True if this is the first time this function has been called
 	*  oMap - a map from the outgoing node id associated with the whole intergraph to the new unique id of the node
 	*/
-	double InterGraph::getOutnodeRegExps(map<int,reg_exp_t>& outNodeRegExps, map<int,int>& uMap, map<int,std::pair< std::pair<int,int>,int> >& mapBack, vector<int>& eps)
+	double InterGraph::getOutnodeRegExps(map<int,reg_exp_t>& outNodeRegExps, map<int,int>& uMap, map<int,int>& oMap, map<int,std::pair< std::pair<int,int>,int> >& mapBack, std::map<std::pair<std::pair<int,int>,int>,int> & transMap, vector<int>& eps, map<std::pair<int,int>,std::pair<int,int>>& mergeSrcMap)
 	{
 	  wali::util::GoodTimer * t = new wali::util::GoodTimer("graphTime");
 	  //t->start();
@@ -1345,6 +1345,7 @@ namespace wali {
             int eno = gr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, sem->zero(), true);
 			//uno - number of the node this edge depends on - it's a hyperedge, so it must
             int uno = gr->edges[eno].updatable_no;
+			//std::cout << "uno: " << uno << ":" << (*it2).src2 << std::endl;
 			uMap[uno] = (*it2).src2;
 			// gr2 is the graph associated with the 2nd src of the hyperedge
 			IntraGraph *gr2 = nodes[(*it2).src2].gr;
@@ -1358,6 +1359,29 @@ namespace wali {
             IntraGraph *gr1 = nodes[(*it3).first].gr;
             IntraGraph *gr2 = nodes[(*it3).second].gr;
             gr1->addCallEdge(gr2);
+			t->stop();
+			TransMap::iterator itTrans = node_number.begin();
+			int src, tgt, mSrc, mTgt;
+			for (itTrans; itTrans != node_number.end(); itTrans++)
+			{
+				//Add information mapping inter node ids 
+				if ((*itTrans).second == ((*it3).first))
+				{
+					src = (*itTrans).first.stack;
+					mSrc = (*itTrans).first.tgt;
+					//std::cout << " s: " << (*itTrans).first.stack << " mS: " << (*itTrans).first.tgt << std::endl;
+				}
+				if ((*itTrans).second == (*it3).second)
+				{
+					tgt = (*itTrans).first.stack;
+					mTgt = (*itTrans).first.tgt;
+
+					//std::cout << " t: " << (*itTrans).first.stack << " mT: " << (*itTrans).first.tgt << std::endl;
+				}
+			}
+			//std::cout << "s: " << src << " mS: " << mSrc << " t: " << tgt << " mTgt: " << mTgt << std::endl;
+			mergeSrcMap[std::pair<int, int>(mSrc, mTgt)] = std::pair<int, int>(src, tgt);
+			t->start();
           }
 
 		  int index = 1;
@@ -1374,9 +1398,14 @@ namespace wali {
 					int tgt = (*nit).trans.tgt;
 					int stack = (*nit).trans.stack;
 					int src = (*nit).trans.src;
+					/*std::cout << index << ": ";
+					std::cout << " tgt: " << tgt;
+					std::cout << " src: " << src;
+					std::cout << " stack: " << stack << std::endl;*/
 					//Put a src, tgt, stack info in the transitions
 					mapBack[index] = std::make_pair(std::make_pair(src,tgt),stack);
 					outNodeRegExps[index] = (*nit).regexp;
+					transMap[std::make_pair(std::make_pair(src,tgt),stack)] = index;
 					if (stack == 0 && tgt != 0)
 					{
 						eps.push_back(index);
@@ -1388,14 +1417,7 @@ namespace wali {
 								//Find this node as numbered in the intergraph and associate that with the new unique id of the node
 								if ((*dit) == intraNum)
 								{
-									map<int, int>::iterator uIt;
-									for (uIt = uMap.begin(); uIt != uMap.end(); uIt++)
-									{
-										if (uIt->second == (*cit))
-										{
-											uMap[uIt->first] = index;
-										}
-									}
+									oMap[(*cit)] = index;
 								}
 								dit++;
 							}
@@ -1470,7 +1492,10 @@ namespace wali {
 
           for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
             IntraGraph *gr = nodes[(*it2).tgt].gr;
-            gr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, sem->zero(), true);
+            int eno = gr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, sem->zero(), true);
+			//uno - number of the node this edge depends on - it's a hyperedge, so it must
+			int uno = gr->edges[eno].updatable_no;
+			//std::cout << "uno: " << uno << ":" << (*it2).src2 << std::endl;
             IntraGraph *gr2 = nodes[(*it2).src2].gr;
             gr2->setOutNode(nodes[(*it2).src2].intra_nodeno, (*it2).src2);
           }

@@ -60,6 +60,15 @@ namespace wali
       fa.insert(tc);
     }
 
+	/**************
+	* TransReturner
+	***************/
+
+	void TransReturner::operator()(const ITrans* t)
+	{
+		transitions.push_back(t);
+	}
+
 
     /***********
      * TransDeleter

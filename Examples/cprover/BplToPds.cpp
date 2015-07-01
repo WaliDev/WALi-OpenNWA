@@ -4,6 +4,7 @@
 #include <sstream>
 #include <map>
 #include "wali/domains/binrel/BinRelMergeFns.hpp"
+#include "../../../svn-repository/NWAOBDDRelMergeFns.hpp"
 #include <boost/cast.hpp>
 #include "wali/wpds/ewpds/EWPDS.hpp"
 #include "../turetsky/svn-repository/nwaobdd.h"
@@ -90,7 +91,7 @@ namespace wali
 	namespace nwaobddrel
 	{
 		/*
-		* Create the NWA_OBDD for a contrains statement with the given context
+		* Create the NWA_OBDD for a contrain statement e with the given context
 		*/
 		static NWA_OBDD::NWAOBDD xformer_for_constrain(const expr * e, NWAOBDDContext * con, const char * f) {
 		{
@@ -158,7 +159,6 @@ namespace wali
     {
       namespace resolve_details
       {
-
         void clear_stmt_ptr_stmt_list_ptr_hash_map(stmt_ptr_stmt_list_ptr_hash_map& m)
         {
           for(stmt_ptr_stmt_list_ptr_hash_map::iterator iter = m.begin(); iter != m.end(); ++iter){
@@ -173,6 +173,8 @@ namespace wali
           m.clear();
         }
 
+		//Match the labels in the boolean program with the statements they point for use in the later goto statements
+		//Populate the map with the ll "label" values
         static void map_label_to_stmt_helper(str_stmt_ptr_hash_map& m, const stmt_list * sl)
         {
           const str_list * ll;
@@ -190,11 +192,13 @@ namespace wali
             sl = sl->n;
           }
         }
+
         void map_label_to_stmt(str_stmt_ptr_hash_map& m, const proc * p)
         {
           map_label_to_stmt_helper(m, p->sl);
         }
 
+		//Maps names to the procedure locations for use in call statements
         void map_name_to_proc(str_proc_ptr_hash_map& m, const prog * pg)
         {
           const proc_list * pl;
@@ -233,7 +237,7 @@ namespace wali
           map_goto_to_targets_helper(mout, min, p->sl);
         }
 
-
+		//For each call - find the location of the entry statement of the procdure they call to
         void map_call_to_callee_helper(stmt_ptr_proc_ptr_hash_map& mout, str_proc_ptr_hash_map& min, const stmt_list * sl)
         {
           while(sl){
@@ -261,6 +265,8 @@ namespace wali
         static void instrument_asserts_in_stmt_list(stmt_list * sl, const char * errLbl);
         static void instrument_asserts_in_stmt(stmt * s, const char * errLbl);
 
+		//Change the asserts to assumes + gotos - and create error labels
+		//This is where the error statement is created
         void instrument_asserts_prog(prog * pg, const char * errLbl)
         {          
           assert(pg && "instrument_asserts");
@@ -308,6 +314,8 @@ namespace wali
           }
         }
 
+		//If there is an assert, create and ite statement which goes to the error statement
+		//if the ite is false, go to the error label
         static void instrument_asserts_in_stmt(stmt * s, const char * errLbl)
         {
           assert(s && "instrument_asserts_in_stmt");
@@ -331,7 +339,7 @@ namespace wali
         }
 
 
-        // 
+        //Create the void returns (procedures that have no returns) to have actual return operations used for rule creation
         void make_void_returns_explicit_in_prog(prog * pg)
         {
           assert(pg && "make_void_returns_explicit_in_prog");
@@ -370,6 +378,7 @@ namespace wali
         static void remove_skip_in_prog(prog * pg);
         static stmt_list * remove_skip_in_stmt_list(stmt_list * sl);
 
+		//Remove skip statements from the program
         static void remove_skip_in_prog(prog * pg)
         {
           assert(pg && "remove_skip_in_prog");
@@ -439,6 +448,7 @@ namespace wali
         }
 
         
+		//Change enforce statements to assume rules
         static void instrument_enforce_in_proc(proc * p)
         {
           assert(p && "instrument_enforce_in_proc");
@@ -451,6 +461,7 @@ namespace wali
           }
         }
 
+		//Change enforce statements to assume rules
         static void instrument_enforce_in_stmt_list(stmt_list * h, stmt_list * sl, expr const * e)
         {
           assert(sl && sl->s && "instrument_enforce_in_stmt_list");
@@ -830,54 +841,60 @@ namespace wali
       }
 
 
-		  NWAOBDDContext * dump_pds_from_prog_nwa(wpds::WPDS * pds, prog * pg)
-		  {
+	  NWAOBDDContext * dump_pds_from_prog_nwa(wpds::WPDS * pds, prog * pg, bool first)
+	  {
 
-			  map<string, int> vars;
+		  map<string, int> vars;
 
-			  //Iterate through the global variables and give them unique names
-			  const str_list * vl = pg->vl;
+		  //Iterate through the global variables and give them unique names
+		  const str_list * vl = pg->vl;
+		  while (vl){
+			  stringstream ss;
+			  ss << "::" << vl->v;
+			  vars[ss.str()] = 2; //A Boolean type
+			  vl = vl->n;
+		  }
+
+		  //For each procedure
+		  proc_list * pl = pg->pl;
+		  while (pl){
+			  //Iterate through the arguments to the procedure and give them unique names
+			  vl = pl->p->al;
 			  while (vl){
 				  stringstream ss;
-				  ss << "::" << vl->v;
+				  ss << pl->p->f << "::" << vl->v;
 				  vars[ss.str()] = 2; //A Boolean type
 				  vl = vl->n;
 			  }
-
-			  //For each procedure
-			  proc_list * pl = pg->pl;
-			  while (pl){
-				  //Iterate through the arguments to the procedure and give them unique names
-				  vl = pl->p->al;
-				  while (vl){
-					  stringstream ss;
-					  ss << pl->p->f << "::" << vl->v;
-					  vars[ss.str()] = 2; //A Boolean type
-					  vl = vl->n;
-				  }
-				  //Iterate through the local variables of the procedure and give them unique names
-				  vl = pl->p->vl;
-				  while (vl){
-					  stringstream ss;
-					  ss << pl->p->f << "::" << vl->v;
-					  //con->addBoolVar(ss.str());
-					  vars[ss.str()] = 2; //A Boolean type
-					  vl = vl->n;
-				  }
-				  pl = pl->n;
+			  //Iterate through the local variables of the procedure and give them unique names
+			  vl = pl->p->vl;
+			  while (vl){
+				  stringstream ss;
+				  ss << pl->p->f << "::" << vl->v;
+				  //con->addBoolVar(ss.str());
+				  vars[ss.str()] = 2; //A Boolean type
+				  vl = vl->n;
 			  }
-			  fprintf(stderr, "Entering setIntVars\n");
-			  
-			  int numVars;
-			  numVars = vars.size();
-			  unsigned int numSpaces = 12 * numVars;
-			  unsigned int minLevels = ceil(log2(numSpaces + 4) - 2);
-			  if (minLevels % 2)
-			  {
-				  minLevels++;
-			  }
+			  pl = pl->n;
+		  }
+		  fprintf(stderr, "Entering setIntVars\n");
 
-			  
+
+		  //Determine the number of labels needed for the NWAOBDD
+		  int numVars;
+		  numVars = vars.size();
+		  unsigned int numSpaces = 12 * numVars;
+		  unsigned int minLevels = ceil(log2(numSpaces + 4) - 2);
+		  if (minLevels % 2)
+		  {
+			  minLevels++;
+		  }
+
+		  if (first)
+		  {
+			  //Setup the NWAOBDD enviroment
+			  //Initialize the Hash table and the NWAOBDDs used
+			  //for this specific variable ordering
 			  NWA_OBDD::setMaxLevel(minLevels);
 			  NWA_OBDD::NWAOBDDNodeHandle::InitNoDistinctionTable();
 			  NWA_OBDD::NWAOBDDNodeHandle::InitReduceCache();
@@ -885,9 +902,13 @@ namespace wali
 			  NWA_OBDD::InitPathSummaryCache();
 			  NWA_OBDD::InitPairProductMapCaches();
 			  InitModPathSummaryCache();
-			  NWAOBDDContext * con = new NWAOBDDContext(BASE_1ST_TENSOR_ROOT);
-			  con->setIntVars(vars,minLevels);
-			  fprintf(stderr, "Done with setIntVars\n");
+		  }
+		  NWAOBDDContext * con = new NWAOBDDContext(BASE_1ST_TENSOR_ROOT);
+
+		  //Populate the name to variable map
+		  con->setIntVars(vars, minLevels);
+		  fprintf(stderr, "Done with setIntVars\n");
+
 
 			  str_stmt_ptr_hash_map label_to_stmt;
 			  str_proc_ptr_hash_map name_to_proc;
@@ -896,21 +917,29 @@ namespace wali
 
 			  resolve_details::map_name_to_proc(name_to_proc, pg);
 
+			  //For each procedure in the program
 			  pl = pg->pl;
 			  while (pl){
 				  proc * p = pl->p;
+				  
+				  //Run preprocessing on the procedure
 				  resolve_details::map_label_to_stmt(label_to_stmt, p);
 				  resolve_details::map_goto_to_targets(goto_to_targets, label_to_stmt, p);
 				  resolve_details::map_call_to_callee(call_to_callee, name_to_proc, p);
 
+				  //Create pds from the statement list of the procedure
 				  dump_pds_from_proc(pds, p, con, goto_to_targets, call_to_callee);
 
+				  //Clear the maps used
 				  label_to_stmt.clear();
 				  clear_stmt_ptr_stmt_list_ptr_hash_map(goto_to_targets);
 				  call_to_callee.clear();
+				  
+				  //Get the next procedure
 				  pl = pl->n;
 			  }
 
+			  //Havoc the locals of the NWA a
 			  havocLocalsNWA(pds, pg, con);
 			  name_to_proc.clear();
 			  fprintf(stderr, "Done converting\n");
@@ -928,10 +957,12 @@ namespace wali
 				  assert(0 && "expr_as_nwaobdd");
 			  NWA_OBDD::NWAOBDD l = NWA_OBDD::MkFalse(), r = NWA_OBDD::MkFalse();
 			  stringstream ss;
-			  if (e->l)
+			  if (e->l){
 				  l = expr_as_nwaobdd(e->l, con, f);
-			  if (e->r)
-				  r = expr_as_nwaobdd(e->r, con, f);
+				  }
+				  if (e->r){
+					  r = expr_as_nwaobdd(e->r, con, f);
+				  }
 			  switch (e->op){
 			  case AST_NOT:
 				  return con->Not(l);
@@ -950,7 +981,9 @@ namespace wali
 			  case AST_NONDET:
 				  return NWA_OBDD::MkTrue();
 			  case AST_SCHOOSE:
+			  {
 				  return con->Or(l, con->And(con->Not(r), NWA_OBDD::MkTrue()));
+			  }
 			  case AST_VAR:
 				  ss << f << "::" << e->v;
 				  if (con->varMap.find(ss.str()) != con->varMap.end()){
@@ -1005,7 +1038,7 @@ namespace wali
       // There is a static global variable merge_type,
       // dump_pds_from_stmt will look at this variables to decide what kind of
       // merge function to dump.
-      typedef enum {NO_MERGE, MEET_MERGE, TENSOR_MERGE} MergeFn;
+      typedef enum {NO_MERGE, MEET_MERGE, TENSOR_MERGE, NEWTON_MERGE} MergeFn;
       static MergeFn merge_type = NO_MERGE;
       void set_merge_type(MergeFn m)
       {
@@ -1157,29 +1190,55 @@ namespace wali
             assert(callee_iter->second->sl->s);
             // Make a call rule to the callee.
             // The stack symbol for callee is derived from the proc itself (not the first statement in the proc)
-            switch(merge_type){
-              case NO_MERGE:
-                pds->add_rule(stt(), stk(s), stt(), stk(callee_iter->second), stk(ns), one);
-                break;
+			switch (merge_type){
+			case NEWTON_MERGE:
+			{
+				vector<string> lvars;
+				vector<string> lvars2;
+				stringstream ss;
+				ss << s->f << "::";
+				stringstream st;
+				st << f << "::";
+				string str = ss.str();
+				string str2 = st.str();
+
+				for (ProgramBddContext::const_iterator cit = con->begin(); cit != con->end(); ++cit)
+				{
+					if (cit->first.find(str) != string::npos)
+					{
+						lvars.push_back(cit->first);
+					}
+					if (cit->first.find(str2) != string::npos)
+					{
+						lvars2.push_back(cit->first);
+					}
+				}
+				con->addVarList(std::pair<int, int>(stk(s), stk(callee_iter->second)), lvars, lvars2);
+
+				//std::cout << "stk: " << stk(s) << " tgt " << stk(callee_iter->second) << std::endl;
+			}
+			case NO_MERGE:
+				pds->add_rule(stt(), stk(s), stt(), stk(callee_iter->second), stk(ns), one);
+				break;
               case MEET_MERGE:
               case TENSOR_MERGE:
                 {
                   vector<string> lvars;
-		  vector<string> lvars2;
+				  vector<string> lvars2;
                   stringstream ss;
                   ss << s->f << "::";
-		  stringstream st;
-		  st << f << "::";
+				  stringstream st;
+				  st << f << "::";
                   string str = ss.str();
-		  string str2 = st.str();
+				  string str2 = st.str();
                   for(ProgramBddContext::const_iterator cit = con->begin(); cit != con->end(); ++cit)
-		  {
+				  {
                     if(cit->first.find(str) != string::npos)
                       lvars.push_back(cit->first);
-		    if(cit->first.find(str2) != string::npos)
-		      lvars2.push_back(cit->first);
+					if(cit->first.find(str2) != string::npos)
+					  lvars2.push_back(cit->first);
                   }
-		  merge_fn_t merge;
+				  merge_fn_t merge;
                   if(merge_type == MEET_MERGE)
                     merge = new MeetMergeFn(con, lvars, lvars2);
                   else
@@ -1226,13 +1285,15 @@ namespace wali
 			  stmt_ptr_proc_ptr_hash_map& call_to_callee, const char * f, stmt * ns)
 		  {
 			  nwaobdd_t one = con->getBaseOne();
-			  NWA_OBDD::NWAOBDD b, b1;
+			  nwaobdd_t testB;
+			  NWA_OBDD::NWAOBDD b, b1, Tester, Tester2, Tester3, Tester4, bT1, bT2, bT3, nT1, nT2, nT3, nT4, nT5, nT6, nT7, nT8, vT10, vT11, vT9, vT10Pr, vT10Ps, vT9Pr, vT9Ps, vT11Pr, vT11Ps, vT4Pr, vT4N, vT7Pr, vT7PrN, vT7Ps, vT7PsN, vT8Pr, vT8PrN, vT8PsN, vT8Ps;
 			  str_list * vl;
 			  expr_list * el;
 			  stmt_list * sl;
 			  stmt_ptr_stmt_list_ptr_hash_map::const_iterator goto_iter;
 			  stmt_ptr_proc_ptr_hash_map::const_iterator callee_iter;
 			  string lhs;
+			  int rnd;
 
 			  if (!s)
 				  assert(0 && "dump_pds_from_stmt");
@@ -1298,6 +1359,7 @@ namespace wali
 					  vl = vl->n;
 					  el = el->n;
 				  }
+				  rnd = 0;
 				  vl = s->vl;
 				  el = s->el;
 				  b1 = NWA_OBDD::MkTrue();
@@ -1374,9 +1436,35 @@ namespace wali
 				  // Make a call rule to the callee.
 				  // The stack symbol for callee is derived from the proc itself (not the first statement in the proc)
 				  switch (merge_type){
+				  case NEWTON_MERGE:
+				  {
+					  vector<string> lvars;
+					  vector<string> lvars2;
+					  stringstream ss;
+					  ss << s->f << "::";
+					  stringstream st;
+					  st << f << "::";
+					  string str = ss.str();
+					  string str2 = st.str();
+
+					  for (std::map<string, int>::const_iterator cit = con->varMap.begin(); cit != con->varMap.end(); ++cit)
+					  {
+						  if (cit->first.find(str) != string::npos)
+						  {
+							  lvars.push_back(cit->first);
+						  }
+						  if (cit->first.find(str2) != string::npos)
+						  {
+							  lvars2.push_back(cit->first);
+						  }
+					  }
+					  con->addVarList(std::pair<int,int>(stk(s),stk(callee_iter->second)), lvars, lvars2);
+				  }
 				  case NO_MERGE:
+				  {
 					  pds->add_rule(stt(), stk(s), stt(), stk(callee_iter->second), stk(ns), one);
 					  break;
+				  }
 				  case MEET_MERGE:
 				  case TENSOR_MERGE:
 				  {
@@ -1396,12 +1484,10 @@ namespace wali
 							  lvars2.push_back(cit->first);
 					  }
 					  merge_fn_t merge;
-					  //ETTODO - implement Merge
-					  /*if (merge_type == MEET_MERGE)
-						  merge = new MeetMergeFn(con, lvars, lvars2);
+					  if (merge_type == MEET_MERGE)
+						  merge = new MeetMergeFnNWAOBDD(con, lvars, lvars2);
 					  else
-						  merge = new TensorMergeFn(con, lvars, lvars2);
-					  */
+						  merge = new TensorMergeFnNWAOBDD(con, lvars, lvars2);
 					  boost::polymorphic_cast<EWPDS*>(pds)->add_rule(stt(), stk(s), stt(), stk(callee_iter->second), stk(ns), one, merge);
 				  }
 					  break;
@@ -1419,7 +1505,9 @@ namespace wali
 		  {
 			  while (sl){
 				  if (sl->n)
+				  {
 					  dump_pds_from_stmt(pds, sl->s, con, goto_to_targets, call_to_callee, f, sl->n->s);
+				  }
 				  else
 					  dump_pds_from_stmt(pds, sl->s, con, goto_to_targets, call_to_callee, f, es);
 				  sl = sl->n;
@@ -1495,6 +1583,15 @@ namespace wali
       pds->printStatistics(cout);
       return con;
     }
+
+	BddContext * pds_from_prog_with_newton_merge(wpds::ewpds::EWPDS * pds, prog *pg)
+	{
+		assert(pg);
+		set_merge_type(wali::cprover::details::NEWTON_MERGE);
+		BddContext * con = dump_pds_from_prog(pds, pg);
+		pds->printStatistics(cout);
+		return con;
+	}
 
     BddContext * havocLocals(wpds::WPDS * pds, prog * pg, ProgramBddContext * con)
     {
@@ -1597,43 +1694,55 @@ namespace wali
 			parsing_result = NULL;
 			if (dbg)
 				emit_prog(stdout, pg);
-			NWAOBDDContext * con = dump_pds_from_prog_nwa(pds, pg);
+			NWAOBDDContext * con = dump_pds_from_prog_nwa(pds, pg, true);
 			deep_erase_prog(&pg);
 			return con;
 		}
 	}
-		NWAOBDDContext * pds_from_prog_nwa(wpds::WPDS * pds, prog * pg)
+		
+
+		NWAOBDDContext * pds_from_prog_nwa(wpds::WPDS * pds, prog * pg, bool first)
 		{
 			assert(pg);
 			set_merge_type(wali::cprover::details::NO_MERGE);
-			NWAOBDDContext * con = dump_pds_from_prog_nwa(pds, pg);
-			pds->printStatistics(cout);
-			return con;
-		}
-		namespace nwaobddrel {
-		NWAOBDDContext * pds_from_prog_with_meet_merge(wpds::ewpds::EWPDS * pds, prog *pg)
-		{
-			assert(pg);
-			set_merge_type(wali::cprover::details::MEET_MERGE);
-			NWAOBDDContext * con = dump_pds_from_prog_nwa(pds, pg);
+			NWAOBDDContext * con = dump_pds_from_prog_nwa(pds, pg, first);
 			pds->printStatistics(cout);
 			return con;
 		}
 
-		NWAOBDDContext * pds_from_prog_with_tensor_merge(wpds::ewpds::EWPDS * pds, prog *pg)
+		NWAOBDDContext * pds_from_prog_with_meet_merge_nwa(wpds::ewpds::EWPDS * pds, prog *pg, bool first)
 		{
 			assert(pg);
-			set_merge_type(wali::cprover::details::TENSOR_MERGE);
-			NWAOBDDContext * con = dump_pds_from_prog_nwa(pds, pg);
+			set_merge_type(wali::cprover::details::MEET_MERGE);
+			NWAOBDDContext * con = dump_pds_from_prog_nwa(pds, pg, first);
 			pds->printStatistics(cout);
 			return con;
 		}
-	}
+
+		NWAOBDDContext * pds_from_prog_with_tensor_merge_nwa(wpds::ewpds::EWPDS * pds, prog *pg, bool first)
+		{
+			assert(pg);
+			set_merge_type(wali::cprover::details::TENSOR_MERGE);
+			NWAOBDDContext * con = dump_pds_from_prog_nwa(pds, pg, first);
+			pds->printStatistics(cout);
+			return con;
+		}
+
+		NWAOBDDContext * pds_from_prog_with_newton_merge_nwa(wpds::ewpds::EWPDS * pds, prog * pg, bool first)
+		{
+			assert(pg);
+			set_merge_type(wali::cprover::details::NEWTON_MERGE);
+			NWAOBDDContext * con = dump_pds_from_prog_nwa(pds, pg, first);
+			pds->printStatistics(cout);
+			return con;
+		}
 	
+		//Create a rule to havoc the local variables and insert it into the start of each procedure
 		NWAOBDDContext * havocLocalsNWA(wpds::WPDS * pds, prog * pg, NWAOBDDContext * con)
 		{
 			WpdsRules dr = WpdsRules();
 			pds->for_each(dr);
+
 			for (std::set<Rule>::iterator it = dr.pushRules.begin();
 				it != dr.pushRules.end(); ++it){
 
@@ -1657,6 +1766,7 @@ namespace wali
 						stringstream ss;
 						ss << pl->p->f << "::" << vl->v;
 						string lhs = ss.str();
+						//Havoc the locat variables
 						h = con->HavocVar(lhs, h);
 						vl = vl->n;
 					}

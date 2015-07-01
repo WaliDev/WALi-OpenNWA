@@ -94,9 +94,9 @@ namespace details
     accumulate(vars, get_partial_mapping_for_fdd(name, info.baseLhs));
     accumulate(vars, get_partial_mapping_for_fdd(name + "\'", info.baseRhs));
     accumulate(vars, get_partial_mapping_for_fdd(name + "\'\'", info.baseExtra));
-    accumulate(vars, get_partial_mapping_for_fdd(name + "_t1", info.tensor1Lhs));
-    accumulate(vars, get_partial_mapping_for_fdd(name + "_t1\'", info.tensor1Rhs));
-    accumulate(vars, get_partial_mapping_for_fdd(name + "_t1\'\'", info.tensor1Extra));
+    //accumulate(vars, get_partial_mapping_for_fdd(name + "_t1", info.tensor1Lhs));
+    //accumulate(vars, get_partial_mapping_for_fdd(name + "_t1\'", info.tensor1Rhs));
+    //accumulate(vars, get_partial_mapping_for_fdd(name + "_t1\'\'", info.tensor1Extra));
     accumulate(vars, get_partial_mapping_for_fdd(name + "_t2", info.tensor2Lhs));
     accumulate(vars, get_partial_mapping_for_fdd(name + "_t2\'", info.tensor2Rhs));    
     accumulate(vars, get_partial_mapping_for_fdd(name + "_t2\'\'", info.tensor2Extra));
@@ -1170,14 +1170,14 @@ bdd ProgramBddContext::tGetRandomTransformer(bool isTensored, unsigned seed) con
       }else{
         n = rand() % 4;
         if(n==0)
-          inbdd = inbdd & fdd_ithvar(iter->second->tensor1Lhs,rand()%siz);
+          inbdd = inbdd & fdd_ithvar(iter->second->baseLhs,rand()%siz);
         if(n==1)    
-          inbdd = inbdd | fdd_ithvar(iter->second->tensor1Lhs,rand()%siz);
+          inbdd = inbdd | fdd_ithvar(iter->second->baseLhs,rand()%siz);
         n = rand() % 4;
         if(n==0)
-          inbdd = inbdd & fdd_ithvar(iter->second->tensor1Rhs,rand()%siz);
+          inbdd = inbdd & fdd_ithvar(iter->second->baseRhs,rand()%siz);
         if(n==1)    
-          inbdd = inbdd | fdd_ithvar(iter->second->tensor1Rhs,rand()%siz);
+          inbdd = inbdd | fdd_ithvar(iter->second->baseRhs,rand()%siz);
         n = rand() % 4;
         if(n==0)
           inbdd = inbdd & fdd_ithvar(iter->second->tensor2Lhs,rand()%siz);

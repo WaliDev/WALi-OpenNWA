@@ -193,7 +193,7 @@ namespace wali
           unsigned maxSize; 
           // These store indices for the "base" only bdd levels that we use for manipulation
           bddinfo_t regAInfo, regBInfo;
-
+		 
           bdd bddAnd() const;
           bdd bddOr() const;
           bdd bddNot() const;

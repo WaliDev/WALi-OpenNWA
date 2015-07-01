@@ -91,7 +91,7 @@ namespace wali {
               return this->EWPDS::poststar(input);
           }
 
-          double getOutRegExps( wfa::WFA const & input, wfa::WFA & output, map<int,reg_exp_t> & outNodeRegExps, map<int,int> & uMap, map<int,std::pair< std::pair<int,int> ,int > > & mapBack, vector<int> & eps);
+          double getOutRegExps( wfa::WFA const & input, wfa::WFA & output, map<int,reg_exp_t> & outNodeRegExps, map<int,int> & uMap, map<int,int> & oMap, map<int,std::pair< std::pair<int,int> ,int > > & mapBack, std::map<std::pair<std::pair<int,int>,int>,int> & transMap, vector<int> & eps, map<std::pair<int,int>,std::pair<int,int>> & mergeSrcMap);
 		  double getOutRegExpsSimple(wfa::WFA const & input, wfa::WFA & output, map<int, reg_exp_t> & outNodeRegExps);
 		  void poststarIGR( wfa::WFA const & input, wfa::WFA & output );
 

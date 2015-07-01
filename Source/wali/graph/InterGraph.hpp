@@ -264,7 +264,7 @@ namespace wali {
             void setESource(Transition t, wali::sem_elem_t wtAtCall, wali::sem_elem_t wtAfterCall);
 
             void setupInterSolution(std::list<Transition> *wt_required = NULL);
-            double getOutnodeRegExps(std::map<int,reg_exp_t> & outNodes, std::map<int,int> & uMap, std::map<int, std::pair< std::pair<int,int>, int> > & mapBack, std::vector<int> & eps);
+            double getOutnodeRegExps(std::map<int,reg_exp_t> & outNodes, std::map<int,int> & uMap, std::map<int,int> & oMap, std::map<int, std::pair< std::pair<int,int>, int> > & mapBack, std::map<std::pair<std::pair<int,int>,int>,int> & transMap, std::vector<int> & eps, std::map<std::pair<int,int>,std::pair<int,int>> & mergeMap);
 			double getOutnodeRegExpsSimple(std::map<int, reg_exp_t> & outNodes);
             /**
              * @brief From the given TDG (The original InterGraph), create linearized TDGs corresponding

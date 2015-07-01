@@ -9,6 +9,7 @@
 #include <iostream>
 #include <map>
 #include <set>
+#include <vector>
 #include "wali/HashMap.hpp"
 #include "wali/wfa/TransSet.hpp"
 
@@ -77,6 +78,16 @@ namespace wali
       }
     };
 
+
+	class TransReturner : public wali::wfa::ConstTransFunctor
+	{
+		std::vector<ITrans const *> & transitions;
+		public: 
+			TransReturner(std::vector<ITrans const *> & trans) : transitions(trans){}
+
+			virtual ~TransReturner() {}
+			virtual void operator()(const ITrans * t);
+	};
     /*!
      * @class TransPrinter
      *

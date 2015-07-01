@@ -415,6 +415,16 @@ void BddContext::setIntVars(const std::map<std::string, int>& flatvars)
   setIntVars(vars);
 }
 
+void BddContext::addVarList(std::pair<int, int> loc, std::vector<std::string> lVars1, std::vector<std::string> lVars2)
+{
+	mergeVars[loc] = std::pair<std::vector<std::string>, std::vector<std::string>>(lVars1, lVars2);
+}
+
+std::pair<std::vector<std::string>, std::vector<std::string>> BddContext::getLocalVars(std::pair<int, int> loc) const
+{
+	return mergeVars.at(loc);
+}
+
 void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& vars)
 {
   int vari;
@@ -1238,7 +1248,7 @@ bool BinRel::Equal( binrel_t that) const
 #endif
   //We skip this test if you insist
 #ifndef BINREL_HASTY
-  if(isTensored != that->isTensored || con != that->con){
+  if(isTensored != that->isTensored){
     std::cerr << "con: " << con << "\n";
     std::cerr << "that->con: " << that->con << "\n";
     *waliErr << "[WARNING] " << "Compared (Equality) incompatible relations" 
@@ -1309,6 +1319,86 @@ binrel_t BinRel::Kronecker(binrel_t that) const
     return static_cast<BinRel*>(ret->one().get_ptr());
   return ret;
 }
+
+binrel_t BinRel::Merge(int v, int c) const
+{
+	// start with Id in the base domain
+	bdd havocCalleeLocalsBdd = con->getBaseOne()->getBdd();
+	// start with top
+	bdd constrainLocalsBdd = con->getBaseTop()->getBdd();
+
+	std::pair<std::vector<std::string>, std::vector<std::string>> sList = con->getLocalVars(std::pair<int, int>(v, c));
+	std::vector<std::string> localVars = sList.first;
+	std::vector<std::string> localVars2 = sList.second;
+	for (std::vector<std::string>::const_iterator cit = localVars.begin(); cit != localVars.end(); ++cit){
+		BddContext::const_iterator vocIter = con->find(*cit);
+		if (vocIter == con->end()){
+			std::cerr << "Unknown variable " << *cit << endl;
+			assert(0);
+		}
+		// for each local variable:
+		// havoc the post vocabulary for that variables
+		havocCalleeLocalsBdd = bdd_exist(havocCalleeLocalsBdd, fdd_ithset(vocIter->second->baseRhs));
+	}
+	for (std::vector<std::string>::const_iterator cit2 = localVars2.begin(); cit2 != localVars2.end(); ++cit2){
+		BddContext::const_iterator vocIter2 = con->find(*cit2);
+		if (vocIter2 == con->end()){
+			std::cerr << "Unknown variable " << *cit2 << endl;
+			assert(0);
+		}
+		// enforce id across that variables
+		constrainLocalsBdd = constrainLocalsBdd & bdd_biimp(fdd_ithset(vocIter2->second->baseLhs), fdd_ithset(vocIter2->second->baseRhs));
+	}
+
+	binrel_t havocCalleeLocals = new BinRel(con, havocCalleeLocalsBdd);
+	binrel_t constrainLocals = new BinRel(con, constrainLocalsBdd);
+	binrel_t ret;
+	ret = this->Compose(havocCalleeLocals);
+	ret = ret->Intersect(constrainLocals);
+
+	return ret;
+}
+
+
+binrel_t BinRel::TensorMerge(int v, int c) const
+{
+	// start with Id in the base domain
+	bdd havocCalleeLocalsBdd = con->getTensorOne()->getBdd();
+	// start with top
+	bdd constrainLocalsBdd = con->getTensorTop()->getBdd();
+
+	std::pair<std::vector<std::string>, std::vector<std::string>> sList = con->getLocalVars(std::pair<int, int>(v, c));
+	std::vector<std::string> localVars = sList.first;
+	std::vector<std::string> localVars2 = sList.second;
+	for (std::vector<std::string>::const_iterator cit = localVars.begin(); cit != localVars.end(); ++cit){
+		BddContext::const_iterator vocIter = con->find(*cit);
+		if (vocIter == con->end()){
+			std::cerr << "Unknown variable " << *cit << endl;
+			assert(0);
+		}
+		// for each local variable:
+		// havoc the post vocabulary for that variables
+		havocCalleeLocalsBdd = bdd_exist(havocCalleeLocalsBdd, fdd_ithset(vocIter->second->tensor2Rhs));
+	}
+	for (std::vector<std::string>::const_iterator cit2 = localVars2.begin(); cit2 != localVars2.end(); ++cit2){
+		BddContext::const_iterator vocIter2 = con->find(*cit2);
+		if (vocIter2 == con->end()){
+			std::cerr << "Unknown variable " << *cit2 << endl;
+			assert(0);
+		}
+		// enforce id across that variables
+		constrainLocalsBdd = constrainLocalsBdd & bdd_biimp(fdd_ithset(vocIter2->second->tensor1Rhs), fdd_ithset(vocIter2->second->tensor2Rhs));
+	}
+
+	binrel_t havocCalleeLocals = new BinRel(con, havocCalleeLocalsBdd, true);
+	binrel_t constrainLocals = new BinRel(con, constrainLocalsBdd, true);
+	binrel_t ret;
+	ret = this->Compose(havocCalleeLocals);
+	ret = ret->Intersect(constrainLocals);
+
+	return ret;
+}
+
 
 binrel_t BinRel::Eq23Project() const
 {
