@@ -6,7 +6,7 @@
 #include <sstream>
 
 
-#include "kernel.h"
+//#include "kernel.h"
 #include "bdd.h"
 #include "nwa_detensor.hpp"
 // ::wali

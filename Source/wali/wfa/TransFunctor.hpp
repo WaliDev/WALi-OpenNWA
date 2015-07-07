@@ -88,6 +88,17 @@ namespace wali
 			virtual ~TransReturner() {}
 			virtual void operator()(const ITrans * t);
 	};
+
+	class TransStackGetter : public wali::wfa::ConstTransFunctor
+	{
+		Key sSymbol;
+		std::vector<ITrans const *> & transitions;
+		public:
+			TransStackGetter(Key stackSymbol, std::vector<ITrans const *> & trans) : sSymbol(stackSymbol), transitions(trans){}
+			
+			virtual ~TransStackGetter(){}
+			virtual void operator()(const ITrans * t);
+	};
     /*!
      * @class TransPrinter
      *

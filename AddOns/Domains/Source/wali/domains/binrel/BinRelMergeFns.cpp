@@ -102,7 +102,7 @@ TensorMergeFn::TensorMergeFn(BddContext * con, std::vector<std::string> const& l
       assert(0);
     }
     // enforce equality across the two tensor levels
-    idWithEqualLocalsBdd = idWithEqualLocalsBdd & bdd_biimp(fdd_ithset(vocIter->second->tensor1Lhs), fdd_ithset(vocIter->second->tensor2Lhs));
+    idWithEqualLocalsBdd = idWithEqualLocalsBdd & bdd_biimp(fdd_ithset(vocIter->second->baseLhs), fdd_ithset(vocIter->second->tensor2Lhs));
   }
 
   havocCalleeLocals = new BinRel(con, havocCalleeLocalsBdd, false);

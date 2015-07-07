@@ -1261,7 +1261,6 @@ namespace wali {
 		}
 		t->stop();
 		double totTime = t->total_time();
-		delete t;
 		return totTime;
 	}
 	/* Get the regular expressions for the outgoing nodes and the maps associated with them
@@ -1395,6 +1394,7 @@ namespace wali {
 				if(((*nit).node_no != -1) && ((*nit).node_no != 0))
 				{
 					int intraNum = (*nit).node_no;
+					//std::cout << (*gr_it) << ":" << index << std::endl;
 					int tgt = (*nit).trans.tgt;
 					int stack = (*nit).trans.stack;
 					int src = (*nit).trans.src;
@@ -1409,6 +1409,7 @@ namespace wali {
 					if (stack == 0 && tgt != 0)
 					{
 						eps.push_back(index);
+						//std::cout << "Eps Trans: " << index << std::endl;
 						if ((*nit).type == 3)  //It's an outgoing node
 						{
 							list<int>::const_iterator dit = (*gr_it)->out_nodes_intra->begin(); // out nodes numbered as in this IntraGraph
@@ -1430,7 +1431,6 @@ namespace wali {
 		}
 		t->stop();
 		double totTime = t->total_time();
-		delete t;
 		return totTime;
 	}
 

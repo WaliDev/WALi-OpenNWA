@@ -6,6 +6,7 @@
 #include "wali/wfa/TransFunctor.hpp"
 #include "wali/wfa/Trans.hpp"
 #include "wali/wfa/WFA.hpp"
+#include "wali/IntSource.hpp"
 
 namespace wali
 {
@@ -67,6 +68,20 @@ namespace wali
 	void TransReturner::operator()(const ITrans* t)
 	{
 		transitions.push_back(t);
+	}
+
+	/**************
+	* TransStackGetter
+	***************/
+
+	void TransStackGetter::operator()(const ITrans* t)
+	{
+		key_src_t kSrc = getKeySource(t->stack());
+		IntSource * iSrc = static_cast<wali::IntSource*>(kSrc.get_ptr());
+		if (sSymbol == iSrc->getInt())
+		{
+			transitions.push_back(t);
+		}
 	}
 
 

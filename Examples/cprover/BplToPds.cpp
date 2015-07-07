@@ -109,21 +109,21 @@ namespace wali
           r = xformer_for_constrain(e->r, con, f);
         switch(e->op){
           case AST_NOT:
-            return con->Not(l);
+            return NWA_OBDD::MkNot(l);
           case AST_XOR:
-			  return con->Or(con->And(l, con->Not(r)), con->And(con->Not(l), r));
+			  return NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, NWA_OBDD::MkNot(r)), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), r));
           case AST_OR:
-			  return con->Or(l, r);
+			  return NWA_OBDD::MkOr(l, r);
           case AST_AND:
-			  return con->And(l, r);
+			  return NWA_OBDD::MkAnd(l, r);
           case AST_EQ:
-			  return con->Or(con->And(l, r), con->And(con->Not(l), con->Not(r)));
+			  return NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, r), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), NWA_OBDD::MkNot(r)));
           case AST_NEQ:
-			  return con->Or(con->And(l, con->Not(r)), con->And(con->Not(l), r));
+			  return NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, NWA_OBDD::MkNot(r)), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), r));
           case AST_IMP:
-			  return con->Or(con->Not(l), r);
+			  return NWA_OBDD::MkOr(NWA_OBDD::MkNot(l), r);
           case AST_SCHOOSE:
-			  return con->Or(l, con->And(con->Not(r), NWA_OBDD::MkTrue()));
+			  return NWA_OBDD::MkOr(l, NWA_OBDD::MkAnd(NWA_OBDD::MkNot(r), NWA_OBDD::MkTrue()));
           case AST_VAR:
 		  case AST_VAR_POST:
             ss << f << "::" << e->v;
@@ -1380,13 +1380,17 @@ namespace wali
 						  ss2 << "::" << vl->v;
 						  lhs = string(ss2.str());
 					  }
-					  b1 = NWA_OBDD::MkAnd(b1, con->AssignGen(lhs,nwaobddrel::expr_as_nwaobdd(el->e, con, f), b));
+					  b1 = NWA_OBDD::MkAnd(b1, con->AssignGen(lhs, nwaobddrel::expr_as_nwaobdd(el->e, con, f), b));
 					  vl = vl->n;
 					  el = el->n;
 				  }
 				  if (s->e)
-					  b1 = NWA_OBDD::MkAnd(b1,xformer_for_constrain(s->e, con, f));
-				  pds->add_rule(stt(), stk(s), stt(), stk(ns), new NWAOBDDRel(con, b1));
+				  {
+					  //NWAOBDDRel * t = new NWAOBDDRel(con, xformer_for_constrain(s->e, con, f));
+					  //t->print(std::cout);
+					  b1 = NWA_OBDD::MkAnd(b1, xformer_for_constrain(s->e, con, f));
+				  }
+					  pds->add_rule(stt(), stk(s), stt(), stk(ns), new NWAOBDDRel(con, b1));
 				  break;
 			  case AST_ITE:
 				  assert(s->e && s->sl1);
@@ -1629,7 +1633,7 @@ namespace wali
 	BinRel * h_new = new BinRel(con,h);
 	sem_elem_t h_sem = (SemElem *)h_new;
 
-    	// For each rule r_n, if r+n is of the form <p',y'> -w-> <p", y''', y''''>
+    	// For each rule r_n, if r_n is of the form <p',y'> -w-> <p", y''', y''''>
     	//                                      <p',y'> -w-> <p",y'''>
     	//                                      <p',y'> -w-> <p",*>
     	//    weight w_new = h extend w

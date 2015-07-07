@@ -157,10 +157,10 @@ namespace wali
 	// Returns the vocabulary generated when creating the pds.
 	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_nwa(wpds::WPDS * pds, prog * pg, bool first);
 	// Same, but generates MergeFns of type wali::domains::binrel::BinRelMeetMerge
-	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_with_meet_merge_nwa(wpds::ewpds::EWPDS * pds, prog * pg, bool first);
+	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_with_meet_merge_nwa(wpds::ewpds::EWPDS * pds, prog * pg, bool first = true);
 	// Same, but generates MergeFns of type wali::domains::binrel::BinRelTensorMerge
-	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_with_tensor_merge_nwa(wpds::ewpds::EWPDS * pds, prog * pg, bool first);
-	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_with_newton_merge_nwa(wpds::ewpds::EWPDS * pds, prog * pg, bool first);
+	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_with_tensor_merge_nwa(wpds::ewpds::EWPDS * pds, prog * pg, bool first = true);
+	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_with_newton_merge_nwa(wpds::ewpds::EWPDS * pds, prog * pg, bool first = true);
 
     wali::domains::binrel::BddContext * havocLocals(wpds::WPDS * pds, prog * pg, domains::binrel::ProgramBddContext * con);
 	wali::domains::nwaobddrel::NWAOBDDContext * havocLocalsNWA(wpds::WPDS * pds, prog * pg, domains::nwaobddrel::NWAOBDDContext * con);

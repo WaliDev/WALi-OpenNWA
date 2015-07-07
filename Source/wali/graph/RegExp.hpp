@@ -160,6 +160,7 @@ namespace wali {
               friend class RegExpDag; 
             public:
                 unsigned int count; // for reference counting
+				list<reg_exp_t> children;
             private:
                 /**
                  * @author Prathmesh Prabhu
@@ -173,7 +174,6 @@ namespace wali {
                 delta_map_t delta;
 #endif
                 node_no_t updatable_node_no;
-                list<reg_exp_t> children;
 #if defined(PUSH_EVAL)
                 /*
                    In push based evaluation of the RegExp graph, an updatable regular expression

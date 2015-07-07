@@ -449,6 +449,7 @@ namespace wali
          */
         virtual void path_summary_tarjan_fwpds();
         virtual void path_summary_tarjan_fwpds(bool top_down);
+		virtual void path_summary_tarjan_fwpds(bool top_down, WFA & ansFA);
 
         virtual void path_summary_crosscheck_all();
 
@@ -458,6 +459,7 @@ namespace wali
          * This is mostly intended to be an internal structure.
          */
         virtual void path_summary_via_wpds(wpds::WPDS & wpds);
+		virtual void path_summary_via_wpds(wpds::WPDS & wpds, WFA & ansFA);
 
 	virtual std::map<wali::Key, sem_elem_t>
 	readOutCombineOverAllPathsValues(std::set<Key> alpha);

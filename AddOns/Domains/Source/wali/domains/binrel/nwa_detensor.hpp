@@ -3,9 +3,9 @@
 // ::std
 #include <utility>
 // ::std::tr1
-#include <tr1/tuple>
+#include <boost/tr1/tuple.hpp>
 // ::std::tr1
-#include <tr1/unordered_map>
+#include <boost/tr1/unordered_map.hpp>
 // ::opennwa
 #include "opennwa/Nwa.hpp"
 #include "opennwa/WeightGen.hpp"
@@ -16,7 +16,7 @@
 // ::wali::domains::binrel
 #include "BinRel.hpp"
 
-#include "buddy/bdd.h"
+#include "bdd.h"
 
 class bdd;
 

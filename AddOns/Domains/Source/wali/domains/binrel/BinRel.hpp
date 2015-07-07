@@ -202,9 +202,6 @@ namespace wali
           unsigned baseExtra;
           //The following three indices are for the tensored relations when this
           //variable is in the left operand in the tensor product
-          unsigned tensor1Lhs;
-          unsigned tensor1Rhs;
-          unsigned tensor1Extra;
           //The following three indices are for the tensored relations when this
           //variable is in the right operand in the tensor product
           unsigned tensor2Lhs;
@@ -352,6 +349,9 @@ namespace wali
           bdd commonBddContextSet13;
           //Id: TL2 = TR2
           bdd commonBddContextId13;
+
+		  bdd commonBddContextSet24;
+		  bdd commonBddContextId24;
 
           //We cache zero and one BinRel objects, since they are used so much
           binrel_t cachedBaseOne;

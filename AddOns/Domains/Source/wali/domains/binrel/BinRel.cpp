@@ -161,9 +161,6 @@ std::ostream& BddInfo::print(std::ostream& o) const
     << "[baseLhs " << baseLhs << "] "
     << "[baseRhs " << baseRhs << "] "
     << "[baseExtra " << baseExtra << "] "
-    << "[tensor1Lhs " << tensor1Lhs << "] "
-    << "[tensor1Rhs " << tensor1Rhs << "] "
-    << "[tensor1Extra " << tensor1Extra << "] "
     << "[tensor2Lhs " << tensor2Lhs << "] "
     << "[tensor2Rhs " << tensor2Rhs << "] "
     << "[tensor2Extra " << tensor2Extra << "] } ";
@@ -255,9 +252,11 @@ BddContext::BddContext(int bddMemSize, int cacheSize) :
   baseSecBddContextSet = bddtrue;
   tensorSecBddContextSet= bddtrue;
   commonBddContextSet23 = bddtrue;
+  commonBddContextSet24 = bddtrue;
   commonBddContextSet13 = bddtrue;
   commonBddContextId23 = bddtrue;
   commonBddContextId13 = bddtrue;
+  commonBddContextId24 = bddtrue;
 
   cachedBaseOne = NULL;
   cachedBaseZero = NULL;
@@ -299,7 +298,9 @@ BddContext::BddContext(const BddContext& other) :
   tensorSecBddContextSet(other.tensorSecBddContextSet),
   commonBddContextSet23(other.commonBddContextSet23),
   commonBddContextSet13(other.commonBddContextSet13),
+  commonBddContextSet24(other.commonBddContextSet24),
   commonBddContextId13(other.commonBddContextId13),
+  commonBddContextId24(other.commonBddContextId24),
   cachedBaseOne(other.cachedBaseOne),
   cachedBaseZero(other.cachedBaseZero),
   cachedTensorOne(other.cachedTensorOne),
@@ -341,6 +342,8 @@ BddContext& BddContext::operator = (const BddContext& other)
     tensorSecBddContextSet=other.tensorSecBddContextSet;
     commonBddContextSet23=other.commonBddContextSet23;
     commonBddContextSet13=other.commonBddContextSet13;
+	commonBddContextSet24 = other.commonBddContextSet24;
+	commonBddContextId24 = other.commonBddContextId24;
     commonBddContextId13=other.commonBddContextId13;
     cachedBaseOne=other.cachedBaseOne;
     cachedBaseZero=other.cachedBaseZero;
@@ -375,7 +378,9 @@ BddContext::~BddContext()
   commonBddContextSet23 = bddtrue;
   commonBddContextId23 = bddtrue;
   commonBddContextSet13 = bddtrue;
+  commonBddContextSet24 = bddtrue;
   commonBddContextId13 = bddtrue;
+  commonBddContextId24 = bddtrue;
 
   //Delete cached BinRel objects.
   cachedBaseOne = NULL;
@@ -445,16 +450,16 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
 #if (TENSOR_MAX_AFFINITY == 1)
   for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
     std::map<std::string, int> interleavedVars = *cvi;
-    int * domains = new int[9 * interleavedVars.size()];
+    int * domains = new int[6 * interleavedVars.size()];
     vari = 0;
     for(std::map<std::string, int>::const_iterator cmi = interleavedVars.begin(); cmi != interleavedVars.end(); ++cmi){
-      for(int j=vari * 9; j < 9 * (vari + 1); ++j)
+      for(int j=vari * 6; j < 6 * (vari + 1); ++j)
         domains[j] = cmi->second;
       vari++;
     }
     //Now actually create the fdd levels
     // lock mutex
-    int base = fdd_extdomain(domains, 9 * interleavedVars.size());
+    int base = fdd_extdomain(domains, 6 * interleavedVars.size());
     // release mutex
     if (base < 0){
       *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
@@ -466,13 +471,10 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
     vari = 0;
     for(std::map<std::string, int>::const_iterator cmi = interleavedVars.begin(); cmi != interleavedVars.end(); ++cmi){
       bddinfo_t varInfo = (*this)[cmi->first];
-      int j = 9 * vari;
+      int j = 6 * vari;
       varInfo->baseLhs = base + j++;
       varInfo->baseRhs = base + j++;
       varInfo->baseExtra = base + j++;
-      varInfo->tensor1Lhs = base + j++;
-      varInfo->tensor1Rhs = base + j++;
-      varInfo->tensor1Extra = base + j++;
       varInfo->tensor2Lhs = base + j++;
       varInfo->tensor2Rhs = base + j++;
       varInfo->tensor2Extra = base + j++;
@@ -745,9 +747,6 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
     idx2Name[varInfo->baseLhs] = ci->first;
     idx2Name[varInfo->baseRhs] = ci->first + "'";
     idx2Name[varInfo->baseExtra] = ci->first + "''";
-    idx2Name[varInfo->tensor1Lhs] = ci->first + "_t1";
-    idx2Name[varInfo->tensor1Rhs] = ci->first + "_t1'";
-    idx2Name[varInfo->tensor1Extra] = ci->first + "_t1''";
     idx2Name[varInfo->tensor2Lhs] = ci->first + "_t2";
     idx2Name[varInfo->tensor2Rhs] = ci->first + "_t2'";
     idx2Name[varInfo->tensor2Extra] = ci->first + "_t2''";
@@ -773,9 +772,6 @@ void BddContext::setupCachedBdds()
   int * baseLhs = new int[this->size()];
   int * baseRhs = new int[this->size()];
   int * baseExtra = new int[this->size()];
-  int * tensor1Lhs = new int[this->size()];
-  int * tensor1Rhs = new int[this->size()];  
-  int * tensor1Extra = new int[this->size()];
   int * tensor2Lhs = new int[this->size()];
   int * tensor2Rhs = new int[this->size()];
   int * tensor2Extra = new int[this->size()];
@@ -785,9 +781,6 @@ void BddContext::setupCachedBdds()
     baseLhs[vari] = varInfo->baseLhs;
     baseRhs[vari] = varInfo->baseRhs;
     baseExtra[vari] = varInfo->baseExtra;
-    tensor1Lhs[vari] = varInfo->tensor1Lhs;
-    tensor1Rhs[vari] = varInfo->tensor1Rhs;
-    tensor1Extra[vari] = varInfo->tensor1Extra;
     tensor2Lhs[vari] = varInfo->tensor2Lhs;
     tensor2Rhs[vari] = varInfo->tensor2Rhs;
     tensor2Extra[vari] = varInfo->tensor2Extra;
@@ -837,48 +830,44 @@ void BddContext::setupCachedBdds()
 
   fdd_setpairs(baseSwap.get(), baseLhs, baseRhs, this->size());
   fdd_setpairs(baseSwap.get(), baseRhs, baseLhs, this->size());
-  fdd_setpairs(tensor1Swap.get(), tensor1Lhs, tensor1Rhs, this->size());
-  fdd_setpairs(tensor1Swap.get(), tensor1Rhs, tensor1Lhs, this->size());
   fdd_setpairs(baseRightShift.get(), baseLhs, baseRhs, this->size());
   fdd_setpairs(baseRightShift.get(), baseRhs, baseExtra, this->size());
-  fdd_setpairs(tensorRightShift.get(), tensor1Lhs, tensor1Rhs, this->size());
+  fdd_setpairs(tensorRightShift.get(), baseLhs, baseRhs, this->size());
   fdd_setpairs(tensorRightShift.get(), tensor2Lhs, tensor2Rhs, this->size());
-  fdd_setpairs(tensorRightShift.get(), tensor1Rhs, tensor1Extra, this->size());
+  fdd_setpairs(tensorRightShift.get(), baseRhs, baseExtra, this->size());
   fdd_setpairs(tensorRightShift.get(), tensor2Rhs, tensor2Extra, this->size());
   fdd_setpairs(baseRestore.get(), baseExtra, baseRhs, this->size());
-  fdd_setpairs(tensorRestore.get(), tensor1Extra, tensor1Rhs, this->size());
+  fdd_setpairs(tensorRestore.get(), baseExtra, baseRhs, this->size());
   fdd_setpairs(tensorRestore.get(), tensor2Extra, tensor2Rhs, this->size());
-  fdd_setpairs(move2Tensor1.get(), baseLhs, tensor1Lhs, this->size());
-  fdd_setpairs(move2Tensor1.get(), baseRhs, tensor1Rhs, this->size());
   fdd_setpairs(move2Tensor2.get(), baseLhs, tensor2Lhs, this->size());
   fdd_setpairs(move2Tensor2.get(), baseRhs, tensor2Rhs, this->size());
-  fdd_setpairs(move2Base.get(), tensor1Lhs, baseLhs, this->size());
   fdd_setpairs(move2Base.get(), tensor2Rhs, baseRhs, this->size());
-  fdd_setpairs(move2BaseTwisted.get(), tensor1Lhs, baseLhs, this->size());
   fdd_setpairs(move2BaseTwisted.get(), tensor2Lhs, baseRhs, this->size());
-  fdd_setpairs(move2BaseTwisted24.get(), tensor1Rhs, baseLhs, this->size());
   fdd_setpairs(move2BaseTwisted24.get(), tensor2Rhs, baseRhs, this->size());
+  fdd_setpairs(move2BaseTwisted24.get(), baseRhs, baseLhs, this->size());
 
   // Update static bdds
   baseSecBddContextSet = fdd_makeset(baseRhs, this->size());
-  tensorSecBddContextSet = fdd_makeset(tensor1Rhs, this->size());
+  tensorSecBddContextSet = fdd_makeset(baseRhs, this->size());
   tensorSecBddContextSet &= fdd_makeset(tensor2Rhs, this->size());
-  commonBddContextSet23 = fdd_makeset(tensor1Rhs, this->size());
+  commonBddContextSet23 = fdd_makeset(baseRhs, this->size());
   commonBddContextSet23 &= fdd_makeset(tensor2Lhs, this->size());
-  commonBddContextSet13 = fdd_makeset(tensor1Lhs, this->size());
+  commonBddContextSet13 = fdd_makeset(baseLhs, this->size());
   commonBddContextSet13 &= fdd_makeset(tensor2Lhs, this->size());
+  commonBddContextSet24 &= fdd_makeset(baseRhs, this->size());
+  commonBddContextSet24 &= fdd_makeset(tensor2Rhs, this->size());
   assert(this->size() == 0 || (baseSecBddContextSet != bddfalse && tensorSecBddContextSet != bddfalse
         && tensorSecBddContextSet != bddfalse && commonBddContextSet23 != bddfalse && commonBddContextSet13 != bddfalse));
-#if (DETENSOR_TOGETHER == 1)
+//#if (DETENSOR_TOGETHER == 1)
   // Somehow make this efficient
   for(std::map<const std::string, bddinfo_t>::const_iterator ci = this->begin(); ci != this->end(); ++ci){
     bddinfo_t varInfo = ci->second;
     commonBddContextId23 = commonBddContextId23 &
-      fdd_equals(varInfo->tensor1Rhs, varInfo->tensor2Lhs);
+      fdd_equals(varInfo->baseRhs, varInfo->tensor2Lhs);
     commonBddContextId13 = commonBddContextId13 & 
-      fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
+      fdd_equals(varInfo->baseLhs, varInfo->tensor2Lhs);
   }
-#endif
+//#endif
 
   // Create cached BinRel objects
   // Somehow make this efficient
@@ -887,7 +876,7 @@ void BddContext::setupCachedBdds()
   for(BddContextIter varIter = this->begin(); varIter != this->end();  ++varIter){
     bddinfo_t varInfo = (*varIter).second;
     baseId = baseId & fdd_equals(varInfo->baseLhs, varInfo->baseRhs);
-    tensorId = tensorId & (fdd_equals(varInfo->tensor1Lhs, varInfo->tensor1Rhs) & 
+    tensorId = tensorId & (fdd_equals(varInfo->baseLhs, varInfo->baseRhs) & 
         fdd_equals(varInfo->tensor2Lhs, varInfo->tensor2Rhs));
   }
   cachedBaseOne = new BinRel(this, baseId, false);
@@ -900,9 +889,6 @@ void BddContext::setupCachedBdds()
   delete [] baseLhs;
   delete [] baseRhs;
   delete [] baseExtra;
-  delete [] tensor1Lhs;
-  delete [] tensor1Rhs;
-  delete [] tensor1Extra;
   delete [] tensor2Lhs;
   delete [] tensor2Rhs;
   delete [] tensor2Extra;
@@ -974,17 +960,6 @@ void BddContext::addIntVar(std::string name, unsigned size)
   varInfo->baseRhs = base + 1;
   varInfo->baseExtra = base + 2;
 
-  //create fdds for tensor1
-  base = fdd_extdomain(domains,3);
-  if (base < 0){
-    *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
-    *waliErr << "    Aborting." << endl;
-    assert (false);
-  }
-  varInfo->tensor1Lhs = base;
-  varInfo->tensor1Rhs = base + 1;
-  varInfo->tensor1Extra = base + 2;
-
   //create fdds for tensor2
   base = fdd_extdomain(domains,3);
   if (base < 0){
@@ -1001,39 +976,37 @@ void BddContext::addIntVar(std::string name, unsigned size)
   //update bddPairs
   fdd_setpair(baseSwap.get(), varInfo->baseLhs, varInfo->baseRhs);
   fdd_setpair(baseSwap.get(), varInfo->baseRhs, varInfo->baseLhs);
-  fdd_setpair(tensor1Swap.get(), varInfo->tensor1Lhs, varInfo->tensor1Rhs);
-  fdd_setpair(tensor1Swap.get(), varInfo->tensor1Rhs, varInfo->tensor1Lhs);
   fdd_setpair(baseRightShift.get(), varInfo->baseLhs, varInfo->baseRhs);
   fdd_setpair(baseRightShift.get(), varInfo->baseRhs, varInfo->baseExtra);
-  fdd_setpair(tensorRightShift.get(), varInfo->tensor1Lhs, varInfo->tensor1Rhs);
+  fdd_setpair(tensorRightShift.get(), varInfo->baseLhs, varInfo->baseRhs);
   fdd_setpair(tensorRightShift.get(), varInfo->tensor2Lhs, varInfo->tensor2Rhs);
-  fdd_setpair(tensorRightShift.get(), varInfo->tensor1Rhs, varInfo->tensor1Extra);
+  fdd_setpair(tensorRightShift.get(), varInfo->baseRhs, varInfo->baseExtra);
   fdd_setpair(tensorRightShift.get(), varInfo->tensor2Rhs, varInfo->tensor2Extra);
   fdd_setpair(baseRestore.get(), varInfo->baseExtra, varInfo->baseRhs);
-  fdd_setpair(tensorRestore.get(), varInfo->tensor1Extra, varInfo->tensor1Rhs);
+  fdd_setpair(tensorRestore.get(), varInfo->baseExtra, varInfo->baseRhs);
   fdd_setpair(tensorRestore.get(), varInfo->tensor2Extra, varInfo->tensor2Rhs);
-  fdd_setpair(move2Tensor1.get(), varInfo->baseLhs, varInfo->tensor1Lhs);
-  fdd_setpair(move2Tensor1.get(), varInfo->baseRhs, varInfo->tensor1Rhs);
   fdd_setpair(move2Tensor2.get(), varInfo->baseLhs, varInfo->tensor2Lhs);
   fdd_setpair(move2Tensor2.get(), varInfo->baseRhs, varInfo->tensor2Rhs);
-  fdd_setpair(move2Base.get(), varInfo->tensor1Lhs, varInfo->baseLhs);
   fdd_setpair(move2Base.get(), varInfo->tensor2Rhs, varInfo->baseRhs);
-  fdd_setpair(move2BaseTwisted.get(), varInfo->tensor1Lhs, varInfo->baseLhs);
   fdd_setpair(move2BaseTwisted.get(), varInfo->tensor2Lhs, varInfo->baseRhs);
-  fdd_setpair(move2BaseTwisted24.get(), varInfo->tensor1Rhs, varInfo->baseLhs);
   fdd_setpair(move2BaseTwisted24.get(), varInfo->tensor2Rhs, varInfo->baseRhs);
+  fdd_setpair(move2BaseTwisted24.get(), varInfo->baseRhs, varInfo->baseLhs);
   //update static bdds
   baseSecBddContextSet = baseSecBddContextSet & fdd_ithset(varInfo->baseRhs);
-  tensorSecBddContextSet = tensorSecBddContextSet & fdd_ithset(varInfo->tensor1Rhs);
+  tensorSecBddContextSet = tensorSecBddContextSet & fdd_ithset(varInfo->baseRhs);
   tensorSecBddContextSet = tensorSecBddContextSet & fdd_ithset(varInfo->tensor2Rhs);
-  commonBddContextSet23 = commonBddContextSet23 & fdd_ithset(varInfo->tensor1Rhs);
+  commonBddContextSet23 = commonBddContextSet23 & fdd_ithset(varInfo->baseRhs);
   commonBddContextSet23 = commonBddContextSet23 & fdd_ithset(varInfo->tensor2Lhs);
   commonBddContextId23 = commonBddContextId23 &
-    fdd_equals(varInfo->tensor1Rhs, varInfo->tensor2Lhs);
-  commonBddContextSet13 = commonBddContextSet13 & fdd_ithset(varInfo->tensor1Lhs);
+    fdd_equals(varInfo->baseRhs, varInfo->tensor2Lhs);
+  commonBddContextSet13 = commonBddContextSet13 & fdd_ithset(varInfo->baseLhs);
   commonBddContextSet13 = commonBddContextSet13 & fdd_ithset(varInfo->tensor2Lhs);
   commonBddContextId13 = commonBddContextId13 & 
-    fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
+	  fdd_equals(varInfo->baseLhs, varInfo->tensor2Lhs);
+  commonBddContextSet24 = commonBddContextSet24 & fdd_ithset(varInfo->baseRhs);
+  commonBddContextSet24 = commonBddContextSet24 & fdd_ithset(varInfo->tensor2Rhs);
+  commonBddContextId24 = commonBddContextId24 &
+	  fdd_equals(varInfo->baseRhs, varInfo->tensor2Rhs);
 
   //update cached BinRel objects
   populateCache();
@@ -1042,9 +1015,6 @@ void BddContext::addIntVar(std::string name, unsigned size)
   idx2Name[varInfo->baseLhs] = name;
   idx2Name[varInfo->baseRhs] = name + "'";
   idx2Name[varInfo->baseExtra] = name + "''";
-  idx2Name[varInfo->tensor1Lhs] = name + "_t1";
-  idx2Name[varInfo->tensor1Rhs] = name + "_t1'";
-  idx2Name[varInfo->tensor1Extra] = name + "_t1''";
   idx2Name[varInfo->tensor2Lhs] = name + "_t2";
   idx2Name[varInfo->tensor2Rhs] = name + "_t2'";
   idx2Name[varInfo->tensor2Extra] = name + "_t2''";
@@ -1064,7 +1034,7 @@ void BddContext::populateCache()
     baseId = baseId &
       fdd_equals(varInfo->baseLhs, varInfo->baseRhs);
     tensorId = tensorId &
-      (fdd_equals(varInfo->tensor1Lhs, varInfo->tensor1Rhs) &
+		(fdd_equals(varInfo->baseLhs, varInfo->baseRhs) &
        fdd_equals(varInfo->tensor2Lhs, varInfo->tensor2Rhs));
   }
   cachedBaseOne = new BinRel(this, baseId, false);
@@ -1308,9 +1278,8 @@ binrel_t BinRel::Kronecker(binrel_t that) const
 #endif
   bdd c = tensorViaDetensor(r); //nwa_detensor.cpp
 #else
-  bdd rel1 = bdd_replace(rel, con->move2Tensor1.get());
   bdd rel2 = bdd_replace(that->rel, con->move2Tensor2.get());
-  bdd c = rel1 & rel2;
+  bdd c = rel & rel2;
 #endif
   binrel_t ret = new BinRel(con, c,true);
   if(ret->isZero())
@@ -1322,8 +1291,7 @@ binrel_t BinRel::Kronecker(binrel_t that) const
 
 binrel_t BinRel::Merge(int v, int c) const
 {
-	// start with Id in the base domain
-	bdd havocCalleeLocalsBdd = con->getBaseOne()->getBdd();
+	bdd rel0 = this->rel;
 	// start with top
 	bdd constrainLocalsBdd = con->getBaseTop()->getBdd();
 
@@ -1338,7 +1306,7 @@ binrel_t BinRel::Merge(int v, int c) const
 		}
 		// for each local variable:
 		// havoc the post vocabulary for that variables
-		havocCalleeLocalsBdd = bdd_exist(havocCalleeLocalsBdd, fdd_ithset(vocIter->second->baseRhs));
+		rel0 = bdd_exist(rel0, fdd_ithset(vocIter->second->baseRhs));
 	}
 	for (std::vector<std::string>::const_iterator cit2 = localVars2.begin(); cit2 != localVars2.end(); ++cit2){
 		BddContext::const_iterator vocIter2 = con->find(*cit2);
@@ -1350,11 +1318,10 @@ binrel_t BinRel::Merge(int v, int c) const
 		constrainLocalsBdd = constrainLocalsBdd & bdd_biimp(fdd_ithset(vocIter2->second->baseLhs), fdd_ithset(vocIter2->second->baseRhs));
 	}
 
-	binrel_t havocCalleeLocals = new BinRel(con, havocCalleeLocalsBdd);
+	binrel_t rel_t = new BinRel(con, rel0);
 	binrel_t constrainLocals = new BinRel(con, constrainLocalsBdd);
 	binrel_t ret;
-	ret = this->Compose(havocCalleeLocals);
-	ret = ret->Intersect(constrainLocals);
+	ret = rel_t->Intersect(constrainLocals);
 
 	return ret;
 }
@@ -1363,7 +1330,7 @@ binrel_t BinRel::Merge(int v, int c) const
 binrel_t BinRel::TensorMerge(int v, int c) const
 {
 	// start with Id in the base domain
-	bdd havocCalleeLocalsBdd = con->getTensorOne()->getBdd();
+	bdd rel0 = this->rel;
 	// start with top
 	bdd constrainLocalsBdd = con->getTensorTop()->getBdd();
 
@@ -1378,7 +1345,7 @@ binrel_t BinRel::TensorMerge(int v, int c) const
 		}
 		// for each local variable:
 		// havoc the post vocabulary for that variables
-		havocCalleeLocalsBdd = bdd_exist(havocCalleeLocalsBdd, fdd_ithset(vocIter->second->tensor2Rhs));
+		rel0 = bdd_exist(rel0, fdd_ithset(vocIter->second->tensor2Rhs));
 	}
 	for (std::vector<std::string>::const_iterator cit2 = localVars2.begin(); cit2 != localVars2.end(); ++cit2){
 		BddContext::const_iterator vocIter2 = con->find(*cit2);
@@ -1387,14 +1354,12 @@ binrel_t BinRel::TensorMerge(int v, int c) const
 			assert(0);
 		}
 		// enforce id across that variables
-		constrainLocalsBdd = constrainLocalsBdd & bdd_biimp(fdd_ithset(vocIter2->second->tensor1Rhs), fdd_ithset(vocIter2->second->tensor2Rhs));
+		constrainLocalsBdd = constrainLocalsBdd & bdd_biimp(fdd_ithset(vocIter2->second->baseRhs), fdd_ithset(vocIter2->second->tensor2Rhs));
 	}
-
-	binrel_t havocCalleeLocals = new BinRel(con, havocCalleeLocalsBdd, true);
+	binrel_t rel_n = new BinRel(con, rel0, true);
 	binrel_t constrainLocals = new BinRel(con, constrainLocalsBdd, true);
 	binrel_t ret;
-	ret = this->Compose(havocCalleeLocals);
-	ret = ret->Intersect(constrainLocals);
+	ret = rel_n->Intersect(constrainLocals);
 
 	return ret;
 }
@@ -1419,9 +1384,9 @@ binrel_t BinRel::Eq23Project() const
   bdd rel1 = rel;
   for(std::map<const std::string, bddinfo_t>::const_iterator citer = con->begin(); citer != con->end(); ++citer){
     bddinfo_t varInfo = (*citer).second;
-    bdd id = fdd_equals(varInfo->tensor1Rhs, varInfo->tensor2Lhs);
+    bdd id = fdd_equals(varInfo->baseRhs, varInfo->tensor2Lhs);
     rel1 = rel1 & id;
-    rel1 = bdd_exist(rel1, fdd_ithset(varInfo->tensor1Rhs) & fdd_ithset(varInfo->tensor2Lhs));
+	rel1 = bdd_exist(rel1, fdd_ithset(varInfo->baseRhs) & fdd_ithset(varInfo->tensor2Lhs));
   }
   bdd c = bdd_replace(rel1, con->move2Base.get());
 #endif
@@ -1452,11 +1417,11 @@ binrel_t BinRel::Eq13Project() const
   bdd rel1 = rel;
   for(std::map<const std::string, bddinfo_t>::const_iterator citer = con->begin(); citer != con->end(); ++citer){
     bddinfo_t varInfo = (*citer).second;
-    bdd id = fdd_equals(varInfo->tensor1Rhs, varInfo->tensor2Rhs);
+	bdd id = fdd_equals(varInfo->baseRhs, varInfo->tensor2Rhs);
     rel1 = rel1 & id;
-    rel1 = bdd_exist(rel1, fdd_ithset(varInfo->tensor1Rhs) & fdd_ithset(varInfo->tensor2Rhs));
+	rel1 = bdd_exist(rel1, fdd_ithset(varInfo->baseRhs) & fdd_ithset(varInfo->tensor2Rhs));
     rel1 = bdd_replace(rel1, con->move2BaseTwisted.get());
-    rel1 = bdd_exist(rel1, fdd_ithset(varInfo->tensor1Lhs) & fdd_ithset(varInfo->tensor2Lhs));
+	rel1 = bdd_exist(rel1, fdd_ithset(varInfo->baseLhs) & fdd_ithset(varInfo->tensor2Lhs));
   }
   bdd c = rel1;
 #endif
@@ -1484,7 +1449,22 @@ binrel_t BinRel::Eq24Project() const
   bdd rel2 = bdd_exist(rel1, con->commonBddContextSet13);
   bdd c = bdd_replace(rel2, con->move2BaseTwisted24.get());
 #else
-  bdd rel1 = rel;
+  /*bdd rel1 = rel & con->commonBddContextId13;
+  bdd rel2 = bdd_exist(rel1, con->commonBddContextSet13);
+  bdd rel3 = bdd_replace(rel2, con->move2BaseTwisted24.get());
+  bdd c = bdd_exist(rel2, con->commonBddContextSet24);*/
+   // = bdd_replace(that->rel, con->tensorRightShift.get());
+  /*bdd id = bddtrue;
+  for (std::map<const std::string, bddinfo_t>::const_iterator citer = con->begin(); citer != con->end(); ++citer){
+	  bddinfo_t varInfo = (*citer).second;
+	  id = id & fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
+  }
+  binrel_t tn = new BinRel(con, id, true);
+  tn->print(std::cout) << std::endl;*/
+  bdd rel0 = bdd_relprod(rel, con->commonBddContextId13, con->commonBddContextSet13);
+  bdd c = bdd_replace(rel0, con->move2BaseTwisted24.get());
+  //bdd c = bdd_exist(rel2, con->commonBddContextSet24);
+  /*bdd rel1 = rel;
   for(std::map<const std::string, bddinfo_t>::const_iterator citer = con->begin(); citer != con->end(); ++citer){
     bddinfo_t varInfo = (*citer).second;
     bdd id = fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
@@ -1493,7 +1473,7 @@ binrel_t BinRel::Eq24Project() const
     rel1 = bdd_replace(rel1, con->move2BaseTwisted24.get());
     rel1 = bdd_exist(rel1, fdd_ithset(varInfo->tensor1Rhs) & fdd_ithset(varInfo->tensor2Rhs));
   }
-  bdd c = rel1;
+  bdd c = rel1;*/
 #endif
   binrel_t ret = new BinRel(con,c,false);
   if(ret->isZero())

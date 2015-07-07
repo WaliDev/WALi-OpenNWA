@@ -409,7 +409,6 @@ double FWPDS::getOutRegExps(wfa::WFA const & input, wfa::WFA& output, map<int,re
   t->stop();
   double tmpTime = interGr->getOutnodeRegExps(outNodeRegExps, uMap, oMap, mapBack, transMap, eps, mergeSrcMap);
   double totTime = tmpTime + t->total_time();
-  delete t;
   return totTime;
 }
 
@@ -446,7 +445,6 @@ double FWPDS::getOutRegExpsSimple(wfa::WFA const & input, wfa::WFA& output, map<
 	t->stop();
 	double tmpTime = interGr->getOutnodeRegExpsSimple(outNodeRegExps);
 	double totTime = tmpTime + t->total_time();
-	delete t;
 	return totTime;
 }
 
