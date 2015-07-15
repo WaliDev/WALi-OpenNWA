@@ -91,10 +91,11 @@ namespace wali
 	  wali::domains::nwaobddrel::NWAOBDDContext * dump_pds_from_prog_nwa(wpds::WPDS * pds, prog * pg, bool first);
 	  
 	  void dump_pds_from_proc(
-          wpds::WPDS * pds, 
-          proc * p, 
-          domains::binrel::ProgramBddContext * con, 
-          const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
+		  wpds::WPDS * pds,
+		  proc * p,
+		  domains::binrel::ProgramBddContext * con,
+		  const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
+		  std::map<string, int> & localVars,
           const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee);
 	  void dump_pds_from_proc(
 		  wpds::WPDS * pds,
@@ -108,6 +109,7 @@ namespace wali
           domains::binrel::ProgramBddContext * con, 
           const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
           const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee,
+		  std::map<string, int> & localVars,
           const char * f,
           stmt * ns);
 
@@ -117,6 +119,7 @@ namespace wali
           domains::binrel::ProgramBddContext * con, 
           const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, 
           const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee, 
+		  std::map<string, int> & localVars,
           const char * f, 
           stmt * es);
 	  void dump_pds_from_stmt(
@@ -162,7 +165,7 @@ namespace wali
 	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_with_tensor_merge_nwa(wpds::ewpds::EWPDS * pds, prog * pg, bool first = true);
 	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_with_newton_merge_nwa(wpds::ewpds::EWPDS * pds, prog * pg, bool first = true);
 
-    wali::domains::binrel::BddContext * havocLocals(wpds::WPDS * pds, prog * pg, domains::binrel::ProgramBddContext * con);
+    wali::domains::binrel::BddContext * havocLocals(wpds::WPDS * pds, prog * pg, domains::binrel::ProgramBddContext * con, std::map<string,int> & localVars);
 	wali::domains::nwaobddrel::NWAOBDDContext * havocLocalsNWA(wpds::WPDS * pds, prog * pg, domains::nwaobddrel::NWAOBDDContext * con);
 	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_nwa(wpds::WPDS * pds, prog * pg, bool first);
     void print_prog_stats(prog * pg);

@@ -31,7 +31,7 @@ namespace wali
     namespace binrel
     {
       //We're breaking the ProgramBddContext abstraction here to get the bdds for constrain clauses.
-      static bdd xformer_for_constrain(const expr * e, ProgramBddContext * con, const char * f)
+      static bdd xformer_for_constrain(const expr * e, ProgramBddContext * con, std::map<string, int> localVars, const char * f)
       {
         bddinfo_t varInfo;
         string s;
@@ -40,9 +40,9 @@ namespace wali
         bdd l = bddfalse, r = bddfalse;
         stringstream ss;
         if(e->l)
-          l = xformer_for_constrain(e->l, con, f);
+			l = xformer_for_constrain(e->l, con, localVars, f);
         if(e->r)
-          r = xformer_for_constrain(e->r, con, f);
+			r = xformer_for_constrain(e->r, con, localVars, f);
         switch(e->op){
           case AST_NOT:
             return bdd_not(l);
@@ -64,7 +64,14 @@ namespace wali
           case AST_VAR_POST:
             ss << f << "::" << e->v;
             s = ss.str();
-            if(con->find(ss.str()) == con->end()){
+			if (localVars.find(ss.str()) != localVars.end())
+			{
+				stringstream ll;
+				ll << "local::" << localVars[ss.str()];
+				s = ll.str();
+			}
+            else
+			{
               stringstream ss2;
               ss2 << "::" << e->v;
               assert(con->find(ss2.str()) != con->end());
@@ -83,7 +90,7 @@ namespace wali
             else
               return bddfalse;
           default:
-            assert(0 && "expr_as_bdd: Unknown case");
+            assert(0 && "xformer_for_constrain: Unknown case");
         }
       }
     }
@@ -721,6 +728,7 @@ namespace wali
         //ProgramBddContext * con = new ProgramBddContext(); 
 
         map<string, int> vars;
+		map<string, int> localVars;
 
 	//Iterate through the global variables and give them unique names
         const str_list * vl = pg->vl;
@@ -732,26 +740,40 @@ namespace wali
         }
 	
 	//For each procedure
+		int maxLocals = 0;
         proc_list * pl = pg->pl;
         while(pl){
+			int numLocals = 0;
 	  //Iterate through the arguments to the procedure and give them unique names
           vl = pl->p->al;
           while(vl){
             stringstream ss;
             ss << pl->p->f << "::" << vl->v;
-            vars[ss.str()] = 2; //A Boolean type
-            vl = vl->n;
+			localVars[ss.str()] = numLocals; //A Boolean type
+			vl = vl->n;
+			numLocals++;
           }
 	  //Iterate through the local variables of the procedure and give them unique names
           vl = pl->p->vl;
           while(vl){
             stringstream ss;
             ss << pl->p->f << "::" << vl->v;
-            //con->addBoolVar(ss.str());
-            vars[ss.str()] = 2; //A Boolean type
+            //con->addBoolVar(ss.str())
+            localVars[ss.str()] = numLocals;
             vl = vl->n;
+			numLocals++;
           }
           pl = pl->n;
+		  if (numLocals > maxLocals)
+		  {
+			  for (int i = maxLocals; i < numLocals; i++)
+			  {
+				  stringstream sl;
+				  sl << "local::" << i;
+				  vars[sl.str()] = 2; //A Boolean type
+			  }
+			  maxLocals = numLocals;
+		  }
         }
         fprintf(stderr, "Entering setIntVars\n");
         con->setIntVars(vars);
@@ -771,7 +793,7 @@ namespace wali
 		  resolve_details::map_goto_to_targets(goto_to_targets, label_to_stmt, p);
 		  resolve_details::map_call_to_callee(call_to_callee, name_to_proc, p);
 
-          dump_pds_from_proc(pds, p, con, goto_to_targets, call_to_callee); 
+		  dump_pds_from_proc(pds, p, con, goto_to_targets, localVars, call_to_callee);
 
           label_to_stmt.clear();
           clear_stmt_ptr_stmt_list_ptr_hash_map(goto_to_targets);
@@ -779,7 +801,7 @@ namespace wali
           pl = pl->n;
         }
 		
-		cprover::havocLocals(pds, pg, con);
+		cprover::havocLocals(pds, pg, con, localVars);
         name_to_proc.clear();
         fprintf(stderr, "Done converting\n");
 
@@ -789,16 +811,16 @@ namespace wali
 
       
 
-      static bdd expr_as_bdd(const expr * e, ProgramBddContext *  con, const char * f)
+      static bdd expr_as_bdd(const expr * e, ProgramBddContext *  con, std::map<string,int> & localVars, const char * f)
       {
         if(!e)
           assert(0 && "expr_as_bdd");
         bdd l = bddfalse, r = bddfalse;
-        stringstream ss;
+        stringstream ss, sl;
         if(e->l)
-          l = expr_as_bdd(e->l, con, f);
+			l = expr_as_bdd(e->l, con, localVars, f);
         if(e->r)
-          r = expr_as_bdd(e->r, con, f);
+			r = expr_as_bdd(e->r, con, localVars, f);
         switch(e->op){
           case AST_NOT:
             return con->Not(l);
@@ -820,8 +842,13 @@ namespace wali
 	    return con->Or(l, con->And(con->Not(r), con->NonDet()));
           case AST_VAR:
             ss << f << "::" << e->v;
-            if(con->find(ss.str()) != con->end()){
-              return con->From(ss.str());
+			if (localVars.find(ss.str()) != localVars.end())
+			{
+				int varInt = localVars[ss.str()];
+				sl << "local::" << varInt;
+				if (con->find(sl.str()) != con->end()){
+					return con->From(sl.str());
+				}
             }else{
               stringstream ss2;
               ss2 << "::" << e->v;
@@ -1046,7 +1073,7 @@ namespace wali
       }
 
       void dump_pds_from_stmt(WPDS * pds, stmt * s, ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const
-          stmt_ptr_proc_ptr_hash_map& call_to_callee, const char * f, stmt * ns)
+          stmt_ptr_proc_ptr_hash_map& call_to_callee, std::map<string,int> & localVars, const char * f, stmt * ns)
       {
         binrel_t one = con->getBaseOne();
         bdd b, b1;
@@ -1077,11 +1104,13 @@ namespace wali
               b = one->getBdd();
               // havoc all local variables because there is no merge function.
               stringstream ss;
-              ss << f << "::";
+              ss << "local::";
               string str = ss.str();
               for(ProgramBddContext::const_iterator cit = con->begin(); cit != con->end(); ++cit)
+			  {
                 if(cit->first.find(str) != string::npos)
                   b = b | con->Assign(cit->first, con->NonDet()); 
+				}
             }else b = one->getBdd();
             pds->add_rule(stt(), stk(s), stt(), new BinRel(con, b));
             break;
@@ -1102,10 +1131,12 @@ namespace wali
                 el = el->n;
                 continue;
               }
-              stringstream ss;
+              stringstream ss, sl;
               ss << f << "::" << vl->v;
-	      if(con->find(ss.str()) != con->end()){
-                lhs = ss.str();
+			  if (localVars.find(ss.str()) != localVars.end())
+			  {
+				  sl << "local::" << localVars[ss.str()];
+				  lhs = string(sl.str());
               }else{
                 stringstream ss2;
                 ss2 << "::" << vl->v;           
@@ -1129,50 +1160,53 @@ namespace wali
                 el = el->n;
                 continue;
               }
-              stringstream ss;
+              stringstream ss, sl;
               ss << f << "::" << vl->v;
-              if(con->find(ss.str()) != con->end()){
-                lhs = ss.str();
-              }else{
-                stringstream ss2;
-                ss2 << "::" << vl->v;
-                lhs = string(ss2.str());
-              }
-              b1 = b1 & con->AssignGen(lhs, expr_as_bdd(el->e, con, f), b);
+			  if (localVars.find(ss.str()) != localVars.end())
+			  {
+				  sl << "local::" << localVars[ss.str()];
+				  lhs = string(sl.str());
+			  }
+			  else{
+				  stringstream ss2;
+				  ss2 << "::" << vl->v;
+				  lhs = string(ss2.str());
+			  }
+			  b1 = b1 & con->AssignGen(lhs, expr_as_bdd(el->e, con, localVars, f), b);
               vl = vl->n;
               el = el->n;
             }
             if(s->e)
-              b1 = b1 & xformer_for_constrain(s->e, con, f);
+              b1 = b1 & xformer_for_constrain(s->e, con, localVars, f);
             pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b1));
             break;
           case AST_ITE:   
             assert(s->e && s->sl1);
             if(s->sl1){
               assert(s->sl1->s);
-              b = con->Assume(expr_as_bdd(s->e, con, f), con->True());
+			  b = con->Assume(expr_as_bdd(s->e, con, localVars, f), con->True());
               pds->add_rule(stt(), stk(s), stt(), stk(s->sl1->s), new BinRel(con, b));
             }
             if(s->sl2){
               assert(s->sl2->s);
-              b = con->Assume(expr_as_bdd(s->e, con, f), con->False());
+			  b = con->Assume(expr_as_bdd(s->e, con, localVars, f), con->False());
               pds->add_rule(stt(), stk(s), stt(), stk(s->sl2->s), new BinRel(con, b));
             }else{
               // fall through edge.
-              b = con->Assume(expr_as_bdd(s->e, con, f), con->False());
+				b = con->Assume(expr_as_bdd(s->e, con, localVars, f), con->False());
               pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
             }
             if(s->sl1)
-              dump_pds_from_stmt_list(pds, s->sl1, con, goto_to_targets, call_to_callee, f, ns);
+				dump_pds_from_stmt_list(pds, s->sl1, con, goto_to_targets, call_to_callee, localVars, f, ns);
             if(s->sl2)
-              dump_pds_from_stmt_list(pds, s->sl2, con, goto_to_targets, call_to_callee, f, ns);
+				dump_pds_from_stmt_list(pds, s->sl2, con, goto_to_targets, call_to_callee, localVars, f, ns);
             break;
           case AST_WHILE:
             assert(s->e && s->sl1);
-            b = con->Assume(expr_as_bdd(s->e, con, f), con->True());
+			b = con->Assume(expr_as_bdd(s->e, con, localVars, f), con->True());
             pds->add_rule(stt(), stk(s), stt(), stk(s->sl1->s), new BinRel(con, b));
-            dump_pds_from_stmt_list(pds, s->sl1, con, goto_to_targets, call_to_callee, f, s);
-            b = con->Assume(expr_as_bdd(s->e, con, f), con->False());
+			dump_pds_from_stmt_list(pds, s->sl1, con, goto_to_targets, call_to_callee, localVars, f, s);
+			b = con->Assume(expr_as_bdd(s->e, con, localVars, f), con->False());
             pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
             break;       
           case AST_ASSERT:
@@ -1180,7 +1214,7 @@ namespace wali
             break;
           case AST_ASSUME:
             assert(s->e);
-            b = con->Assume(expr_as_bdd(s->e, con, f), con->True());
+			b = con->Assume(expr_as_bdd(s->e, con, localVars, f), con->True());
             pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
             break;
           case AST_CALL:
@@ -1202,15 +1236,21 @@ namespace wali
 				string str = ss.str();
 				string str2 = st.str();
 
-				for (ProgramBddContext::const_iterator cit = con->begin(); cit != con->end(); ++cit)
+				for (std::map<string, int>::iterator cit = localVars.begin(); cit != localVars.end(); ++cit)
 				{
 					if (cit->first.find(str) != string::npos)
 					{
-						lvars.push_back(cit->first);
+						stringstream sl;
+						int lInt = cit->second;
+						sl << "local::" << lInt;
+						lvars.push_back(sl.str());
 					}
 					if (cit->first.find(str2) != string::npos)
 					{
-						lvars2.push_back(cit->first);
+						stringstream sl;
+						int lInt = cit->second;
+						sl << "local::" << lInt;
+						lvars2.push_back(sl.str());
 					}
 				}
 				con->addVarList(std::pair<int, int>(stk(s), stk(callee_iter->second)), lvars, lvars2);
@@ -1231,13 +1271,23 @@ namespace wali
 				  st << f << "::";
                   string str = ss.str();
 				  string str2 = st.str();
-                  for(ProgramBddContext::const_iterator cit = con->begin(); cit != con->end(); ++cit)
-				  {
-                    if(cit->first.find(str) != string::npos)
-                      lvars.push_back(cit->first);
-					if(cit->first.find(str2) != string::npos)
-					  lvars2.push_back(cit->first);
-                  }
+				  for (std::map<string, int>::iterator cit = localVars.begin(); cit != localVars.end(); ++cit)
+				{
+					if (cit->first.find(str) != string::npos)
+					{
+						stringstream sl;
+						int lInt = cit->second;
+						sl << "local::" << lInt;
+						lvars.push_back(sl.str());
+					}
+					if (cit->first.find(str2) != string::npos)
+					{
+						stringstream sl;
+						int lInt = cit->second;
+						sl << "local::" << lInt;
+						lvars2.push_back(sl.str());
+					}
+				}
 				  merge_fn_t merge;
                   if(merge_type == MEET_MERGE)
                     merge = new MeetMergeFn(con, lvars, lvars2);
@@ -1255,22 +1305,22 @@ namespace wali
       }
 
       void dump_pds_from_stmt_list(WPDS * pds, stmt_list * sl, ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map&
-          goto_to_targets, const stmt_ptr_proc_ptr_hash_map& call_to_callee, const char * f, stmt * es)
+		  goto_to_targets, const stmt_ptr_proc_ptr_hash_map& call_to_callee, std::map<string, int> & localVars, const char * f, stmt * es)
       {
         while(sl){
           if(sl->n)
-            dump_pds_from_stmt(pds, sl->s, con, goto_to_targets, call_to_callee, f, sl->n->s);
+            dump_pds_from_stmt(pds, sl->s, con, goto_to_targets, call_to_callee, localVars, f, sl->n->s);
           else
-            dump_pds_from_stmt(pds, sl->s, con, goto_to_targets, call_to_callee, f, es);
+            dump_pds_from_stmt(pds, sl->s, con, goto_to_targets, call_to_callee, localVars, f, es);
           sl = sl->n;
         }
       }
 
-      void dump_pds_from_proc(WPDS * pds, proc * p, ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const stmt_ptr_proc_ptr_hash_map& call_to_callee)
+	  void dump_pds_from_proc(WPDS * pds, proc * p, ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, std::map<string, int> & localVars, const stmt_ptr_proc_ptr_hash_map& call_to_callee)
       {
         // Create a lead-in edge from the proc itself to the first statment.
         pds->add_rule(stt(), stk(p), stt(), stk(p->sl->s), con->getBaseOne());
-        dump_pds_from_stmt_list(pds, p->sl, con, goto_to_targets, call_to_callee, p->f, NULL);
+        dump_pds_from_stmt_list(pds, p->sl, con, goto_to_targets, call_to_callee, localVars, p->f, NULL);
       }
 
 	  
@@ -1597,95 +1647,163 @@ namespace wali
 		return con;
 	}
 
-    BddContext * havocLocals(wpds::WPDS * pds, prog * pg, ProgramBddContext * con)
+    BddContext * havocLocals(wpds::WPDS * pds, prog * pg, ProgramBddContext * con, std::map<string,int> & localVars)
     {
         WpdsRules dr = WpdsRules();
         pds->for_each(dr);
-        for( std::set<Rule>::iterator it = dr.pushRules.begin();
-	   it != dr.pushRules.end(); ++it ){
+		proc * pM = pg->pl->p;
 
-        // Find p', y'
-        Key p_prime = it->to_state();
-        Key y_prime = it->to_stack1();
-    	Key y_prime_prime = it->to_stack2();
+		Key p_main = stt();
+		Key y_main = stk(pM);
+		bdd hm = con->BaseID();
 
-    	assert(y_prime_prime != WALI_EPSILON);
-   	assert(y_prime != WALI_EPSILON);
+		std::set<int> totLocals;
+		for (std::map<string, int>::iterator lit = localVars.begin(); lit != localVars.end(); lit++)
+		{
+			int nextLocal = lit->second;
+			totLocals.insert(nextLocal);
+		}
+		for (int i = 0; i < totLocals.size(); i++)
+		{
+			stringstream ss;
+			ss << "local::" << i;
+			string lhs = ss.str();
+			hm = con->HavocVar(lhs, hm);
+		}
 
-    	// Create havoc weight h
-    	bdd h = con->BaseID();
+		BinRel * hm_new = new BinRel(con, hm);
+		sem_elem_t hm_sem = (SemElem *)hm_new;
 
-        //For each procedure
-        proc_list * pl = pg->pl;
-        while(pl){
-          //Iterate through the local variables of the procedure and give them unique names
-          const str_list * vl = pl->p->vl;
-          while(vl){
-            stringstream ss;
-            ss << pl->p->f << "::" << vl->v;
-            string lhs = ss.str();
-            h = con->HavocVar(lhs, h);
-            vl = vl->n;
-          }
-          pl = pl->n;
-        }
+		for (std::set<Rule>::iterator sit = dr.stepRules.begin();
+			sit != dr.stepRules.end(); sit++)
+		{
+			Key p_prime2 = sit->from_state();
+			Key y_prime2 = sit->from_stack();
+			if ((p_prime2 == p_main) && (y_prime2 == y_main))
+			{
+				Key p_dprime = sit->to_state();
+				Key y_prime3 = sit->to_stack1();
+				Key y_prime4 = sit->to_stack2();
+				sem_elem_t w_new = hm_sem->extend(sit->weight());
+				pds->replace_rule(p_main, y_main, p_dprime, y_prime3, y_prime4, w_new);
+			}
+		}
 
-	BinRel * h_new = new BinRel(con,h);
-	sem_elem_t h_sem = (SemElem *)h_new;
+		for (std::set<Rule>::iterator sit = dr.popRules.begin();
+			sit != dr.popRules.end(); sit++)
+		{
+			Key p_prime2 = sit->from_state();
+			Key y_prime2 = sit->from_stack();
+			if ((p_prime2 == p_main) && (y_prime2 == y_main))
+			{
+				Key p_dprime = sit->to_state();
+				Key y_prime3 = sit->to_stack1();
+				Key y_prime4 = sit->to_stack2();
+				sem_elem_t w_new = hm_sem->extend(sit->weight());
+				pds->replace_rule(p_main, y_main, p_dprime, y_prime3, y_prime4, w_new);
+			}
+		}
 
-    	// For each rule r_n, if r_n is of the form <p',y'> -w-> <p", y''', y''''>
-    	//                                      <p',y'> -w-> <p",y'''>
-    	//                                      <p',y'> -w-> <p",*>
-    	//    weight w_new = h extend w
-    	//    add_rule(... same rule with w_new ...);
-    	// p", y''', y''''
-	for( std::set<Rule>::iterator sit = dr.stepRules.begin();
-	     sit != dr.stepRules.end(); sit++ )
-	{
-	  Key p_prime2 = sit->from_state();
-	  Key y_prime2 = sit->from_stack();
-	  if ((p_prime2 == p_prime) && (y_prime2 == y_prime))
-	  {
-	    Key p_dprime = sit->to_state();
-	    Key y_prime3 = sit->to_stack1();
-	    Key y_prime4 = sit->to_stack2();
-	    sem_elem_t w_new = h_sem->extend(sit->weight());
-	    pds->replace_rule(p_prime,y_prime,p_dprime,y_prime3,y_prime4,w_new);
-	  }
-	}
+		for (std::set<Rule>::iterator sit = dr.pushRules.begin();
+			sit != dr.pushRules.end(); sit++)
+		{
+			Key p_prime2 = sit->from_state();
+			Key y_prime2 = sit->from_stack();
+			if ((p_prime2 == p_main) && (y_prime2 == y_main))
+			{
+				Key p_dprime = sit->to_state();
+				Key y_prime3 = sit->to_stack1();
+				Key y_prime4 = sit->to_stack2();
+				sem_elem_t w_new = hm_sem->extend(sit->weight());
+				pds->replace_rule(p_main, y_main, p_dprime, y_prime3, y_prime4, w_new);
+			}
+		}
 
-                for( std::set<Rule>::iterator sit = dr.popRules.begin();
-             sit != dr.popRules.end(); sit++ )
-        {
-          Key p_prime2 = sit->from_state();
-          Key y_prime2 = sit->from_stack();
-          if ((p_prime2 == p_prime) && (y_prime2 == y_prime))
-          {
-            Key p_dprime = sit->to_state();
-            Key y_prime3 = sit->to_stack1();
-            Key y_prime4 = sit->to_stack2();
-            sem_elem_t w_new = h_sem->extend(sit->weight());
-            pds->replace_rule(p_prime,y_prime,p_dprime,y_prime3,y_prime4,w_new);
-          }
-        }
+		for (std::set<Rule>::iterator it = dr.pushRules.begin(); it != dr.pushRules.end(); ++it)
+		{
 
-        for( std::set<Rule>::iterator sit = dr.pushRules.begin();
-             sit != dr.pushRules.end(); sit++ )
-        {
-          Key p_prime2 = sit->from_state();
-          Key y_prime2 = sit->from_stack();
-          if ((p_prime2 == p_prime) && (y_prime2 == y_prime))
-          {
-            Key p_dprime = sit->to_state();
-            Key y_prime3 = sit->to_stack1();
-            Key y_prime4 = sit->to_stack2();
-            sem_elem_t w_new = h_sem->extend(sit->weight());
-            pds->replace_rule(p_prime,y_prime,p_dprime,y_prime3,y_prime4,w_new);
-          }
-        }
+			// Find p', y'
+			Key p_prime = it->to_state();
+			Key y_prime = it->to_stack1();
+			Key y_prime_prime = it->to_stack2();
 
-	return con;
-      }
+			assert(y_prime_prime != WALI_EPSILON);
+			assert(y_prime != WALI_EPSILON);
+
+			// Create havoc weight h
+			bdd h = con->BaseID();
+
+			std::set<int> totLocals;
+			for (std::map<string, int>::iterator lit = localVars.begin(); lit != localVars.end(); lit++)
+			{
+				int nextLocal = lit->second;
+				totLocals.insert(nextLocal);
+			}
+			for (int i = 0; i < totLocals.size(); i++)
+			{
+				stringstream ss;
+				ss << "local::" << i;
+				string lhs = ss.str();
+				h = con->HavocVar(lhs, h);
+			}
+
+
+			BinRel * h_new = new BinRel(con, h);
+			sem_elem_t h_sem = (SemElem *)h_new;
+
+			// For each rule r_n, if r_n is of the form <p',y'> -w-> <p", y''', y''''>
+			//                                      <p',y'> -w-> <p",y'''>
+			//                                      <p',y'> -w-> <p",*>
+			//    weight w_new = h extend w
+			//    add_rule(... same rule with w_new ...);
+			// p", y''', y''''
+			for (std::set<Rule>::iterator sit = dr.stepRules.begin();
+				sit != dr.stepRules.end(); sit++)
+			{
+				Key p_prime2 = sit->from_state();
+				Key y_prime2 = sit->from_stack();
+				if ((p_prime2 == p_prime) && (y_prime2 == y_prime))
+				{
+					Key p_dprime = sit->to_state();
+					Key y_prime3 = sit->to_stack1();
+					Key y_prime4 = sit->to_stack2();
+					sem_elem_t w_new = h_sem->extend(sit->weight());
+					pds->replace_rule(p_prime, y_prime, p_dprime, y_prime3, y_prime4, w_new);
+				}
+			}
+
+			for (std::set<Rule>::iterator sit = dr.popRules.begin();
+				sit != dr.popRules.end(); sit++)
+			{
+				Key p_prime2 = sit->from_state();
+				Key y_prime2 = sit->from_stack();
+				if ((p_prime2 == p_prime) && (y_prime2 == y_prime))
+				{
+					Key p_dprime = sit->to_state();
+					Key y_prime3 = sit->to_stack1();
+					Key y_prime4 = sit->to_stack2();
+					sem_elem_t w_new = h_sem->extend(sit->weight());
+					pds->replace_rule(p_prime, y_prime, p_dprime, y_prime3, y_prime4, w_new);
+				}
+			}
+
+			for (std::set<Rule>::iterator sit = dr.pushRules.begin();
+				sit != dr.pushRules.end(); sit++)
+			{
+				Key p_prime2 = sit->from_state();
+				Key y_prime2 = sit->from_stack();
+				if ((p_prime2 == p_prime) && (y_prime2 == y_prime))
+				{
+					Key p_dprime = sit->to_state();
+					Key y_prime3 = sit->to_stack1();
+					Key y_prime4 = sit->to_stack2();
+					sem_elem_t w_new = h_sem->extend(sit->weight());
+					pds->replace_rule(p_prime, y_prime, p_dprime, y_prime3, y_prime4, w_new);
+				}
+			}
+
+			return con;
+		}
     }
 
 	namespace nwaobddrel {

@@ -86,8 +86,8 @@
  *
  * The tensor choice is determined by setting **exactly one** macro to 1.
  **/
-#define TENSOR_MAX_AFFINITY 1
-#define TENSOR_MIN_AFFINITY 0
+#define TENSOR_MAX_AFFINITY 0
+#define TENSOR_MIN_AFFINITY 1
 #define BASE_MAX_AFFINITY_TENSOR_MIXED 0
 #define TENSOR_MATCHED_PAREN 0
 

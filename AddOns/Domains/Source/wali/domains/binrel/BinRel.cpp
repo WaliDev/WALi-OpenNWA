@@ -514,7 +514,7 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
     }
   }
   //Next for tensor1
-  for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
+  /*for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
     std::map<std::string, int> interleavedVars = *cvi;
     vari = 0;
     int * domains = new int[3 * interleavedVars.size()];
@@ -543,7 +543,7 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
       varInfo->tensor1Extra = base + j++;
       vari++;  
     }
-  }
+  }*/
   //Finally for tensor2
   for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
     std::map<std::string, int> interleavedVars = *cvi;
@@ -854,11 +854,10 @@ void BddContext::setupCachedBdds()
   commonBddContextSet23 &= fdd_makeset(tensor2Lhs, this->size());
   commonBddContextSet13 = fdd_makeset(baseLhs, this->size());
   commonBddContextSet13 &= fdd_makeset(tensor2Lhs, this->size());
-  commonBddContextSet24 &= fdd_makeset(baseRhs, this->size());
   commonBddContextSet24 &= fdd_makeset(tensor2Rhs, this->size());
   assert(this->size() == 0 || (baseSecBddContextSet != bddfalse && tensorSecBddContextSet != bddfalse
         && tensorSecBddContextSet != bddfalse && commonBddContextSet23 != bddfalse && commonBddContextSet13 != bddfalse));
-//#if (DETENSOR_TOGETHER == 1)
+#if (DETENSOR_TOGETHER == 1)
   // Somehow make this efficient
   for(std::map<const std::string, bddinfo_t>::const_iterator ci = this->begin(); ci != this->end(); ++ci){
     bddinfo_t varInfo = ci->second;
@@ -867,7 +866,7 @@ void BddContext::setupCachedBdds()
     commonBddContextId13 = commonBddContextId13 & 
       fdd_equals(varInfo->baseLhs, varInfo->tensor2Lhs);
   }
-//#endif
+#endif
 
   // Create cached BinRel objects
   // Somehow make this efficient
@@ -1003,7 +1002,6 @@ void BddContext::addIntVar(std::string name, unsigned size)
   commonBddContextSet13 = commonBddContextSet13 & fdd_ithset(varInfo->tensor2Lhs);
   commonBddContextId13 = commonBddContextId13 & 
 	  fdd_equals(varInfo->baseLhs, varInfo->tensor2Lhs);
-  commonBddContextSet24 = commonBddContextSet24 & fdd_ithset(varInfo->baseRhs);
   commonBddContextSet24 = commonBddContextSet24 & fdd_ithset(varInfo->tensor2Rhs);
   commonBddContextId24 = commonBddContextId24 &
 	  fdd_equals(varInfo->baseRhs, varInfo->tensor2Rhs);
@@ -1417,11 +1415,7 @@ binrel_t BinRel::Eq13Project() const
   bdd rel1 = rel;
   for(std::map<const std::string, bddinfo_t>::const_iterator citer = con->begin(); citer != con->end(); ++citer){
     bddinfo_t varInfo = (*citer).second;
-	bdd id = fdd_equals(varInfo->baseRhs, varInfo->tensor2Rhs);
-    rel1 = rel1 & id;
-	rel1 = bdd_exist(rel1, fdd_ithset(varInfo->baseRhs) & fdd_ithset(varInfo->tensor2Rhs));
-    rel1 = bdd_replace(rel1, con->move2BaseTwisted.get());
-	rel1 = bdd_exist(rel1, fdd_ithset(varInfo->baseLhs) & fdd_ithset(varInfo->tensor2Lhs));
+	
   }
   bdd c = rel1;
 #endif
@@ -1460,20 +1454,18 @@ binrel_t BinRel::Eq24Project() const
 	  id = id & fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
   }
   binrel_t tn = new BinRel(con, id, true);
-  tn->print(std::cout) << std::endl;*/
+  tn->print(std::cout) << std::endl;
   bdd rel0 = bdd_relprod(rel, con->commonBddContextId13, con->commonBddContextSet13);
-  bdd c = bdd_replace(rel0, con->move2BaseTwisted24.get());
+  bdd c = bdd_replace(rel0, con->move2BaseTwisted24.get());*/
   //bdd c = bdd_exist(rel2, con->commonBddContextSet24);
-  /*bdd rel1 = rel;
-  for(std::map<const std::string, bddinfo_t>::const_iterator citer = con->begin(); citer != con->end(); ++citer){
-    bddinfo_t varInfo = (*citer).second;
-    bdd id = fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
-    rel1 = rel1 & id;
-    rel1 = bdd_exist(rel1, fdd_ithset(varInfo->tensor1Lhs) & fdd_ithset(varInfo->tensor2Lhs));
-    rel1 = bdd_replace(rel1, con->move2BaseTwisted24.get());
-    rel1 = bdd_exist(rel1, fdd_ithset(varInfo->tensor1Rhs) & fdd_ithset(varInfo->tensor2Rhs));
+  bdd rel1 = rel;
+  BddPairPtr move2BaseTwisted24BitbyBit = BddPairPtr(bdd_newpair());
+  for (std::map<const std::string, bddinfo_t>::const_iterator citer = con->begin(); citer != con->end(); ++citer){
+	  bddinfo_t varInfo = (*citer).second;
+	  bdd id = fdd_equals(varInfo->baseLhs, varInfo->tensor2Lhs);
+	  rel1 = bdd_relprod(rel1, id, fdd_ithset(varInfo->baseLhs) & fdd_ithset(varInfo->tensor2Lhs));
   }
-  bdd c = rel1;*/
+  bdd c = bdd_replace(rel1, con->move2BaseTwisted24.get());
 #endif
   binrel_t ret = new BinRel(con,c,false);
   if(ret->isZero())
