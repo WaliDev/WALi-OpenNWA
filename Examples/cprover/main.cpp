@@ -405,6 +405,11 @@ namespace{
 
 
 namespace goals {
+
+	// Stack frames needed by the non-recursive versions of convertToTSL and Eval and EvalT
+
+	//A Stack frame which takes a regexp_t and has pointers to it's left and right children, used from
+	//Converting to a TSLRegExp
 	struct cFrame
 	{
 		cFrame(reg_exp_t & e) : is_new(true), e(e), op(), left(), right() {}
@@ -415,15 +420,20 @@ namespace goals {
 		reg_exp_t left;
 		reg_exp_t right;
 	};
-	struct tFrame
+
+	//A Stack frame which takes a TSL regExpRefPtr and has pointers to it's left and right children
+	//Used for the differential function and evalRegExpAt0 and evalRegExp
+	struct dFrame
 	{
-		tFrame(RTG::regExpRefPtr & e) : is_new(true), e(e), op(), left(), right(){}
+		dFrame(RTG::regExpRefPtr & e) : is_new(true), e(e), op(), left(), right(){}
 		bool is_new;
 		RTG::regExpRefPtr e;
 		int op;
 		RTG::regExpRefPtr left;
 		RTG::regExpRefPtr right;
 	};
+
+	//A Stack frame which takes a TSL regExpTRefPtr and has pointers to it's left and right children, used for evalT
 	struct sFrame
 	{
 		sFrame(RTG::regExpTRefPtr & e) : is_new(true), e(e), op(), left(), right(){}
@@ -434,29 +444,6 @@ namespace goals {
 		RTG::regExpTRefPtr right;
 	};
 
-	/* 
-	*  Globals for the newton run
-	*/
-	map<int, reg_exp_t> outNodeRegExpMap; // A map from a unique id of an outgoing node to the regular expression associated with it
-	map<int, reg_exp_t> rNew; // A map from the node ids to the regexps representing the full differentials associated with that node id
-	map<int, int> updateableMap;  //A map from an upadateable node number to the id of the node it depends on 
-	map<int, int> oMap;
-	map<int, pair< pair<int, int>, int> > mapBack;  //A map from the node index to the struct of the <<src,tgt>,stack> - used to insert weights back into wfa
-	map<pair<pair<int, int>, int>,int> transMap;
-	vector<int> differentiatedList; //A list of nodes with where the differential is to be taken
-	tslRegExpMap E;  //The map of all tsl regular expression
-	tslRegExpMap diffMap;  //The map of tsl regular expressions to be differentiated (the program return points)
-	tslDiffMap differentialMap;  //This is a map from regexp ids to the partial differentials assoicated with them
-	tslUntensoredDiffMap untensoredDifferentialMap;
-	tslRegExpTMap tensoredRegExpMap;
-	map<int, domain_t> finWeights;  //The map from node id to the final relational weights
-	map<std::pair<int, int>, std::pair<int, int>> mergeSrcMap; //The map that keeps track of the src of calls on call instructions
-	std::vector<int> wl;
-	std::set<int> vl;
-	double baseEvalTime = 0;
-	map<int, std::set<int>> varDependencies;
-  
-  std::set<pair<std::pair<int,int>,int> > globalEpsilon;  //used for debugging Newton
   short dump = false;
   char * mainProc = NULL, * errLbl = NULL;
   string fname;
@@ -464,25 +451,17 @@ namespace goals {
   
 
   //Calls postar on the pds and wfa, also prints out .dot and .txt files with the initial wfa and final wfa.
+  //Author: Prathmesh Prahbu
   void doPostStar(WPDS * pds, WFA& outfa)
   {
-    if(dump){
-      fstream outfile("init_outfa.dot", fstream::out);
-      outfa.print_dot(outfile, true);
-      outfile.close();
-    }
-    if(dump){
-      fstream outfile("init_outfa.txt", fstream::out);
-      outfa.print(outfile);
-      outfile.close();
-    }
-
+	//Create the initial wfa - with only the start and the accept states
     WFA fa;
     wali::Key acc = wali::getKeySpace()->getKey("accept");
     fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, pds->get_theZero()->one());
     fa.setInitialState(getPdsState());
     fa.addFinalState(acc);
 
+	//Dump the initial wfa to a dot and txt file
    if(dump){
       fstream outfile("init_outfa.dot", fstream::out);
       fa.print_dot(outfile, true);
@@ -498,11 +477,13 @@ namespace goals {
     cout << "[Newton Compare] Computing poststar..." << endl;
     FWPDS * fpds = NULL;
     fpds = dynamic_cast<FWPDS*>(pds);
-    if(fpds == NULL){
+    if(fpds == NULL){ //We are using an ewpds, so no lazy transitions and therefore no IGR
       pds->poststar(fa,outfa); 
     }else{
       fpds->poststarIGR(fa,outfa);
     }
+
+	//Dump the resultant wfa to dot and txt files
     if(dump){
       cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
       fstream outfile("final_outfa.dot", fstream::out);
@@ -516,75 +497,45 @@ namespace goals {
     }
   }
   
-  //Computes the path summary to determin if the error label is reachable
-  sem_elem_t computePathSummary(WPDS * pds, WFA& outfa)
+  /*
+  *  Takes the final automata after poststar (or the newton solver) -- ETTODO - check this
+  *  and returns the resultant path summary from a pruned version of the wfa with a new
+  *  initial state that represents the error location.
+  *
+  *  The resultant weight represents all possible paths from the error state to the accept state
+  *  in the wfa.
+  *  
+  *  If the weight is not null, then the error state is reachable in the program.
+  *
+  *  @param: out
+  *  Input:  outfa - wfa representing the boolean program
+  *  Return:  Weight representing all possible paths to the error location in the program.  Zero/False
+			  if there is not path.
+  *  Author: Emma Turetsky
+  */
+  sem_elem_t computePathSummary(WFA& outfa)
   {
     cout << "[Newton Compare] Checking error label reachability..." << endl;
-    WpdsStackSymbols syms;
-	pds->for_each(syms);
 
+	//Get the new initial key for the wfa - using what we know about how that state is labeled
+	//That key will be stored in fKey
 	Key errKey = wali::getKeySpace()->getKey("error");
 	Key iKey = wali::getKeySpace()->getKey("Unique State Name");
 	Key pErrKey = wali::getKeySpace()->getKey(iKey, errKey);
 	GenKeySource * t = new wali::wpds::GenKeySource(1, pErrKey);
 	Key fKey = wali::getKeySpace()->getKey(t);
 
-
-	//Creates an errorwfa, that accepts if the error transition is seen and then has a loop to the accept state
-	//for all other transitions.
-    /*WFA errfa;
-    wali::Key fin = wali::getKeySpace()->getKey("accept");
-    std::set<Key>::iterator it;
-    errfa.addTrans(getPdsState(), getErrStk(pg), fin, outfa.getSomeWeight());
-    for(it = syms.gamma.begin(); it != syms.gamma.end(); it++)
-      errfa.addTrans(fin, *it, fin, outfa.getSomeWeight());
-    errfa.setInitialState(getPdsState());
-    errfa.addFinalState(fin);*/
-
-    /*if(dump){
-      cout << "[Newton Compare] Dumping the error automaton in dot format to errfa.dot" << endl;
-      fstream outfile("errfa.dot", fstream::out);
-      errfa.print_dot(outfile, true);
-      outfile.close();
-    }
-    if(dump){
-      cout << "[Newton Compare] Dumping the error automaton to errfa.txt" << endl;
-      fstream outfile("errfa.txt", fstream::out);
-      errfa.print(outfile);
-      outfile.close();
-    }*/
-
-	//Creates the interfa, which intersects the given and the error wfa
-    /*WFA interfa;
-    KeepLeft wmaker;
-    interfa = outfa.intersect(wmaker, errfa);*/
-    
-
-    /*if(dump){
-      cout << "[Newton Compare] Dumping the intersected automaton in dot format to intfa.dot" << endl;
-      fstream outfile("intfa.dot", fstream::out);
-      interfa.print_dot(outfile, true);
-      outfile.close();
-    }
-    if(dump){
-      cout << "[Newton Compare] Dumping the intersected automaton to intfa.txt" << endl;
-      fstream outfile("intfa.txt", fstream::out);
-      interfa.print(outfile);
-      outfile.close();
-    }*/
-
-	//If there is a path through the interfa, then there is a legal assignment of variables in the program that reaches
-	//an error state.  The weight returned represents that assignment.
     cout << "[Newton Compare] Computing path summary..." << endl;
-    //interfa.path_summary_iterative_original(outfa.getSomeWeight()->one());
 
-    //sem_elem_t wt1 = interfa.getState(interfa.getInitialState())->weight();
+	//First check to be sure the error state even exits (if it doesn't, error state is not reachable
 	if (outfa.getState(fKey) != NULL)
 	{
+		//Prune outfa to be start at the error state and then call path_summary _tarjan_fwpds
 		outfa.setInitialState(fKey);
 		outfa.prune();
 		outfa.path_summary_tarjan_fwpds(true);
 		sem_elem_t wt2;
+		//If the weight from the path summary isn't null, then return that value, otherwise return the False/Zero weight
 		if (outfa.getState(outfa.getInitialState()) != NULL)
 		{
 			wt2 = outfa.getState(outfa.getInitialState())->weight();
@@ -593,20 +544,9 @@ namespace goals {
 		{
 			wt2 = con->getBaseZero();
 		}
-		/*if (wt1->equal(wt2))
-		{
-		std::cout << "Huzzah!  Weights are equal";
-		}
-		else
-		{
-		std::cout << "Something's wrong" << std::endl;
-		wt1->print(std::cout) << std::endl;
-		wt2->print(std::cout) << std::endl;
-
-		}*/
 		return wt2;
 	}
-	else
+	else //The error state doesn't exist
 	{
 		return con->getBaseZero();
 	}
@@ -618,6 +558,8 @@ namespace goals {
   *  Creates an npds representing the program with bdds as weights.  Runs a newton solver for WPDS queries, 
   *  using EWPDS solvers for the genearted linear equations. The correctness of this solver
   *  is uncertain
+  *
+  *  Author:  Prathmesh Prahbu
   */
   void runNwpds(WFA& outfa, FWPDS * originalPds = NULL)
   { 
@@ -631,8 +573,8 @@ namespace goals {
       npds = new NWPDS();
 	  con = pds_from_prog(npds, pg);
     }
-	freopen("nwaobddOut.txt", "w", stdout);
-    npds->print(std::cout) << endl;
+	//freopen("nwaobddOut.txt", "w", stdout);
+    //npds->print(std::cout) << endl;
     wali::set_verify_fwpds(false);
 
 #if defined(BINREL_STATS)
@@ -641,7 +583,7 @@ namespace goals {
     wali::util::Timer * t = new wali::util::Timer("NWPDS poststar",cout);
     t->measureAndReport =false;
     doPostStar(npds, outfa);
-    sem_elem_t wt = computePathSummary(npds, outfa);
+    sem_elem_t wt = computePathSummary(outfa);
     if(wt->equal(wt->zero()))
       cout << "[Newton Compare] NWPDS ==> error not reachable" << endl;
     else{
@@ -660,6 +602,8 @@ namespace goals {
   *
   *  Creates an fpds representing the program with bdds (or nwaobdds) as weights.  Runs poststar and computes a
   *  path summary to find the results.
+  *
+  *  Author:  Prathmesh Prahbu
   */
   double runFwpds(WFA& outfa, FWPDS * originalPds = NULL)
   { 
@@ -671,48 +615,37 @@ namespace goals {
       fpds = new FWPDS(*originalPds);
     else{
       fpds = new FWPDS();
-      //con = pds_from_prog(fpds, pg);
 	  con = pds_from_prog_with_meet_merge(fpds, pg);
     }
 
     wali::set_verify_fwpds(false);
     fpds->useNewton(false);
 	
-	freopen("testingLocalVars.txt", "w", stdout);
-	fpds->print(std::cout) << std::endl;
+	//freopen("testingLocalVars.txt", "w", stdout);
+	//fpds->print(std::cout) << std::endl;
 #if defined(BINREL_STATS)
-  //  con->resetStats(); 
+    con->resetStats(); 
 #endif
 	double curTime;
     wali::util::GoodTimer * t = new wali::util::GoodTimer("FWPDS poststar");
     //t->measureAndReport =false;
     doPostStar(fpds, outfa);
-    //outfa.path_summary_iterative_original(outfa.getSomeWeight()->one());
-    sem_elem_t wt = computePathSummary(fpds, outfa);
-	/*cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
-	fstream outfile("fwpds_outfa.dot", fstream::out);
-	outfa.print_dot(outfile, true);
-	outfile.close();*/
+    sem_elem_t wt = computePathSummary(outfa);
     if(wt->equal(wt->zero()))
       cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
     else{
       cout << "[Newton Compare] FWPDS ==> error reachable" << endl;
     }
-	//cout << "[Newton Compare] FWPDS ==> error reachable" << endl;
 	t->stop();
 	double totTime = t->total_time();
 	std::cout << "[Newton Compare] Time taken by: FWPDS: ";
 	cout << totTime << endl;
-    /*t->stop();
-    double totTime = t->total_time();
-    delete t;*/
-    return totTime;
 
 #if defined(BINREL_STATS)
- //   con->printStats(cout);
+	con->printStats(cout);
 #endif //if defined(BINREL_STATS)
-    //delete fpds;
-	return 0;//return totTime; 
+
+    return totTime;
   }
   
   /*
@@ -720,6 +653,8 @@ namespace goals {
   *
   *  Creates an fpds representing the program with bdds as weights.  Runs poststar and computes a
   *  path summary to find the results.
+  *
+  *  Author: Prathmesh Prahbu
   */
   double runEwpds(WFA& outfa, EWPDS * originalPds = NULL)
   {
@@ -733,16 +668,17 @@ namespace goals {
 	  con = pds_from_prog_with_meet_merge(pds, pg);//_with_meet_merge(pds, pg);
     }
 
+	//freopen("testingEWPDS.txt", "w", stdout);
     //pds->print(std::cout) << endl;
 
 #if defined(BINREL_STATS)
-   // con->resetStats();
+    con->resetStats();
 #endif
     wali::util::GoodTimer * t = new wali::util::GoodTimer("EWPDS poststar");
     //t->measureAndReport =false;
     doPostStar(pds, outfa);
     //outfa.path_summary_iterative_original(outfa.getSomeWeight()->one());
-    sem_elem_t wt = computePathSummary(pds, outfa);
+    sem_elem_t wt = computePathSummary(outfa);
     if(wt->equal(wt->zero()))
       cout << "[Newton Compare] EWPDS ==> error not reachable" << endl;
     else{
@@ -753,11 +689,10 @@ namespace goals {
     //delete t;
     t->stop();
 #if defined(BINREL_STATS)
-  //  con->printStats(cout);
+    con->printStats(cout);
 #endif //if defined(BINREL_STATS)
     double totTime = t->total_time();
     cout << totTime << std::endl;
-    //delete pds;
     return totTime;
   }
 
@@ -766,6 +701,8 @@ namespace goals {
   *
   *  Creates an fpds representing the program with bdds as weights.  Runs poststar and computes a
   *  path summary to find the results.
+  *
+  *  Author: Prathmesh Prahbu
   */
   void runWpds(WFA& outfa, EWPDS * originalPds = NULL)
   { 
@@ -787,7 +724,7 @@ namespace goals {
     wali::util::Timer * t = new wali::util::Timer("WPDS poststar",cout);
     t->measureAndReport =false;
     doPostStar(pds, outfa);
-    sem_elem_t wt = computePathSummary(pds, outfa);
+    sem_elem_t wt = computePathSummary(outfa);
     wt->print(std::cout);
     if(wt->equal(wt->zero()))
       cout << "[Newton Compare] WPDS ==> error not reachable" << endl;
@@ -803,17 +740,42 @@ namespace goals {
     delete pds;
   }
 
-  RTG::regExpTListRefPtr nonRecDiff(RTG::regExpRefPtr exp)
+
+  /*
+  *  A non recursive version of the Differential function that uses a stack
+  *  It takes in a TSL regular expression and returns a Tensored differential
+  *
+  *  This is based on the recursive TDifferential in regExp.tsl and uses that function's hashtable
+  *
+  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
+  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
+  *			the case, then it will return an error.  Should be fixed in the future using
+  *		    a different has table (ETTODO)
+  *
+  *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be differentiated
+  *  @return:  RTG::regExpTListRefPtr - A list of the tensored differentials with respect to
+  *									    all the variables in exp
+  *
+  *  Author: Emma Turetsky
+  */
+  RTG::regExpTListRefPtr nonRecTDiff(RTG::regExpRefPtr exp)
   {
-	  //std::cout << hits << std::endl;
-	  std::stack<tFrame> todo;
+	  //This stack represents the worklist, as long as it's not empty, there are still
+	  //TSL regular expressions to be differentiated
+	  std::stack<dFrame> todo;
 	  std::map<RTG::regExpRefPtr, RTG::regExpTListRefPtr>::iterator it;
 
-	  todo.push(tFrame(exp));
+	  //Push the top frame onto the stack
+	  todo.push(dFrame(exp));
+
+	  //While there are still 
 	  while (!todo.empty())
 	  {
-		  tFrame & frame = todo.top();
-		  if (frame.is_new){
+		  //Get the top stack frame
+		  dFrame & frame = todo.top();
+		  //If this is the first time we've seen this frame
+		  if (frame.is_new){  //First check if this regularexpression has been differentiated before, if so then no need to differentiate again
+							  //Just return the differentiated regular expression and pop the frame off the stack
 			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForTDifferentialHash(frame.e);
 			  RTG::TDifferentialHash_T::const_iterator TDifferential___it = RTG::_TDifferentialHash().find(lookupKeyForTDifferentialHash);
 			  if (TDifferential___it != RTG::_TDifferentialHash().end()) {
@@ -821,65 +783,84 @@ namespace goals {
 				  continue;
 			  }
 			  frame.is_new = false;
+
+			  //Now determine what type of TSLRegExp this is - either a one with children (Kleene,Plus,Dot) or a leaf
+			  //If it's not a leaf, determine if the children have been differentiated before.  If they haven't, push them
+			  //on the stack.  If they have, differentiate the TSLRegExp and pop it from the stack
 			  if (CIR::isKleene(frame.e).get_data())
 			  {
 				  frame.op = 0;
+				  //Kleene only has one child
 				  RTG::regExpRefPtr child = CIR::getLChild(frame.e);
 				  frame.left = child;
+				  //Look it up in the hash table
 				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForTDifferentialHashL(child);
 				  RTG::TDifferentialHash_T::const_iterator TDifferential___it = RTG::_TDifferentialHash().find(lookupKeyForTDifferentialHashL);
+				  //If it has been seen before
 				  if (TDifferential___it != RTG::_TDifferentialHash().end())
 				  {
+					  //Create the tensored differential for frame.e
 					  RTG::regExpTListRefPtr ret;
 					  RTG::regExpTRefPtr tmp = CIR::mkTensorTranspose(frame.e, frame.e);
 					  ret = CIR::mapDotTOnRight(TDifferential___it->second, tmp);
+					  //Add the resultant value to the hashmap and pop the stack frame
 					  RTG::_TDifferentialHash().insert(std::make_pair(lookupKeyForTDifferentialHash, ret));
 					  todo.pop();
 					  continue;
 				  }
 				  else
 				  {
-					  todo.push(tFrame(child));
+					  //Push the child TSL RegExp onto the stackframe
+					  todo.push(dFrame(child));
 					  continue;
 				  }
 			  }
 			  else if (CIR::isDot(frame.e).get_data())
 			  {
 				  frame.op = 1;
+				  //Dot has a left and right child
 				  frame.left = CIR::getLChild(frame.e);
 				  frame.right = CIR::getRChild(frame.e);
+				  //Look up the left child in the hash table
 				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForTDifferentialHashL(frame.left);
 				  RTG::TDifferentialHash_T::const_iterator TDifferential___it = RTG::_TDifferentialHash().find(lookupKeyForTDifferentialHashL);
+				  //The left child has been differentiated before
 				  if (TDifferential___it != RTG::_TDifferentialHash().end())
 				  {
 					  RTG::regExpTListRefPtr lch = TDifferential___it->second;
+					  //Look up the right child in the hash table
 					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForTDifferentialHashR(frame.right);
 					  RTG::TDifferentialHash_T::const_iterator TDifferential___it = RTG::_TDifferentialHash().find(lookupKeyForTDifferentialHashR);
+					  //If the right child has been differentiated before
 					  if (TDifferential___it != RTG::_TDifferentialHash().end())
 					  {
+						  //Create the tensored differential for frame.e
 						  RTG::regExpTListRefPtr rch = TDifferential___it->second;
 						  RTG::regExpTListRefPtr ret;
 						  RTG::regExpTListRefPtr mma = CIR::mapDotTOnRight(lch, CIR::mkTensorTranspose(RTG::One::make(), frame.right));
 						  RTG::regExpTListRefPtr mmb = CIR::mapDotTOnRight(rch, CIR::mkTensorTranspose(frame.left, RTG::One::make()));
 						  ret = CIR::mapPlusT(mma, mmb);
+						  //Add the resultant value to the hashmap and pop the stack frame
 						  RTG::_TDifferentialHash().insert(std::make_pair(lookupKeyForTDifferentialHash, ret));
 						  todo.pop();
 						  continue;
 					  }
-					  else
+					  else  //The right child must be differentiated, so push it on to the stack frame
 					  {
-						  todo.push(tFrame(frame.right));
+						  todo.push(dFrame(frame.right));
 						  continue;
 					  }
 				  }
-				  else
+				  else //The left child must be differentiated, so push it on to the stack frame
 				  {
-					  todo.push(tFrame(frame.left));
+					  todo.push(dFrame(frame.left));
+					  //Look up the right child in the hash table
 					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForTDifferentialHashR(frame.right);
 					  RTG::TDifferentialHash_T::const_iterator TDifferential___it = RTG::_TDifferentialHash().find(lookupKeyForTDifferentialHashR);
+					  //If the right child also must be differentiated, push it on to the stack frame
 					  if (TDifferential___it == RTG::_TDifferentialHash().end())
 					  {
-						  todo.push(tFrame(frame.right));
+						  todo.push(dFrame(frame.right));
 						  continue;
 					  }
 				  }
@@ -887,104 +868,147 @@ namespace goals {
 			  else if (CIR::isPlus(frame.e).get_data())
 			  {
 				  frame.op = 2;
+				  //Plus has a left and right child
 				  frame.left = CIR::getLChild(frame.e);
 				  frame.right = CIR::getRChild(frame.e);
+				  //Look up the left child in the hash table
 				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForTDifferentialHashL(frame.left);
 				  RTG::TDifferentialHash_T::const_iterator TDifferential___it = RTG::_TDifferentialHash().find(lookupKeyForTDifferentialHashL);
+				  //The left child has been differentiated before
 				  if (TDifferential___it != RTG::_TDifferentialHash().end())
 				  {
 					  RTG::regExpTListRefPtr lch = TDifferential___it->second;
+					  //Look up the right child in the hash table
 					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForTDifferentialHashR(frame.right);
 					  RTG::TDifferentialHash_T::const_iterator TDifferential___it = RTG::_TDifferentialHash().find(lookupKeyForTDifferentialHashR);
+					  //If the right child has been differentiated before
 					  if (TDifferential___it != RTG::_TDifferentialHash().end())
 					  {
+						  //Create the tensored differential for frame.e
 						  RTG::regExpTListRefPtr rch = TDifferential___it->second;
 						  RTG::regExpTListRefPtr ret;
 						  ret = CIR::mapPlusT(lch, rch);
+						  //Add the resultant value to the hashmap and pop the stack frame
 						  RTG::_TDifferentialHash().insert(std::make_pair(lookupKeyForTDifferentialHash, ret));
 						  todo.pop();
 						  continue;
 					  }
-					  else
+					  else //The right child must be differentiated, so push it on to the stack frame
 					  {
-						  todo.push(tFrame(frame.right));
+						  todo.push(dFrame(frame.right));
 						  continue;
 					  }
 				  }
-				  else
+				  else //The left child must be differentiated, so push it on to the stack frame
 				  {
-					  todo.push(tFrame(frame.left));
+					  todo.push(dFrame(frame.left));
+					  //Look up the right child in the hash table
 					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForTDifferentialHashR(frame.right);
 					  RTG::TDifferentialHash_T::const_iterator TDifferential___it = RTG::_TDifferentialHash().find(lookupKeyForTDifferentialHashR);
+					  //If the right child also must be differentiated, push it on to the stack frame
 					  if (TDifferential___it == RTG::_TDifferentialHash().end())
 					  {
-						  todo.push(tFrame(frame.right));
+						  todo.push(dFrame(frame.right));
 						  continue;
 					  }
 				  }
 			  }
-			  else {
+			  else { 
+				  //The value is a leaf, cheat and just call TDifferential.  This will add it to TDifferentialHash (the hash map) and leverages
+				  //the existing TSL spec.
+				  //Pop the stack frame when done.
 				  CIR::TDifferential(frame.e);
 				  todo.pop();
+				  continue;
 			  }
 		  }
-		  else
+		  else  //This stack fram has been seen before, this means it's children will have been differentiated allready and is not a leaf
 		  {
 			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForTDifferentialHash(frame.e);
 			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForTDifferentialHashL(frame.left);
+			  //Get the left child differentiated value (as all non leaves have a left child) and assign it to lch
 			  RTG::TDifferentialHash_T::const_iterator TDifferential___it = RTG::_TDifferentialHash().find(lookupKeyForTDifferentialHashL);
 			  RTG::regExpTListRefPtr lch = TDifferential___it->second;
 			  RTG::regExpTListRefPtr ret;
-			  if (frame.op == 0)
+			  if (frame.op == 0) //Kleene
 			  {
+				  //Create the tensored differential and insert it into the hash_map
 				  RTG::regExpTRefPtr tmp = CIR::mkTensorTranspose(frame.e, frame.e);
 				  ret = CIR::mapDotTOnRight(lch, tmp);
 				  RTG::_TDifferentialHash().insert(std::make_pair(lookupKeyForTDifferentialHash, ret));
 				  todo.pop();
 				  continue;
 			  }
-			  else
+			  else  //Dot or Plus
 			  {
+				  //Both Dot and Plus have a right child, so look it up and assign it to rch
 				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForTDifferentialHashR(frame.right);
 				  //frame.right->print(std::cout) << std::endl;
 				  RTG::TDifferentialHash_T::const_iterator TDifferential___it = RTG::_TDifferentialHash().find(lookupKeyForTDifferentialHashR);
 
 				  RTG::regExpTListRefPtr rch = TDifferential___it->second;
 				  RTG::regExpTListRefPtr ret;
-				  if (frame.op == 1)
+				  if (frame.op == 1) //Dot
 				  {
+					  //Create the tensored Differential Value for Dot
 					  RTG::regExpTListRefPtr mma = CIR::mapDotTOnRight(lch, CIR::mkTensorTranspose(RTG::One::make(), frame.right));
 					  RTG::regExpTListRefPtr mmb = CIR::mapDotTOnRight(rch, CIR::mkTensorTranspose(frame.left, RTG::One::make()));
 					  ret = CIR::mapPlusT(mma, mmb);
-					  RTG::_TDifferentialHash().insert(std::make_pair(lookupKeyForTDifferentialHash, ret));
-					  todo.pop();
-					  continue;
 				  }
 				  else
 				  {
+					  //Create the tensored Differential Value for Plus
 					  ret = CIR::mapPlusT(lch, rch);
-					  RTG::_TDifferentialHash().insert(std::make_pair(lookupKeyForTDifferentialHash, ret));
-					  todo.pop();
-					  continue;
 				  }
+				  //Insert the resultant value into the hashmap
+				  RTG::_TDifferentialHash().insert(std::make_pair(lookupKeyForTDifferentialHash, ret));
+				  todo.pop();
+				  continue;
 			  }
 		  }
 	  }
 
+	  //This will start with a lookup on the hash_map for exp, which has been evaluated in the loop above, so will not re-evaluate using TDifferential
 	  return CIR::TDifferential(exp);
   }
 
+
+  /*
+  *  A non recursive version of the Differential function that uses a stack
+  *  It takes in a TSL regular expression and returns a non-tensored differential
+  *
+  *  This is based on the recursive Differential in regExp.tsl and uses that function's hashtable
+  *
+  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
+  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
+  *			the case, then it will return an error.  Should be fixed in the future using
+  *		    a different has table (ETTODO)
+  *
+  *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be differentiated
+  *  @return:  RTG::regExpListRefPtr - A list of the non-tensored differentials with respect to
+  *									    all the variables in exp
+  *
+  *  Author: Emma Turetsky
+  */
   RTG::regExpListRefPtr nonRecUntensoredDiff(RTG::regExpRefPtr exp)
   {
 	  //std::cout << hits << std::endl;
-	  std::stack<tFrame> todo;
+	  //This stack represents the worklist, as long as it's not empty, there are still
+	  //TSL regular expressions to be differentiated
+	  std::stack<dFrame> todo;
 	  std::map<RTG::regExpRefPtr, RTG::regExpListRefPtr>::iterator it;
 
-	  todo.push(tFrame(exp));
+	  //Push the top frame onto the stack
+	  todo.push(dFrame(exp));
+
+
 	  while (!todo.empty())
 	  {
-		  tFrame & frame = todo.top();
-		  if (frame.is_new){
+		  //Get the top stack frame
+		  dFrame & frame = todo.top();
+		  //If this is the first time we've seen this frame
+		  if (frame.is_new){ //First check if this regularexpression has been differentiated before, if so then no need to differentiate again
+							  //Just return the differentiated regular expression and pop the frame off the stack
 			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForDifferentialHash(frame.e);
 			  RTG::DifferentialHash_T::const_iterator Differential___it = RTG::_DifferentialHash().find(lookupKeyForDifferentialHash);
 			  if (Differential___it != RTG::_DifferentialHash().end()) {
@@ -992,64 +1016,82 @@ namespace goals {
 				  continue;
 			  }
 			  frame.is_new = false;
+
+			  //Now determine what type of TSLRegExp this is - either a one with children (Kleene,Plus,Dot) or a leaf
+			  //If it's not a leaf, determine if the children have been differentiated before.  If they haven't, push them
+			  //on the stack.  If they have, differentiate the TSLRegExp and pop it from the stack
 			  if (CIR::isKleene(frame.e).get_data())
 			  {
 				  frame.op = 0;
+				  //Kleene only has one child
 				  RTG::regExpRefPtr child = CIR::getLChild(frame.e);
 				  frame.left = child;
+				  //Look it up in the hash table
 				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForDifferentialHashL(child);
 				  RTG::DifferentialHash_T::const_iterator Differential___it = RTG::_DifferentialHash().find(lookupKeyForDifferentialHashL);
+				  //If it has been seen before
 				  if (Differential___it != RTG::_DifferentialHash().end())
 				  {
+					  //Create the tensored differential for frame.e
 					  RTG::regExpListRefPtr ret;
 					  ret = CIR::mapDotBothSides(frame.e, Differential___it->second);
+					  //Add the resultant value to the hashmap and pop the stack frame
 					  RTG::_DifferentialHash().insert(std::make_pair(lookupKeyForDifferentialHash, ret));
 					  todo.pop();
 					  continue;
 				  }
-				  else
+				  else //Push the child TSL RegExp onto the stackframe
 				  {
-					  todo.push(tFrame(child));
+					  todo.push(dFrame(child));
 					  continue;
 				  }
 			  }
 			  else if (CIR::isDot(frame.e).get_data())
 			  {
 				  frame.op = 1;
+				  //Dot has a left and right child
 				  frame.left = CIR::getLChild(frame.e);
 				  frame.right = CIR::getRChild(frame.e);
+				  //Look up the left child in the hash table
 				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForDifferentialHashL(frame.left);
 				  RTG::DifferentialHash_T::const_iterator Differential___it = RTG::_DifferentialHash().find(lookupKeyForDifferentialHashL);
+				  //If the left child has been differentiated before
 				  if (Differential___it != RTG::_DifferentialHash().end())
 				  {
 					  RTG::regExpListRefPtr lch = Differential___it->second;
+					  //Look up the right child in the hash table
 					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForDifferentialHashR(frame.right);
 					  RTG::DifferentialHash_T::const_iterator Differential___it = RTG::_DifferentialHash().find(lookupKeyForDifferentialHashR);
+					  //If the right child has been differentiated before
 					  if (Differential___it != RTG::_DifferentialHash().end())
 					  {
+						  //Create the tensored differential for frame.e
 						  RTG::regExpListRefPtr rch = Differential___it->second;
 						  RTG::regExpListRefPtr ret;
 						  RTG::regExpListRefPtr mma = CIR::mapDotOnRight(lch, frame.right);
 						  RTG::regExpListRefPtr mmb = CIR::mapDotOnLeft(frame.left, rch);
 						  ret = CIR::mapPlus(mma, mmb);
+						  //Add the resultant value to the hashmap and pop the stack frame
 						  RTG::_DifferentialHash().insert(std::make_pair(lookupKeyForDifferentialHash, ret));
 						  todo.pop();
 						  continue;
 					  }
-					  else
+					  else  //The right child must be differentiated, so push it on to the stack frame
 					  {
-						  todo.push(tFrame(frame.right));
+						  todo.push(dFrame(frame.right));
 						  continue;
 					  }
 				  }
-				  else
+				  else //The left child must be differentiated, so push it on to the stack frame
 				  {
-					  todo.push(tFrame(frame.left));
+					  todo.push(dFrame(frame.left));
+					  //Look up the right child in the hash table
 					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForDifferentialHashR(frame.right);
 					  RTG::DifferentialHash_T::const_iterator Differential___it = RTG::_DifferentialHash().find(lookupKeyForDifferentialHashR);
+					  //If the right child also must be differentiated, push it on to the stack frame
 					  if (Differential___it == RTG::_DifferentialHash().end())
 					  {
-						  todo.push(tFrame(frame.right));
+						  todo.push(dFrame(frame.right));
 						  continue;
 					  }
 				  }
@@ -1057,120 +1099,158 @@ namespace goals {
 			  else if (CIR::isPlus(frame.e).get_data())
 			  {
 				  frame.op = 2;
+				  //Plus has a left and right child
 				  frame.left = CIR::getLChild(frame.e);
 				  frame.right = CIR::getRChild(frame.e);
+				  //Look up the left child in the hash table
 				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForDifferentialHashL(frame.left);
 				  RTG::DifferentialHash_T::const_iterator Differential___it = RTG::_DifferentialHash().find(lookupKeyForDifferentialHashL);
+				  //If the left child has been differentiated before
 				  if (Differential___it != RTG::_DifferentialHash().end())
 				  {
 					  RTG::regExpListRefPtr lch = Differential___it->second;
+					  //Look up the right child in the hash table
 					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForDifferentialHashR(frame.right);
 					  RTG::DifferentialHash_T::const_iterator Differential___it = RTG::_DifferentialHash().find(lookupKeyForDifferentialHashR);
+					  //If the right child has been differentiated before
 					  if (Differential___it != RTG::_DifferentialHash().end())
 					  {
+						  //Create the tensored differential for frame.e
 						  RTG::regExpListRefPtr rch = Differential___it->second;
 						  RTG::regExpListRefPtr ret;
 						  ret = CIR::mapPlus(lch, rch);
+						  //Add the resultant value to the hashmap and pop the stack frame
 						  RTG::_DifferentialHash().insert(std::make_pair(lookupKeyForDifferentialHash, ret));
 						  todo.pop();
 						  continue;
 					  }
-					  else
+					  else //The right child must be differentiated, so push it on to the stack frame
 					  {
-						  todo.push(tFrame(frame.right));
+						  todo.push(dFrame(frame.right));
 						  continue;
 					  }
 				  }
-				  else
+				  else //The left child must be differentiated, so push it on to the stack frame
 				  {
-					  todo.push(tFrame(frame.left));
+					  todo.push(dFrame(frame.left));
+					  //Look up the right child in the hash table
 					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForDifferentialHashR(frame.right);
 					  RTG::DifferentialHash_T::const_iterator Differential___it = RTG::_DifferentialHash().find(lookupKeyForDifferentialHashR);
+					  //If the right child also must be differentiated, push it on to the stack frame
 					  if (Differential___it == RTG::_DifferentialHash().end())
 					  {
-						  todo.push(tFrame(frame.right));
+						  todo.push(dFrame(frame.right));
 						  continue;
 					  }
 				  }
 			  }
 			  else {
+				  //The value is a leaf, cheat and just call Differential.  This will add it to DifferentialHash (the hash map) and leverages
+				  //the existing TSL spec.
+				  //Pop the stack frame when done.
 				  CIR::Differential(frame.e);
 				  todo.pop();
+				  continue;
 			  }
 		  }
-		  else
+		  else //This stack fram has been seen before, this means it's children will have been differentiated allready and is not a leaf
 		  {
+			  //Get the left child differentiated value (as all non leaves have a left child) and assign it to lch
 			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForDifferentialHash(frame.e);
 			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForDifferentialHashL(frame.left);
 			  RTG::DifferentialHash_T::const_iterator Differential___it = RTG::_DifferentialHash().find(lookupKeyForDifferentialHashL);
 			  RTG::regExpListRefPtr lch = Differential___it->second;
 			  RTG::regExpListRefPtr ret;
-			  if (frame.op == 0)
+			  if (frame.op == 0) //Kleene
 			  {
+				  //Create the tensored differential and insert it into the hash_map
 				  ret = CIR::mapDotBothSides(frame.e, lch);
 				  RTG::_DifferentialHash().insert(std::make_pair(lookupKeyForDifferentialHash, ret));
 				  todo.pop();
 				  continue;
 			  }
-			  else
+			  else //Dot
 			  {
+				  //Both Dot and Plus have a right child, so look it up and assign it to rch
 				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForDifferentialHashR(frame.right);
 				  //frame.right->print(std::cout) << std::endl;
 				  RTG::DifferentialHash_T::const_iterator Differential___it = RTG::_DifferentialHash().find(lookupKeyForDifferentialHashR);
 
 				  RTG::regExpListRefPtr rch = Differential___it->second;
 				  RTG::regExpListRefPtr ret;
-				  if (frame.op == 1)
+				  if (frame.op == 1) //Dot
 				  {
+					  //Create the tensored Differential Value for Dot
 					  RTG::regExpListRefPtr mma = CIR::mapDotOnRight(lch, frame.right);
 					  RTG::regExpListRefPtr mmb = CIR::mapDotOnLeft(frame.left, rch);
 					  ret = CIR::mapPlus(mma, mmb);
-					  RTG::_DifferentialHash().insert(std::make_pair(lookupKeyForDifferentialHash, ret));
-					  todo.pop();
-					  continue;
 				  }
 				  else
 				  {
+					  //Create the tensored Differential Value for Plus
 					  ret = CIR::mapPlus(lch, rch);
-					  RTG::_DifferentialHash().insert(std::make_pair(lookupKeyForDifferentialHash, ret));
-					  todo.pop();
-					  continue;
 				  }
+				  //Insert the resultant value into the hashmap
+				  RTG::_DifferentialHash().insert(std::make_pair(lookupKeyForDifferentialHash, ret));
+				  todo.pop();
+				  continue;
 			  }
 		  }
 	  }
 
+	  //This will start with a lookup on the hash_map for exp, which has been evaluated in the loop above, so will not re-evaluate using Differential
 	  return CIR::Differential(exp);
   }
 
 
+  /*
+  *  A non recursive version of evalAt0 used to eval TSLRegExp assuming variables are the zero sem_elem. (f(0)).
+  *
+  *  This is based on the recursive evalAt0 in regExp.tsl and uses that function's hastable
+  *
+  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
+  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
+  *			the case, then it will return an error.  Should be fixed in the future using
+  *		    a different has table (ETTODO)
+  *
+  *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be evaluated
+  *  @return:  EXTERN_TYPES::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
+  *
+  *  Author: Emma Turetsky
+  *
+  */
   EXTERN_TYPES::sem_elem_wrapperRefPtr evalNonRecAt0(RTG::regExpRefPtr exp)
   {
 	  //std::cout << hits << std::endl;
-	  std::stack<tFrame> todo;
+	  std::stack<dFrame> todo;
 	  std::map<RTG::regExpRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr>::iterator it;
 
-	  todo.push(tFrame(exp));
+	  todo.push(dFrame(exp));  //Push the expression on the stack as our starter frame
+
 	  while (!todo.empty())
 	  {
-		  tFrame & frame = todo.top();
-		  if (frame.is_new){
-			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0Hash(frame.e);
+		  dFrame & frame = todo.top();
+		  if (frame.is_new){  //See if we've seen this frame before
+			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0Hash(frame.e);  //See if we've evaluated this regexp allready, if so, return evaluated value
 			  RTG::evalRegExpAt0Hash_T::const_iterator evalRegExpAt0___it = RTG::_evalRegExpAt0Hash().find(lookupKeyForevalRegExpAt0Hash);
 			  if (evalRegExpAt0___it != RTG::_evalRegExpAt0Hash().end()) {
 				  todo.pop();
 				  continue;
 			  }
 			  frame.is_new = false;
+			  //If the regexp is of type Kleene star
 			  if (CIR::isKleene(frame.e).get_data())
 			  {
 				  frame.op = 0;
+				  //Determine if the child has been seen before
 				  RTG::regExpRefPtr child = CIR::getLChild(frame.e);
 				  frame.left = child;
 				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashL(child);
 				  RTG::evalRegExpAt0Hash_T::const_iterator evalRegExpAt0___it = RTG::_evalRegExpAt0Hash().find(lookupKeyForevalRegExpAt0HashL);
 				  if (evalRegExpAt0___it != RTG::_evalRegExpAt0Hash().end())
 				  {
+					  //If the child expression has been evaluated before, performe the Kleene Star operation and insert the resultant
+					  //value into the hash table and pop the stack frame
 					  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
 					  ret = EXTERNS::evalKleeneSemElem(evalRegExpAt0___it->second);
 					  RTG::_evalRegExpAt0Hash().insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
@@ -1179,24 +1259,28 @@ namespace goals {
 				  }
 				  else
 				  {
-					  todo.push(tFrame(child));
+					  //Otherwise push the child onto the stack
+					  todo.push(dFrame(child));
 					  continue;
 				  }
 			  }
-			  else if (CIR::isDot(frame.e).get_data())
+			  else if (CIR::isDot(frame.e).get_data())  //If the regexp is of type Dot
 			  {
 				  frame.op = 1;
+				  //Determine if either child has been seen before
 				  frame.left = CIR::getLChild(frame.e);
 				  frame.right = CIR::getRChild(frame.e);
 				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashL(frame.left);
 				  RTG::evalRegExpAt0Hash_T::const_iterator evalRegExpAt0___it = RTG::_evalRegExpAt0Hash().find(lookupKeyForevalRegExpAt0HashL);
-				  if (evalRegExpAt0___it != RTG::_evalRegExpAt0Hash().end())
+				  if (evalRegExpAt0___it != RTG::_evalRegExpAt0Hash().end())  //The left child has been evaluated before
 				  {
 					  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExpAt0___it->second;
 					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashR(frame.right);
 					  RTG::evalRegExpAt0Hash_T::const_iterator evalRegExpAt0___it = RTG::_evalRegExpAt0Hash().find(lookupKeyForevalRegExpAt0HashR);
+					  //The right child has been evaluated before
 					  if (evalRegExpAt0___it != RTG::_evalRegExpAt0Hash().end())
 					  {
+						  //Both children have been evaluated at 0 allready, so evaluate the Dot expression and put the value into the hash table
 						  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalRegExpAt0___it->second;
 						  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
 						  ret = EXTERNS::evalDotSemElem(lch, rch);
@@ -1204,20 +1288,22 @@ namespace goals {
 						  todo.pop();
 						  continue;
 					  }
-					  else
+					  else  //Push the unevaluated right expression onto the stack
 					  {
-						  todo.push(tFrame(frame.right));
+						  todo.push(dFrame(frame.right));
 						  continue;
 					  }
 				  }
 				  else
 				  {
-					  todo.push(tFrame(frame.left));
+					  todo.push(dFrame(frame.left)); //Push the unevaluated left expression onto the stack
 					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashR(frame.right);
 					  RTG::evalRegExpAt0Hash_T::const_iterator evalRegExpAt0___it = RTG::_evalRegExpAt0Hash().find(lookupKeyForevalRegExpAt0HashR);
+					  //If the right child has not been seen before
 					  if (evalRegExpAt0___it == RTG::_evalRegExpAt0Hash().end())
 					  {
-						  todo.push(tFrame(frame.right));
+						  //Push the unevaluated right expression onto the stack
+						  todo.push(dFrame(frame.right));
 						  continue;
 					  }
 				  }
@@ -1225,17 +1311,19 @@ namespace goals {
 			  else if (CIR::isPlus(frame.e).get_data())
 			  {
 				  frame.op = 2;
+				  //Determine if either child has been seen before
 				  frame.left = CIR::getLChild(frame.e);
 				  frame.right = CIR::getRChild(frame.e);
 				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashL(frame.left);
 				  RTG::evalRegExpAt0Hash_T::const_iterator evalRegExpAt0___it = RTG::_evalRegExpAt0Hash().find(lookupKeyForevalRegExpAt0HashL);
-				  if (evalRegExpAt0___it != RTG::_evalRegExpAt0Hash().end())
+				  if (evalRegExpAt0___it != RTG::_evalRegExpAt0Hash().end()) //The left child has been evaluated before
 				  {
 					  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExpAt0___it->second;
 					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashR(frame.right);
 					  RTG::evalRegExpAt0Hash_T::const_iterator evalRegExpAt0___it = RTG::_evalRegExpAt0Hash().find(lookupKeyForevalRegExpAt0HashR);
-					  if (evalRegExpAt0___it != RTG::_evalRegExpAt0Hash().end())
+					  if (evalRegExpAt0___it != RTG::_evalRegExpAt0Hash().end())  //The right child has been evaluated before
 					  {
+						  //Both children have been evaluated at 0 allready, so evaluate the Plus expression and put the value into the hash table
 						  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalRegExpAt0___it->second;
 						  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
 						  ret = EXTERNS::evalPlusSemElem(lch, rch);
@@ -1243,60 +1331,70 @@ namespace goals {
 						  todo.pop();
 						  continue;
 					  }
-					  else
+					  else //Push the unevaluated right expression onto the stack
 					  {
-						  todo.push(tFrame(frame.right));
+						  todo.push(dFrame(frame.right));
 						  continue;
 					  }
 				  }
 				  else
 				  {
-					  todo.push(tFrame(frame.left));
+					  todo.push(dFrame(frame.left)); //Push the unevaluated left expression onto the stack
 					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashR(frame.right);
 					  RTG::evalRegExpAt0Hash_T::const_iterator evalRegExpAt0___it = RTG::_evalRegExpAt0Hash().find(lookupKeyForevalRegExpAt0HashR);
+					  //If the right child has not been seen before
 					  if (evalRegExpAt0___it == RTG::_evalRegExpAt0Hash().end())
 					  {
-						  todo.push(tFrame(frame.right));
+						  //Push the unevaluated right expression onto the stack
+						  todo.push(dFrame(frame.right));
 						  continue;
 					  }
 				  }
 			  }
 			  else {
+				  //The value is a leaf, cheat and just call evalRegExpAt0.  This will add it to evalRegExpAt0Hash (the hash map) and leverages
+				  //the existing TSL spec.
+				  //Pop the stack frame when done.
 				  CIR::evalRegExpAt0(frame.e);
 				  todo.pop();
 			  }
 		  }
-		  else
+		  else  //This is the second time we've popped this stack frame, so it's children must have been evaluated
 		  {
+			  //Look up the left child vlue (this is not a leaf regExp, so it must have a left child)
 			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0Hash(frame.e);
 			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashL(frame.left);
 			  RTG::evalRegExpAt0Hash_T::const_iterator evalRegExpAt0___it = RTG::_evalRegExpAt0Hash().find(lookupKeyForevalRegExpAt0HashL);
 			  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExpAt0___it->second;
 			  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-			  if (frame.op == 0)
+			  if (frame.op == 0) //Kleene
 			  {
+				  //Evaluate and insert into the hashmap
 				  ret = EXTERNS::evalKleeneSemElem(lch);
 				  RTG::_evalRegExpAt0Hash().insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
 				  todo.pop();
 				  continue;
 			  }
-			  else
+			  else  //Dot or Plus
 			  {
+				  //Look up the value for the right child
 				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashR(frame.right);
 				  //frame.right->print(std::cout) << std::endl;
 				  RTG::evalRegExpAt0Hash_T::const_iterator evalRegExpAt0___it = RTG::_evalRegExpAt0Hash().find(lookupKeyForevalRegExpAt0HashR);
 
 				  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalRegExpAt0___it->second;
 				  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-				  if (frame.op == 1)
+				  if (frame.op == 1) //Dot
 				  {
+					  //Evaluate and insert into the hashmap
 					  ret = EXTERNS::evalDotSemElem(lch, rch);
 					  RTG::_evalRegExpAt0Hash().insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
 					  todo.pop();
 					  continue;
 				  }
-				  else
+				  else //Plus
 				  {
+					  //Evaluate and insert into the hashmap
 					  ret = EXTERNS::evalPlusSemElem(lch, rch);
 					  RTG::_evalRegExpAt0Hash().insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
 					  todo.pop();
@@ -1306,36 +1404,57 @@ namespace goals {
 		  }
 	  }
 
+	  //This will start with a lookup on the hash_map for exp, which has been evaluated in the loop above, so will not re-evaluate using evalRegExpAt0
 	  return CIR::evalRegExpAt0(exp);
   }
 
+  /*
+  *  A non recursive version of evalRegExpFin used to eval TSLRegExps given the final assignment a.
+  *
+  *  This is based on the recursive evalRegExpFin in regExp.tsl and uses that function's hastable
+  *
+  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
+  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
+  *			the case, then it will return an error.  Should be fixed in the future using
+  *		    a different has table (ETTODO)
+  *
+  *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be evaluated
+  *			  RTG::assignmentRefPtr a - The final values for the variables in the regExp
+  *  @return:  EXTERN_TYPES::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
+  *
+  *  Author: Emma Turetsky
+  */
   EXTERN_TYPES::sem_elem_wrapperRefPtr evalRegExpFinNonRec(RTG::regExpRefPtr exp, RTG::assignmentRefPtr a)
   {
 	  //std::cout << hits << std::endl;
-	  std::stack<tFrame> todo;
+	  std::stack<dFrame> todo;
 	  std::map<RTG::regExpRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr>::iterator it;
 
-	  todo.push(tFrame(exp));
+	  todo.push(dFrame(exp));
 	  while (!todo.empty())
 	  {
-		  tFrame & frame = todo.top();
-		  if (frame.is_new){
-			  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHash(frame.e, a);
+		  dFrame & frame = todo.top();
+		  if (frame.is_new){ //See if we've seen this frame before
+			  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHash(frame.e, a); //See if we've evaluated this regexp allready, if so, return evaluated value
 			  RTG::evalRegExpFinHash_T::const_iterator evalRegExpFin___it = RTG::_evalRegExpFinHash().find(lookupKeyForevalRegExpFinHash);
 			  if (evalRegExpFin___it != RTG::_evalRegExpFinHash().end()) {
 				  todo.pop();
 				  continue;
 			  }
 			  frame.is_new = false;
+			  //If the regexp is of type Kleene star
 			  if (CIR::isKleene(frame.e).get_data())
 			  {
 				  frame.op = 0;
+				  //Determine if the child has been seen before
 				  RTG::regExpRefPtr child = CIR::getLChild(frame.e);
 				  frame.left = child;
 				  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(child, a);
 				  RTG::evalRegExpFinHash_T::const_iterator evalRegExpFin___it = RTG::_evalRegExpFinHash().find(lookupKeyForevalRegExpFinHashL);
 				  if (evalRegExpFin___it != RTG::_evalRegExpFinHash().end())
 				  {
+					  //If the child expression has been evaluated before, performe the Kleene Star operation and insert the resultant
+					  //value into the hash table and pop the stack frame
 					  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
 					  ret = EXTERNS::evalKleeneSemElem(evalRegExpFin___it->second);
 					  RTG::_evalRegExpFinHash().insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
@@ -1344,24 +1463,27 @@ namespace goals {
 				  }
 				  else
 				  {
-					  todo.push(tFrame(child));
+					  //Otherwise push the child onto the stack
+					  todo.push(dFrame(child));
 					  continue;
 				  }
 			  }
-			  else if (CIR::isDot(frame.e).get_data())
+			  else if (CIR::isDot(frame.e).get_data())  //If the regexp is of type Dot
 			  {
 				  frame.op = 1;
+				  //Determine if either child has been seen before
 				  frame.left = CIR::getLChild(frame.e);
 				  frame.right = CIR::getRChild(frame.e);
 				  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(frame.left, a);
 				  RTG::evalRegExpFinHash_T::const_iterator evalRegExpFin___it = RTG::_evalRegExpFinHash().find(lookupKeyForevalRegExpFinHashL);
-				  if (evalRegExpFin___it != RTG::_evalRegExpFinHash().end())
+				  if (evalRegExpFin___it != RTG::_evalRegExpFinHash().end()) //The left child has been evaluated before
 				  {
 					  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExpFin___it->second;
 					  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
 					  RTG::evalRegExpFinHash_T::const_iterator evalRegExpFin___it = RTG::_evalRegExpFinHash().find(lookupKeyForevalRegExpFinHashR);
-					  if (evalRegExpFin___it != RTG::_evalRegExpFinHash().end())
+					  if (evalRegExpFin___it != RTG::_evalRegExpFinHash().end()) //The right child has been evaluated before
 					  {
+						  //Both children have been evaluated allready, so evaluate the Dot expression and put the value into the hash table
 						  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalRegExpFin___it->second;
 						  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
 						  ret = EXTERNS::evalDotSemElem(lch, rch);
@@ -1369,20 +1491,21 @@ namespace goals {
 						  todo.pop();
 						  continue;
 					  }
-					  else
+					  else //Push the unevaluated right expression onto the stack
 					  {
-						  todo.push(tFrame(frame.right));
+						  todo.push(dFrame(frame.right));
 						  continue;
 					  }
 				  }
 				  else
 				  {
-					  todo.push(tFrame(frame.left));
+					  todo.push(dFrame(frame.left)); //Push the unevaluated left expression onto the stack
 					  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
 					  RTG::evalRegExpFinHash_T::const_iterator evalRegExpFin___it = RTG::_evalRegExpFinHash().find(lookupKeyForevalRegExpFinHashR);
 					  if (evalRegExpFin___it == RTG::_evalRegExpFinHash().end())
 					  {
-						  todo.push(tFrame(frame.right));
+						  //Push the unevaluated right expression onto the stack
+						  todo.push(dFrame(frame.right));
 						  continue;
 					  }
 				  }
@@ -1390,17 +1513,19 @@ namespace goals {
 			  else if (CIR::isPlus(frame.e).get_data())
 			  {
 				  frame.op = 2;
+				  //Determine if either child has been seen before
 				  frame.left = CIR::getLChild(frame.e);
 				  frame.right = CIR::getRChild(frame.e);
 				  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(frame.left, a);
 				  RTG::evalRegExpFinHash_T::const_iterator evalRegExpFin___it = RTG::_evalRegExpFinHash().find(lookupKeyForevalRegExpFinHashL);
-				  if (evalRegExpFin___it != RTG::_evalRegExpFinHash().end())
+				  if (evalRegExpFin___it != RTG::_evalRegExpFinHash().end()) //The left child has been evaluated before
 				  {
 					  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExpFin___it->second;
 					  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
 					  RTG::evalRegExpFinHash_T::const_iterator evalRegExpFin___it = RTG::_evalRegExpFinHash().find(lookupKeyForevalRegExpFinHashR);
-					  if (evalRegExpFin___it != RTG::_evalRegExpFinHash().end())
+					  if (evalRegExpFin___it != RTG::_evalRegExpFinHash().end()) //The right child has been evaluated before
 					  {
+						  //Both children have been evaluated allready, so evaluate the Plus expression and put the value into the hash table
 						  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalRegExpFin___it->second;
 						  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
 						  ret = EXTERNS::evalPlusSemElem(lch, rch);
@@ -1410,34 +1535,39 @@ namespace goals {
 					  }
 					  else
 					  {
-						  todo.push(tFrame(frame.right));
+						  //Push the unevaluated right expression onto the stack
+						  todo.push(dFrame(frame.right));
 						  continue;
 					  }
 				  }
 				  else
 				  {
-					  todo.push(tFrame(frame.left));
+					  todo.push(dFrame(frame.left)); //Push the unevaluated left expression onto the stack
 					  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
 					  RTG::evalRegExpFinHash_T::const_iterator evalRegExpFin___it = RTG::_evalRegExpFinHash().find(lookupKeyForevalRegExpFinHashR);
 					  if (evalRegExpFin___it == RTG::_evalRegExpFinHash().end())
 					  {
-						  todo.push(tFrame(frame.right));
+						  //Push the unevaluated right expression onto the stack
+						  todo.push(dFrame(frame.right));
 						  continue;
 					  }
 				  }
 			  }
 			  else if (CIR::isProject(frame.e).get_data())
 			  {
+				  //Get the children for project (MT = merge Target, MS = merge Src)
 				  frame.op = 3;
 				  RTG::ProjectRefPtr t_T_c1_scast__1 = static_cast<RTG::Project*>(frame.e.get_ptr());
 				  BASETYPE::INT32 e_Project_1 = t_T_c1_scast__1->Get_MS();
 				  BASETYPE::INT32 e_Project_2 = t_T_c1_scast__1->Get_MT();
 				  RTG::regExpRefPtr e_Project_3 = t_T_c1_scast__1->Get_child();
 				  frame.left = e_Project_3;
+				  //if the child has been evaluated before
 				  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(frame.left, a);
 				  RTG::evalRegExpFinHash_T::const_iterator evalRegExpFin___it = RTG::_evalRegExpFinHash().find(lookupKeyForevalRegExpFinHashL);
 				  if (evalRegExpFin___it != RTG::_evalRegExpFinHash().end())
 				  {
+					  //Evaluate the projection and insert it into the hash table
 					  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
 					  ret = EXTERNS::evalProjectSemElem(e_Project_1, e_Project_2,evalRegExpFin___it->second);
 					  RTG::_evalRegExpFinHash().insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
@@ -1446,30 +1576,36 @@ namespace goals {
 				  }
 				  else
 				  {
-					  todo.push(tFrame(frame.left));
+					  todo.push(dFrame(frame.left)); //Push the unevaluated child expression onto the stack
 					  continue;
 				  }
 			  }
 			  else {
+				  //The value is a leaf, cheat and just call evalRegExpFin.  This will add it to evalRegExpFinHash (the hash map) and leverages
+				  //the existing TSL spec.
+				  //Pop the stack frame when done.
 				  CIR::evalRegExpFin(frame.e, a);
 				  todo.pop();
 			  }
 		  }
-		  else
+		  else  //This is the second time we've seen this value, so the children must have been evaluated at a, allready
 		  {
+			  //Look up the children's evaluated values
+			  //Determine the op code
+			  //Call the appropriate evaluattion function depending on frame.op
 			  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHash(frame.e, a);
 			  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(frame.left, a);
 			  RTG::evalRegExpFinHash_T::const_iterator evalRegExpFin___it = RTG::_evalRegExpFinHash().find(lookupKeyForevalRegExpFinHashL);
 			  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExpFin___it->second;
 			  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-			  if (frame.op == 0)
+			  if (frame.op == 0) //Kleene
 			  {
 				  ret = EXTERNS::evalKleeneSemElem(lch);
 				  RTG::_evalRegExpFinHash().insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
 				  todo.pop();
 				  continue;
 			  }
-			  else if (frame.op == 3)
+			  else if (frame.op == 3)  //Project
 			  {
 				  RTG::ProjectRefPtr t_T_c1_scast__1 = static_cast<RTG::Project*>(frame. e.get_ptr());
 				  BASETYPE::INT32 e_Project_1 = t_T_c1_scast__1->Get_MS();
@@ -1479,7 +1615,7 @@ namespace goals {
 				  todo.pop();
 				  continue;
 			  }
-			  else
+			  else //Dot or Plus
 			  {
 				  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
 				  //frame.right->print(std::cout) << std::endl;
@@ -1487,14 +1623,14 @@ namespace goals {
 
 				  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalRegExpFin___it->second;
 				  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-				  if (frame.op == 1)
+				  if (frame.op == 1)  //Dot
 				  {
 					  ret = EXTERNS::evalDotSemElem(lch, rch);
 					  RTG::_evalRegExpFinHash().insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
 					  todo.pop();
 					  continue;
 				  }
-				  else
+				  else  //Plus
 				  {
 					  ret = EXTERNS::evalPlusSemElem(lch, rch);
 					  RTG::_evalRegExpFinHash().insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
@@ -1505,26 +1641,48 @@ namespace goals {
 		  }
 	  }
 
+	  //This will start with a lookup on the hash_map for exp, which has been evaluated in the loop above, so will not re-evaluate using evalRegExpFin
 	  return CIR::evalRegExpFin(exp, a);
   }
 
+  /*
+  *  A non recursive version of evalRegExp used to eval TSLRegExps given the assignment a.
+  *
+  *  This is based on the recursive evalRegExp in regExp.tsl and uses that function's hashtable
+  *
+  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
+  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
+  *			the case, then it will return an error.  Should be fixed in the future using
+  *		    a different has table (ETTODO)
+  *
+  *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be evaluated
+  *           RTG::assignmentRefPtr a - The final values for the variables in the regExp
+  *  @return:  EXTERN_TYPES::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
+  *
+  *  Author: Emma Turetsky
+  */
   EXTERN_TYPES::sem_elem_wrapperRefPtr evalRegExpNonRec(RTG::regExpRefPtr exp, RTG::assignmentRefPtr a)
   {
 	  //std::cout << hits << std::endl;
-	  std::stack<tFrame> todo;
+	  std::stack<dFrame> todo;
 	  std::map<RTG::regExpRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr>::iterator it;
 
-	  todo.push(tFrame(exp));
+	  todo.push(dFrame(exp));
 	  while (!todo.empty())
 	  {
-		  tFrame & frame = todo.top();
+		  dFrame & frame = todo.top();
+
+		  //Determine if this frame has been seen before
 		  if (frame.is_new){
+			  //The frame has not been seen before, but frame.e may be pointing to a regexp that's been previously evaluated.  If so, return that result
 			  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHash(frame.e, a);
 			  RTG::evalRegExpHash_T::const_iterator evalRegExp___it = RTG::_evalRegExpHash().find(lookupKeyForevalRegExpHash);
 			  if (evalRegExp___it != RTG::_evalRegExpHash().end()) {
 				  todo.pop();
 				  continue;
 			  }
+			  //frame.e has not been evaluated before, so lookup the children in the hash map.  If all the children of the frame.e have been evaluated, then evaluate frame.e, otherwise
+			  //push the unevaluated children onto the stack
 			  frame.is_new = false;
 			  if (CIR::isKleene(frame.e).get_data())
 			  {
@@ -1543,7 +1701,7 @@ namespace goals {
 				  }
 				  else
 				  {
-					  todo.push(tFrame(child));
+					  todo.push(dFrame(child));
 					  continue;
 				  }
 			  }
@@ -1570,18 +1728,18 @@ namespace goals {
 					  }
 					  else
 					  {
-						  todo.push(tFrame(frame.right));
+						  todo.push(dFrame(frame.right));
 						  continue;
 					  }
 				  }
 				  else
 				  {
-					  todo.push(tFrame(frame.left));
+					  todo.push(dFrame(frame.left));
 					  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
 					  RTG::evalRegExpHash_T::const_iterator evalRegExp___it = RTG::_evalRegExpHash().find(lookupKeyForevalRegExpHashR);
 					  if (evalRegExp___it == RTG::_evalRegExpHash().end())
 					  {
-						  todo.push(tFrame(frame.right));
+						  todo.push(dFrame(frame.right));
 						  continue;
 					  }
 				  }
@@ -1609,35 +1767,37 @@ namespace goals {
 					  }
 					  else
 					  {
-						  todo.push(tFrame(frame.right));
+						  todo.push(dFrame(frame.right));
 						  continue;
 					  }
 				  }
 				  else
 				  {
-					  todo.push(tFrame(frame.left));
+					  todo.push(dFrame(frame.left));
 					  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
 					  RTG::evalRegExpHash_T::const_iterator evalRegExp___it = RTG::_evalRegExpHash().find(lookupKeyForevalRegExpHashR);
 					  if (evalRegExp___it == RTG::_evalRegExpHash().end())
 					  {
-						  todo.push(tFrame(frame.right));
+						  todo.push(dFrame(frame.right));
 						  continue;
 					  }
 				  }
 			  }
-			  else {
+			  else {  //frame.e is a leaf, so just leverage the TSL function as it's a base case (non recursive)
 				  CIR::evalRegExp(frame.e, a);
 				  todo.pop();
 			  }
 		  }
 		  else
 		  {
+			  //This frame has been seen before, so it's children have all previously been evaluated.  So lookup the children in the hashtable and evaluate
+			  //frame.e as appropriate based on what type of operation it is (determined in frame.op)
 			  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHash(frame.e, a);
 			  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashL(frame.left, a);
 			  RTG::evalRegExpHash_T::const_iterator evalRegExp___it = RTG::_evalRegExpHash().find(lookupKeyForevalRegExpHashL);
 			  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExp___it->second;
 			  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-			  if (frame.op == 0)
+			  if (frame.op == 0) //Kleene
 			  {
 				  ret = EXTERNS::evalKleeneSemElem(lch);
 				  RTG::_evalRegExpHash().insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
@@ -1652,14 +1812,14 @@ namespace goals {
 
 				  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalRegExp___it->second;
 				  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-				  if (frame.op == 1)
+				  if (frame.op == 1) //Dot
 				  {
 					  ret = EXTERNS::evalDotSemElem(lch, rch);
 					  RTG::_evalRegExpHash().insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
 					  todo.pop();
 					  continue;
 				  }
-				  else
+				  else //Plus
 				  {
 					  ret = EXTERNS::evalPlusSemElem(lch, rch);
 					  RTG::_evalRegExpHash().insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
@@ -1670,9 +1830,28 @@ namespace goals {
 		  }
 	  }
 
+	  //This will start with a lookup on the hash_map for exp, which has been evaluated in the loop above, so will not re-evaluate using evalRegExp
 	  return CIR::evalRegExp(exp, a);
   }
 
+
+  /*
+  *  A non recursive version of evalT used to eval TSLRegExps representing tensored weights
+  *  given the assignment a.
+  *
+  *  This is based on the recursive evalT in regExp.tsl and uses that function's hashtable
+  *
+  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
+  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
+  *			the case, then it will return an error.  Should be fixed in the future using
+  *		    a different has table (ETTODO)
+  *
+  *  @param:  RTG::regExpTRefPtr exp - The top level tensored regular expression to be evaluated
+  *           RTG::assignmentRefPtr a - The final values for the variables in the regExp
+  *  @return:  EXTERN_TYPES::sem_elem_wrapperRefPtr - A sem_elem wrapper around a tensored sem_elem wt
+  *
+  *  Author: Emma Turetsky
+  */
   EXTERN_TYPES::sem_elem_wrapperRefPtr evalTNonRec(RTG::regExpTRefPtr exp, RTG::assignmentRefPtr a)
   {
 	  //std::cout << hits << std::endl;
@@ -1683,7 +1862,8 @@ namespace goals {
 	  while (!todo.empty())
 	  {
 		  sFrame & frame = todo.top();
-		  if (frame.is_new){
+		  if (frame.is_new){  //Determine if this is the first time looking at this frame
+			  //Check frame.e see if it's been evaluated before.
 			  MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHash(frame.e, a);
 			  RTG::evalTHash_T::const_iterator evalT___it = RTG::_evalTHash().find(lookupKeyForevalTHash);
 			  if (evalT___it != RTG::_evalTHash().end()) {
@@ -1691,6 +1871,8 @@ namespace goals {
 				  continue;
 			  }
 			  frame.is_new = false;
+			  //frame.e has not been evaluated before - check to see if the children have been seen before
+			  //If so, evaluate frame.e as appropriate, otherwise push the children on to the stack
 			  if (CIR::isKleeneT(frame.e).get_data())
 			  {
 				  frame.op = 0;
@@ -1848,27 +2030,28 @@ namespace goals {
 					  todo.pop();
 					  continue;
 				  }
-			  else
+			  else  //Leaf tensored regexp, so call evalT as it's a base case
 			  {
 				  CIR::evalT(frame.e, a);
 				  todo.pop();
 			  }
 		  }
-		  else
+		  else  //We've seen this stack frame before
 		  {
+			  //All the children of frame.e have been evaluated, so evaluate frame.e as appropriate
 			  MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHash(frame.e, a);
 			  MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
 			  RTG::evalTHash_T::const_iterator evalT___it = RTG::_evalTHash().find(lookupKeyForevalTHashL);
 			  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalT___it->second;
 			  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-			  if (frame.op == 0)
+			  if (frame.op == 0) //Kleene
 			  {
 				  ret = EXTERNS::evalKleeneSemElemT(lch);
 				  RTG::_evalTHash().insert(std::make_pair(lookupKeyForevalTHash, ret));
 				  todo.pop();
 				  continue;
 			  }
-			  else if (frame.op == 3)
+			  else if (frame.op == 3) //Project
 			  {
 				  RTG::ProjectTRefPtr t_T_b1_scast__1 = static_cast<RTG::ProjectT*>(frame.e.get_ptr());
 				  BASETYPE::INT32 e_ProjectT_1 = t_T_b1_scast__1->Get_MS();
@@ -1878,7 +2061,7 @@ namespace goals {
 				  todo.pop();
 				  continue;
 			  }
-			  else
+			  else //Dot or Plust
 			  {
 				  MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
 				  //frame.right->print(std::cout) << std::endl;
@@ -1886,14 +2069,14 @@ namespace goals {
 
 				  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalT___it->second;
 				  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-				  if (frame.op == 1)
+				  if (frame.op == 1)  //Dot
 				  {
 					  ret = EXTERNS::evalDotSemElemT(lch, rch);
 					  RTG::_evalTHash().insert(std::make_pair(lookupKeyForevalTHash, ret));
 					  todo.pop();
 					  continue;
 				  }
-				  else
+				  else  //Plus
 				  {
 					  ret = EXTERNS::evalPlusSemElemT(lch, rch);
 					  RTG::_evalTHash().insert(std::make_pair(lookupKeyForevalTHash, ret));
@@ -1904,20 +2087,25 @@ namespace goals {
 		  }
 	  }
 
-	  return CIR::evalT(exp, a);
+	  return CIR::evalT(exp, a);  //Grabs exp evaluated at assignment a from the hash_map
   }
 
   /*
-  * Create the differentials from the regular expressions of nodes
-  * with epsilon transitions
+  * Create the tensored differentials from the regular expressions of nodes
+  * with epsilon transitions and populate the map
+  *
+  * @params:  tslRegExpMap & diffMap - reference to map from varID to it's corresponding TSLRegExp
+  *			 tslDiffMap & differentialMap - reference to map from varID to it's list of TSL tensoredDifferentials
+  *
+  * @author:  Emma Turetsky 
   */
-  void createDifferentials(){
+  void createDifferentials(tslRegExpMap & diffMap, tslDiffMap & differentialMap){
 	  for (tslRegExpMap::iterator it = diffMap.begin(); it != diffMap.end(); ++it)
 	  {
 		  //std::cout << "EMap: " << it->first << ": ";
 		  //it->second.print(std::cout);
 		  //std::cout << std::endl;
-		  RTG::regExpTListRefPtr rtList = nonRecDiff(it->second);
+		  RTG::regExpTListRefPtr rtList = nonRecTDiff(it->second);
 		  differentialMap[it->first] = rtList;
 		 // std::cout << "Diff: " << it->first << ": ";
 		 // rtList->print(std::cout);
@@ -1926,7 +2114,16 @@ namespace goals {
   }
 
 
-  void createUntensoredDifferentials() {
+  /*
+  * Create the differentials from the regular expressions of nodes
+  * with epsilon transitions and populate the map
+  *
+  * @params:  tslRegExpMap & diffMap - reference to map from varID to it's corresponding TSLRegExp
+  *			  tslUntensoredDiffMap & differentialMap - reference to map from varID to it's list of TSL non-Differentials
+  *
+  * @author:  Emma Turetsky
+  */
+  void createUntensoredDifferentials(tslRegExpMap & diffMap, tslUntensoredDiffMap & untensoredDifferentialMap) {
 	  //Also, for each Differential, create a enter and exit state in the keyspace for the differential
 	  for (tslRegExpMap::iterator it = diffMap.begin(); it != diffMap.end(); ++it)
 	  {
@@ -1945,8 +2142,21 @@ namespace goals {
   *  The wali regexp represents a differentiated value.  The weight represents a regexp in eMap
   *  differentiated with respect to a given variable (or not differentiated, depending) or is
   *  the representation of "one"
+  *
+  *
+  *  params:  reg_exp_t exp - Wali regExp of the sem_elem
+  *			  tslRegExpMap & regExpMap - map from varId to the TSL regExpRepresenting it
+  *			  tslDiffMap & differentialMap - map from varId to list of partial differentials representing varId differentiated with
+  *			  respect to different variables
+  *			  mapBack - a map for associating different variables with the appropriate variableID, needed because of the different node names
+  *                     in the fwpds IGR - should try to eliminate this need if possible
+  *           bool call - true if it's possible that this reg_exp_t is a call
+  *
+  *  return:  RTG::regExpTRefPtr - a tensored TSLRegexp representing the tensored differential of exp
+  *
+  *  Author:  Emma Turetsky
   */
-  RTG::regExpTRefPtr convertToRegExpT(reg_exp_t exp, bool call)
+  RTG::regExpTRefPtr convertToRegExpT(reg_exp_t exp, tslRegExpMap & regExpMap, tslDiffMap & differentialMap, std::map<int, std::pair<std::pair<int, int>, int>> & mapBack, map<std::pair<int, int>, std::pair<int, int>>  & mergeSrcMap, bool call)
   {
 	  if (exp->isConstant())
 	  {
@@ -1958,7 +2168,7 @@ namespace goals {
 				  return RTG::OneT::make();  //The value isn't a variable, so make it a tensored one
 			  }
 			  else {
-				  RTG::regExpRefPtr d = E[reID];
+				  RTG::regExpRefPtr d = regExpMap[reID]; //lookup the appropraite regexp and evaluate at 0
 				  EXTERN_TYPES::sem_elem_wrapperRefPtr newVal = evalNonRecAt0(d);;
 				  return CIR::mkTensorTranspose(RTG::One::make(), RTG::Weight::make(newVal));  //Create a tensored weight with the regexp
 			  }
@@ -1975,7 +2185,7 @@ namespace goals {
 	  }
 	  else if (exp->isStar()){ //A Star operation only has one child in the children list 
 		  list<reg_exp_t> children = exp->getChildren();
-		  RTG::regExpTRefPtr c = convertToRegExpT(children.front(), false);
+		  RTG::regExpTRefPtr c = convertToRegExpT(children.front(), regExpMap, differentialMap, mapBack, mergeSrcMap, false);
 		  return CIR::mkKleeneT(c);
 	  }
 	  else if (exp->isExtend()){ //Convert an extend to a Dot regExpT using recursive calls and the left and right children of the regexp
@@ -1983,7 +2193,7 @@ namespace goals {
 		  {
 			  list<reg_exp_t> children = exp->getChildren();
 			  list<reg_exp_t>::iterator ch = children.begin();
-			  RTG::regExpTRefPtr lch = convertToRegExpT(children.front(), false);
+			  RTG::regExpTRefPtr lch = convertToRegExpT(children.front(), regExpMap, differentialMap, mapBack, mergeSrcMap, false);
 			  ch++;
 			  NameWeight * nw = static_cast<wali::domains::name_weight::NameWeight*>((*ch)->get_weight().get_ptr());
 			  int var = nw->getName1();
@@ -2000,80 +2210,41 @@ namespace goals {
 		  {
 			  list<reg_exp_t> children = exp->getChildren();
 			  list<reg_exp_t>::iterator ch = children.begin();
-			  RTG::regExpTRefPtr lch = convertToRegExpT(*ch, false);
+			  RTG::regExpTRefPtr lch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap, false);
 			  ch++;
-			  RTG::regExpTRefPtr rch = convertToRegExpT(*ch, false);
+			  RTG::regExpTRefPtr rch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap, false);
 			  return CIR::mkDotT(lch, rch);
 		  }
 	  }
 	  else if (exp->isCombine()){ //Convert an combine to a Plus regExpT using recursive calls and the left and right children of the regexp
 		  list<reg_exp_t> children = exp->getChildren();
 		  list<reg_exp_t>::iterator ch = children.begin();
-		  RTG::regExpTRefPtr lch = convertToRegExpT(*ch, true);
+		  RTG::regExpTRefPtr lch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap, true);
 		  ch++;
-		  RTG::regExpTRefPtr rch = convertToRegExpT(*ch, true);
+		  RTG::regExpTRefPtr rch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap, true);
 		  return CIR::mkPlusT(lch, rch);
 	  }
   }	
-  
-  /*{
-	//If the expressions is a constant, then it has a name weight type
-    if(exp->isConstant())
-    {
-      NameWeight * nw = static_cast<wali::domains::name_weight::NameWeight*>(exp->get_weight().get_ptr());
-      int var = nw->getName1();
-      int reID = nw->getName2();
-      if (var == -1){
-        if(reID == -1){
-			return RTG::OneT::make();  //The value isn't a variable, so make it a tensored one
-		} else {
-			RTG::regExpRefPtr d = eMap[reID];
-			EXTERN_TYPES::sem_elem_wrapperRefPtr newVal = CIR::evalRegExpAt0(d);
-			return RTG::TensorTranspose::make(RTG::One::make(),RTG::Weight::make(newVal));  //Create a tensored weight with the regexp
-		}
-      }
-	  else {
-		  int tgt = mapBack[reID].first.second;
-		  int src = mergeMap[tgt];
-		  RTG::regExpTRefPtr d = CIR::getTFromRegList(DMap[reID],var); //the NameWeight represents reID differentiated with respect to Variable var (note the regExps contain
-																	 //the updateable variables
-		return d;
-      }
-    }else if (exp->isUpdatable()){  //This is a placeholder, it will never occur due to linear nature of the nameweight fwpds
-	  int node_no = exp->updatableNumber();
-      return RTG::VarT::make(CBTI::INT32(node_no));
-   } else if (exp->isStar()){ //A Star operation only has one child in the children list
-        list<reg_exp_t> children = exp->getChildren();
-		RTG::regExpTRefPtr c = convertToRegExpT(children.front(), eMap, DMap, mapBack, mergeMap, false);
-        return RTG::KleeneT::make(c);
-    } else if (exp->isExtend()){ //Convert an extend to a Dot regExpT using recursive calls and the left and right children of the regexp
-        list<reg_exp_t> children = exp->getChildren();
-        list<reg_exp_t>::iterator ch = children.begin();
-		RTG::regExpTRefPtr lch = convertToRegExpT(*ch, eMap, DMap, mapBack, mergeMap, false);
-        ch++;
-		RTG::regExpTRefPtr rch = convertToRegExpT(*ch, eMap, DMap, mapBack, mergeMap, false);
-        return RTG::DotT::make(lch,rch);
-    } else if (exp->isCombine()){ //Convert an combine to a Plus regExpT using recursive calls and the left and right children of the regexp
-        list<reg_exp_t> children = exp->getChildren();
-        list<reg_exp_t>::iterator ch = children.begin();
-		RTG::regExpTRefPtr lch = convertToRegExpT(*ch, eMap, DMap, mapBack, mergeMap, false);
-        ch++;
-		RTG::regExpTRefPtr rch = convertToRegExpT(*ch, eMap, DMap, mapBack, mergeMap, false);
-        return RTG::PlusT::make(lch,rch);
-    }
-  }*/
+
 
   /*
   *  Converts from a reg_exp_t to a RTG::regExpRefPtr
   *
-  *  exp - the expression to be converted
-  *  uMap - a map from updateable node to the node number it depends on (that node number is still associated with the inter graph)
-  *  oMap - a map from the intergraph node number to the correct unique number for the tsl regexps
+  *  @param: reID - the varID the regular expressiosn
+  *          exp - the expression to be converted
+  *          varDependencies - a map from reID to the set of variabels it depends on that will be populated as we convert, used for the newton round later
+  *			 updateableMap - a map from updateable node to the intergraph node number it depends on (that node number is still associated with the inter graph)
+  *			 oMap - a map from the intergraph node number to the correct unique number for the tsl regexps
+  *			 mapBack - a map for associating different variables with the appropriate variableID, needed because of the different node names
+  *                     in the fwpds IGR - should try to eliminate this need if possible]
+  *          elapsedTime - Total time done on possible calculations in the conversion (due to simplification in MkDot
+  *
+  *   Author: Emma Turetsky
   */
-  RTG::regExpRefPtr convertToRegExp(int reID, reg_exp_t exp, double * elapsedTime)
+  RTG::regExpRefPtr convertToRegExp(int reID, reg_exp_t exp, std::map<int, std::set<int>> & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int>> & mapBack, std::map<std::pair<int, int>, std::pair<int, int>> & mergeSrcMap, double * elapsedTime)
   {
 	  std::stack<cFrame> todo;
-	  std::map<reg_exp_t, RTG::regExpRefPtr> seen;
+	  std::map<reg_exp_t, RTG::regExpRefPtr> seen; //map of regExps that have allready been seen (should change to an unordered_map for speedup)
 	  std::map<reg_exp_t, RTG::regExpRefPtr>::iterator it;
 	  wali::util::GoodTimer * tC = new wali::util::GoodTimer("temp");
 	  tC->stop();
@@ -2085,7 +2256,7 @@ namespace goals {
 	  while (!todo.empty())
 	  {
 		  cFrame & frame = todo.top();
-		  if (frame.is_new){
+		  if (frame.is_new){ //We've seen the frame before
 			  it = seen.find(frame.e);
 			  if (it != seen.end())
 			  {
@@ -2107,7 +2278,7 @@ namespace goals {
 				  todo.pop();
 				  continue;
 			  }
-			  else if (frame.e->isUpdatable())
+			  else if (frame.e->isUpdatable())  //This means it's a call
 			  {
 				  //If the expression is updatable/is a variable
 				  //Then look up the node it depends on - and make a variable associated with it
@@ -2123,11 +2294,13 @@ namespace goals {
 					  wl.push_back(mNum);
 					  vl.insert(mNum);
 				  }
-				  vDep.insert(mNum);
+				  vDep.insert(mNum);  //This regExp is dependent on the regExp represented by mNum
 				  seen[frame.e] = RTG::Project::make(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), RTG::Var::make(CBTI::INT32(mNum)));
 				  todo.pop();
 				  continue;
 			  }
+			  //Determine if the children of this reg_exp_t have been seen before.  If so convert to the TSLRegExp, otherwise
+			  //push the children reg_exp_t onto the stack
 			  else if (frame.e->isStar())
 			  {
 				  frame.op = 0;
@@ -2196,26 +2369,27 @@ namespace goals {
 				  }
 			  }
 		  }
-		  else
+		  else  //We've seen this reg_exp_t before, so it's children have been converted
 		  {
+			  //Look up the children and call the appropriate constructor for TSL
 			  RTG::regExpRefPtr lch = seen[frame.left];
 			  RTG::regExpRefPtr ret;
-			  if (frame.op == 0)
+			  if (frame.op == 0)  //Kleene
 			  {
 				  tC->start();
 				  ret = CIR::mkKleene(lch);
 				  tC->stop();
 			  }
-			  else
+			  else  //Dot or Plus
 			  {
 				  RTG::regExpRefPtr rch = seen[frame.right];
-				  if (frame.op == 1)
+				  if (frame.op == 1)  //Dot
 				  {
 					  tC->start();
 					  ret = CIR::mkDot(lch, rch);
 					  tC->stop();
 				  }
-				  else
+				  else  //Plus
 				  {
 					  tC->start();
 					  ret = CIR::mkPlus(lch, rch);
@@ -2227,82 +2401,69 @@ namespace goals {
 		  }
 	  }
 
-	  varDependencies[reID] = vDep;
+	  varDependencies[reID] = vDep;   //Put the dependant variable set into varDependencies
 	  *elapsedTime = tC->total_time() - extraTime;
 	  return seen[exp];
   }
 	  
-/*	  else if (exp->isStar()){
-		  RTG::regExpRefPtr c = convertToRegExp(reID, exp->children.front(), evalTime); //A Star operation only has one child in the children list
-		  wali::util::GoodTimer tC = wali::util::GoodTimer("temp");
-		  RTG::regExpRefPtr ret = CIR::mkKleene(c);
-		  tC.stop();
-		  *evalTime += tC.total_time();
-		  return ret;
-	  }
-
-	//If the expression is a constant, return the appropriate constant types
-	else if (exp->isExtend()){  //Convert an extend to a Dot regExp using recursive calls and the left and right children of the regexp
-		list<reg_exp_t>::iterator ch = exp->children.begin();
-		RTG::regExpRefPtr lch = convertToRegExp(reID, *ch, evalTime);
-		ch++;
-		RTG::regExpRefPtr rch = convertToRegExp(reID, *ch, evalTime);
-		wali::util::GoodTimer tC = wali::util::GoodTimer("temp");
-		RTG::regExpRefPtr ret = CIR::mkDot(lch, rch);
-		tC.stop();
-		double time = tC.total_time();
-		*evalTime += time;
-		return ret;
-    } 
-	else if (exp->isCombine()){ //Convert a combine to a Plus regExp using recursive calls and the left and right children of the regexp
-        list<reg_exp_t>::iterator ch = exp->children.begin();
-		RTG::regExpRefPtr lch = convertToRegExp(reID, *ch, evalTime);
-        ch++;
-		RTG::regExpRefPtr rch = convertToRegExp(reID, *ch, evalTime);
-		wali::util::GoodTimer tC = wali::util::GoodTimer("temp");
-		RTG::regExpRefPtr ret = CIR::mkPlus(lch, rch);
-		tC.stop();
-		*evalTime += tC.total_time();
-		return ret;
-    }
-  }*/
 
   /*
   *  For each element in the list of regular expressions, convert it to a TSL regular expression and put it in a map from
   *  RegExp ID to TSL regular expressions
   *
-  *  updateableMap - A map of nodes and the regExp they depend on
-  *  oMap - still unsure about
+  *  outNodeRegExpMap - A map from reID to the wali reg_exp_t that represents it
+  *  updateableMap - A map of updateable node numbers to the intergraph node they depend on
+  *  oMap - a map of intergraph nodes to the ReID that represents them
+  *  varDependencies - a map from reID to the set of variabels it depends on that will be populated as we convert, used for the newton round later
+  *	 mapBack - a map for associating different variables with the appropriate variableID, needed because of the different node names
+  *
+  *  Author:  Emma Turetsky
   */
-  double convertToTSLRegExps(int reg)
+  double convertToTSLRegExps(int reg, std::map<int, reg_exp_t> & outNodeRegExpMap, tslRegExpMap & regExpMap, std::map<int, std::set<int>> & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int>> & mapBack, std::map<std::pair<int, int>, std::pair<int, int >>  & mergeSrcMap)
   {
 	  //std::cout << "REID: " << reg << endl;
 	  //outNodeRegExpMap[reg]->print(std::cout) << std::endl;
 	  double evalTime = 0;
-	  RTG::regExpRefPtr rExp = convertToRegExp(reg, outNodeRegExpMap[reg], &evalTime);
+	  RTG::regExpRefPtr rExp = convertToRegExp(reg, outNodeRegExpMap[reg], varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, &evalTime);
 	  //rExp->print(std::cout) << std::endl;
 	  //std::cout << "src: " << mapBack[reg].first.first << "tgt: " << mapBack[reg].first.second << "stack: " << mapBack[reg].second << endl << endl;
-      E[reg] = rExp;
+      regExpMap[reg] = rExp;
 	  return evalTime;
   }
 
 
   /*
-  *    For each regular expression, convert to a tensored tsl regexp
+  *  For each wali NameWeight regexp create a tensored regular expressions
+  *
+  *  The wali regexp represents a differentiated value.  The weight represents a regexp in eMap
+  *  differentiated with respect to a given variable (or not differentiated, depending) or is
+  *  the representation of "one"
+  *
+  *
+  *  params:  rList - Map from reID to the appropriate NameWeight regExp
+  *			  tslRegExpMap & regExpMap - map from varId to the TSL regExpRepresenting it
+  *			  tslDiffMap & differentialMap - map from varId to list of partial differentials representing varId differentiated with
+  *			  respect to different variables
+  *			  mapBack - a map for associating different variables with the appropriate variableID, needed because of the different node names
+  *                     in the fwpds IGR - should try to eliminate this need if possible
+  *
+  *  return:  RTG::regExpTRefPtr - a tensored TSLRegexp representing the tensored differential of exp
+  *
+  *  Author:  Emma Turetsky
   */
-  void convertToTSLRegExpsT(std::map<int, reg_exp_t> rList)
+  void convertToTSLRegExpsT(std::map<int, reg_exp_t> & rList, tslRegExpMap & regExpMap, tslRegExpTMap & tensoredRegExpMap, tslDiffMap & differentialMap, std::map<int, std::pair<std::pair<int, int>, int>> & mapBack, std::map<std::pair<int, int>, std::pair<int, int >>  & mergeSrcMap)
   {
-    for (std::map<int,reg_exp_t>::iterator it=rList.begin(); it!=rList.end(); ++it)
-    {
-      if (it->first != -1){
-		 // std::cout << "Converting RegExp: " << it->first << std::endl;
-		 // it->second->print(std::cout);
-		 // std::cout << std::endl;
-        RTG::regExpTRefPtr rExp = convertToRegExpT(it->second, false);
-		//rExp->print(std::cout) << endl;
-		tensoredRegExpMap[it->first] = rExp;
-      }
-    }
+	  for (std::map<int, reg_exp_t>::iterator it = rList.begin(); it != rList.end(); ++it)
+	  {
+		  if (it->first != -1){
+			  // std::cout << "Converting RegExp: " << it->first << std::endl;
+			  // it->second->print(std::cout);
+			  // std::cout << std::endl;
+			  RTG::regExpTRefPtr rExp = convertToRegExpT(it->second, regExpMap, differentialMap, mapBack, mergeSrcMap, false);
+			  //rExp->print(std::cout) << endl;
+			  tensoredRegExpMap[it->first] = rExp;
+		  }
+	  }
   }
 
   /*
@@ -2360,6 +2521,10 @@ namespace goals {
     return srcList;
   }
 
+  /*
+  * Given a list of non-differentials, return a list of variables
+  * used by them
+  */
   set<int> getDVarList(RTG::regExpListRefPtr dList)
   {
 	  set<int> srcList;
@@ -2389,9 +2554,12 @@ namespace goals {
   *  Creates a new fwpds using differentials generated from regular expressions
   *  
   *  pds - the new fwpds that's being generated
-  *  DMap - the map of differentials
+  *  differentialMap - the map of differentials
+  *  varDependencies - A map from reID to the set of variables it depends on
+  *
+  *  Author: Emma Turetsky
   */
-  void fwpdsFromDifferential(FWPDS * pds)
+  void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<int, std::set<int>> & varDependencies)
   {
 	//For each differential
     for(tslDiffMap::iterator it = differentialMap.begin(); it!=differentialMap.end(); ++it)
@@ -2419,11 +2587,14 @@ namespace goals {
 
   /*
   *  Runs the Newton method on on the various maps until we have reached a fix point
-  *  Mmap - a list of tensored regular expressions
-  *  D - a list of differentials
+  *  differentialMap - a list of differentials
   *  aList - an initial assignments for variables
+  *  varDependencies - A map from reID to the set of variables it depends on
+  *  tensoredRegExpMap - A map from reID to the tensored regular expression representing it
+  *
+  *  Author:  Emma Turetsky
   */
-  void runNewton(RTG::assignmentRefPtr & aList)
+  void runNewton(RTG::assignmentRefPtr & aList, tslDiffMap & differentialMap, std::map<int, std::set<int>> & varDependencies, tslRegExpTMap & tensoredRegExpMap)
   {
 	int rnd = 0;
     bool newton = true;
@@ -2527,13 +2698,13 @@ namespace goals {
 
   //Evaluate the tslRegExps using a list of variable assignments 'aList' - put the result
   // into finWeights
-  void evalRegExps(RTG::assignmentRefPtr aList)
+  void evalRegExps(RTG::assignmentRefPtr aList, tslRegExpMap & regExpMap, map<int, domain_t> & finWeights)
   {
-    for(tslRegExpMap::iterator it = E.begin(); it != E.end(); it++)
-    {
-		EXTERN_TYPES::sem_elem_wrapperRefPtr w = evalRegExpFinNonRec(it->second, aList);
-      finWeights[it->first] = w.v;
-    }
+	  for (tslRegExpMap::iterator it = regExpMap.begin(); it != regExpMap.end(); it++)
+	  {
+		  EXTERN_TYPES::sem_elem_wrapperRefPtr w = evalRegExpFinNonRec(it->second, aList);
+		  finWeights[it->first] = w.v;
+	  }
   }
 
   /*
@@ -2557,6 +2728,8 @@ namespace goals {
   *
   *  Step 7 - Insert the new weights into the original outfa and perform the iterative path summary in order to
   *			  determine if the error weight is reachable
+  *
+  *  Author:  Emma Turetsky
   */
   double run_newton(WFA& outfa, FWPDS * originalPds = NULL)
   { 
@@ -2576,6 +2749,23 @@ namespace goals {
 	//fpds->print(std::cout) << endl;
 
 	int dummy = -1;
+	map<int, reg_exp_t> outNodeRegExpMap; // A map from a unique id of an outgoing node to the regular expression associated with it
+	map<int, reg_exp_t> rNew; // A map from the node ids to the regexps representing the full differentials associated with that node id
+	map<int, int> updateableMap;  //A map from an upadateable node number to the id of the node it depends on 
+	map<int, int> oMap;
+	map<int, pair< pair<int, int>, int> > mapBack;  //A map from the node index to the struct of the <<src,tgt>,stack> - used to insert weights back into wfa
+	map<pair<pair<int, int>, int>, int> transMap;
+	vector<int> differentiatedList; //A list of nodes with where the differential is to be taken
+	tslRegExpMap regExpMap;  //The map of all tsl regular expression
+	tslRegExpMap diffMap;  //The map of tsl regular expressions to be differentiated (the program return points)
+	tslDiffMap differentialMap;  //This is a map from regexp ids to the partial differentials assoicated with them
+	tslRegExpTMap tensoredRegExpMap;  //A map from the regexpId to the tsl tensored differential representing it
+	map<int, domain_t> finWeights;  //The map from node id to the final relational weights
+	map<std::pair<int, int>, std::pair<int, int>> mergeSrcMap; //The map that keeps track of the src of calls on call instructions
+	std::vector<int> wl;
+	std::set<int> vl;
+	double baseEvalTime = 0;
+	map<int, std::set<int>> varDependencies;
 
 
     wali::set_verify_fwpds(false);
@@ -2614,24 +2804,31 @@ namespace goals {
 	t->start();
 	int testSize = mapBack.size();
 	int testSize2 = transMap.size();
+
+	//Find the key to the error state
 	Key errKey = wali::getKeySpace()->getKey("error");
 	Key iKey = wali::getKeySpace()->getKey("Unique State Name");
 	Key pErrKey = wali::getKeySpace()->getKey(iKey, errKey);
 	GenKeySource * esrc = new wali::wpds::GenKeySource(1, pErrKey);
 	Key fKey = wali::getKeySpace()->getKey(esrc);
 	bool prune = false;
+
+	//If the error state is in the wfa, then prune, otherwise the error is reachable  -- ETTODO (prune check is redundant)
 	if (outfa.getState(fKey) != NULL)
 	{
 		prune = true;
 	}
 	if (prune)
 	{
+		//Set the initial state to be the error state in the wfa and then prune
 		outfa.setInitialState(fKey);
 		outfa.prune();
 		t->stop();
 		std::set<Key> faStates = outfa.getStates();
 		std::set<Key>::iterator stateIter;
 		int numTrans = 0;
+
+		//Get the set of transitions on the remaining states and put that into the worklist
 		for (stateIter = faStates.begin(); stateIter != faStates.end(); stateIter++)
 		{
 			TransSet & transSet = outfa.getState(*stateIter)->getTransSet();
@@ -2648,8 +2845,6 @@ namespace goals {
 				numTrans++;
 			}
 		}
-		int sizeTest3 = wl.size();
-		int sizeTest4 = vl.size();
 		if (dump){
 			cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
 			fstream outfile("inter_outfa.dot", fstream::out);
@@ -2676,7 +2871,7 @@ namespace goals {
 			int rToConvert = wl.back();
 			//std::cout << rToConvert << endl;
 			wl.pop_back();
-			baseEvalTime += convertToTSLRegExps(rToConvert);
+			baseEvalTime += convertToTSLRegExps(rToConvert, outNodeRegExpMap, regExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap);
 		}
 		//std::cout << "ESIZE: " << E.size() << std::endl;
 		//std::cout << "DSIZE: " << differentiatedList.size() << std::endl;
@@ -2686,10 +2881,10 @@ namespace goals {
 		for (vector<int>::iterator eit = differentiatedList.begin(); eit != differentiatedList.end(); eit++)
 		{
 			// std::cout << "D: " << *eit << endl;
-			RTG::regExpRefPtr tmpReg = E[(*eit)];
+			RTG::regExpRefPtr tmpReg = regExpMap[(*eit)];
 			if (tmpReg != NULL)
 			{
-				diffMap[(*eit)] = E[(*eit)];
+				diffMap[(*eit)] = regExpMap[(*eit)];
 			}
 			//  std::cout << "RE: " << *eit;
 			//  std::cout << " ";
@@ -2711,7 +2906,7 @@ namespace goals {
 		double t2 = 0;
 		if (diffMap.size() != 0)
 		{
-			createDifferentials();
+			createDifferentials(diffMap, differentialMap);
 
 			tslDiffMap::iterator it3;
 
@@ -2720,7 +2915,7 @@ namespace goals {
 			*/
 			//Now we create new fwpds using these differentials, this fwpds has the weight type of nameweight
 			FWPDS * fnew = new FWPDS();
-			fwpdsFromDifferential(fnew);
+			fwpdsFromDifferential(fnew, differentialMap, varDependencies);
 
 			//Now create another finite automata
 			WFA fa2;
@@ -2761,12 +2956,12 @@ namespace goals {
 			/* Step 5 - Use the reg exps representing the differentials, the partial differentials, and the original
 			*			tsl regular expressions to get the tensored regular expressions we need to run the newton rounds
 			*/
-			convertToTSLRegExpsT(rNew);
+			convertToTSLRegExpsT(rNew, regExpMap, tensoredRegExpMap, differentialMap, mapBack, mergeSrcMap);
 			aList = CIR::initializeAssignment();
 
 			/*Step 6 - Use newton's method to find the fixed point of the weights and then reevaluate the values of all the regexps*/
 			cout << "[Newton Compare] Running Newton" << endl;
-			runNewton(aList);
+			runNewton(aList, differentialMap, varDependencies, tensoredRegExpMap);
 
 			//Using the final weights from Newton, evaluate the tslRegExps to get the final weights
 			//evalRegExps(aList);
@@ -2776,13 +2971,15 @@ namespace goals {
 			*			determine if the error weight is reachable
 			*/
 		}
-		else
+		else  //There are no variables to be differentiated
 		{
 			aList = CIR::initializeAssignment();
 			//evalRegExps(aList);
 			t2 = 0;
 		}
 		t->stop();
+
+		//Map the evaluated wts back to the transitions the regexps came from
 		for (stateIter = faStates.begin(); stateIter != faStates.end(); stateIter++)
 		{
 			TransSet & transSet = outfa.getState(*stateIter)->getTransSet();
@@ -2795,7 +2992,7 @@ namespace goals {
 				int tStack = tt->stack();
 				int transReg = transMap[std::make_pair(std::make_pair(tSrc, tTgt), tStack)];
 				t->start();
-				EXTERN_TYPES::sem_elem_wrapperRefPtr w = evalRegExpFinNonRec(E[transReg], aList);
+				EXTERN_TYPES::sem_elem_wrapperRefPtr w = evalRegExpFinNonRec(regExpMap[transReg], aList);
 				t->stop();
 				//std::cout << "OutWeight: " << tSrc << "," << tTgt << "," << tStack << ":";
 				//w.v->print(std::cout) << endl;
@@ -2807,6 +3004,7 @@ namespace goals {
 		outfa.print_dot(outfile, true);
 		outfile.close();*/
 
+		//Perform the final path summary
 		t->start();
 		outfa.path_summary_tarjan_fwpds(true);
 		State * initS = outfa.getState(outfa.getInitialState());
@@ -2832,7 +3030,7 @@ namespace goals {
 		cout << tTime << endl;
 		return tTime;
 	}
-	else
+	else  //There is no error state
 	{
 		cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
 		double tTime = t->total_time() + t1;;
@@ -2854,6 +3052,8 @@ namespace goals {
   *
   *	 Step 3 - Convert these regexps into TSL regular expressions and get the differentials
   *			  with respect their variables
+  *
+  *  Step 4 -
   */
   double run_newton_noTensor(WFA& outfa, FWPDS * originalPds = NULL)
   {
@@ -2872,6 +3072,24 @@ namespace goals {
 	  //freopen("newtonOutTest.txt", "w", stdout);
 	  //fpds->print(std::cout) << endl;
 
+
+	  map<int, reg_exp_t> outNodeRegExpMap; // A map from a unique id of an outgoing node to the regular expression associated with it
+	  map<int, int> updateableMap;  //A map from an upadateable node number to the id of the node it depends on 
+	  map<int, int> oMap;
+	  map<int, pair< pair<int, int>, int> > mapBack;  //A map from the node index to the struct of the <<src,tgt>,stack> - used to insert weights back into wfa
+	  map<pair<pair<int, int>, int>, int> transMap;
+	  vector<int> differentiatedList; //A list of nodes with where the differential is to be taken
+	  tslRegExpMap regExpMap;  //The map of all tsl regular expression
+	  tslRegExpMap diffMap;  //The map of tsl regular expressions to be differentiated (the program return points)
+	  tslUntensoredDiffMap untensoredDifferentialMap;
+	  map<int, domain_t> finWeights;  //The map from node id to the final relational weights
+	  map<std::pair<int, int>, std::pair<int, int>> mergeSrcMap; //The map that keeps track of the src of calls on call instructions
+	  std::vector<int> wl;
+	  std::set<int> vl;
+	  double baseEvalTime = 0;
+	  map<int, std::set<int>> varDependencies;
+
+	  std::set<pair<std::pair<int, int>, int> > globalEpsilon;  //used for debugging Newton
 	  int dummy = -1;
 
 
@@ -2909,12 +3127,15 @@ namespace goals {
 	  t->stop();
 	  double t1 = fpds->getOutRegExps(fa, outfa, outNodeRegExpMap, updateableMap, oMap, mapBack, transMap, differentiatedList, mergeSrcMap);
 	  t->start();
+
+	  //Get the key to the error state
 	  Key errKey = wali::getKeySpace()->getKey("error");
 	  Key iKey = wali::getKeySpace()->getKey("Unique State Name");
 	  Key pErrKey = wali::getKeySpace()->getKey(iKey, errKey);
 	  GenKeySource * esrc = new wali::wpds::GenKeySource(1, pErrKey);
 	  Key fKey = wali::getKeySpace()->getKey(esrc);
 	  bool prune = false;
+	  //Set the initial state to the error state, if the error state exists and prune the wfa
 	  if (outfa.getState(fKey) != NULL)
 	  {
 		  prune = true;
@@ -2929,6 +3150,7 @@ namespace goals {
 		  int numTrans = 0;
 		  for (stateIter = faStates.begin(); stateIter != faStates.end(); stateIter++)
 		  {
+			  //Get the regular expressions on each remaining transition
 			  TransSet & transSet = outfa.getState(*stateIter)->getTransSet();
 			  TransSet::iterator transIt;
 			  for (transIt = transSet.begin(); transIt != transSet.end(); transIt++)
@@ -2943,8 +3165,6 @@ namespace goals {
 				  numTrans++;
 			  }
 		  }
-		  int sizeTest3 = wl.size();
-		  int sizeTest4 = vl.size();
 		  if (dump){
 			  cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
 			  fstream outfile("inter_outfa.dot", fstream::out);
@@ -2971,32 +3191,24 @@ namespace goals {
 			  int rToConvert = wl.back();
 			  //std::cout << rToConvert << endl;
 			  wl.pop_back();
-			  baseEvalTime += convertToTSLRegExps(rToConvert);
+			  baseEvalTime += convertToTSLRegExps(rToConvert, outNodeRegExpMap, regExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap);
 		  }
 
-		  /*for (std::map<int, reg_exp_t>::iterator regListIT = outNodeRegExpMap.begin(); regListIT != outNodeRegExpMap.end(); regListIT++)
-		  {
-		  // std::cout << regListIT->first << ": ";
-		  baseEvalTime += convertToTSLRegExps(regListIT->first);
-		  //std::cout << endl;
-		  //regListIT->second->print(std::cout) << endl;
-		  //E[regListIT->first].print(std::cout) << endl;
-		  }*/
 
 		  int entry = 0;
 		  bool first = true;
 		  for (vector<int>::iterator eit = differentiatedList.begin(); eit != differentiatedList.end(); eit++)
 		  {
 			  //std::cout << "D: " << *eit << endl;
-			  RTG::regExpRefPtr tmpReg = E[(*eit)];
-			  if (tmpReg != NULL)
+			  RTG::regExpRefPtr tmpReg = regExpMap[(*eit)];
+			  if (tmpReg != NULL) //That updateable node may have been pruned away
 			  {
 				  if (first)
 				  {
 					  entry = (*eit);
 					  first = false;
 				  }
-				  diffMap[(*eit)] = E[(*eit)];
+				  diffMap[(*eit)] = regExpMap[(*eit)];
 			  }
 			  //std::cout << "RE: " << *eit;
 			  //std::cout << " ";
@@ -3016,7 +3228,7 @@ namespace goals {
 		  {
 			  std::cout << "[Newton Compare] Creating Differentials" << std::endl;
 			  //Created the differentials
-			  createUntensoredDifferentials();
+			  createUntensoredDifferentials(diffMap,untensoredDifferentialMap);
 
 			  //For each Differential
 			  //Create the rules for the TSLDifferentialPDS
@@ -3052,7 +3264,7 @@ namespace goals {
 				  //std::cout << "KeyExit: " << keyStringExit.str() << " ----> " << KeyExit << endl;
 
 				  //Create a delta 1 fpds rule from e_entry to e_ext with reg_exp e at 0
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr w0 = evalNonRecAt0(E[wID]);
+				  EXTERN_TYPES::sem_elem_wrapperRefPtr w0 = evalNonRecAt0(regExpMap[wID]);
 				  RTG::regExpRefPtr w = RTG::Weight::make(w0);
 				  tslFwpds->add_rule(st1(), stk(KeyEntry), st1(), stk(KeyExit), new TSLWeight(w));
 				  set<int> srcList = varDependencies[rePIt->first];
@@ -3332,7 +3544,7 @@ namespace goals {
 				  int tStack = tt->stack();
 				  int transReg = transMap[std::make_pair(std::make_pair(tSrc, tTgt), tStack)];
 				  t->start();
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr w = evalRegExpFinNonRec(E[transReg], aList);
+				  EXTERN_TYPES::sem_elem_wrapperRefPtr w = evalRegExpFinNonRec(regExpMap[transReg], aList);
 				  t->stop();
 				  //std::cout << "OutWeight: " << tSrc << "," << tTgt << "," << tStack << ":";
 				  //w.v->print(std::cout) << endl;
@@ -3398,98 +3610,6 @@ namespace goals {
 
 	  //FOR EACH Zi that depends on the changed variables
 	  //RE-EVALUATE THE tslFPDS RULE and create a new weight of the domain_t pds rule
-
-	  /*
-
-	  bool first = true; //So we know we are on the first Newton Round
-
-	  //While the set of changed variables != empty, continue iterating through NewtonRounds
-	  //This is the actual workhorse of the Newton Rounds
-	  while (changedVars.size() != 0){
-		  rnd++;
-		  std::set<int>::iterator pIt;
-		  //For each of the variables whose dependencies changed, get their new assignement from aList
-		  for (pIt = changedVars.begin(); pIt != changedVars.end(); pIt++)
-		  {
-			  aPrime = CIR::updateAssignment(aPrime, CBTI_INT32(*pIt), CIR::getAssignment(CBTI_INT32(*pIt), aList));
-		  }
-
-		  C = changedVars;
-		  changedVars.clear();
-
-		  tslRegExpTMap::iterator assignIt;
-
-		  //For each outgoing regular expression
-		  for (assignIt = tensoredRegExpMap.begin(); assignIt != tensoredRegExpMap.end(); assignIt++)
-		  {
-			  //Get the list of variables this regexp's differentials depend on
-			  int var = assignIt->first;
-			  std::set<int> varsUsedInP = dependenceMap[var];
-
-			  //Now determine if any of the variables on which the program return point at assignIt depends have been changed
-			  bool found = false; //True if a variable has been altered
-			  std::set<int>::iterator sIt1 = C.begin();
-			  std::set<int>::iterator sIt2 = varsUsedInP.begin();
-			  //Check to see if C intersect VarsUsedIn(p) is empty
-			  if (!first){
-				  while ((sIt1 != C.end()) && (sIt2 != varsUsedInP.end()) && !found)
-				  {
-					  if (*sIt1<*sIt2)
-						  ++sIt1;
-					  else if (*sIt2<*sIt1)
-						  ++sIt2;
-					  else
-					  {
-						  found = true;
-						  break;
-					  }
-				  }
-			  }
-			  else  //It's the first time doing a NewtonRound, so all variables have been altered
-			  {
-				  found = true;
-			  }
-			  if (found){
-				  //v = Tdetensor(evalT(Mmap[p],aPrime))
-				  //The variable representing the regexp is potentially dirty, so reevaluate it using the
-				  //new assignment in aPrime
-				  //std::cout << "Eval: " << assignIt->first << std::endl;
-				  //assignIt->second.print(std::cout);
-				  //std::cout << std::endl;
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr newVal = CIR::evalT(assignIt->second, aPrime);
-				  //DetensorTranspose the new value
-				  //std::cout << std::endl << "Result: ";
-				  //newVal.v->print(std::cout);
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr rep = EXTERNS::detensorTranspose(newVal);
-				  //std::cout << std::endl << "Detensored Val: ";
-				  //rep.v->print(std::cout);
-				  //Perform the computation needed for merge functions by computing rep = M(1,rep)
-				  //FIXME - what is applied here has to be a global merge function that applies at all procedure exits
-				  //		- we don't have the information to perform exit-specific merge functions
-				  //Check to see if the new value is the same as the previous one
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr oldVal = CIR::getAssignment(CBTI_INT32(var), aPrime);
-				  //if A'[p] != v`
-				  //Add v' to the changedVar set and updated the assignmentList
-				  if (!(oldVal.v->Equal(rep.v))){
-					  changedVars.insert(var); //C' = {p}
-					  //A[p] = v
-					  aList = CIR::updateAssignment(aList, CBTI_INT32(var), rep);
-				  }
-			  }
-		  }
-		  first = false;
-		  RTG::_evalRegExpHash().clear();
-	  }
-	  std::cout << std::endl << "NumRnds: " << rnd << std::endl;
-	  //FOR EACH NEWTON ROUND
-		//GET THE SET OF CHANGED VARIABLES
-		//FOR EACH Zi that depends on the changed variables
-			//RE-EVALUATE THE tslFPDS RULE and create a new weight of the domain_t pds rule
-	
-	    //Repeat the pathsummary steps
-	    //Compare with the new assignment
-
-	  //Once we have the full assignment - do the final evaluation and mapback like tensored newton*/
   }
 
   /*
