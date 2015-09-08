@@ -47,11 +47,14 @@
 #include "wali/domains/tsl_weight/TSLWeight.hpp"
 //#include "PtoICFG.hpp"
 // TSL
-#include "wali/domains/binrel/BinRel.hpp"
+#ifdef USE_NWAOBDD
 #include "../turetsky/svn-repository/NWAOBDDRel.hpp"
 #include "../turetsky/svn-repository/NWAOBDDRelMergeFns.hpp"
-#include "NewtonCompare.hpp"
 #include "Newton_Compare_NWA.hpp"
+#else
+#include "wali/domains/binrel/BinRel.hpp"
+#include "NewtonCompare.hpp"
+#endif
 
 using namespace std;
 using namespace wali;
@@ -1361,7 +1364,7 @@ namespace goals {
 		  }
 		  else  //This is the second time we've popped this stack frame, so it's children must have been evaluated
 		  {
-			  //Look up the left child vlue (this is not a leaf regExp, so it must have a left child)
+			  //Look up the left child value (this is not a leaf regExp, so it must have a left child)
 			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0Hash(frame.e);
 			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashL(frame.left);
 			  RTG::evalRegExpAt0Hash_T::const_iterator evalRegExpAt0___it = RTG::_evalRegExpAt0Hash().find(lookupKeyForevalRegExpAt0HashL);
@@ -2241,7 +2244,7 @@ namespace goals {
   *
   *   Author: Emma Turetsky
   */
-  RTG::regExpRefPtr convertToRegExp(int reID, reg_exp_t exp, std::map<int, std::set<int>> & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int>> & mapBack, std::map<std::pair<int, int>, std::pair<int, int>> & mergeSrcMap, double * elapsedTime)
+  RTG::regExpRefPtr convertToRegExp(int reID, reg_exp_t exp, std::map<int, std::set<int>> & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int>> & mapBack, std::map<std::pair<int, int>, std::pair<int, int>> & mergeSrcMap, std::vector<int> & wl, std::set<int> & vl, double * elapsedTime)
   {
 	  std::stack<cFrame> todo;
 	  std::map<reg_exp_t, RTG::regExpRefPtr> seen; //map of regExps that have allready been seen (should change to an unordered_map for speedup)
@@ -2419,12 +2422,12 @@ namespace goals {
   *
   *  Author:  Emma Turetsky
   */
-  double convertToTSLRegExps(int reg, std::map<int, reg_exp_t> & outNodeRegExpMap, tslRegExpMap & regExpMap, std::map<int, std::set<int>> & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int>> & mapBack, std::map<std::pair<int, int>, std::pair<int, int >>  & mergeSrcMap)
+  double convertToTSLRegExps(int reg, std::map<int, reg_exp_t> & outNodeRegExpMap, tslRegExpMap & regExpMap, std::map<int, std::set<int>> & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int>> & mapBack, std::map<std::pair<int, int>, std::pair<int, int >>  & mergeSrcMap, std::vector<int> & wl, std::set<int> & vl)
   {
 	  //std::cout << "REID: " << reg << endl;
 	  //outNodeRegExpMap[reg]->print(std::cout) << std::endl;
 	  double evalTime = 0;
-	  RTG::regExpRefPtr rExp = convertToRegExp(reg, outNodeRegExpMap[reg], varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, &evalTime);
+	  RTG::regExpRefPtr rExp = convertToRegExp(reg, outNodeRegExpMap[reg], varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl, &evalTime);
 	  //rExp->print(std::cout) << std::endl;
 	  //std::cout << "src: " << mapBack[reg].first.first << "tgt: " << mapBack[reg].first.second << "stack: " << mapBack[reg].second << endl << endl;
       regExpMap[reg] = rExp;
@@ -2871,7 +2874,7 @@ namespace goals {
 			int rToConvert = wl.back();
 			//std::cout << rToConvert << endl;
 			wl.pop_back();
-			baseEvalTime += convertToTSLRegExps(rToConvert, outNodeRegExpMap, regExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap);
+			baseEvalTime += convertToTSLRegExps(rToConvert, outNodeRegExpMap, regExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl);
 		}
 		//std::cout << "ESIZE: " << E.size() << std::endl;
 		//std::cout << "DSIZE: " << differentiatedList.size() << std::endl;
@@ -3191,7 +3194,7 @@ namespace goals {
 			  int rToConvert = wl.back();
 			  //std::cout << rToConvert << endl;
 			  wl.pop_back();
-			  baseEvalTime += convertToTSLRegExps(rToConvert, outNodeRegExpMap, regExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap);
+			  baseEvalTime += convertToTSLRegExps(rToConvert, outNodeRegExpMap, regExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl);
 		  }
 
 
@@ -3777,11 +3780,13 @@ namespace goals {
     cout << "EWPDS TIME: " << totalEtime << "\n";
     cout << "FWPDS TIME: " << totalFtime << "\n";
     cout << "Newton Time: " << totalNtime << "\n";
+#ifdef USE_NWAOBDD
 	NWA_OBDD::DisposeOfPairProductMapCaches();
 	NWA_OBDD::DisposeOfPairProductCache();
 	NWA_OBDD::DisposeOfPathSummaryCache();
 	DisposeOfModPathSummaryCache();
 	NWA_OBDD::NWAOBDDNodeHandle::DisposeOfReduceCache();
+#endif
     
   }
 
@@ -3901,13 +3906,8 @@ int main(int argc, char ** argv)
   instrument_call_return(pg);
 
   if(dump){
-	  NWA_OBDD::NWAOBDDNodeHandle::InitNoDistinctionTable();
-	  NWA_OBDD::NWAOBDDNodeHandle::InitReduceCache();
-	  NWA_OBDD::InitPairProductCache();
-	  NWA_OBDD::InitPathSummaryCache();
-	  NWA_OBDD::InitPairProductMapCaches();
     FWPDS * originalPds = new FWPDS();
-	ncon = pds_from_prog_nwa(originalPds, pg, true);
+	con = pds_from_prog(originalPds, pg);
     cout << "[Newton Compare] Dumping PDS to pds.dot..." << endl;
     fstream pds_stream("pds.dot", fstream::out);
     RuleDotty rd(pds_stream);
@@ -3915,10 +3915,6 @@ int main(int argc, char ** argv)
     originalPds->for_each(rd);
     pds_stream << "}" << endl;
     delete(originalPds);
-	NWA_OBDD::DisposeOfPairProductMapCaches();
-	NWA_OBDD::DisposeOfPairProductCache();
-	NWA_OBDD::DisposeOfPathSummaryCache();
-	NWA_OBDD::NWAOBDDNodeHandle::DisposeOfReduceCache();
   }
 
   //void * dump; 
