@@ -8,9 +8,12 @@
 #include "wali/wpds/Rule.hpp"
 #include "wali/wpds/RuleFunctor.hpp"
 
+#ifdef USE_NWAOBDD
+#include "../turetsky/svn-repository/NWAOBDDRel.hpp"
+#else
 #include "wali/domains/binrel/BinRel.hpp"
 #include "wali/domains/binrel/ProgramBddContext.hpp"
-#include "../turetsky/svn-repository/NWAOBDDRel.hpp"
+#endif
 
 extern "C" {
 #include "ast.h"
@@ -87,22 +90,48 @@ namespace wali
         void map_call_to_callee(stmt_ptr_proc_ptr_hash_map& mout, str_proc_ptr_hash_map& min, const proc * p);
       }
 
+
+#ifdef USE_NWAOBDD
+      wali::domains::nwaobddrel::NWAOBDDContext * dump_pds_from_prog_nwa(wpds::WPDS * pds, prog * pg, bool first);
+#else
       wali::domains::binrel::BddContext * dump_pds_from_prog(wpds::WPDS * pds, prog * pg);
-	  wali::domains::nwaobddrel::NWAOBDDContext * dump_pds_from_prog_nwa(wpds::WPDS * pds, prog * pg, bool first);
-	  
-	  void dump_pds_from_proc(
-		  wpds::WPDS * pds,
-		  proc * p,
-		  domains::binrel::ProgramBddContext * con,
-		  const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
-		  std::map<string, int> & localVars,
-          const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee);
+#endif
+
+#ifdef USE_NWAOBDD
+
 	  void dump_pds_from_proc(
 		  wpds::WPDS * pds,
 		  proc * p,
 		  domains::nwaobddrel::NWAOBDDContext * con,
 		  const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
 		  const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee);
+
+
+	  void dump_pds_from_stmt(
+		  wpds::WPDS * pds,
+		  stmt * s,
+		  domains::nwaobddrel::NWAOBDDContext * con,
+		  const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
+		  const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee,
+		  const char * f,
+		  stmt * ns);
+
+	  void dump_pds_from_stmt_list(
+		  wpds::WPDS * pds,
+		  stmt_list * sl,
+		  domains::nwaobddrel::NWAOBDDContext * con,
+		  const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
+		  const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee,
+		  const char * f,
+		  stmt * es);
+#else
+         void dump_pds_from_proc(
+		  wpds::WPDS * pds,
+		  proc * p,
+		  domains::binrel::ProgramBddContext * con,
+		  const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
+		  std::map<string, int> & localVars,
+          const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee);
       void dump_pds_from_stmt(
           wpds::WPDS * pds, 
           stmt * s, 
@@ -122,25 +151,23 @@ namespace wali
 		  std::map<string, int> & localVars,
           const char * f, 
           stmt * es);
-	  void dump_pds_from_stmt(
-		  wpds::WPDS * pds,
-		  stmt * s,
-		  domains::nwaobddrel::NWAOBDDContext * con,
-		  const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
-		  const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee,
-		  const char * f,
-		  stmt * ns);
-
-	  void dump_pds_from_stmt_list(
-		  wpds::WPDS * pds,
-		  stmt_list * sl,
-		  domains::nwaobddrel::NWAOBDDContext * con,
-		  const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
-		  const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee,
-		  const char * f,
-		  stmt * es);
+#endif
     }
 
+#ifdef USE_NWAOBDD
+
+	// Dumps the program as a PDS into pds. pds must be preallocated.
+	// Returns the vocabulary generated when creating the pds.
+	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_nwa(wpds::WPDS * pds, prog * pg, bool first);
+	// Same, but generates MergeFns of type wali::domains::binrel::BinRelMeetMerge
+	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_with_meet_merge_nwa(wpds::ewpds::EWPDS * pds, prog * pg, bool first = true);
+	// Same, but generates MergeFns of type wali::domains::binrel::BinRelTensorMerge
+	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_with_tensor_merge_nwa(wpds::ewpds::EWPDS * pds, prog * pg, bool first = true);
+	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_with_newton_merge_nwa(wpds::ewpds::EWPDS * pds, prog * pg, bool first = true);
+
+	wali::domains::nwaobddrel::NWAOBDDContext * havocLocalsNWA(wpds::WPDS * pds, prog * pg, domains::nwaobddrel::NWAOBDDContext * con);
+	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_nwa(wpds::WPDS * pds, prog * pg, bool first);
+#else
     // Parses the program in file fname and generates the PDS in pds. pds must be preallocated.
     // Returns the vocabulary generated when parsing the program.
     wali::domains::binrel::BddContext * read_prog(wpds::WPDS * pds, const char * fname, bool dbg = false);
@@ -155,19 +182,8 @@ namespace wali
     wali::domains::binrel::BddContext * pds_from_prog_with_tensor_merge(wpds::ewpds::EWPDS * pds, prog * pg);
 	wali::domains::binrel::BddContext * pds_from_prog_with_newton_merge(wpds::ewpds::EWPDS * pds, prog * pg);
 
-
-	// Dumps the program as a PDS into pds. pds must be preallocated.
-	// Returns the vocabulary generated when creating the pds.
-	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_nwa(wpds::WPDS * pds, prog * pg, bool first);
-	// Same, but generates MergeFns of type wali::domains::binrel::BinRelMeetMerge
-	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_with_meet_merge_nwa(wpds::ewpds::EWPDS * pds, prog * pg, bool first = true);
-	// Same, but generates MergeFns of type wali::domains::binrel::BinRelTensorMerge
-	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_with_tensor_merge_nwa(wpds::ewpds::EWPDS * pds, prog * pg, bool first = true);
-	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_with_newton_merge_nwa(wpds::ewpds::EWPDS * pds, prog * pg, bool first = true);
-
     wali::domains::binrel::BddContext * havocLocals(wpds::WPDS * pds, prog * pg, domains::binrel::ProgramBddContext * con, std::map<string,int> & localVars);
-	wali::domains::nwaobddrel::NWAOBDDContext * havocLocalsNWA(wpds::WPDS * pds, prog * pg, domains::nwaobddrel::NWAOBDDContext * con);
-	wali::domains::nwaobddrel::NWAOBDDContext * pds_from_prog_nwa(wpds::WPDS * pds, prog * pg, bool first);
+    #endif
     void print_prog_stats(prog * pg);
 
     // Must be called to fix fall-through returns *before* dumping PDS

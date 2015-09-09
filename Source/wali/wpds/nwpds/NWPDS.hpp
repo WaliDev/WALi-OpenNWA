@@ -22,7 +22,7 @@
 // ::std
 #include <vector>
 // ::std::tr1
-#include <unordered_map>
+#include <tr1/unordered_map>
 // ::std (for pair)
 #include <utility>
 

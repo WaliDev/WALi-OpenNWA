@@ -3,9 +3,9 @@
 // ::std
 #include <utility>
 // ::std::tr1
-#include <boost/tr1/tuple.hpp>
+#include <boost/tuple/tuple.hpp>
 // ::std::tr1
-#include <boost/tr1/unordered_map.hpp>
+#include <tr1/unordered_map>
 // ::opennwa
 #include "opennwa/Nwa.hpp"
 #include "opennwa/WeightGen.hpp"
@@ -16,7 +16,7 @@
 // ::wali::domains::binrel
 #include "BinRel.hpp"
 
-#include "bdd.h"
+#include "buddy/bdd.h"
 
 class bdd;
 
@@ -134,7 +134,7 @@ namespace wali
         //  CALL_TO_RET:  corresponds to the call-to-return part of a Return transition in the NWA -- XXX: afaik, never used 
         
         public:
-          typedef std::tr1::tuple< Kind, Key, Key, Key > TransQuad;
+          typedef boost::tuple< Kind, Key, Key, Key > TransQuad;
           class TransQuadHash
           {
             public:

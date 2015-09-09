@@ -101,14 +101,15 @@ namespace wali
       }
     }
 
+#ifdef USE_NWAOBDD
 	namespace nwaobddrel
 	{
 		/*
 		* Create the NWA_OBDD for a contrain statement e with the given context
 		*/
 		static NWA_OBDD::NWAOBDD xformer_for_constrain(const expr * e, NWAOBDDContext * con, const char * f) {
-		{
-        int varInfo;
+        {
+	int varInfo;
         string s;
         if(!e)
           assert(0 && "xformer_for_constrain");
@@ -164,7 +165,7 @@ namespace wali
         }
       }
 		}
-	}
+		#endif
   }
   namespace cprover
   {
@@ -976,7 +977,7 @@ BddContext * dump_pds_from_prog(wpds::WPDS * pds, prog * pg)
 		pl = pl->n;
 	}
 
-	cprover::havocLocals(pds, pg, con, localVars);
+	havocLocals(pds, pg, con, localVars);
 	name_to_proc.clear();
 	fprintf(stderr, "Done converting\n");
 

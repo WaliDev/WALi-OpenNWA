@@ -8,7 +8,7 @@
 #include "ProgramBddContext.hpp"
 
 #include "glog/logging.h"
-#include "fdd.h"
+#include "buddy/fdd.h"
 
 #include <cstdlib>
 #include <ctime>

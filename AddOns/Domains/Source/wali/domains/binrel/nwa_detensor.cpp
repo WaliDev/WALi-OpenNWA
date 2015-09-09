@@ -7,7 +7,7 @@
 
 
 //#include "kernel.h"
-#include "bdd.h"
+#include "buddy/bdd.h"
 #include "nwa_detensor.hpp"
 // ::wali
 #include "wali/KeyPairSource.hpp"

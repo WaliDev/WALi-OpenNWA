@@ -2,6 +2,7 @@
 #define WALI_XFA_RELATIONMAKER_HPP
 
 #include "wali/SemElem.hpp"
+#include <wali/domains/binrel/BinRel_Interface.hpp>
 #include <string>
 
 namespace wali
@@ -11,7 +12,7 @@ namespace wali
         struct RelationMaker
         {
             virtual
-            sem_elem_t
+	    sem_elem_t
             initialize_variable_to_val(std::string const & varname,
                                        int val) const = 0;
 

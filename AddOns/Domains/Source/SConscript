@@ -18,6 +18,7 @@ if Debug:
 walidomains_files = Split("""
 ./wali/domains/binrel/BinRel.cpp
 ./wali/domains/binrel/ProgramBddContext.cpp
+./wali/domains/binrel/BinRel_Interface.cpp
 ./wali/domains/binrel/nwa_detensor.cpp
 ./wali/domains/binrel/BinRelMergeFns.cpp
 ./wali/domains/reach/Reach.cpp

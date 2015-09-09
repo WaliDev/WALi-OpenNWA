@@ -34,8 +34,8 @@
 #include "wali/Countable.hpp"
 #include "wali/ref_ptr.hpp"
 #include "wali/SemElemTensor.hpp"
-#include "fdd.h"
-#include "bdd.h"
+#include "buddy/fdd.h"
+#include "buddy/bdd.h"
 #include "wali/Key.hpp"
 
 /**
@@ -263,7 +263,7 @@ namespace wali
           virtual void setIntVars(const std::map<std::string, int>& vars);
           virtual void setIntVars(const std::vector<std::map<std::string, int> >& vars);
 		  void addVarList(std::pair<int, int> loc, std::vector<std::string> lVars1, std::vector<std::string> lVars2);
-		  std::pair<std::vector<std::string>, std::vector<std::string>> getLocalVars(std::pair<int, int> loc) const;
+		  std::pair<std::vector<std::string>, std::vector<std::string> > getLocalVars(std::pair<int, int> loc) const;
 
 #if (NWA_DETENSOR == 1)
           /**
@@ -307,7 +307,7 @@ namespace wali
           void populateCache();
 
 
-		  std::map<std::pair<int, int>, std::pair<std::vector<std::string>, std::vector<std::string>>> mergeVars;
+		  std::map<std::pair<int, int>, std::pair<std::vector<std::string>, std::vector<std::string> > > mergeVars;
           
         private:
           // ///////////////////////////////

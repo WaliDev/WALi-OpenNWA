@@ -339,9 +339,6 @@ namespace wali {
                     & fdd_ithset(info->baseLhs)
                     & fdd_ithset(info->baseRhs)
                     & fdd_ithset(info->baseExtra)
-                    & fdd_ithset(info->tensor1Lhs)
-                    & fdd_ithset(info->tensor1Rhs)
-                    & fdd_ithset(info->tensor1Extra)
                     & fdd_ithset(info->tensor2Lhs)
                     & fdd_ithset(info->tensor2Rhs)
                     & fdd_ithset(info->tensor2Extra);

@@ -2,8 +2,8 @@
 
 set -e
 
-export BOOST_HOME=/unsup/boost-1.49.0/include 
-export BOOST_LIB=/unsup/boost-1.49.0/lib
+export BOOST_HOME=/unsup/boost/amd64_rhel6/include 
+export BOOST_LIB=/unsup/boost/amd64_rhel6/lib
  
 scons -j12 tests coverage=True checking=fast CXX=/s/gcc-4.6.3/bin/g++ strong_warnings=False
 

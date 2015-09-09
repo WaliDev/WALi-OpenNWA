@@ -170,16 +170,16 @@ elif BaseEnv['compiler'] in ['cl', 'cl.EXE']:
 
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir, '../../tsl-sandbox')])
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
-if os.path.isdir(os.path.join(WaliDir, '..', 'third-party', 'boost')):
-    BaseEnv.Append(CPPPATH = [os.path.join(WaliDir, '..', 'third-party', 'boost')])
-else:
-    BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , '..', 'boost')])
-try:
-        BaseEnv.Append(CPPPATH = [os.environ['BOOST_HOME']])
-        BaseEnv.Append(LIBPATH = [os.environ['BOOST_LIB']])
-        BaseEnv.Append(RPATH = [os.environ['BOOST_LIB']])
-except KeyError:
-    pass
+#if os.path.isdir(os.path.join(WaliDir, '..', 'third-party', 'boost')):
+#    BaseEnv.Append(CPPPATH = [os.path.join(WaliDir, '..', 'third-party', 'boost')])
+#else:
+#    BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , '..', 'boost')])
+#try:
+BaseEnv.Append(CPPPATH = ['/unsup/boost-1.55.0/amd64_rhel6/include'])
+BaseEnv.Append(LIBPATH = ['/unsup/boost-1.55.0/amd64_rhel6/lib'])
+BaseEnv.Append(RPATH = ['/unsup/boost-1.55.0/amd64_rhel6/lib'])
+#except KeyError:
+#    pass
 
 conf = Configure(BaseEnv)
 BaseEnv["HAS_BOOST_FILESYSTEM"] = conf.CheckLib('boost_filesystem', language='c++')

@@ -5,7 +5,7 @@
  */
  
 #include "BinRel.hpp"
-#include "fdd.h"
+#include "buddy/fdd.h"
 #include "ProgramBddContext.hpp"
 //#include "BuddyExt.hpp"
 #include "combination.hpp"
@@ -16,7 +16,7 @@
 
 #include <boost/algorithm/string/predicate.hpp>
 
-#include <unordered_map>
+#include <tr1/unordered_map>
 
 using namespace wali::domains::binrel;
 using std::endl;
@@ -298,8 +298,8 @@ BddContext::BddContext(const BddContext& other) :
   tensorSecBddContextSet(other.tensorSecBddContextSet),
   commonBddContextSet23(other.commonBddContextSet23),
   commonBddContextSet13(other.commonBddContextSet13),
-  commonBddContextSet24(other.commonBddContextSet24),
   commonBddContextId13(other.commonBddContextId13),
+  commonBddContextSet24(other.commonBddContextSet24),
   commonBddContextId24(other.commonBddContextId24),
   cachedBaseOne(other.cachedBaseOne),
   cachedBaseZero(other.cachedBaseZero),
@@ -422,10 +422,10 @@ void BddContext::setIntVars(const std::map<std::string, int>& flatvars)
 
 void BddContext::addVarList(std::pair<int, int> loc, std::vector<std::string> lVars1, std::vector<std::string> lVars2)
 {
-	mergeVars[loc] = std::pair<std::vector<std::string>, std::vector<std::string>>(lVars1, lVars2);
+	mergeVars[loc] = std::pair<std::vector<std::string>, std::vector<std::string> >(lVars1, lVars2);
 }
 
-std::pair<std::vector<std::string>, std::vector<std::string>> BddContext::getLocalVars(std::pair<int, int> loc) const
+std::pair<std::vector<std::string>, std::vector<std::string> > BddContext::getLocalVars(std::pair<int, int> loc) const
 {
 	return mergeVars.at(loc);
 }
@@ -1293,7 +1293,7 @@ binrel_t BinRel::Merge(int v, int c) const
 	// start with top
 	bdd constrainLocalsBdd = con->getBaseTop()->getBdd();
 
-	std::pair<std::vector<std::string>, std::vector<std::string>> sList = con->getLocalVars(std::pair<int, int>(v, c));
+	std::pair<std::vector<std::string>, std::vector<std::string> > sList = con->getLocalVars(std::pair<int, int>(v, c));
 	std::vector<std::string> localVars = sList.first;
 	std::vector<std::string> localVars2 = sList.second;
 	for (std::vector<std::string>::const_iterator cit = localVars.begin(); cit != localVars.end(); ++cit){
@@ -1332,7 +1332,7 @@ binrel_t BinRel::TensorMerge(int v, int c) const
 	// start with top
 	bdd constrainLocalsBdd = con->getTensorTop()->getBdd();
 
-	std::pair<std::vector<std::string>, std::vector<std::string>> sList = con->getLocalVars(std::pair<int, int>(v, c));
+	std::pair<std::vector<std::string>, std::vector<std::string> > sList = con->getLocalVars(std::pair<int, int>(v, c));
 	std::vector<std::string> localVars = sList.first;
 	std::vector<std::string> localVars2 = sList.second;
 	for (std::vector<std::string>::const_iterator cit = localVars.begin(); cit != localVars.end(); ++cit){

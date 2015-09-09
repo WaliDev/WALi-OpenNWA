@@ -14,8 +14,8 @@
 #include <iomanip>
 #include <sstream>
 #include <boost/cast.hpp>
-#include <unordered_map>
-#include <unordered_set>
+#include <tr1/unordered_map>
+#include <tr1/unordered_set>
 
 // ::wali
 #include "wali/SemElemTensor.hpp"
@@ -1223,9 +1223,7 @@ namespace wali {
 		//For each inter hyperedge - edge between two graphs
 		for (it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
 			//gr = graph associated with the target edge
-			IntraGraph *gr = nodes[(*it2).tgt].gr;
 			//eno - edgenumber associated with edge in the graph (create a new one if it allready exists)
-			int eno = gr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, sem->zero(), true);
 			//uno - number of the node this edge depends on - it's a hyperedge, so it must
 			// gr2 is the graph associated with the 2nd src of the hyperedge
 			IntraGraph *gr2 = nodes[(*it2).src2].gr;
@@ -1240,8 +1238,6 @@ namespace wali {
 			IntraGraph *gr2 = nodes[(*it3).second].gr;
 			gr1->addCallEdge(gr2);
 		}
-
-		int index = 1;
 
 		// Setup Worklist - for each graph, set up the intra solution
 		for (gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
@@ -1273,7 +1269,7 @@ namespace wali {
 	*  first - True if this is the first time this function has been called
 	*  oMap - a map from the outgoing node id associated with the whole intergraph to the new unique id of the node
 	*/
-	double InterGraph::getOutnodeRegExps(map<int,reg_exp_t>& outNodeRegExps, map<int,int>& uMap, map<int,int>& oMap, map<int,std::pair< std::pair<int,int>,int> >& mapBack, std::map<std::pair<std::pair<int,int>,int>,int> & transMap, vector<int>& eps, map<std::pair<int,int>,std::pair<int,int>>& mergeSrcMap)
+	double InterGraph::getOutnodeRegExps(map<int,reg_exp_t>& outNodeRegExps, map<int,int>& uMap, map<int,int>& oMap, map<int,std::pair< std::pair<int,int>,int> >& mapBack, std::map<std::pair<std::pair<int,int>,int>,int> & transMap, vector<int>& eps, map<std::pair<int,int>,std::pair<int,int> >& mergeSrcMap)
 	{
 	  wali::util::GoodTimer * t = new wali::util::GoodTimer("graphTime");
 	  //t->start();
@@ -1360,8 +1356,11 @@ namespace wali {
             gr1->addCallEdge(gr2);
 			t->stop();
 			TransMap::iterator itTrans = node_number.begin();
-			int src, tgt, mSrc, mTgt;
-			for (itTrans; itTrans != node_number.end(); itTrans++)
+			int src = 0;
+			int tgt = 0;
+			int mSrc = 0;
+			int mTgt = 0;
+			for (itTrans = node_number.begin(); itTrans != node_number.end(); itTrans++)
 			{
 				//Add information mapping inter node ids 
 				if ((*itTrans).second == ((*it3).first))
@@ -1491,11 +1490,6 @@ namespace wali {
           }
 
           for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
-            IntraGraph *gr = nodes[(*it2).tgt].gr;
-            int eno = gr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, sem->zero(), true);
-			//uno - number of the node this edge depends on - it's a hyperedge, so it must
-			int uno = gr->edges[eno].updatable_no;
-			//std::cout << "uno: " << uno << ":" << (*it2).src2 << std::endl;
             IntraGraph *gr2 = nodes[(*it2).src2].gr;
             gr2->setOutNode(nodes[(*it2).src2].intra_nodeno, (*it2).src2);
           }
@@ -1975,7 +1969,7 @@ namespace wali {
       sem_elem_t weight;
       std::list<int> *moutnodes;
 
-      std::unordered_map<int, sem_elem_t> cwt, xwt;
+      std::tr1::unordered_map<int, sem_elem_t> cwt, xwt;
       vector<HyperEdge>::iterator it2;
 
       // Initially store the values of c/x to compare against.
@@ -2055,7 +2049,7 @@ namespace wali {
         // Linear solve done. 
         // Update psuedo-constants.
         change = false;
-        std::unordered_set<int> onodesChanged;
+        std::tr1::unordered_set<int> onodesChanged;
         for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
           bool onodeChanged = false;
           int inode = it2->tgt;
