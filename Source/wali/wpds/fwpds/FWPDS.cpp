@@ -376,7 +376,7 @@ void FWPDS::poststar( wfa::WFA const & input, wfa::WFA& output ) {
 }
 
 
-double FWPDS::getOutRegExps(wfa::WFA const & input, wfa::WFA& output, map<int,reg_exp_t>& outNodeRegExps, map<int,int>& uMap, map<int,int>& oMap, map<int,std::pair< std::pair<int,int>,int> >& mapBack, std::map<std::pair<std::pair<int,int>,int>, int> & transMap, vector<int>& eps, map<std::pair<int,int>,std::pair<int,int> > & mergeSrcMap)
+double FWPDS::getOutRegExps(wfa::WFA const & input, wfa::WFA& output, map<int, reg_exp_t>& outNodeRegExps, std::map<int, reg_exp_t> & GLPRegExps, map<int, int>& uMap, map<int, int>& oMap, map<int, std::pair< std::pair<int, int>, int> >& mapBack, std::map<std::pair<std::pair<int, int>, int>, int> & transMap, vector<int>& eps, map<std::pair<int, int>, std::pair<int, int>> & mergeSrcMap)
 {
   wali::util::GoodTimer * t = new wali::util::GoodTimer("tTimer");
   EWPDS::poststarSetupFixpoint(input,output);
@@ -407,7 +407,7 @@ double FWPDS::getOutRegExps(wfa::WFA const & input, wfa::WFA& output, map<int,re
   // Build the InterGraph using EWPDS saturation without weights
   EWPDS::poststarComputeFixpoint(output);
   t->stop();
-  double tmpTime = interGr->getOutnodeRegExps(outNodeRegExps, uMap, oMap, mapBack, transMap, eps, mergeSrcMap);
+  double tmpTime = interGr->getOutnodeRegExps(outNodeRegExps, GLPRegExps, uMap, oMap, mapBack, transMap, eps, mergeSrcMap);
   double totTime = tmpTime + t->total_time();
   return totTime;
 }
@@ -480,6 +480,7 @@ void FWPDS::poststarIGR( wfa::WFA const & input, wfa::WFA& output )
 
   // Build the InterGraph using EWPDS saturation without weights
   EWPDS::poststarComputeFixpoint(output);
+  //interGr->print(std::cout);
 
 #if ET_DBG == 1
   interGr->print(std::cout);

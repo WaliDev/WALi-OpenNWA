@@ -37,6 +37,7 @@
 #include "buddy/fdd.h"
 #include "buddy/bdd.h"
 #include "wali/Key.hpp"
+#include "wali/IMergeFn.hpp"
 
 /**
  *
@@ -86,8 +87,8 @@
  *
  * The tensor choice is determined by setting **exactly one** macro to 1.
  **/
-#define TENSOR_MAX_AFFINITY 0
-#define TENSOR_MIN_AFFINITY 1
+#define TENSOR_MAX_AFFINITY 1
+#define TENSOR_MIN_AFFINITY 0
 #define BASE_MAX_AFFINITY_TENSOR_MIXED 0
 #define TENSOR_MATCHED_PAREN 0
 
@@ -134,7 +135,7 @@
 /** 
   To switch on statistics collection in BinRel
 **/
-#define BINREL_STATS
+#define BINREL_STATS 0
 
 
 /// This checks two implementations of the 'subsumes' operation (subset) off
@@ -263,7 +264,7 @@ namespace wali
           virtual void setIntVars(const std::map<std::string, int>& vars);
           virtual void setIntVars(const std::vector<std::map<std::string, int> >& vars);
 		  void addVarList(std::pair<int, int> loc, std::vector<std::string> lVars1, std::vector<std::string> lVars2);
-		  std::pair<std::vector<std::string>, std::vector<std::string> > getLocalVars(std::pair<int, int> loc) const;
+		  std::pair<merge_fn_t,merge_fn_t> getLocalVars(std::pair<int, int> loc) const;
 
 #if (NWA_DETENSOR == 1)
           /**
@@ -307,7 +308,7 @@ namespace wali
           void populateCache();
 
 
-		  std::map<std::pair<int, int>, std::pair<std::vector<std::string>, std::vector<std::string> > > mergeVars;
+		  std::map<std::pair<int, int>, std::pair<merge_fn_t, merge_fn_t> >mergeVars;
           
         private:
           // ///////////////////////////////

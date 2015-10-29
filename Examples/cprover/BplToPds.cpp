@@ -108,64 +108,65 @@ namespace wali
 		* Create the NWA_OBDD for a contrain statement e with the given context
 		*/
 		static NWA_OBDD::NWAOBDD xformer_for_constrain(const expr * e, NWAOBDDContext * con, const char * f) {
-        {
-	int varInfo;
-        string s;
-        if(!e)
-          assert(0 && "xformer_for_constrain");
-		//Our left and right sides of the expression start as falase NWA_OBDDs
-		NWA_OBDD::NWAOBDD l = NWA_OBDD::MkFalse(), r = NWA_OBDD::MkFalse();
-        stringstream ss;
-		//Get the left and right sides of the expression as NWA_OBDDs
-        if(e->l)
-          l = xformer_for_constrain(e->l, con, f);
-        if(e->r)
-          r = xformer_for_constrain(e->r, con, f);
-        switch(e->op){
-          case AST_NOT:
-            return NWA_OBDD::MkNot(l);
-          case AST_XOR:
-			  return NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, NWA_OBDD::MkNot(r)), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), r));
-          case AST_OR:
-			  return NWA_OBDD::MkOr(l, r);
-          case AST_AND:
-			  return NWA_OBDD::MkAnd(l, r);
-          case AST_EQ:
-			  return NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, r), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), NWA_OBDD::MkNot(r)));
-          case AST_NEQ:
-			  return NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, NWA_OBDD::MkNot(r)), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), r));
-          case AST_IMP:
-			  return NWA_OBDD::MkOr(NWA_OBDD::MkNot(l), r);
-          case AST_SCHOOSE:
-			  return NWA_OBDD::MkOr(l, NWA_OBDD::MkAnd(NWA_OBDD::MkNot(r), NWA_OBDD::MkTrue()));
-          case AST_VAR:
-		  case AST_VAR_POST:
-            ss << f << "::" << e->v;
-            s = ss.str();
-            if(con->varMap.find(ss.str()) == con->varMap.end()){
-              stringstream ss2;
-              ss2 << "::" << e->v;
-			  assert(con->varMap.find(ss2.str()) != con->varMap.end());
-              s = ss2.str();
-            }
-			varInfo = con->varMap.find(s)->second;
-            if(e->op == AST_VAR)
-              return con->NWAOBDDTCreate(varInfo,BASE_PRE);
-            else // e->op == AST_VAR_POST
-				return con->NWAOBDDTCreate(varInfo, BASE_POST);
-          case AST_NONDET:
-            return NWA_OBDD::MkTrue();
-          case AST_CONSTANT:
-            if(e->c == ONE)
-				return NWA_OBDD::MkTrue();
-            else
-              return NWA_OBDD::MkFalse();
-          default:
-            assert(0 && "expr_as_nwaobdd: Unknown case");
-        }
-      }
+				{
+					int varInfo;
+					string s;
+					if (!e)
+						assert(0 && "xformer_for_constrain");
+					//Our left and right sides of the expression start as falase NWA_OBDDs
+					NWA_OBDD::NWAOBDD l = NWA_OBDD::MkFalse(), r = NWA_OBDD::MkFalse();
+					stringstream ss;
+					//Get the left and right sides of the expression as NWA_OBDDs
+					if (e->l)
+						l = xformer_for_constrain(e->l, con, f);
+					if (e->r)
+						r = xformer_for_constrain(e->r, con, f);
+					switch (e->op){
+					case AST_NOT:
+						return NWA_OBDD::MkNot(l);
+					case AST_XOR:
+						return NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, NWA_OBDD::MkNot(r)), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), r));
+					case AST_OR:
+						return NWA_OBDD::MkOr(l, r);
+					case AST_AND:
+						return NWA_OBDD::MkAnd(l, r);
+					case AST_EQ:
+						return NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, r), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), NWA_OBDD::MkNot(r)));
+					case AST_NEQ:
+						return NWA_OBDD::MkOr(NWA_OBDD::MkAnd(l, NWA_OBDD::MkNot(r)), NWA_OBDD::MkAnd(NWA_OBDD::MkNot(l), r));
+					case AST_IMP:
+						return NWA_OBDD::MkOr(NWA_OBDD::MkNot(l), r);
+					case AST_SCHOOSE:
+						return NWA_OBDD::MkOr(l, NWA_OBDD::MkAnd(NWA_OBDD::MkNot(r), NWA_OBDD::MkTrue()));
+					case AST_VAR:
+					case AST_VAR_POST:
+						ss << f << "::" << e->v;
+						s = ss.str();
+						if (con->varMap.find(ss.str()) == con->varMap.end()){
+							stringstream ss2;
+							ss2 << "::" << e->v;
+							assert(con->varMap.find(ss2.str()) != con->varMap.end());
+							s = ss2.str();
+						}
+						varInfo = con->varMap.find(s)->second;
+						if (e->op == AST_VAR)
+							return con->NWAOBDDTCreate(varInfo, BASE_PRE);
+						else // e->op == AST_VAR_POST
+							return con->NWAOBDDTCreate(varInfo, BASE_POST);
+					case AST_NONDET:
+						return NWA_OBDD::MkTrue();
+					case AST_CONSTANT:
+						if (e->c == ONE)
+							return NWA_OBDD::MkTrue();
+						else
+							return NWA_OBDD::MkFalse();
+					default:
+						assert(0 && "expr_as_nwaobdd: Unknown case");
+					}
+				}
 		}
-		#endif
+	}
+#endif
   }
   namespace cprover
   {
@@ -1595,7 +1596,8 @@ void dump_pds_from_proc(WPDS * pds, proc * p, ProgramBddContext * con, const stm
         return sc;
       }
 
-    } //namespace details
+    } 
+	//namespace details
 
 	prog * parse_prog(const char * fname)
 	{

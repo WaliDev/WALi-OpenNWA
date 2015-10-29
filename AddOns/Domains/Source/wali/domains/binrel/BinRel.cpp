@@ -7,6 +7,7 @@
 #include "BinRel.hpp"
 #include "buddy/fdd.h"
 #include "ProgramBddContext.hpp"
+#include "BinRelMergeFns.hpp"
 //#include "BuddyExt.hpp"
 #include "combination.hpp"
 
@@ -422,10 +423,19 @@ void BddContext::setIntVars(const std::map<std::string, int>& flatvars)
 
 void BddContext::addVarList(std::pair<int, int> loc, std::vector<std::string> lVars1, std::vector<std::string> lVars2)
 {
+<<<<<<< HEAD
 	mergeVars[loc] = std::pair<std::vector<std::string>, std::vector<std::string> >(lVars1, lVars2);
 }
 
 std::pair<std::vector<std::string>, std::vector<std::string> > BddContext::getLocalVars(std::pair<int, int> loc) const
+=======
+	merge_fn_t merge = new MeetMergeFn(this, lVars1, lVars2);
+	merge_fn_t merge2 = new TensorMergeFn(this, lVars1, lVars2);
+	mergeVars[loc] = std::pair<merge_fn_t,merge_fn_t>(merge,merge2);
+}
+
+std::pair<wali::ref_ptr<wali::IMergeFn>, wali::ref_ptr<wali::IMergeFn> > BddContext::getLocalVars(std::pair<int, int> loc) const
+>>>>>>> origin/binrel_merge_fn
 {
 	return mergeVars.at(loc);
 }
@@ -1289,10 +1299,11 @@ binrel_t BinRel::Kronecker(binrel_t that) const
 
 binrel_t BinRel::Merge(int v, int c) const
 {
-	bdd rel0 = this->rel;
 	// start with top
 	bdd constrainLocalsBdd = con->getBaseTop()->getBdd();
+	binrel_t current = new BinRel(*this);
 
+<<<<<<< HEAD
 	std::pair<std::vector<std::string>, std::vector<std::string> > sList = con->getLocalVars(std::pair<int, int>(v, c));
 	std::vector<std::string> localVars = sList.first;
 	std::vector<std::string> localVars2 = sList.second;
@@ -1321,15 +1332,18 @@ binrel_t BinRel::Merge(int v, int c) const
 	binrel_t ret;
 	ret = rel_t->Intersect(constrainLocals);
 
+=======
+	meet_merge_fn_t mf = dynamic_cast<MeetMergeFn*>(con->getLocalVars(std::pair<int, int>(v, c)).first.get_ptr());
+	binrel_t ret = dynamic_cast<BinRel*>(mf->apply_f(this->one().get_ptr(), current).get_ptr());
+>>>>>>> origin/binrel_merge_fn
 	return ret;
 }
 
 
 binrel_t BinRel::TensorMerge(int v, int c) const
 {
-	// start with Id in the base domain
-	bdd rel0 = this->rel;
 	// start with top
+<<<<<<< HEAD
 	bdd constrainLocalsBdd = con->getTensorTop()->getBdd();
 
 	std::pair<std::vector<std::string>, std::vector<std::string> > sList = con->getLocalVars(std::pair<int, int>(v, c));
@@ -1358,7 +1372,13 @@ binrel_t BinRel::TensorMerge(int v, int c) const
 	binrel_t constrainLocals = new BinRel(con, constrainLocalsBdd, true);
 	binrel_t ret;
 	ret = rel_n->Intersect(constrainLocals);
+=======
+	bdd constrainLocalsBdd = con->getBaseTop()->getBdd();
+	binrel_t current = new BinRel(*this);
+>>>>>>> origin/binrel_merge_fn
 
+	tensor_merge_fn_t mf = dynamic_cast<TensorMergeFn*>(con->getLocalVars(std::pair<int, int>(v, c)).second.get_ptr());
+	binrel_t ret = dynamic_cast<BinRel*>(mf->apply_f(this->one().get_ptr(), current).get_ptr());
 	return ret;
 }
 
@@ -1415,7 +1435,11 @@ binrel_t BinRel::Eq13Project() const
   bdd rel1 = rel;
   for(std::map<const std::string, bddinfo_t>::const_iterator citer = con->begin(); citer != con->end(); ++citer){
     bddinfo_t varInfo = (*citer).second;
-	
+	bdd id = fdd_equals(varInfo->baseRhs, varInfo->tensor2Rhs);
+	rel1 = rel1 & id;
+	rel1 = bdd_exist(rel1, fdd_ithset(varInfo->baseRhs) & fdd_ithset(varInfo->tensor2Rhs));
+	rel1 = bdd_replace(rel1, con->move2BaseTwisted.get());
+	rel1 = bdd_exist(rel1, fdd_ithset(varInfo->baseLhs) & fdd_ithset(varInfo->tensor2Lhs));
   }
   bdd c = rel1;
 #endif
@@ -1443,10 +1467,10 @@ binrel_t BinRel::Eq24Project() const
   bdd rel2 = bdd_exist(rel1, con->commonBddContextSet13);
   bdd c = bdd_replace(rel2, con->move2BaseTwisted24.get());
 #else
-  /*bdd rel1 = rel & con->commonBddContextId13;
-  bdd rel2 = bdd_exist(rel1, con->commonBddContextSet13);
-  bdd rel3 = bdd_replace(rel2, con->move2BaseTwisted24.get());
-  bdd c = bdd_exist(rel2, con->commonBddContextSet24);*/
+  //bdd rel1 = rel & con->commonBddContextId13;
+  //bdd rel2 = bdd_exist(rel1, con->commonBddContextSet13);
+  //bdd rel3 = bdd_replace(rel2, con->move2BaseTwisted24.get());
+  //bdd c = bdd_exist(rel3, con->commonBddContextSet24);
    // = bdd_replace(that->rel, con->tensorRightShift.get());
   /*bdd id = bddtrue;
   for (std::map<const std::string, bddinfo_t>::const_iterator citer = con->begin(); citer != con->end(); ++citer){
@@ -1454,12 +1478,12 @@ binrel_t BinRel::Eq24Project() const
 	  id = id & fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
   }
   binrel_t tn = new BinRel(con, id, true);
-  tn->print(std::cout) << std::endl;
-  bdd rel0 = bdd_relprod(rel, con->commonBddContextId13, con->commonBddContextSet13);
-  bdd c = bdd_replace(rel0, con->move2BaseTwisted24.get());*/
+  tn->print(std::cout) << std::endl;*/
+  //bdd rel0 = bdd_relprod(rel, con->commonBddContextId13, con->commonBddContextSet13);
+  //bdd c = bdd_replace(rel0, con->move2BaseTwisted24.get());
   //bdd c = bdd_exist(rel2, con->commonBddContextSet24);
   bdd rel1 = rel;
-  BddPairPtr move2BaseTwisted24BitbyBit = BddPairPtr(bdd_newpair());
+  //BddPairPtr move2BaseTwisted24BitbyBit = BddPairPtr(bdd_newpair());
   for (std::map<const std::string, bddinfo_t>::const_iterator citer = con->begin(); citer != con->end(); ++citer){
 	  bddinfo_t varInfo = (*citer).second;
 	  bdd id = fdd_equals(varInfo->baseLhs, varInfo->tensor2Lhs);

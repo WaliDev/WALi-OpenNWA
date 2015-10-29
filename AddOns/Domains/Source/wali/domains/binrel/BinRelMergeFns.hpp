@@ -1,3 +1,6 @@
+#ifndef wali_binrel_BINRELMERGEFNS_GUARD
+#define wali_binrel_BINRELMERGEFNS_GUARD 1
+
 // ::wali::domains::binrel
 #include "wali/domains/binrel/BinRel.hpp"
 // ::wali
@@ -84,4 +87,5 @@ namespace wali
     } // namespace binrel
   } // namespace domains
 } // namespace wali
+#endif
 

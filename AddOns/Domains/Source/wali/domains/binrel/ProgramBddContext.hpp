@@ -1,5 +1,5 @@
 #ifndef wN_binrel_BINRELMANAGER_GUARD
-#define wN_binrel_BINRELMANAGER_GUARD
+#define wN_binrel_BINRELMANAGER_GUARD 1
 
 // ::wali::domains::binrel
 #include "BinRel.hpp"

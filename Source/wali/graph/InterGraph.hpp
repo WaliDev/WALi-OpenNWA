@@ -158,6 +158,31 @@ namespace wali {
             SCCGraph() : visited(false), scc_number(0) {}
         };
 
+		/**
+		* @class CondensationGraph
+		* A simple graph structure for creating the condensation graph after taking the SCCs.  Since the condensation graph is used to
+		* determine what regular expressions represent generalized leaf procedures, there are a few extra booleans for each node that will
+		* be used when findGLPs is Called
+		**/
+
+		struct CGraphNode{
+			int node_no;
+			bool visited;
+			bool LP;
+			bool Loop;
+		};
+
+		class CondensationGraph;
+		typedef wali::ref_ptr<CondensationGraph> cg_graph_t;
+
+		class CondensationGraph : public Countable
+		{
+		public:
+			std::list<CGraphNode> startNodes;
+			std::map<int,CGraphNode> nodes;
+			std::map<int,std::list<int> > edges;
+		};
+
        
         enum inter_node_t {InterNone = 0, InterSource = 1, InterOutNode = 2, InterSourceOutNode = 3};
 
@@ -264,7 +289,7 @@ namespace wali {
             void setESource(Transition t, wali::sem_elem_t wtAtCall, wali::sem_elem_t wtAfterCall);
 
             void setupInterSolution(std::list<Transition> *wt_required = NULL);
-            double getOutnodeRegExps(std::map<int,reg_exp_t> & outNodes, std::map<int,int> & uMap, std::map<int,int> & oMap, std::map<int, std::pair< std::pair<int,int>, int> > & mapBack, std::map<std::pair<std::pair<int,int>,int>,int> & transMap, std::vector<int> & eps, std::map<std::pair<int,int>,std::pair<int,int> > & mergeMap);
+			double getOutnodeRegExps(std::map<int, reg_exp_t> & outNodes, std::map<int, reg_exp_t> & GLPRegExps, std::map<int, int> & uMap, std::map<int, int> & oMap, std::map<int, std::pair< std::pair<int, int>, int> > & mapBack, std::map<std::pair<std::pair<int, int>, int>, int> & transMap, std::vector<int> & eps, std::map<std::pair<int, int>, std::pair<int, int>> & mergeMap);
 			double getOutnodeRegExpsSimple(std::map<int, reg_exp_t> & outNodes);
             /**
              * @brief From the given TDG (The original InterGraph), create linearized TDGs corresponding
@@ -320,7 +345,11 @@ namespace wali {
 
             void bfsIntra(IntraGraph *start, unsigned int scc_number);
 
-            unsigned SCC(std::list<IntraGraph *> &grlist, std::list<IntraGraph *> &grsorted);
+			void build_components_list(std::list<IntraGraph *> &grsorted, std::map<int, std::list<IntraGraph *> > & componentsList);
+			void build_condensation_graph(std::map<int, std::list<IntraGraph *> > & components_list, CondensationGraph & cg, std::map<IntraGraph *, std::list<IntraGraph *> > &rev_edges);
+			bool InterGraph::findGLPs(CondensationGraph & cg, CGraphNode & n, std::list<int> & GLPs);
+			void InterGraph::findGLPsTop(CondensationGraph & cg, std::list<int> & GLPs);
+			unsigned SCC(std::list<IntraGraph *> &grlist, std::list<IntraGraph *> &grsorted, std::map<IntraGraph *, std::list<IntraGraph *> > &rev_edges);
 
             /**
              * @brief A depth first walk on SCCGraph rooted at gr. addes all reverse edges found to rev_edges
