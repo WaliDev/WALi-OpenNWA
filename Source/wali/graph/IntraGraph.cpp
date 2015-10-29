@@ -66,9 +66,9 @@ namespace wali {
 
     ostream &IntraGraph::print_trans(Transition &t, ostream &out, PRINT_OP pop) {
       out << "(";
-      pop(out, t.src) << "(" << t.src << "),";
-      pop(out, t.stack) << "(" << t.stack << "),";
-      pop(out, t.tgt) << "(" << t.tgt << "))";
+      pop(out, t.src) << "(" << key2str(t.src) << "),";
+	  pop(out, t.stack) << "(" << key2str(t.stack) << "),";
+	  pop(out, t.tgt) << "(" << key2str(t.tgt) << "))";
       return out;
     }
 

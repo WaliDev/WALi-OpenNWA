@@ -659,7 +659,7 @@ namespace wali
       int cnt = 0;
       const_iterator it = config_map().begin();
       for( ; it != config_map().end() ; it++ ) {
-        const Config *c = config_map().value( it );
+        const Config *c = config_map().value_d( it );
         Config::const_iterator rit = c->begin();
         for( ; rit != c->end() ; rit++ )
           cnt++;
@@ -671,7 +671,7 @@ namespace wali
     {
       const_iterator it = config_map().begin();
       for( ; it != config_map().end() ; it++ ) {
-        const Config *c = config_map().value( it );
+        const Config *c = config_map().value_d( it );
         Config::const_iterator rit = c->begin();
         for( ; rit != c->end() ; rit++ )
           func( *rit );
@@ -682,7 +682,7 @@ namespace wali
     {
       iterator it = config_map().begin();
       for( ; it != config_map().end() ; it++ ) {
-        Config *c = config_map().value( it );
+        Config *c = config_map().value_d( it );
         Config::iterator rit = c->begin();
         for( ; rit != c->end() ; rit++ )
           func( *rit );

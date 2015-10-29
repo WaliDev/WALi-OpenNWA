@@ -261,17 +261,20 @@ namespace wali {
 
             SharedMemBuffer * memBuf;
 
+			int intra_node_no;
+
             static ostream &defaultPrintOp(ostream &out, int a) {
                 out << a;
                 return out;
             }
             public:
-            IntraGraph(RegExpDag * d, bool pre, sem_elem_t _se, SharedMemBuffer * m = NULL) : 
-              hasTensoredWeights(false),
-              dag(d), 
-              nodes(50, IntraGraphNode(dag)),  
-              edges(50, IntraGraphEdge(dag)),
-              memBuf(m)
+				IntraGraph(RegExpDag * d, bool pre, sem_elem_t _se, SharedMemBuffer * m = NULL, int inn = 0) :
+					hasTensoredWeights(false),
+					dag(d),
+					nodes(50, IntraGraphNode(dag)),
+					edges(50, IntraGraphEdge(dag)),
+					memBuf(m),
+					intra_node_no(inn)
             {
                 visited = false;
                 scc_number = 0;

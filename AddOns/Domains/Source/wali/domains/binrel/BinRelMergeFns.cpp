@@ -25,7 +25,7 @@ MeetMergeFn::MeetMergeFn(BddContext * con, std::vector<std::string> const& local
     // for each local variable:
     // havoc the post vocabulary for that variables
     havocCalleeLocalsBdd = bdd_exist(havocCalleeLocalsBdd, fdd_ithset(vocIter->second->baseRhs));
-  }
+ }
   for (std::vector<std::string>::const_iterator cit2 = localVars2.begin(); cit2 != localVars2.end(); ++cit2){
     BddContext::const_iterator vocIter2 = con->find(*cit2);
     if (vocIter2 == con->end()){
@@ -68,6 +68,7 @@ sem_elem_t MeetMergeFn::apply_f(sem_elem_t w1, sem_elem_t w2)
 
   binrel_t ret;
   ret = b2 * havocCalleeLocals;
+  ret = havocCalleeLocals * ret;
   ret = ret & constrainLocals;
   ret = b1 * ret;
 
@@ -80,33 +81,34 @@ sem_elem_t MeetMergeFn::apply_f(sem_elem_t w1, sem_elem_t w2)
 // //////////////////////////////////////////////////////
 TensorMergeFn::TensorMergeFn(BddContext * con, std::vector<std::string> const& localVars, std::vector<std::string> const& localVars2)
 {
-  id = con->getBaseOne();
-  // start with Id in the base domain
-  bdd havocCalleeLocalsBdd = con->getBaseOne()->getBdd();
-  // start with Id in the tensor domain
-  bdd idWithEqualLocalsBdd = con->getTensorOne()->getBdd();
-  for(std::vector<std::string>::const_iterator cit = localVars.begin(); cit != localVars.end(); ++cit){
-    BddContext::iterator vocIter = con->find(*cit);
-    if(vocIter == con->end()){
-      cerr << "Unknown variable " << *cit << endl;
-      assert(0);
-    }
-    // for each local variable:
-    // havoc the post vocabulary for that variables
-    havocCalleeLocalsBdd = bdd_exist(havocCalleeLocalsBdd, fdd_ithset(vocIter->second->baseRhs));
-  }
-  for(std::vector<std::string>::const_iterator cit = localVars2.begin(); cit != localVars2.end(); ++ cit){
-    BddContext::iterator vocIter = con->find(*cit);
-    if(vocIter == con->end()){
-      cerr << "Unkown variable " << *cit << endl;
-      assert(0);
-    }
-    // enforce equality across the two tensor levels
-    idWithEqualLocalsBdd = idWithEqualLocalsBdd & bdd_biimp(fdd_ithset(vocIter->second->baseLhs), fdd_ithset(vocIter->second->tensor2Lhs));
-  }
+	// start with Id in the tensor domain
+	bdd havocCalleeLocalsBdd = con->getTensorOne()->getBdd();
+
+	// start with top
+	bdd constrainLocalsBdd = con->getTensorTop()->getBdd();
+
+	for (std::vector<std::string>::const_iterator cit = localVars.begin(); cit != localVars.end(); ++cit){
+		BddContext::const_iterator vocIter = con->find(*cit);
+		if (vocIter == con->end()){
+			std::cerr << "Unknown variable " << *cit << endl;
+			assert(0);
+		}
+		// for each local variable:
+		// havoc the post vocabulary for that variables
+		havocCalleeLocalsBdd = bdd_exist(havocCalleeLocalsBdd, fdd_ithset(vocIter->second->tensor2Rhs));
+	}
+	for (std::vector<std::string>::const_iterator cit2 = localVars2.begin(); cit2 != localVars2.end(); ++cit2){
+		BddContext::const_iterator vocIter2 = con->find(*cit2);
+		if (vocIter2 == con->end()){
+			std::cerr << "Unknown variable " << *cit2 << endl;
+			assert(0);
+		}
+		// enforce id across that variables
+		constrainLocalsBdd = constrainLocalsBdd & bdd_biimp(fdd_ithset(vocIter2->second->baseRhs), fdd_ithset(vocIter2->second->tensor2Rhs));
+	}
 
   havocCalleeLocals = new BinRel(con, havocCalleeLocalsBdd, false);
-  idWithEqualLocals = new BinRel(con, idWithEqualLocalsBdd, true);
+  idWithEqualLocals = new BinRel(con, constrainLocalsBdd, true);
 }
 
 bool TensorMergeFn::equal(merge_fn_t mf)
@@ -133,14 +135,12 @@ ostream& TensorMergeFn::print(ostream& o) const
 // Replaces the default merge fun: w1 x w2
 sem_elem_t TensorMergeFn::apply_f(sem_elem_t w1, sem_elem_t w2)
 {
-  sem_elem_tensor_t b1 = boost::polymorphic_downcast<SemElemTensor*>(w1.get_ptr());
-  sem_elem_tensor_t b2 = boost::polymorphic_downcast<SemElemTensor*>(w2.get_ptr());
+	binrel_t b1 = boost::polymorphic_downcast<BinRel*>(w1.get_ptr());
+	binrel_t b2 = boost::polymorphic_downcast<BinRel*>(w2.get_ptr());
 
-  sem_elem_tensor_t ret = b2;
-  ret = boost::polymorphic_downcast<SemElemTensor*>(ret->extend(havocCalleeLocals.get_ptr()).get_ptr());
-  ret = ret->tensor(id.get_ptr());
-  ret = boost::polymorphic_downcast<SemElemTensor*>(idWithEqualLocals->extend(ret.get_ptr()).get_ptr());
-  ret = ret->detensor();
-  ret = boost::polymorphic_downcast<SemElemTensor*>(b1->extend(ret.get_ptr()).get_ptr());
+	binrel_t ret;
+  ret = havocCalleeLocals * ret;
+  ret = ret & idWithEqualLocals;
+  ret = b1 * ret;
   return ret;
 }

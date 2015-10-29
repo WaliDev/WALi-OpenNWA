@@ -465,7 +465,124 @@ namespace wali {
           finished.push_front(gr);
         }
 
-        unsigned InterGraph::SCC(list<IntraGraph *> &grlist, std::list<IntraGraph *> &grsorted) {
+
+		void InterGraph::findGLPsTop(CondensationGraph & cg, std::list<int> & GLPs)
+		{
+			std::list<CGraphNode>::iterator it;
+			for (it = cg.startNodes.begin(); it != cg.startNodes.end(); it++)
+			{
+				findGLPs(cg, *it, GLPs);
+			}
+		}
+		/* Finds the list of generalized leaf procedures from a condensation graph of the Intergraph
+		*  This performs a depth first search to find the GLPs and ands them to the list on exit if they are there.
+		*
+		*  @author Emma Turetsky
+		*/
+		bool InterGraph::findGLPs(CondensationGraph & cg, CGraphNode & n, std::list<int> & GLPs)
+		{
+			if (n.visited)
+			{
+				return n.LP;
+			}
+			bool currentL = n.LP;
+			std::list<int> children = cg.edges[n.node_no];
+			std::list<int>::iterator ch = children.begin();
+			for (ch; ch != children.end(); ch++)
+			{
+				currentL = findGLPs(cg, cg.nodes[*ch], GLPs) && currentL;
+			}
+			if (n.Loop)
+			{
+				currentL = false;
+			}
+			if (currentL)
+			{
+				if (!n.visited){
+					GLPs.push_back(n.node_no);
+				}
+			}
+			n.visited = true;
+			n.LP = currentL;
+			return currentL;
+		}
+
+
+		/*  Builds the condensation DAG after the InterGraph has been broken in to SCCs.
+		*
+		*  @author Emma Turetsky
+		*/
+		void InterGraph::build_condensation_graph(std::map<int, std::list<IntraGraph *> > & components_list, CondensationGraph & cg, std::map<IntraGraph *, std::list<IntraGraph *> > &rev_edges)
+		{
+			bool startNode = false;
+			for (unsigned int i = components_list.size(); i > 0; i--)
+			{
+				CGraphNode cg_node;
+				cg_node.node_no = i;
+				cg_node.visited = false;
+				cg_node.LP = true;
+				cg_node.Loop = false;
+
+				std::list<IntraGraph *>::iterator gr_it; 
+				std::list<IntraGraph *>::iterator gr_ed_it;
+
+				std::vector<int> adjacency_list;
+				for (gr_it = components_list[i].begin(); gr_it != components_list[i].end(); gr_it++)
+				{
+					IntraGraph *gr = *gr_it;
+					std::list<int> *outnodes = gr->getOutTransitions();
+					if (outnodes->size() == 0)
+						startNode = true;
+					std::list<int>::iterator it;
+					gr_ed_it = rev_edges[gr].begin();
+					while (gr_ed_it != rev_edges[gr].end()) {
+						IntraGraph *ch = *gr_ed_it;
+						int scc_num = ch->scc_number;
+						if (scc_num != i){
+							adjacency_list.push_back(scc_num);
+						}
+						else
+						{
+							cg_node.Loop = true;
+						}
+						gr_ed_it++;
+					}
+				}
+				cg.nodes[i] = cg_node;
+
+				if (startNode){
+					cg.startNodes.push_back(cg_node);
+					startNode = false;
+				}
+
+				std::sort(adjacency_list.begin(), adjacency_list.end());
+				std::vector<int>::iterator di =
+					std::unique(adjacency_list.begin(), adjacency_list.end());
+				if (di != adjacency_list.end())
+					adjacency_list.erase(di, adjacency_list.end());
+
+				for (std::vector<int>::const_iterator aIt = adjacency_list.begin();
+					aIt != adjacency_list.end(); ++aIt) {
+					cg.edges[i].push_back(*aIt);
+				}
+			}
+		}
+
+		/*  A helper function for creating the condensation graph for the SCCs - just creates a map from SCC to the list of intragraphs
+		*   in the SCC.  Note, grsorted must be obtained from running SCC first
+		*  
+		*  @author: Emma Turetsky
+		*/
+		void InterGraph::build_components_list(list<IntraGraph *> & grsorted, std::map<int, list<IntraGraph *> > &components_list){
+			std::list<IntraGraph *>::iterator gr_it;
+			for (gr_it = grsorted.begin(); gr_it != grsorted.end(); gr_it++)
+			{
+				int scc = (*gr_it)->scc_number;
+				components_list[scc].push_back(*gr_it);
+			}
+		}
+
+		unsigned InterGraph::SCC(list<IntraGraph *> &grlist, std::list<IntraGraph *> &grsorted, std::map<IntraGraph *, std::list<IntraGraph *> > &rev_edges) {
           std::list<IntraGraph *>::iterator gr_it;
           // reset visited
           for(gr_it = grlist.begin(); gr_it != grlist.end(); gr_it++) {
@@ -474,7 +591,6 @@ namespace wali {
             (*gr_it)->bfs_number = (unsigned)(-1);
           }
           std::list<IntraGraph *> finished;
-          std::map<IntraGraph *, std::list<IntraGraph *> > rev_edges;
           // Do DFS
           std::list<IntraGraph *>::reverse_iterator gr_rit;
           for(gr_rit = grlist.rbegin(); gr_rit != grlist.rend(); gr_rit++) {
@@ -1273,7 +1389,7 @@ namespace wali {
 	*  first - True if this is the first time this function has been called
 	*  oMap - a map from the outgoing node id associated with the whole intergraph to the new unique id of the node
 	*/
-	double InterGraph::getOutnodeRegExps(map<int,reg_exp_t>& outNodeRegExps, map<int,int>& uMap, map<int,int>& oMap, map<int,std::pair< std::pair<int,int>,int> >& mapBack, std::map<std::pair<std::pair<int,int>,int>,int> & transMap, vector<int>& eps, map<std::pair<int,int>,std::pair<int,int>>& mergeSrcMap)
+	double InterGraph::getOutnodeRegExps(map<int, reg_exp_t>& outNodeRegExps, std::map<int, reg_exp_t> & GLPRegExps, map<int, int>& uMap, map<int, int>& oMap, map<int, std::pair< std::pair<int, int>, int> >& mapBack, std::map<std::pair<std::pair<int, int>, int>, int> & transMap, vector<int>& eps, map<std::pair<int, int>, std::pair<int, int>>& mergeSrcMap)
 	{
 	  wali::util::GoodTimer * t = new wali::util::GoodTimer("graphTime");
 	  //t->start();
@@ -1315,7 +1431,7 @@ namespace wali {
             int j = intra_graph_uf->find(i);
 			//If this node isn't associated with a graph, create a graph for it
             if(nodes[j].gr == NULL) {
-              nodes[j].gr = new IntraGraph(dag, running_prestar,sem, memBuf);
+              nodes[j].gr = new IntraGraph(dag, running_prestar,sem, memBuf, j);
               gr_list.push_back(nodes[j].gr);
             }
 			//If the node is a source node, set it to be so
@@ -1385,6 +1501,7 @@ namespace wali {
 
 		  int index = 1;
 
+		  std::map<int, std::pair<int, reg_exp_t> > gr_to_regexp_map;
           // Setup Worklist - for each graph, set up the intra solution
           for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
             (*gr_it)->setupIntraSolution(false);
@@ -1409,6 +1526,7 @@ namespace wali {
 					if (stack == 0 && tgt != 0)
 					{
 						eps.push_back(index);
+						gr_to_regexp_map[(*gr_it)->intra_node_no] = std::make_pair(index,(*nit).regexp);
 						//std::cout << "Eps Trans: " << index << std::endl;
 						if ((*nit).type == 3)  //It's an outgoing node
 						{
@@ -1428,10 +1546,33 @@ namespace wali {
 				}
 			}
 			t->start();
-		}
-		t->stop();
-		double totTime = t->total_time();
-		return totTime;
+		  }
+
+		  std::list<IntraGraph *> gr_sorted;
+		  std::map<IntraGraph *, std::list<IntraGraph *> > rev_edges;
+		  unsigned components = SCC(gr_list, gr_sorted, rev_edges);
+		  std::map<int, std::list<IntraGraph *> > components_list;
+		  build_components_list(gr_sorted, components_list);
+		  CondensationGraph cg;
+		  build_condensation_graph(components_list, cg, rev_edges);
+		  std::list<int> GLPs;
+		  findGLPsTop(cg, GLPs);
+
+		  //Now that we have the SCCs of the GLPs - get the node and regExp associated with them
+		  for (std::list<int>::iterator GLPiter = GLPs.begin(); GLPiter != GLPs.end(); GLPiter++)
+		  {
+			  std::list<IntraGraph* > cList = components_list[*GLPiter];
+			  for (std::list<IntraGraph* >::iterator cIter = cList.begin(); cIter != cList.end(); cIter++)
+			  {
+				  int glp_index = (*cIter)->intra_node_no;
+				  std::pair<int, reg_exp_t> p = gr_to_regexp_map[glp_index];
+				  GLPRegExps[p.first] = p.second;
+			  }
+		  }
+
+		  t->stop();
+		  double totTime = t->total_time();
+		  return totTime;
 	}
 
         // If an argument is passed in then only weights on those transitions will be available
@@ -1534,7 +1675,8 @@ namespace wali {
 #endif
           // Do SCC decomposition of IntraGraphs
           std::list<IntraGraph *> gr_sorted;
-          unsigned components = SCC(gr_list, gr_sorted);
+		  std::map<IntraGraph *, std::list<IntraGraph *> > rev_edges;
+          unsigned components = SCC(gr_list, gr_sorted, rev_edges);
           STAT(stats.ncomponents = components);
 
           int numSteps = 0;
@@ -1907,7 +2049,8 @@ namespace wali {
 #endif
           // Do SCC decomposition of IntraGraphs
           std::list<IntraGraph *> gr_sorted;
-          unsigned components = SCC(gr_list, gr_sorted);
+		  std::map<IntraGraph *, std::list<IntraGraph *> > rev_edges;
+		  unsigned components = SCC(gr_list, gr_sorted, rev_edges);
           STAT(stats.ncomponents = components);
 
           int numSteps = 0;

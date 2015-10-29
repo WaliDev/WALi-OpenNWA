@@ -169,6 +169,7 @@ namespace wali {
                  **/
                 RegExpDag * dag;
                 reg_exp_type type;
+				bool is_seen_by_GLP;
                 sem_elem_t value;
 #ifdef DWPDS
                 delta_map_t delta;
@@ -204,77 +205,82 @@ namespace wali {
                 std::vector<unsigned int> updates;
                 std::vector<unsigned int> evaluations;
 
-                RegExp(long unsigned int currentSatProcess, RegExpDag * d, node_no_t nno, sem_elem_t se) {
-                    type = Updatable;
-                    value = se;
-                    updatable_node_no = nno;
-                    count = 0;
-#if defined(PUSH_EVAL)
-                    dirty = true;
-#endif
-                    last_change = 1;
-                    last_seen = 1;
-                    uptodate = false;
-                    nevals = 0;
-                    samechange = differentchange = 0;
-                    lastchange=-1;
-                    satProcess = currentSatProcess;
-                    dag = d;
-                }
-                RegExp(long unsigned int currentSatProcess, RegExpDag * d, reg_exp_type t, reg_exp_t r1, reg_exp_t r2 = 0) {
-                    count = 0;
-                    nevals = 0;
-                    if(t == Extend || t == Combine) {
-                        type = t;
-                        assert(r1.get_ptr() != 0 && r2.get_ptr() != 0);
-                        value = r1->value->zero();
-                        children.push_back(r1);
-                        children.push_back(r2);
-                    } else if(t == Star) {
-                        type = Star;
-                        assert(r1.get_ptr() != 0);
-                        value = r1->value->zero();
-                        children.push_back(r1);
-                    } else {
-                        assert(0);
-                    }
-#if defined(PUSH_EVAL)
-                    // Not thread safe? Constructor isn't done yet, and some
-                    // outside has a pointer to the object.
-                    // (pprabhu, 2/20/2013): The best solution I know is to create an init() and
-                    // call init after the constructor. To heavy handed to implement right now.
-                    dirty = true;
-                    r1->parents.insert(static_cast<RegExp*>(this));
-                    if(!(r2 == NULL))
-                      r2->parents.insert(static_cast<RegExp*>(this));
-#endif
-                    last_change = 0;
-                    last_seen = 0;
-                    uptodate = false;
-                    samechange = differentchange = 0;
-                    lastchange=-1;
-                    satProcess = currentSatProcess;
-                    dag = d;
-                }
-                RegExp(long unsigned int currentSatProcess, RegExpDag * d, sem_elem_t se) {
-                    type = Constant;
-                    value = se;
-                    updatable_node_no = 0; // default value
-                    count = 0;
-#if defined(PUSH_EVAL)
-                    dirty = false; //Will always remains o                    
-#endif
-                    last_change = 1;
-                    last_seen = 0;
-                    uptodate = false;
-                    nevals = 0;
-                    samechange = differentchange = 0;
-                    lastchange=-1;
-                    satProcess = currentSatProcess;
-                    dag = d;
-                }
 
             public:
+				RegExp(long unsigned int currentSatProcess, RegExpDag * d, node_no_t nno, sem_elem_t se) {
+					type = Updatable;
+					value = se;
+					updatable_node_no = nno;
+					count = 0;
+#if defined(PUSH_EVAL)
+					dirty = true;
+#endif
+					last_change = 1;
+					last_seen = 1;
+					uptodate = false;
+					nevals = 0;
+					samechange = differentchange = 0;
+					lastchange = -1;
+					satProcess = currentSatProcess;
+					dag = d;
+					is_seen_by_GLP = false;
+				}
+				RegExp(long unsigned int currentSatProcess, RegExpDag * d, reg_exp_type t, reg_exp_t r1, reg_exp_t r2 = 0) {
+					count = 0;
+					nevals = 0;
+					is_seen_by_GLP = false;
+					if (t == Extend || t == Combine) {
+						type = t;
+						assert(r1.get_ptr() != 0 && r2.get_ptr() != 0);
+						value = r1->value->zero();
+						children.push_back(r1);
+						children.push_back(r2);
+					}
+					else if (t == Star) {
+						type = Star;
+						assert(r1.get_ptr() != 0);
+						value = r1->value->zero();
+						children.push_back(r1);
+					}
+					else {
+						assert(0);
+					}
+#if defined(PUSH_EVAL)
+					// Not thread safe? Constructor isn't done yet, and some
+					// outside has a pointer to the object.
+					// (pprabhu, 2/20/2013): The best solution I know is to create an init() and
+					// call init after the constructor. To heavy handed to implement right now.
+					dirty = true;
+					r1->parents.insert(static_cast<RegExp*>(this));
+					if (!(r2 == NULL))
+						r2->parents.insert(static_cast<RegExp*>(this));
+#endif
+					last_change = 0;
+					last_seen = 0;
+					uptodate = false;
+					samechange = differentchange = 0;
+					lastchange = -1;
+					satProcess = currentSatProcess;
+					dag = d;
+				}
+				RegExp(long unsigned int currentSatProcess, RegExpDag * d, sem_elem_t se) {
+					type = Constant;
+					value = se;
+					is_seen_by_GLP = false;
+					updatable_node_no = 0; // default value
+					count = 0;
+#if defined(PUSH_EVAL)
+					dirty = false; //Will always remains o                    
+#endif
+					last_change = 1;
+					last_seen = 0;
+					uptodate = false;
+					nevals = 0;
+					samechange = differentchange = 0;
+					lastchange = -1;
+					satProcess = currentSatProcess;
+					dag = d;
+				}
 
                 ~RegExp()
                 {
@@ -324,6 +330,10 @@ namespace wali {
 		  return (type == Combine);
 		}
 
+		long unsigned int getSatProcess(){
+			return satProcess;
+		}
+
 		list<reg_exp_t> getChildren(){
 		  return children;
 		}
@@ -334,6 +344,10 @@ namespace wali {
 		{
 		  return dag;
 		}
+
+				void setGLPWeight(sem_elem_t w);
+				bool isSeenByGLP();
+				sem_elem_t getValue();
                 /**
                  * @author Prathmesh Prabhu
                  * Obtain the hash map that stores the roots in the current
@@ -350,6 +364,7 @@ namespace wali {
                 sem_elem_t evaluate(sem_elem_t w);
                 sem_elem_t evaluateRev(sem_elem_t w);
                 sem_elem_t reevaluateIter();
+
 
                 bool dfs(set<RegExp *> &, set<RegExp *> &);
                 int calculate_height(set<RegExp *> &visited, out_node_stat_t &stat_map);

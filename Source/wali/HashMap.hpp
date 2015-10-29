@@ -52,8 +52,8 @@ namespace wali
   template< typename Value > struct Bucket
   {
     Bucket( const Value& v, Bucket *n=0 )
-      : value(v),next(n) {}
-    Value value;
+      : value_b(v),next(n) {}
+    Value value_b;
     Bucket *next;
   };
 
@@ -92,12 +92,12 @@ namespace wali
 
           inline value_type *operator->()
           {
-            return &(bucket->value);
+            return &(bucket->value_b);
           }
 
           inline value_type& operator*()
           {
-            return bucket->value;
+            return bucket->value_b;
           }
 
           inline bool operator==( const iterator& right )
@@ -120,7 +120,7 @@ namespace wali
             bucket_type *old = bucket;
             bucket = bucket->next;
             if( !bucket ) {
-              size_type bktNum = hashMap->bucketFromValue( old->value );
+              size_type bktNum = hashMap->bucketFromValue( old->value_b );
               while( !bucket && ++bktNum < hashMap->numBuckets ) {
                 bucket = hashMap->buckets[bktNum];
               }
@@ -162,12 +162,12 @@ namespace wali
 
           inline const value_type *operator->()
           {
-            return &(bucket->value);
+            return &(bucket->value_b);
           }
 
           inline const value_type& operator*()
           {
-            return bucket->value;
+            return bucket->value_b;
           }
 
           inline bool operator==( const const_iterator& right )
@@ -190,7 +190,7 @@ namespace wali
             const bucket_type *old = bucket;
             bucket = bucket->next;
             if( !bucket ) {
-              size_type bktNum = hashMap->bucketFromValue( old->value );
+              size_type bktNum = hashMap->bucketFromValue( old->value_b );
               while( !bucket && ++bktNum < hashMap->numBuckets ) {
                 bucket = hashMap->buckets[bktNum];
               }
@@ -251,7 +251,7 @@ namespace wali
           HashMap& operator=( const HashMap& hm ) {
             clear();
             for( const_iterator it = hm.begin() ; it != hm.end() ; it++ ) {
-              insert(key(it),value(it));
+              insert(key(it),value_d(it));
             }
             return *this;
           }
@@ -332,12 +332,12 @@ namespace wali
             return it->first;
           }
 
-          Data & value( iterator & it )
+          Data & value_d( iterator & it )
           {
             return it->second;
           }
 
-          const Data & value( const_iterator & it ) const
+          const Data & value_d( const_iterator & it ) const
           {
             return it->second;
           }
@@ -475,7 +475,7 @@ namespace wali
       {
         size_type bktNum = bucketFromKey( the_key );
         for( bucket_type *bkt = buckets[bktNum]; bkt; bkt = bkt->next )
-          if( equalFunc( the_key,bkt->value.first) )
+          if( equalFunc( the_key,bkt->value_b.first) )
             return iterator( bkt,this );
         return end();
       }
@@ -489,7 +489,7 @@ namespace wali
       {
         size_type bktNum = bucketFromKey( the_key );
         for( bucket_type *bkt = buckets[bktNum]; bkt; bkt = bkt->next )
-          if( equalFunc( the_key,bkt->value.first) )
+          if( equalFunc( the_key,bkt->value_b.first) )
             return const_iterator( bkt,this );
         return end();
       }
@@ -511,7 +511,7 @@ namespace wali
         bucket_type *bkt = it.bucket;
         if( bkt ) {
           // get the first bucket in chain
-          size_type bktNum = bucketFromValue( it.bucket->value );
+          size_type bktNum = bucketFromValue( it.bucket->value_b );
           bucket_type *cur = buckets[bktNum];
           if( cur == bkt ) {
             buckets[bktNum] = cur->next;
@@ -548,7 +548,7 @@ namespace wali
         size_type bktNum = bucketFromValue( the_value );
         bucket_type *bktptr = buckets[bktNum];
         for( bucket_type *tmp = bktptr; tmp ; tmp = tmp->next ) {
-          if( equalFunc( the_value.first,tmp->value.first ) ) {
+          if( equalFunc( the_value.first,tmp->value_b.first ) ) {
             return RPair( iterator(tmp,this),false );
           }
         }
@@ -592,7 +592,7 @@ namespace wali
           while( buckets[i] ) {
             bucket_type *old = buckets[i];
             // get new bucket num from hashing
-            newBktNum = _bucketFromValue( old->value,new_size );
+            newBktNum = _bucketFromValue( old->value_b,new_size );
             // store old's next ptr
             buckets[i] = old->next;
             // set up old's new bktNum

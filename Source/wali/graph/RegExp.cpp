@@ -78,6 +78,21 @@ namespace wali {
           }
         }
 #endif
+		bool RegExp::isSeenByGLP()
+		{
+			return is_seen_by_GLP;
+		}
+
+		void RegExp::setGLPWeight(sem_elem_t glp_weight)
+		{
+			is_seen_by_GLP = true;
+			value = glp_weight;
+		}
+
+		sem_elem_t RegExp::getValue()
+		{
+			return value;
+		}
 
         // Updates all the updatable edgses given in the list together, so that all of them
         // get the same update_count.
@@ -1487,7 +1502,7 @@ namespace wali {
         return del;
     }
 #endif
-
+	
     sem_elem_t RegExp::get_weight() {
         if(last_seen == dag->satProcesses[satProcess].update_count && last_change != (unsigned)-1)  // evaluate(w) sets last_change to -1
 	   return value;
@@ -1519,9 +1534,6 @@ namespace wali {
         unsigned int &update_count = dag->satProcesses[dag->currentSatProcess].update_count;
         evaluations.push_back(update_count);
         nevals++;
-	//cout << "Evaluating RegExp :";
-	//this->print(cout);
-	//cout << "\n";
 	switch(type) {
             case Constant:
             case Updatable: 
