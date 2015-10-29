@@ -1337,6 +1337,11 @@ namespace wali {
             eval_map.clear();
           }
 #endif //#if defined(PUSH_EVAL)
+#if ET_DBG == 1
+          cout << "Evaluating RegExp :";
+	  this->print(cout);
+	  cout << "\n";
+#endif
           unsigned int &update_count = dag->satProcesses[dag->currentSatProcess].update_count;
           evaluations.push_back(update_count);
           switch(type) {
@@ -1348,13 +1353,16 @@ namespace wali {
             case Star: {
                          reg_exp_t ch = children.front();
                          sem_elem_t ans = w->zero(), nans = w;
-                         sem_elem_t temp = w;
-                         while(!ans->equal(nans)) {
+                         sem_elem_t temp = w->one();
+                         sem_elem_t temp2 = ch->evaluate(temp);
+                         sem_elem_t temp3 = temp2->star();
+                         ans = w->extend(temp3);
+                         /*while(!ans->equal(nans)) {
                            ans = nans;
                            temp = ch->evaluate(temp);
                            nans = nans->combine(temp);
                            STAT(dag->stats.ncombine++);
-                         }
+                         }*/
                          /*
                          nans = ch->evaluate(w);
                          while(!ans->equal(nans)) {
@@ -1364,7 +1372,7 @@ namespace wali {
                            STAT(dag->stats.nextend++);
                          }
                          */
-                         ret = nans;
+                         ret = ans;
                          break;
                        }
             case Extend: {
@@ -1387,8 +1395,13 @@ namespace wali {
                             break;
                           }
           }
-          eval_map[w] = ret;
+  	  eval_map[w] = ret;
           last_seen = dag->satProcesses[satProcess].update_count; last_change = (unsigned)-1;
+#if ET_DBG == 1
+	  std::cout << "Weight: " << std::endl;
+	  ret->print(std::cout);
+	  std::cout << std::endl;
+#endif
           return ret;
         }
 
@@ -1455,7 +1468,6 @@ namespace wali {
                               break;
                           }
         }
-        eval_map[w] = ret;
         last_seen = dag->satProcesses[satProcess].update_count; last_change = (unsigned)-1;
         return ret;
     }

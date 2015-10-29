@@ -66,9 +66,9 @@ namespace wali {
 
     ostream &IntraGraph::print_trans(Transition &t, ostream &out, PRINT_OP pop) {
       out << "(";
-      pop(out, t.src) << "(" << t.src << "),";
-      pop(out, t.stack) << "(" << t.stack << "),";
-      pop(out, t.tgt) << "(" << t.tgt << "))";
+      pop(out, t.src) << "(" << key2str(t.src) << "),";
+      pop(out, t.stack) << "(" << key2str(t.stack) << "),";
+      pop(out, t.tgt) << "(" << key2str(t.tgt) << "))";
       return out;
     }
 
@@ -905,17 +905,18 @@ namespace wali {
       computePathSequence(nodes, nnodes, edges, nedges, path_sequence);
       buildRegExp(path_sequence);
 
+#if ET_DGB==1
       { // NAK DEBUGGING REGEXP
-        /*
+        
         for( int i=0; i < nnodes; i++) {
           nodes[i].regexp->print(std::cout<< i << ")   ") << std::endl;
         }
         cout << "graph = (" << nnodes << "," << nedges << ")\n";
         cout << "size = " << path_sequence.size() << "\n";
         cout << "\n";
-        */
+        
       }
-
+#endif
 
       STAT(stats.ndom_sequence = path_sequence.size());
 #elif REGEXP_METHOD==1
@@ -995,10 +996,12 @@ namespace wali {
 
       for(i=0;i<(int)seq.size();i++) {
         PathSequence &ps = seq[i];
+#if ET_DBG == 1
         {//DEBUGGING
-          //cout << "PATH SEQUENCE(" << ps.src << "-->" << ps.tgt << ")\n";
-          //ps.regexp->print(cout) << endl;
+          cout << "PATH SEQUENCE(" << ps.src << "-->" << ps.tgt << ")\n";
+          ps.regexp->print(cout) << endl;
         }//DEBUGGING
+#endif
         if(ps.src == ps.tgt) {
           nodes[ps.src].regexp = dag->extend(nodes[ps.src].regexp, ps.regexp);
         } else {
@@ -1302,11 +1305,15 @@ namespace wali {
 
         for(j=0;j<seq.size();j++) {
           sequence.push_back(PathSequence(seq[j].regexp, inv_node_map[i][seq[j].src], inv_node_map[i][seq[j].tgt]));
-          //seq[j].regexp->print(cout) << "\n";
         }
         // Now put in the connecting edges
         for(j=0;j<connecting_edges[i].size();j++) {
           int ed = connecting_edges[i][j];
+#if ET_DBG == 1
+	  std::cout << "Edge: " << cedges[ed].src << "," <<cedges[ed].tgt << std::endl;
+	  cedges[ed].regexp->print(std::cout);
+          std::cout << std::endl;
+#endif
           sequence.push_back(PathSequence(cedges[ed].regexp, cedges[ed].src, cedges[ed].tgt));
         }
       }

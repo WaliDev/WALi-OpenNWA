@@ -1490,6 +1490,11 @@ namespace wali {
           }
 
           for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
+	    IntraGraph *gr = nodes[(*it2).tgt].gr;
+            int eno = gr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, sem->zero(), true);
+            //uno - number of the node this edge depends on - it's a hyperedge, so it must
+	    gr->edges[eno].updatable_no;
+	    //std::cout << "uno: " << uno << ":" << (*it2).src2 << std::endl;
             IntraGraph *gr2 = nodes[(*it2).src2].gr;
             gr2->setOutNode(nodes[(*it2).src2].intra_nodeno, (*it2).src2);
           }

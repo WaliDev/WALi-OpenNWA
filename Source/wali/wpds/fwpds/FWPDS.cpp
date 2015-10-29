@@ -481,6 +481,9 @@ void FWPDS::poststarIGR( wfa::WFA const & input, wfa::WFA& output )
   // Build the InterGraph using EWPDS saturation without weights
   EWPDS::poststarComputeFixpoint(output);
 
+#if ET_DBG == 1
+  interGr->print(std::cout);
+#endif
   {
     std::string msg = (get_verify_fwpds()) ? "FWPDS Saturation" : "";
     util::Timer timer(msg);

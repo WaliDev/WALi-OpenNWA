@@ -1,13 +1,12 @@
-//#include "src/lang/gtr_config.h"
-//#include "tsl/cir/regexp/conc.1level.cir.hpp"
-//#include "tsl/analysis_components/src/reinterps/emul/conc_extern_types.hpp"
-//#include "tsl/analysis_components/src/reinterps/emul/conc_externs.hpp"
-//#include "tsl/analysis_components/src/reinterps/emul/conc_extern_types.cpp"
-//#include "tsl/analysis_components/src/reinterps/emul/conc_externs.cpp"
-//#include "tsl/analysis_components/src/reinterps/emul/concrete_base_type_interp.hpp"
-//#include "tsl/analysis_components/src/reinterps/emul/concrete_base_type_interp.cpp"
-#include "wali/domains/binrel/BinRelMergeFns.hpp"
-//#include "tsl/cir/regexp/conc.1level.cir.cpp"
+#include "gtr/src/lang/gtr_config.h"
+#include "tsl/cir/regexp/conc.1level.cir.hpp"
+#include "tsl/analysis_components/src/reinterps/emul/conc_extern_types.hpp"
+#include "tsl/analysis_components/src/reinterps/emul/conc_externs.hpp"
+#include "tsl/analysis_components/src/reinterps/emul/conc_extern_types.cpp"
+#include "tsl/analysis_components/src/reinterps/emul/conc_externs.cpp"
+#include "tsl/analysis_components/src/reinterps/emul/concrete_base_type_interp.hpp"
+#include "tsl/analysis_components/src/reinterps/emul/concrete_base_type_interp.cpp"
+#include "tsl/cir/regexp/conc.1level.cir.cpp"
 // ::wali::wpds::fwpds
 #include "wali/wpds/fwpds/FWPDS.hpp"
 // ::wali::wpds::ewpds
@@ -21,6 +20,7 @@
 #endif
 // ::wali::wfa
 #include "wali/wfa/WFA.hpp"
+#include "wali/wfa/Trans.hpp"
 #include "wali/wfa/TransFunctor.hpp"
 #include "wali/wfa/State.hpp"
 // ::wali::wpds
@@ -44,15 +44,23 @@
 // ::wali::cprover
 #include "BplToPds.hpp"
 #include "wali/domains/name_weight/nameWeight.hpp"
-//#include "wali/domains/tsl_weight/TSLWeight.hpp"
+#include "wali/domains/tsl_weight/TSLWeight.hpp"
 //#include "PtoICFG.hpp"
 // TSL
 #ifdef USE_NWAOBDD
 #include "../turetsky/svn-repository/NWAOBDDRel.hpp"
 #include "../turetsky/svn-repository/NWAOBDDRelMergeFns.hpp"
 #include "Newton_Compare_NWA.hpp"
+#elif USE_DUET
+#include "wali/domains/duet/DuetRel.hpp"
+#include "NewtonOcamlInterface.hpp"
+extern "C" {
+#include <caml/mlvalues.h>
+#include <caml/callback.h>
+}
 #else
 #include "wali/domains/binrel/BinRel.hpp"
+#include "wali/domains/binrel/BinRelMergeFns.hpp"
 #include "NewtonCompare.hpp"
 #endif
 
@@ -66,26 +74,29 @@ using namespace wali::wpds::nwpds;
 using namespace wali::cprover;
 using namespace wali::domains::binrel;
 using namespace wali::domains::name_weight;
-//using namespace wali::domains::tsl_weight;
+using namespace wali::domains::duetrel;
+using namespace wali::domains::tsl_weight;
 //using namespace wali::domains::nwaobddrel;
-//using namespace tsl_regexp;
+using namespace tsl_regexp;
 
 typedef wali::ref_ptr<graph::RegExp> reg_exp_t;
-//typedef tsl_regexp::Conc1LevelRTG RTG;
-//typedef tsl_regexp::Conc1LevelCIR CIR;
-//typedef std::map<int,RTG::regExpRefPtr> tslRegExpMap;
-//typedef std::map<int,RTG::regExpTRefPtr> tslRegExpTMap;
-//typedef std::map<int,RTG::regExpTListRefPtr> tslDiffMap;
-//typedef std::map<int, RTG::regExpListRefPtr> tslUntensoredDiffMap;
+typedef tsl_regexp::Conc1LevelRTG RTG;
+typedef tsl_regexp::Conc1LevelCIR CIR;
+typedef std::map<int,RTG::regExpRefPtr> tslRegExpMap;
+typedef std::map<int,RTG::regExpTRefPtr> tslRegExpTMap;
+typedef std::map<int,RTG::regExpTListRefPtr> tslDiffMap;
+typedef std::map<int, RTG::regExpListRefPtr> tslUntensoredDiffMap;
 
 #ifdef USE_NWAOBDD
 typedef nwaobdd_t domain_t;
 typedef NWAOBDDRel Relation;
+#elif USE_DUET
+typedef duetrel_t domain_t;
+typedef DuetRel Relation;
 #else
 typedef binrel_t domain_t;
 typedef BinRel Relation;
 #endif
-
 
 //#include <signal.h>
 #include <boost/cast.hpp>
@@ -426,7 +437,7 @@ namespace goals {
 
 	//A Stack frame which takes a TSL regExpRefPtr and has pointers to it's left and right children
 	//Used for the differential function and evalRegExpAt0 and evalRegExp
-/*	struct dFrame
+	struct dFrame
 	{
 		dFrame(RTG::regExpRefPtr & e) : is_new(true), e(e), op(), left(), right(){}
 		bool is_new;
@@ -446,7 +457,7 @@ namespace goals {
 		RTG::regExpTRefPtr left;
 		RTG::regExpTRefPtr right;
 	};
-*/
+
   short dump = false;
   char * mainProc = NULL, * errLbl = NULL;
   string fname;
@@ -600,6 +611,19 @@ namespace goals {
 #endif
   }
 
+/******
+*
+*
+*  DuetTest
+*
+*/
+
+  double duetTest(DuetRel* a, DuetRel * b)
+{
+  duetrel_t c = a->Compose(b);
+  c->print(std::cout);
+  return 0;
+}
   /*
   *  Determines if an error state in 'pg' is reachable using an npds.
   *
@@ -761,7 +785,7 @@ namespace goals {
   *
   *  Author: Emma Turetsky
   */
-  /*RTG::regExpTListRefPtr nonRecTDiff(RTG::regExpRefPtr exp)
+  RTG::regExpTListRefPtr nonRecTDiff(RTG::regExpRefPtr exp)
   {
 	  //This stack represents the worklist, as long as it's not empty, there are still
 	  //TSL regular expressions to be differentiated
@@ -974,7 +998,7 @@ namespace goals {
 	  //This will start with a lookup on the hash_map for exp, which has been evaluated in the loop above, so will not re-evaluate using TDifferential
 	  return CIR::TDifferential(exp);
   }
-*/
+
 
   /*
   *  A non recursive version of the Differential function that uses a stack
@@ -993,7 +1017,7 @@ namespace goals {
   *
   *  Author: Emma Turetsky
   */
-  /*RTG::regExpListRefPtr nonRecUntensoredDiff(RTG::regExpRefPtr exp)
+  RTG::regExpListRefPtr nonRecUntensoredDiff(RTG::regExpRefPtr exp)
   {
 	  //std::cout << hits << std::endl;
 	  //This stack represents the worklist, as long as it's not empty, there are still
@@ -1205,7 +1229,7 @@ namespace goals {
 	  return CIR::Differential(exp);
   }
 
-*/
+
   /*
   *  A non recursive version of evalAt0 used to eval TSLRegExp assuming variables are the zero sem_elem. (f(0)).
   *
@@ -1222,7 +1246,7 @@ namespace goals {
   *  Author: Emma Turetsky
   *
   */
-  /*EXTERN_TYPES::sem_elem_wrapperRefPtr evalNonRecAt0(RTG::regExpRefPtr exp)
+  EXTERN_TYPES::sem_elem_wrapperRefPtr evalNonRecAt0(RTG::regExpRefPtr exp)
   {
 	  //std::cout << hits << std::endl;
 	  std::stack<dFrame> todo;
@@ -1410,7 +1434,7 @@ namespace goals {
 	  //This will start with a lookup on the hash_map for exp, which has been evaluated in the loop above, so will not re-evaluate using evalRegExpAt0
 	  return CIR::evalRegExpAt0(exp);
   }
-*/
+
   /*
   *  A non recursive version of evalRegExpFin used to eval TSLRegExps given the final assignment a.
   *
@@ -1427,7 +1451,7 @@ namespace goals {
   *
   *  Author: Emma Turetsky
   */
-  /*EXTERN_TYPES::sem_elem_wrapperRefPtr evalRegExpFinNonRec(RTG::regExpRefPtr exp, RTG::assignmentRefPtr a)
+  EXTERN_TYPES::sem_elem_wrapperRefPtr evalRegExpFinNonRec(RTG::regExpRefPtr exp, RTG::assignmentRefPtr a)
   {
 	  //std::cout << hits << std::endl;
 	  std::stack<dFrame> todo;
@@ -1648,7 +1672,7 @@ namespace goals {
 	  return CIR::evalRegExpFin(exp, a);
   }
 
-  *//*
+  /*
   *  A non recursive version of evalRegExp used to eval TSLRegExps given the assignment a.
   *
   *  This is based on the recursive evalRegExp in regExp.tsl and uses that function's hashtable
@@ -1664,7 +1688,7 @@ namespace goals {
   *
   *  Author: Emma Turetsky
   */
-  /*EXTERN_TYPES::sem_elem_wrapperRefPtr evalRegExpNonRec(RTG::regExpRefPtr exp, RTG::assignmentRefPtr a)
+  EXTERN_TYPES::sem_elem_wrapperRefPtr evalRegExpNonRec(RTG::regExpRefPtr exp, RTG::assignmentRefPtr a)
   {
 	  //std::cout << hits << std::endl;
 	  std::stack<dFrame> todo;
@@ -1838,7 +1862,7 @@ namespace goals {
   }
 
 
-  *//*
+  /*
   *  A non recursive version of evalT used to eval TSLRegExps representing tensored weights
   *  given the assignment a.
   *
@@ -1855,7 +1879,7 @@ namespace goals {
   *
   *  Author: Emma Turetsky
   */
-  /*EXTERN_TYPES::sem_elem_wrapperRefPtr evalTNonRec(RTG::regExpTRefPtr exp, RTG::assignmentRefPtr a)
+  EXTERN_TYPES::sem_elem_wrapperRefPtr evalTNonRec(RTG::regExpTRefPtr exp, RTG::assignmentRefPtr a)
   {
 	  //std::cout << hits << std::endl;
 	  std::stack<sFrame> todo;
@@ -2093,7 +2117,7 @@ namespace goals {
 	  return CIR::evalT(exp, a);  //Grabs exp evaluated at assignment a from the hash_map
   }
 
-  *//*
+  /*
   * Create the tensored differentials from the regular expressions of nodes
   * with epsilon transitions and populate the map
   *
@@ -2102,7 +2126,7 @@ namespace goals {
   *
   * @author:  Emma Turetsky 
   */
-  /*void createDifferentials(tslRegExpMap & diffMap, tslDiffMap & differentialMap){
+  void createDifferentials(tslRegExpMap & diffMap, tslDiffMap & differentialMap){
 	  for (tslRegExpMap::iterator it = diffMap.begin(); it != diffMap.end(); ++it)
 	  {
 		  //std::cout << "EMap: " << it->first << ": ";
@@ -2117,7 +2141,7 @@ namespace goals {
   }
 
 
-  *//*
+  /*
   * Create the differentials from the regular expressions of nodes
   * with epsilon transitions and populate the map
   *
@@ -2126,7 +2150,7 @@ namespace goals {
   *
   * @author:  Emma Turetsky
   */
-  /*void createUntensoredDifferentials(tslRegExpMap & diffMap, tslUntensoredDiffMap & untensoredDifferentialMap) {
+  void createUntensoredDifferentials(tslRegExpMap & diffMap, tslUntensoredDiffMap & untensoredDifferentialMap) {
 	  //Also, for each Differential, create a enter and exit state in the keyspace for the differential
 	  for (tslRegExpMap::iterator it = diffMap.begin(); it != diffMap.end(); ++it)
 	  {
@@ -2139,7 +2163,7 @@ namespace goals {
   }
 
 
-  *//*
+  /*
   *  Convert a wali NameWeight regexp to a tensored regular expressions
   *
   *  The wali regexp represents a differentiated value.  The weight represents a regexp in eMap
@@ -2159,7 +2183,7 @@ namespace goals {
   *
   *  Author:  Emma Turetsky
   */
-  /*RTG::regExpTRefPtr convertToRegExpT(reg_exp_t exp, tslRegExpMap & regExpMap, tslDiffMap & differentialMap, std::map<int, std::pair<std::pair<int, int>, int>> & mapBack, map<std::pair<int, int>, std::pair<int, int>>  & mergeSrcMap, bool call)
+  RTG::regExpTRefPtr convertToRegExpT(reg_exp_t exp, tslRegExpMap & regExpMap, tslDiffMap & differentialMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, map<std::pair<int, int>, std::pair<int, int> >  & mergeSrcMap, bool call)
   {
 	  if (exp->isConstant())
 	  {
@@ -2201,6 +2225,9 @@ namespace goals {
 			  NameWeight * nw = static_cast<wali::domains::name_weight::NameWeight*>((*ch)->get_weight().get_ptr());
 			  int var = nw->getName1();
 			  int reID = nw->getName2();
+#ifdef USE_DUET
+			  return CIR::mkDotT(RTG::ProjectT::make(CBTI::INT32(0), CBTI::INT32(0), lch), CIR::getTFromRegList(differentialMap[reID], var));
+#else
 			  //std::cout << "Looking Up: " << reID << "," << var << std::endl;
 			  int t1 = mapBack[reID].first.second;
 			  int t2 = mapBack[var].first.second;
@@ -2208,6 +2235,7 @@ namespace goals {
 			  std::pair<int, int> mergePair = mergeSrcMap[std::pair<int, int>(t1, t2)];
 			  return CIR::mkDotT(RTG::ProjectT::make(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), lch), CIR::getTFromRegList(differentialMap[reID], var)); //the NameWeight represents reID differentiated with respect to Variable var (note the regExps contain
 			  //the updateable variables
+#endif
 		  }
 		  else
 		  {
@@ -2230,7 +2258,7 @@ namespace goals {
   }	
 
 
-  *//*
+  /*
   *  Converts from a reg_exp_t to a RTG::regExpRefPtr
   *
   *  @param: reID - the varID the regular expressiosn
@@ -2244,7 +2272,7 @@ namespace goals {
   *
   *   Author: Emma Turetsky
   */
-  /*RTG::regExpRefPtr convertToRegExp(int reID, reg_exp_t exp, std::map<int, std::set<int>> & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int>> & mapBack, std::map<std::pair<int, int>, std::pair<int, int>> & mergeSrcMap, std::vector<int> & wl, std::set<int> & vl, double * elapsedTime)
+  RTG::regExpRefPtr convertToRegExp(int reID, reg_exp_t exp, std::map<int, std::set<int> > & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, std::map<std::pair<int, int>, std::pair<int, int> > & mergeSrcMap, std::vector<int> & wl, std::set<int> & vl, double * elapsedTime)
   {
 	  std::stack<cFrame> todo;
 	  std::map<reg_exp_t, RTG::regExpRefPtr> seen; //map of regExps that have allready been seen (should change to an unordered_map for speedup)
@@ -2289,6 +2317,15 @@ namespace goals {
 				  //std::cout << "node_no: " << node_no;
 				  int mNum = oMap[updateableMap[node_no]];
 				  //std::cout << " mNum: " << mNum << std::endl;
+#ifdef USE_DUET
+				  vDep.insert(mNum);  //This regExp is dependent on the regExp represented by mNum
+				  seen[frame.e] = RTG::Project::make(CBTI::INT32(0), CBTI::INT32(0), RTG::Var::make(CBTI::INT32(mNum)));
+				  if (vl.find(mNum) == vl.end())
+				  {
+					  wl.push_back(mNum);
+					  vl.insert(mNum);
+				  }
+#else
 				  int t1 = mapBack[reID].first.second;
 				  int t2 = mapBack[mNum].first.second;
 				  std::pair<int, int> mergePair = mergeSrcMap[std::pair<int, int>(t1, t2)];
@@ -2299,6 +2336,7 @@ namespace goals {
 				  }
 				  vDep.insert(mNum);  //This regExp is dependent on the regExp represented by mNum
 				  seen[frame.e] = RTG::Project::make(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), RTG::Var::make(CBTI::INT32(mNum)));
+#endif
 				  todo.pop();
 				  continue;
 			  }
@@ -2410,7 +2448,7 @@ namespace goals {
   }
 	  
 
-  *//*
+  /*
   *  For each element in the list of regular expressions, convert it to a TSL regular expression and put it in a map from
   *  RegExp ID to TSL regular expressions
   *
@@ -2422,7 +2460,7 @@ namespace goals {
   *
   *  Author:  Emma Turetsky
   */
-  /*double convertToTSLRegExps(int reg, std::map<int, reg_exp_t> & outNodeRegExpMap, tslRegExpMap & regExpMap, std::map<int, std::set<int>> & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int>> & mapBack, std::map<std::pair<int, int>, std::pair<int, int >>  & mergeSrcMap, std::vector<int> & wl, std::set<int> & vl)
+  double convertToTSLRegExps(int reg, std::map<int, reg_exp_t> & outNodeRegExpMap, tslRegExpMap & regExpMap, std::map<int, std::set<int> > & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, std::map<std::pair<int, int>, std::pair<int, int > >  & mergeSrcMap, std::vector<int> & wl, std::set<int> & vl)
   {
 	  //std::cout << "REID: " << reg << endl;
 	  //outNodeRegExpMap[reg]->print(std::cout) << std::endl;
@@ -2435,7 +2473,7 @@ namespace goals {
   }
 
 
-  *//*
+  /*
   *  For each wali NameWeight regexp create a tensored regular expressions
   *
   *  The wali regexp represents a differentiated value.  The weight represents a regexp in eMap
@@ -2454,7 +2492,7 @@ namespace goals {
   *
   *  Author:  Emma Turetsky
   */
-  /*void convertToTSLRegExpsT(std::map<int, reg_exp_t> & rList, tslRegExpMap & regExpMap, tslRegExpTMap & tensoredRegExpMap, tslDiffMap & differentialMap, std::map<int, std::pair<std::pair<int, int>, int>> & mapBack, std::map<std::pair<int, int>, std::pair<int, int >>  & mergeSrcMap)
+  void convertToTSLRegExpsT(std::map<int, reg_exp_t> & rList, tslRegExpMap & regExpMap, tslRegExpTMap & tensoredRegExpMap, tslDiffMap & differentialMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, std::map<std::pair<int, int>, std::pair<int, int > >  & mergeSrcMap)
   {
 	  for (std::map<int, reg_exp_t>::iterator it = rList.begin(); it != rList.end(); ++it)
 	  {
@@ -2469,9 +2507,9 @@ namespace goals {
 	  }
   }
 
-  *//*
+  /*
   *  A method to print TSL RegExps
-  *//*
+  */
   void printTSLRegExps(tslRegExpMap rMap)
   {
     for (tslRegExpMap::iterator it = rMap.begin(); it!=rMap.end(); ++it)
@@ -2481,11 +2519,11 @@ namespace goals {
       cout << "\n";
     }
   }
-*/
+
   /*
   *  A method to print TSL Differentials
   */
-  /*void printTSLDifferentials(tslDiffMap dMap)
+  void printTSLDifferentials(tslDiffMap dMap)
   {
     for (tslDiffMap::iterator it = dMap.begin(); it!=dMap.end(); ++it)
     {
@@ -2494,11 +2532,11 @@ namespace goals {
       cout << "\n";
     }
   }
-*/
+
   /*
   *  A method to print TSL tensored RegExps
   */
-  /*void printTSLTExp(tslRegExpTMap tMap)
+  void printTSLTExp(tslRegExpTMap tMap)
   {
     for (tslRegExpTMap::iterator it = tMap.begin(); it!=tMap.end(); ++it)
     {
@@ -2507,12 +2545,12 @@ namespace goals {
       cout << "\n";
     }
   }
-*/
+
   /*
   * Given a list of tensored differentials, return a list of variables
   * used by them
   */
-  /*set<int> getVarList(RTG::regExpTListRefPtr tList)
+  set<int> getVarList(RTG::regExpTListRefPtr tList)
   {
     set<int> srcList;
     int listSize = CIR::getTListLength(tList).get_data();
@@ -2524,11 +2562,11 @@ namespace goals {
     return srcList;
   }
 
-  *//*
+  /*
   * Given a list of non-differentials, return a list of variables
   * used by them
   */
-  /*set<int> getDVarList(RTG::regExpListRefPtr dList)
+  set<int> getDVarList(RTG::regExpListRefPtr dList)
   {
 	  set<int> srcList;
 	  int listSize = CIR::getDListLength(dList).get_data();
@@ -2539,7 +2577,7 @@ namespace goals {
 	  }
 	  return srcList;
   }
-*/
+
   /*
   *  Functions to generate stack and state names
   */
@@ -2562,7 +2600,7 @@ namespace goals {
   *
   *  Author: Emma Turetsky
   */
-  /*void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<int, std::set<int>> & varDependencies)
+  void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies)
   {
 	//For each differential
     for(tslDiffMap::iterator it = differentialMap.begin(); it!=differentialMap.end(); ++it)
@@ -2587,7 +2625,7 @@ namespace goals {
     }
 
   }
-*/
+
   /*
   *  Runs the Newton method on on the various maps until we have reached a fix point
   *  differentialMap - a list of differentials
@@ -2597,7 +2635,7 @@ namespace goals {
   *
   *  Author:  Emma Turetsky
   */
-  /*void runNewton(RTG::assignmentRefPtr & aList, tslDiffMap & differentialMap, std::map<int, std::set<int>> & varDependencies, tslRegExpTMap & tensoredRegExpMap)
+  void runNewton(RTG::assignmentRefPtr & aList, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies, tslRegExpTMap & tensoredRegExpMap)
   {
 	int rnd = 0;
     bool newton = true;
@@ -2710,7 +2748,7 @@ namespace goals {
 	  }
   }
 
-  *//*
+  /*
   *  This runs a fixed point error finding method using Newton rounds.
   *
   *	 Step 1 - Convert the program 'pg' into an fpds where the weights are nwaobdds.
@@ -2734,8 +2772,8 @@ namespace goals {
   *
   *  Author:  Emma Turetsky
   */
-  /*
-  double run_newton(WFA& outfa, FWPDS * originalPds = NULL)
+  
+  double run_newton(WFA& outfa, wali::Key entry_key, FWPDS * originalPds = NULL, bool canPrune = true)
   { 
     cout << "#################################################" << endl;
     cout << "[Newton Compare] Goal VIII: end-to-end newton_merge_notensor_fwpds run" << endl;
@@ -2765,11 +2803,11 @@ namespace goals {
 	tslDiffMap differentialMap;  //This is a map from regexp ids to the partial differentials assoicated with them
 	tslRegExpTMap tensoredRegExpMap;  //A map from the regexpId to the tsl tensored differential representing it
 	map<int, domain_t> finWeights;  //The map from node id to the final relational weights
-	map<std::pair<int, int>, std::pair<int, int>> mergeSrcMap; //The map that keeps track of the src of calls on call instructions
+	map<std::pair<int, int>, std::pair<int, int> > mergeSrcMap; //The map that keeps track of the src of calls on call instructions
 	std::vector<int> wl;
 	std::set<int> vl;
 	double baseEvalTime = 0;
-	map<int, std::set<int>> varDependencies;
+	map<int, std::set<int> > varDependencies;
 
 
     wali::set_verify_fwpds(false);
@@ -2781,7 +2819,7 @@ namespace goals {
     wali::util::GoodTimer * t = new wali::util::GoodTimer("temp");
     WFA fa;
     wali::Key acc = wali::getKeySpace()->getKey("accept");
-    fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, fpds->get_theZero()->one());
+    fa.addTrans(getPdsState(),entry_key, acc, fpds->get_theZero()->one());
     fa.setInitialState(getPdsState());
     fa.addFinalState(acc);
 
@@ -2797,12 +2835,12 @@ namespace goals {
 		outfile.close();
 	}
 
-	*//* Step 2 - Perform poststar on the fpds get the regular expressions associated with
+	/* Step 2 - Perform poststar on the fpds get the regular expressions associated with
 	*			the outgoing nodes in the intra_graph associated with the fwpds
 	*/
 	//This function performs postar on the fa using the fpds and populations the maps as described above
 	//The boolean means this is the first time the functions is called and will generate unique ids as needed
-	/*double curTime = t->total_time();
+	double curTime = t->total_time();
 	t->stop();
 	double t1 = fpds->getOutRegExps(fa, outfa, outNodeRegExpMap, updateableMap, oMap, mapBack, transMap, differentiatedList, mergeSrcMap);
 	t->start();
@@ -2817,16 +2855,19 @@ namespace goals {
 	Key fKey = wali::getKeySpace()->getKey(esrc);
 	bool prune = false;
 
-	//If the error state is in the wfa, then prune, otherwise the error is reachable  -- ETTODO (prune check is redundant)
+	//If the error state is in the wfa, then prune, otherwise the error is not reachable  -- ETTODO (prune check is redundant)
 	if (outfa.getState(fKey) != NULL)
 	{
 		prune = true;
 	}
-	if (prune)
+	if (prune || (!canPrune))
 	{
+                if(prune)
+                {
 		//Set the initial state to be the error state in the wfa and then prune
 		outfa.setInitialState(fKey);
 		outfa.prune();
+		}
 		t->stop();
 		std::set<Key> faStates = outfa.getStates();
 		std::set<Key>::iterator stateIter;
@@ -2861,11 +2902,11 @@ namespace goals {
 			outfile.close();
 		}
 
-		*//*Step 3 - Convert these regexps into TSL regular expressions and get the partial differentials
+		/*Step 3 - Convert these regexps into TSL regular expressions and get the partial differentials
 		*		   with respect their variables
 		*/
 
-		/*cout << "[Newton Compare] converting to TSL" << endl;
+		cout << "[Newton Compare] converting to TSL" << endl;
 		while (!wl.empty())
 		{
 			int wlSzie = wl.size();
@@ -2914,11 +2955,11 @@ namespace goals {
 
 			tslDiffMap::iterator it3;
 
-			*//* Step 4 - Create a new fwpds using these partial differentials - run poststar on the fwpds in
+			/* Step 4 - Create a new fwpds using these partial differentials - run poststar on the fwpds in
 			*	        order to get the full differentials representing the values of the program return points
 			*/
 			//Now we create new fwpds using these differentials, this fwpds has the weight type of nameweight
-			/*FWPDS * fnew = new FWPDS();
+			FWPDS * fnew = new FWPDS();
 			fwpdsFromDifferential(fnew, differentialMap, varDependencies);
 
 			//Now create another finite automata
@@ -2957,24 +2998,24 @@ namespace goals {
 				outfile.close();
 			}
 
-			*//* Step 5 - Use the reg exps representing the differentials, the partial differentials, and the original
+			/* Step 5 - Use the reg exps representing the differentials, the partial differentials, and the original
 			*			tsl regular expressions to get the tensored regular expressions we need to run the newton rounds
 			*/
-			/*convertToTSLRegExpsT(rNew, regExpMap, tensoredRegExpMap, differentialMap, mapBack, mergeSrcMap);
+			convertToTSLRegExpsT(rNew, regExpMap, tensoredRegExpMap, differentialMap, mapBack, mergeSrcMap);
 			aList = CIR::initializeAssignment();
 
-			*//*Step 6 - Use newton's method to find the fixed point of the weights and then reevaluate the values of all the regexps*/
-			/*cout << "[Newton Compare] Running Newton" << endl;
+			/*Step 6 - Use newton's method to find the fixed point of the weights and then reevaluate the values of all the regexps*/
+			cout << "[Newton Compare] Running Newton" << endl;
 			runNewton(aList, differentialMap, varDependencies, tensoredRegExpMap);
 
 			//Using the final weights from Newton, evaluate the tslRegExps to get the final weights
 			//evalRegExps(aList);
 
 
-			*//* Step 7 - Insert the new weights into the original outfa and perform the iterative path summary in order to
+			/* Step 7 - Insert the new weights into the original outfa and perform the iterative path summary in order to
 			*			determine if the error weight is reachable
 			*/
-		/*}
+		}
 		else  //There are no variables to be differentiated
 		{
 			aList = CIR::initializeAssignment();
@@ -3003,13 +3044,13 @@ namespace goals {
 				tt->setWeight(w.v);
 			}
 		}
-		*//*cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
+		/*cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
 		fstream outfile("newton_outfa.dot", fstream::out);
 		outfa.print_dot(outfile, true);
 		outfile.close();*/
 
 		//Perform the final path summary
-		/*t->start();
+		t->start();
 		outfa.path_summary_tarjan_fwpds(true);
 		State * initS = outfa.getState(outfa.getInitialState());
 		if (initS == NULL)
@@ -3046,7 +3087,7 @@ namespace goals {
 
 
 
-  *//*
+  /*
   *  This runs a fixed point error finding method using Newton rounds.
   *
   *	 Step 1 - Convert the program 'pg' into an fpds where the weights are nwaobdds.
@@ -3059,8 +3100,8 @@ namespace goals {
   *
   *  Step 4 -
   */
-  /*double run_newton_noTensor(WFA& outfa, FWPDS * originalPds = NULL)
-  {
+  double run_newton_noTensor(WFA& outfa, FWPDS * originalPds = NULL)
+  { /*
 	  cout << "#################################################" << endl;
 	  cout << "[Newton Compare] Goal VIII: end-to-end newton_merge_notensor_fwpds run" << endl;
 
@@ -3087,11 +3128,11 @@ namespace goals {
 	  tslRegExpMap diffMap;  //The map of tsl regular expressions to be differentiated (the program return points)
 	  tslUntensoredDiffMap untensoredDifferentialMap;
 	  map<int, domain_t> finWeights;  //The map from node id to the final relational weights
-	  map<std::pair<int, int>, std::pair<int, int>> mergeSrcMap; //The map that keeps track of the src of calls on call instructions
+	  map<std::pair<int, int>, std::pair<int, int> > mergeSrcMap; //The map that keeps track of the src of calls on call instructions
 	  std::vector<int> wl;
 	  std::set<int> vl;
 	  double baseEvalTime = 0;
-	  map<int, std::set<int>> varDependencies;
+	  map<int, std::set<int> > varDependencies;
 
 	  std::set<pair<std::pair<int, int>, int> > globalEpsilon;  //used for debugging Newton
 	  int dummy = -1;
@@ -3122,12 +3163,12 @@ namespace goals {
 		  outfile.close();
 	  }
 
-*/	  /* Step 2 - Perform poststar on the fpds get the regular expressions associated with
+	  *//* Step 2 - Perform poststar on the fpds get the regular expressions associated with
 	  *			the outgoing nodes in the intra_graph associated with the fwpds
 	  */
 	  //This function performs postar on the fa using the fpds and populations the maps as described above
 	  //The boolean means this is the first time the functions is called and will generate unique ids as needed
-/*	  double curTime = t->total_time();
+	  /*double curTime = t->total_time();
 	  t->stop();
 	  double t1 = fpds->getOutRegExps(fa, outfa, outNodeRegExpMap, updateableMap, oMap, mapBack, transMap, differentiatedList, mergeSrcMap);
 	  t->start();
@@ -3181,11 +3222,11 @@ namespace goals {
 			  outfile.close();
 		  }
 
-*/		  /*Step 3 - Convert these regexps into TSL regular expressions and get the partial differentials
+		  *//*Step 3 - Convert these regexps into TSL regular expressions and get the partial differentials
 		  *		   with respect their variables
 		  */
-
-/*		  cout << "[Newton Compare] converting to TSL" << endl;
+/*
+		  cout << "[Newton Compare] converting to TSL" << endl;
 		  while (!wl.empty())
 		  {
 			  int wlSzie = wl.size();
@@ -3315,7 +3356,7 @@ namespace goals {
 						  int t1 = mapBack[wID].first.second;
 						  int t2 = mapBack[y_i].first.second;
 						  std::pair<int, int> mergePair = mergeSrcMap[std::pair<int, int>(t1, t2)];
-						  std::pair<std::vector<std::string>, std::vector<std::string>> sList = con->getLocalVars(mergePair);
+						  std::pair<std::vector<std::string>, std::vector<std::string> > sList = con->getLocalVars(mergePair);
 						  std::vector<std::string> localVars = sList.first;
 						  std::vector<std::string> localVars2 = sList.second;
 						  merge_fn_t merge = new MeetMergeFn(con, localVars, localVars2);
@@ -3555,7 +3596,7 @@ namespace goals {
 				  tt->setWeight(w.v);
 			  }
 		  }
-*/		  /*for(map<int,pair<pair<int,int>,int> >::iterator mbit = mapBack.begin(); mbit != mapBack.end(); mbit++)
+		  for(map<int,pair<pair<int,int>,int> >::iterator mbit = mapBack.begin(); mbit != mapBack.end(); mbit++)
 		  {
 		  int src = mbit->second.first.first;
 		  int tgt = mbit->second.first.second;
@@ -3570,8 +3611,8 @@ namespace goals {
 		  // w->print(std::cout);
 		  tt->setWeight(w);
 		  }
-		  }*/
-/*		  t->start();
+		  }
+		  t->start();
 		  //sem_elem_t fWt = computePathSummary(fpds, outfa);
 		  outfa.path_summary_tarjan_fwpds(true);
 		  State * initS = outfa.getState(outfa.getInitialState());
@@ -3613,15 +3654,16 @@ namespace goals {
 	  //This is the actual workhorse of the Newton Rounds
 
 	  //FOR EACH Zi that depends on the changed variables
-	  //RE-EVALUATE THE tslFPDS RULE and create a new weight of the domain_t pds rule
+	  //RE-EVALUATE THE tslFPDS RULE and create a new weight of the domain_t pds rule*/
+	  return 0;
   }
 
-  *//*
+  /*
   *  A function fo compare ewpds,fwpds, and newton methods.  Currently running without merge functions.
   *
   *  Runs ewpds, fwpds, and newton on the same pds with nwaobdd weights and gets timing for each.
   */
-  /*void compareEwpdsFwpdsNewton()
+  void compareEwpdsFwpdsNewton()
   {
 	  bool fadump = false;
 	  FWPDS * originalPds = new FWPDS();
@@ -3665,7 +3707,7 @@ namespace goals {
     //wali::util::GoodTimer * nTimer = new wali::util::GoodTimer("Newton time");
     WFA outfaNewton;
     double cNtime = 0;
-    cNtime = run_newton(outfaNewton);
+    cNtime = run_newton(outfaNewton, getEntryStk(pg, mainProc));
    // nTimer->stop();
 
 	if (fadump) {
@@ -3789,7 +3831,107 @@ namespace goals {
 	NWA_OBDD::NWAOBDDNodeHandle::DisposeOfReduceCache();
 #endif
     
-  }*/
+  }
+
+#ifdef USE_DUET
+std::vector<caml_rule> ruleHolder;
+std::vector<caml_call_rule> callRuleHolder;
+std::vector<caml_epsilon_rule> epsilonRuleHolder;
+wali::Key entry_key;
+wali::Key exit_key;
+duetrel_t compareWeight;
+
+CAMLprim value compare_weights(Trans t) {
+    CAMLparam0();
+    CAMLlocal4(bval, nval, nCVal, sval);
+    value * n_func = caml_named_value("normalize_callback");
+    nCVal = caml_callback(*n_func, compareWeight->getValue());
+    value * eq_func = caml_named_value("eq_callback");
+    value * p_func = caml_named_value("print_callback");
+    nval = caml_callback(*n_func, ((DuetRel*)(t.weight().get_ptr()))->getValue());
+    sval = caml_callback(*p_func, nval);
+    std::cout << "WALI Weight: " << std::endl;
+    std::cout << String_val(sval) << std::endl;
+    sval = caml_callback(*p_func, nCVal);
+    std::cout << "Duet Weight: " << std::endl;
+    std::cout << String_val(sval) << std::endl;
+    bval = caml_callback2(*eq_func, nval, nCVal);
+
+
+    if(Bool_val(bval))
+    {
+	std::cout << "Correct!" << std::endl;
+    }
+    else 
+    {
+	std::cout << "Failure!" << std::endl;
+    }
+    CAMLreturn(Val_unit);
+}
+
+void runFwpds(FWPDS * pds)
+{
+  #if ET_DBG == 1
+    pds->print(std::cout);
+#endif
+    //reachPds->print(std::cout);
+    WFA outfa;
+    WFA outfa2;
+    WFA fa;
+    wali::Key acc = wali::getKeySpace()->getKey("accept");
+    sem_elem_t x = pds->get_theZero();
+    fa.addTrans(st1(),entry_key, acc, pds->get_theZero()->one());
+    fa.setInitialState(st1());
+    fa.addFinalState(acc);
+
+#if ET_DBG == 1
+	map<int, reg_exp_t> outNodeRegExpMap; // A map from a unique id of an outgoing node to the regular expression associated with it
+	map<int, int> updateableMap;  //A map from an upadateable node number to the id of the node it depends on 
+	map<int, int> oMap;
+	map<int, pair< pair<int, int>, int> > mapBack;  //A map from the node index to the struct of the <<src,tgt>,stack> - used to insert weights back into wfa
+	map<pair<pair<int, int>, int>, int> transMap;
+	vector<int> differentiatedList; //A list of nodes with where the differential is to be taken
+	map<std::pair<int, int>, std::pair<int, int> > mergeSrcMap; //The map that keeps track of the src of calls on call instructions
+#endif
+	
+    //Calls the poststar functions
+    cout << "[Newton Compare] Computing poststar..." << endl;
+#if ET_DBG == 1
+      pds->getOutRegExps(fa, outfa, outNodeRegExpMap, updateableMap, oMap, mapBack, transMap, differentiatedList, mergeSrcMap);
+#endif
+      pds->poststarIGR(fa,outfa);
+    //static value * start_anal = NULL;
+    //start_anal = caml_named_value("init_analysis");
+    //caml_callback(*start_anal, Val_unit);
+
+#if ET_DBG == 1
+    cout << "Print Regular Expressions: " << endl;
+    map<int, reg_exp_t>::iterator regExpIt = outNodeRegExpMap.begin();
+    for (regExpIt; regExpIt != outNodeRegExpMap.end(); regExpIt++)
+    {
+ 	regExpIt->second->print(std::cout);
+	std::cout << std::endl << std::endl;
+    }
+
+#endif
+
+    cout << "Finishing poststar: " << endl;
+    outfa.path_summary_iterative_original(outfa.getSomeWeight()->one());
+
+    fstream outfile("outfa.txt", fstream::out);
+		  outfa.print(outfile);
+		  outfile.close();
+
+    Trans t;
+    outfa.find(st1(), exit_key, acc, t);
+
+    compare_weights(t);
+
+
+    #undef flush
+    std::cout << "Finished Printing" << std::endl << std::flush;
+}
+#endif
 
 }
 
@@ -3821,11 +3963,11 @@ void * work(void *)
       runEwpds(outfa);
       break;
     case 6:
-   //   run_newton(outfa);
-     // break;
-//	case 7:
-//		run_newton_noTensor(outfa);
-//		break;
+      run_newton(outfa, getEntryStk(pg, mainProc));
+      break;
+    case 7:
+	run_newton_noTensor(outfa);
+	break;
     default:
       assert(0 && "I don't understand that goal!!!");
   }
@@ -3833,11 +3975,53 @@ void * work(void *)
 }
 
 
+#ifdef USE_DUET
+
+int main(int argc, char **argv)
+{
+    caml_startup(argv);
+    FWPDS * pds = new FWPDS();
+
+    for (std::vector<caml_rule>::iterator it = ruleHolder.begin(); it != ruleHolder.end(); it++)
+    {
+	pds->add_rule(st1(), it->first.first, st1(), it->first.second, it->second);
+    }
+
+    for (std::vector<caml_call_rule>::iterator itc = callRuleHolder.begin(); itc != callRuleHolder.end(); itc++)
+    {
+	pds->add_rule(st1(), itc->first.first, st1(), itc->first.second.first, itc->first.second.second, itc->second);
+    }
+
+    for (std::vector<caml_epsilon_rule>::iterator ite = epsilonRuleHolder.begin(); ite != epsilonRuleHolder.end(); ite++)
+    {
+	pds->add_rule(st1(), ite->first, st1(), ite->second);
+    }
+
+    WFA outfaNewton;
+    goals::run_newton(outfaNewton, entry_key, pds, false);
+
+    wali::Key acc = wali::getKeySpace()->getKey("accept");
+
+    Trans t;
+    outfaNewton.find(st1(), exit_key, acc, t);
+
+    compare_weights(t);
+
+
+    #undef flush
+    std::cout << "Finished Printing" << std::endl << std::flush;
+
+    return 0;
+}
+
+#else
+
 /*
 *  Runs the Esparza evaluation method.
 *
 *  The form should be of <.bp file> <int goal>
 */
+
 int main(int argc, char ** argv)
 {
   // register signal handler
@@ -3928,3 +4112,5 @@ int main(int argc, char ** argv)
   deep_erase_prog(&pg);
   return 0;
 }
+
+#endif
