@@ -1,0 +1,19 @@
+README:
+
+TO BUILD NewtonCompare:
+	go to the WALI home directory
+	run scons addons
+	run scons examples
+	run _buil64\Examples\cprover\NewtonCompare.exe <num>  num = 3,5,6,7 - EWPDS = 3, FWPDS = 5, NewtonTensor = 6, NewtonNoTensor - 7
+
+
+
+Other Issues:
+	If, for some reason, you need to rebuild semantic_spec\common\regexp - then note that the auto-generated files will have compile errors
+	All occurrences of "EXTERNS::sem_elem_wrapperRefPtr" need to be replaced with "EXTERN_TYPES::sem_elem_wrapperRefPtr"
+	In common.conc.1level.rtg.hpp - of the first three typedefs, one needs to be deleted, leaving:
+	typedef CBTI                   BASETYPE;
+    	typedef CONC_OPAQUE_TYPE       OPAQUE_TYPE;
+
+	After doing this, you need to go into conc.1level.cir.cpp in order to manually change all functions written to be tail recursive in tsl to be tail 		recursive in c++
+
