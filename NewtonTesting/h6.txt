@@ -1,0 +1,1560 @@
+executable	= Release/Newton.exe
+universe	= vanilla
+notification	= Error
+notify_user	= turetsky@cs.wisc.edu
+periodic_remove	= (CommittedTime - CumulativeSuspensionTime) > 600
+when_to_transfer_output	= ON_EXIT_OR_EVICT
+should_transfer_files	= yes
+environment	= LD_LIBRARY_PATH=.
+request_memory = 2*1024
+
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__BufAfterReqCompletedIoctlA.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__BufAfterReqCompletedIoctlA.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__BufAfterReqCompletedIoctlA.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__BufAfterReqCompletedIoctlA.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__DeviceInitAPI.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__DeviceInitAPI.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__DeviceInitAPI.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__DeviceInitAPI.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__WmiForward.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__WmiForward.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__WmiForward.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__WmiForward.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__IoDpcRoutine.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__IoDpcRoutine.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__IoDpcRoutine.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__IoDpcRoutine.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__StartIoRecursion.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__StartIoRecursion.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__StartIoRecursion.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__StartIoRecursion.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__CancelRoutine.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__CancelRoutine.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__CancelRoutine.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__CancelRoutine.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedIoctl.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedIoctl.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedIoctl.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__MemAfterReqCompletedIoctl.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__MarkingQueuedIrps.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__MarkingQueuedIrps.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__MarkingQueuedIrps.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__MarkingQueuedIrps.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__DeviceInitAllocate.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__DeviceInitAllocate.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__DeviceInitAllocate.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__DeviceInitAllocate.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__CancelSpinLock.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__CancelSpinLock.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__CancelSpinLock.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__CancelSpinLock.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__IoCompletion.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__IoCompletion.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__IoCompletion.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__IoCompletion.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_network_ndis_athwifi_driver_atheros__NdisStallExecution_Delay.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_network_ndis_athwifi_driver_atheros__NdisStallExecution_Delay.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_network_ndis_athwifi_driver_atheros__NdisStallExecution_Delay.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_network_ndis_athwifi_driver_atheros__NdisStallExecution_Delay.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__DoubleCompletion.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__DoubleCompletion.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__DoubleCompletion.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__DoubleCompletion.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__MarkIrpPending2.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__MarkIrpPending2.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__MarkIrpPending2.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__MarkIrpPending2.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__SpinlockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__SpinlockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__SpinlockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__SpinlockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_network_ndis_xframeii_sys_ndis6__NdisAllocateMemoryWithTagPriority.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_network_ndis_xframeii_sys_ndis6__NdisAllocateMemoryWithTagPriority.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_network_ndis_xframeii_sys_ndis6__NdisAllocateMemoryWithTagPriority.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_network_ndis_xframeii_sys_ndis6__NdisAllocateMemoryWithTagPriority.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__NonPnpKMDFDriver.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__NonPnpKMDFDriver.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__NonPnpKMDFDriver.no.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__NonPnpKMDFDriver.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__QueuedSpinLockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__QueuedSpinLockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__QueuedSpinLockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__QueuedSpinLockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_cdrom__WdfWaitlockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_cdrom__WdfWaitlockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_cdrom__WdfWaitlockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_cdrom__WdfWaitlockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__IrpProcessingComplete.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__IrpProcessingComplete.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__IrpProcessingComplete.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__IrpProcessingComplete.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__CheckAddDevice.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__CheckAddDevice.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__CheckAddDevice.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__CheckAddDevice.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__CheckAddDevice.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__CheckAddDevice.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__CheckAddDevice.no.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__CheckAddDevice.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__KeDpcRoutine.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__KeDpcRoutine.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__KeDpcRoutine.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__KeDpcRoutine.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedRead.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedRead.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedRead.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__BufAfterReqCompletedRead.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__MemAfterReqCompletedWrite.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__MemAfterReqCompletedWrite.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__MemAfterReqCompletedWrite.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__MemAfterReqCompletedWrite.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__RequestFormattedValid.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__RequestFormattedValid.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__RequestFormattedValid.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__RequestFormattedValid.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__KeDpcRoutine.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__KeDpcRoutine.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__KeDpcRoutine.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__KeDpcRoutine.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__DoubleCompletion.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__DoubleCompletion.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__DoubleCompletion.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__DoubleCompletion.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__IrpCancelField.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__IrpCancelField.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__IrpCancelField.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__IrpCancelField.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/p-irpcancel7.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/p-irpcancel7.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/p-irpcancel7.yes.bp.NWAOBDDTest.out
+arguments	= p-irpcancel7.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__RequestCompletedLocal.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__RequestCompletedLocal.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__RequestCompletedLocal.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__RequestCompletedLocal.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__CheckIrpMjPnp.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__CheckIrpMjPnp.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__CheckIrpMjPnp.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__CheckIrpMjPnp.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__AddDeviceBus.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__AddDeviceBus.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__AddDeviceBus.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__AddDeviceBus.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__PagedCode.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__PagedCode.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__PagedCode.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__PagedCode.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__MemAfterReqCompletedWriteA.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__MemAfterReqCompletedWriteA.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__MemAfterReqCompletedWriteA.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__MemAfterReqCompletedWriteA.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__NonPnpKMDFDriver.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__NonPnpKMDFDriver.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__NonPnpKMDFDriver.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__NonPnpKMDFDriver.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IsrRoutine.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IsrRoutine.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IsrRoutine.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__IsrRoutine.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedIoctlA.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedIoctlA.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedIoctlA.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__BufAfterReqCompletedIoctlA.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__IsrRoutine.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__IsrRoutine.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__IsrRoutine.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__IsrRoutine.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__PagedCode.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__PagedCode.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__PagedCode.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__PagedCode.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__StartIoRoutine.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__StartIoRoutine.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__StartIoRoutine.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__StartIoRoutine.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__CancelSpinLock.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__CancelSpinLock.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__CancelSpinLock.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__CancelSpinLock.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedWriteA.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedWriteA.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedWriteA.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__MemAfterReqCompletedWriteA.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__WdfInterruptLockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__WdfInterruptLockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__WdfInterruptLockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__WdfInterruptLockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedRead.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedRead.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedRead.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__MemAfterReqCompletedRead.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__SpinLock.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__SpinLock.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__SpinLock.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__SpinLock.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__IrqlDispatch.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__IrqlDispatch.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__IrqlDispatch.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__IrqlDispatch.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__PnpSameDeviceObject.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__PnpSameDeviceObject.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__PnpSameDeviceObject.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__PnpSameDeviceObject.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/p-update.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/p-update.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/p-update.yes.bp.NWAOBDDTest.out
+arguments	= p-update.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__WdfSpinlockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__WdfSpinlockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__WdfSpinlockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__WdfSpinlockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__MemAfterReqCompletedIntIoctl.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__MemAfterReqCompletedIntIoctl.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__MemAfterReqCompletedIntIoctl.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__MemAfterReqCompletedIntIoctl.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__BufAfterReqCompletedIoctlA.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__BufAfterReqCompletedIoctlA.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__BufAfterReqCompletedIoctlA.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__BufAfterReqCompletedIoctlA.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_usb_osrusbfx2_kmdf_sys_final__DriverCreate.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_usb_osrusbfx2_kmdf_sys_final__DriverCreate.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_usb_osrusbfx2_kmdf_sys_final__DriverCreate.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_usb_osrusbfx2_kmdf_sys_final__DriverCreate.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlKeWaitForSingleObject.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlKeWaitForSingleObject.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlKeWaitForSingleObject.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__IrqlKeWaitForSingleObject.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__CancelRoutine.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__CancelRoutine.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__CancelRoutine.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__CancelRoutine.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__MarkingInterlockedQueuedIrps.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__MarkingInterlockedQueuedIrps.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__MarkingInterlockedQueuedIrps.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__MarkingInterlockedQueuedIrps.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__RequestFormattedValid.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__RequestFormattedValid.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__RequestFormattedValid.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__RequestFormattedValid.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__WorkerThread.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__WorkerThread.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__WorkerThread.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__WorkerThread.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__CheckAddDevice.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__CheckAddDevice.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__CheckAddDevice.no.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__CheckAddDevice.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IoCompletion.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IoCompletion.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IoCompletion.no.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__IoCompletion.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__WmiForward.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__WmiForward.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__WmiForward.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__WmiForward.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedWriteA.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedWriteA.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedWriteA.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedWriteA.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_cdrom__ReqSendWhileSpinlock.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_cdrom__ReqSendWhileSpinlock.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_cdrom__ReqSendWhileSpinlock.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_cdrom__ReqSendWhileSpinlock.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__DoubleCompletionLocal.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__DoubleCompletionLocal.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__DoubleCompletionLocal.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__DoubleCompletionLocal.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__DeviceInitAllocate.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__DeviceInitAllocate.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__DeviceInitAllocate.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__DeviceInitAllocate.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__BufAfterReqCompletedReadA.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__BufAfterReqCompletedReadA.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__BufAfterReqCompletedReadA.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__BufAfterReqCompletedReadA.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__CheckDriverUnload.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__CheckDriverUnload.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__CheckDriverUnload.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__CheckDriverUnload.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__WmiForward.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__WmiForward.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__WmiForward.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__WmiForward.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__MarkingInterlockedQueuedIrps.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__MarkingInterlockedQueuedIrps.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__MarkingInterlockedQueuedIrps.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__MarkingInterlockedQueuedIrps.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__IrqlKeRaiseLower2.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__IrqlKeRaiseLower2.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__IrqlKeRaiseLower2.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__IrqlKeRaiseLower2.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/p-arith2.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/p-arith2.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/p-arith2.no.bp.NWAOBDDTest.out
+arguments	= p-arith2.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__InputBufferAPI.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__InputBufferAPI.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__InputBufferAPI.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__InputBufferAPI.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__IoDpcRoutine.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__IoDpcRoutine.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__IoDpcRoutine.no.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__IoDpcRoutine.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__WorkerThread.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__WorkerThread.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__WorkerThread.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__WorkerThread.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__SpinlockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__SpinlockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__SpinlockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__SpinlockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__CancelSpinLock.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__CancelSpinLock.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__CancelSpinLock.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__CancelSpinLock.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/n-proc-bypass1.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/n-proc-bypass1.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/n-proc-bypass1.no.bp.NWAOBDDTest.out
+arguments	= n-proc-bypass1.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__CheckIrpMjPnp.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__CheckIrpMjPnp.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__CheckIrpMjPnp.no.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__CheckIrpMjPnp.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__WdfSpinlockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__WdfSpinlockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__WdfSpinlockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__WdfSpinlockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__QueuedSpinLockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__QueuedSpinLockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__QueuedSpinLockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__QueuedSpinLockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__OutputBufferAPI.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__OutputBufferAPI.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__OutputBufferAPI.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__OutputBufferAPI.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__DoubleCompletion.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__DoubleCompletion.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__DoubleCompletion.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__DoubleCompletion.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/p-return3.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/p-return3.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/p-return3.fp.yes.bp.NWAOBDDTest.out
+arguments	= p-return3.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__ExclusiveResourceAccessRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__ExclusiveResourceAccessRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__ExclusiveResourceAccessRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__ExclusiveResourceAccessRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__MarkIrpPending.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__MarkIrpPending.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__MarkIrpPending.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__MarkIrpPending.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/p-proc-bypass4.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/p-proc-bypass4.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/p-proc-bypass4.fp.yes.bp.NWAOBDDTest.out
+arguments	= p-proc-bypass4.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__SpinlockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__SpinlockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__SpinlockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__SpinlockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/n-unresolved_if.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/n-unresolved_if.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/n-unresolved_if.no.bp.NWAOBDDTest.out
+arguments	= n-unresolved_if.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__WmiComplete.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__WmiComplete.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__WmiComplete.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__WmiComplete.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__IrqlDispatch.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__IrqlDispatch.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__IrqlDispatch.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__IrqlDispatch.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedIntIoctlA.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedIntIoctlA.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedIntIoctlA.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__BufAfterReqCompletedIntIoctlA.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__IsrRoutine.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__IsrRoutine.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__IsrRoutine.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__IsrRoutine.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_usb_osrusbfx2_kmdf_sys_final__DriverAttributeChanged.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_usb_osrusbfx2_kmdf_sys_final__DriverAttributeChanged.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_usb_osrusbfx2_kmdf_sys_final__DriverAttributeChanged.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_usb_osrusbfx2_kmdf_sys_final__DriverAttributeChanged.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__MarkIrpPending.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__MarkIrpPending.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__MarkIrpPending.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__MarkIrpPending.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlKeDispatchLte.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlKeDispatchLte.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlKeDispatchLte.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__IrqlKeDispatchLte.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__DispatchRoutine.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__DispatchRoutine.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__DispatchRoutine.no.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__DispatchRoutine.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__IoDpcRoutine.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__IoDpcRoutine.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__IoDpcRoutine.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__IoDpcRoutine.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__MarkingQueuedIrps.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__MarkingQueuedIrps.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__MarkingQueuedIrps.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__MarkingQueuedIrps.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__SpinlockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__SpinlockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__SpinlockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__SpinlockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__IrpCancelField.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__IrpCancelField.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__IrpCancelField.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__IrpCancelField.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__AddDevice.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__AddDevice.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__AddDevice.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__AddDevice.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__CancelSpinLock.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__CancelSpinLock.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__CancelSpinLock.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__CancelSpinLock.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__DispatchRoutine.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__DispatchRoutine.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__DispatchRoutine.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__DispatchRoutine.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__CheckIrpMjPnp.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__CheckIrpMjPnp.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__CheckIrpMjPnp.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__CheckIrpMjPnp.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__InitFreeNull.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__InitFreeNull.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__InitFreeNull.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__InitFreeNull.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__IoDpcRoutine.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__IoDpcRoutine.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__IoDpcRoutine.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__IoDpcRoutine.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__BufAfterReqCompletedIntIoctlA.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__BufAfterReqCompletedIntIoctlA.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__BufAfterReqCompletedIntIoctlA.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__BufAfterReqCompletedIntIoctlA.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__EvtIoStopCancel.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__EvtIoStopCancel.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__EvtIoStopCancel.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__EvtIoStopCancel.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__DeviceInitAPI.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__DeviceInitAPI.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__DeviceInitAPI.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__DeviceInitAPI.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/p-return4.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/p-return4.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/p-return4.fp.yes.bp.NWAOBDDTest.out
+arguments	= p-return4.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__MarkIrpPending2.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__MarkIrpPending2.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__MarkIrpPending2.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__MarkIrpPending2.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__WdfInterruptLockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__WdfInterruptLockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__WdfInterruptLockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__WdfInterruptLockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedIntIoctl.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedIntIoctl.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedIntIoctl.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__BufAfterReqCompletedIntIoctl.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_network_ndis_athwifi_driver_atheros__DoubleComplete.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_network_ndis_athwifi_driver_atheros__DoubleComplete.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_network_ndis_athwifi_driver_atheros__DoubleComplete.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_network_ndis_athwifi_driver_atheros__DoubleComplete.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedIntIoctl.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedIntIoctl.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedIntIoctl.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__MemAfterReqCompletedIntIoctl.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__WdfWaitlockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__WdfWaitlockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__WdfWaitlockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__WdfWaitlockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__CriticalRegions.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__CriticalRegions.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__CriticalRegions.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__CriticalRegions.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__QueuedSpinLockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__QueuedSpinLockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__QueuedSpinLockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__QueuedSpinLockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedWriteA.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedWriteA.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedWriteA.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__BufAfterReqCompletedWriteA.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__KeDpcRoutine.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__KeDpcRoutine.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__KeDpcRoutine.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__KeDpcRoutine.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlReturn.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlReturn.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlReturn.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__IrqlReturn.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__NonPnpKMDFDriver.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__NonPnpKMDFDriver.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__NonPnpKMDFDriver.no.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__NonPnpKMDFDriver.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__InitFreeNull.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__InitFreeNull.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__InitFreeNull.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__InitFreeNull.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__SpinlockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__SpinlockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__SpinlockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__SpinlockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__StartIoRoutine.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__StartIoRoutine.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__StartIoRoutine.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__StartIoRoutine.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_cdrom__WdfSpinlock.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_cdrom__WdfSpinlock.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_cdrom__WdfSpinlock.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_cdrom__WdfSpinlock.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_cdrom__NonPnpKMDFDriver.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_cdrom__NonPnpKMDFDriver.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_cdrom__NonPnpKMDFDriver.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_cdrom__NonPnpKMDFDriver.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__CancelSpinLock.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__CancelSpinLock.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__CancelSpinLock.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__CancelSpinLock.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__CheckDriverUnload.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__CheckDriverUnload.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__CheckDriverUnload.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__CheckDriverUnload.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__StartIoRecursion.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__StartIoRecursion.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__StartIoRecursion.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__StartIoRecursion.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__WorkerThread.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__WorkerThread.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__WorkerThread.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__WorkerThread.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_toaster_wdm_func_featured2__WmiForward.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_toaster_wdm_func_featured2__WmiForward.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_toaster_wdm_func_featured2__WmiForward.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_toaster_wdm_func_featured2__WmiForward.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__MarkingQueuedIrps.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__MarkingQueuedIrps.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__MarkingQueuedIrps.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__MarkingQueuedIrps.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_cdrom__SyncReqSend2.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_cdrom__SyncReqSend2.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_cdrom__SyncReqSend2.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_cdrom__SyncReqSend2.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__DispatchRoutine.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__DispatchRoutine.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__DispatchRoutine.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__DispatchRoutine.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__IsrRoutine.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__IsrRoutine.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__IsrRoutine.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__IsrRoutine.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__EvtIoStopCancel.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__EvtIoStopCancel.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__EvtIoStopCancel.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__EvtIoStopCancel.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__CancelSpinlockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__CancelSpinlockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__CancelSpinlockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__CancelSpinlockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__IrpProcessingComplete.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__IrpProcessingComplete.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__IrpProcessingComplete.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__IrpProcessingComplete.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__EvtIoStopResume.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__EvtIoStopResume.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__EvtIoStopResume.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__EvtIoStopResume.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__IoCompletion.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__IoCompletion.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__IoCompletion.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__IoCompletion.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__DanglingDeviceObjectReference.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__DanglingDeviceObjectReference.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__DanglingDeviceObjectReference.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__DanglingDeviceObjectReference.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedWrite.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedWrite.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedWrite.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedWrite.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__ReqNotCanceledLocal.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__ReqNotCanceledLocal.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__ReqNotCanceledLocal.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__ReqNotCanceledLocal.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__ExclusiveResourceAccessRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__ExclusiveResourceAccessRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__ExclusiveResourceAccessRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__ExclusiveResourceAccessRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__IrqlKeDispatchLte.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__IrqlKeDispatchLte.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__IrqlKeDispatchLte.no.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__IrqlKeDispatchLte.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__InvalidReqAccess.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__InvalidReqAccess.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__InvalidReqAccess.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__InvalidReqAccess.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/p-assumption.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/p-assumption.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/p-assumption.fp.yes.bp.NWAOBDDTest.out
+arguments	= p-assumption.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/p-recursion.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/p-recursion.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/p-recursion.yes.bp.NWAOBDDTest.out
+arguments	= p-recursion.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__StartIoRoutine.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__StartIoRoutine.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__StartIoRoutine.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__StartIoRoutine.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__InitFreeNull.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__InitFreeNull.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__InitFreeNull.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__InitFreeNull.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__DanglingDeviceObjectReference.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__DanglingDeviceObjectReference.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__DanglingDeviceObjectReference.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__DanglingDeviceObjectReference.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__DoubleCompletion.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__DoubleCompletion.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__DoubleCompletion.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__DoubleCompletion.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlKeSetEvent.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlKeSetEvent.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlKeSetEvent.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__IrqlKeSetEvent.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_cdrom__ReqMarkCancelableSend.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_cdrom__ReqMarkCancelableSend.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_cdrom__ReqMarkCancelableSend.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_cdrom__ReqMarkCancelableSend.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlIoPassive1.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlIoPassive1.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlIoPassive1.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__IrqlIoPassive1.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__EvtIoStopResume.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__EvtIoStopResume.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__EvtIoStopResume.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__EvtIoStopResume.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__WdfInterruptLockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__WdfInterruptLockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__WdfInterruptLockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__WdfInterruptLockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IoDpcRoutine.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IoDpcRoutine.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IoDpcRoutine.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__IoDpcRoutine.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_network_ndis_xframeii_sys_ndis6__DoubleComplete.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_network_ndis_xframeii_sys_ndis6__DoubleComplete.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_network_ndis_xframeii_sys_ndis6__DoubleComplete.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_network_ndis_xframeii_sys_ndis6__DoubleComplete.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__SpinlockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__SpinlockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__SpinlockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__SpinlockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__DispatchRoutine.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__DispatchRoutine.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__DispatchRoutine.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__DispatchRoutine.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__CheckAddDevice.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__CheckAddDevice.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__CheckAddDevice.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__CheckAddDevice.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_cdrom__PureKmdfDriver.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_cdrom__PureKmdfDriver.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_cdrom__PureKmdfDriver.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_cdrom__PureKmdfDriver.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__CheckDriverUnload.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__CheckDriverUnload.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__CheckDriverUnload.no.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__CheckDriverUnload.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__DanglingDeviceObjectReference.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__DanglingDeviceObjectReference.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__DanglingDeviceObjectReference.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__DanglingDeviceObjectReference.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_cdrom__InitFreeNull.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_cdrom__InitFreeNull.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_cdrom__InitFreeNull.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_cdrom__InitFreeNull.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__BufAfterReqCompletedWriteA.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__BufAfterReqCompletedWriteA.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__BufAfterReqCompletedWriteA.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__BufAfterReqCompletedWriteA.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__SpinlockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__SpinlockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__SpinlockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__SpinlockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_cdrom__WdfInterruptLockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_cdrom__WdfInterruptLockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_cdrom__WdfInterruptLockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_cdrom__WdfInterruptLockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__MarkIrpPending2.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__MarkIrpPending2.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__MarkIrpPending2.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__MarkIrpPending2.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedIoctl.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedIoctl.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedIoctl.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedIoctl.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedWrite.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedWrite.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedWrite.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__MemAfterReqCompletedWrite.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/p-proc-bypass2.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/p-proc-bypass2.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/p-proc-bypass2.fp.yes.bp.NWAOBDDTest.out
+arguments	= p-proc-bypass2.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrpCancelField.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrpCancelField.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrpCancelField.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__IrpCancelField.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__RequestedPowerIrp.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__RequestedPowerIrp.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__RequestedPowerIrp.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__RequestedPowerIrp.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__MarkingInterlockedQueuedIrps.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__MarkingInterlockedQueuedIrps.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__MarkingInterlockedQueuedIrps.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__MarkingInterlockedQueuedIrps.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__MarkIrpPending.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__MarkIrpPending.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__MarkIrpPending.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__MarkIrpPending.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/p-proc-bypass1.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/p-proc-bypass1.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/p-proc-bypass1.fp.yes.bp.NWAOBDDTest.out
+arguments	= p-proc-bypass1.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__QueuedSpinLockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__QueuedSpinLockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__QueuedSpinLockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__QueuedSpinLockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__OutputBufferAPI.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__OutputBufferAPI.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__OutputBufferAPI.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__OutputBufferAPI.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__StartIoRoutine.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__StartIoRoutine.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__StartIoRoutine.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__StartIoRoutine.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__ReqNotCanceledLocal.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__ReqNotCanceledLocal.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__ReqNotCanceledLocal.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__ReqNotCanceledLocal.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/p-unresolved_if.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/p-unresolved_if.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/p-unresolved_if.fp.yes.bp.NWAOBDDTest.out
+arguments	= p-unresolved_if.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedRead.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedRead.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedRead.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedRead.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__EvtIoStopCancel.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__EvtIoStopCancel.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__EvtIoStopCancel.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__EvtIoStopCancel.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__StartIoCancel.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__StartIoCancel.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__StartIoCancel.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__StartIoCancel.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__CheckDriverUnload.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__CheckDriverUnload.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__CheckDriverUnload.no.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__CheckDriverUnload.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__ExclusiveResourceAccessRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__ExclusiveResourceAccessRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__ExclusiveResourceAccessRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__ExclusiveResourceAccessRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__QueuedSpinLockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__QueuedSpinLockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__QueuedSpinLockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__QueuedSpinLockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__DoubleCompletionLocal.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__DoubleCompletionLocal.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__DoubleCompletionLocal.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__DoubleCompletionLocal.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlZwPassive.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlZwPassive.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlZwPassive.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__IrqlZwPassive.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__WmiComplete.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__WmiComplete.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__WmiComplete.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__WmiComplete.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__CheckIrpMjPnp.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__CheckIrpMjPnp.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__CheckIrpMjPnp.no.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__CheckIrpMjPnp.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__DeviceInitAPI.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__DeviceInitAPI.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__DeviceInitAPI.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__DeviceInitAPI.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__RequestFormattedValid.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__RequestFormattedValid.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__RequestFormattedValid.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__RequestFormattedValid.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_toaster_wdm_func_featured1__WmiForward.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_toaster_wdm_func_featured1__WmiForward.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_toaster_wdm_func_featured1__WmiForward.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_toaster_wdm_func_featured1__WmiForward.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__CheckAddDevice.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__CheckAddDevice.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__CheckAddDevice.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__CheckAddDevice.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__InputBufferAPI.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__InputBufferAPI.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__InputBufferAPI.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__InputBufferAPI.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__ExclusiveResourceAccessRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__ExclusiveResourceAccessRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__ExclusiveResourceAccessRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__ExclusiveResourceAccessRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__StartIoRoutine.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__StartIoRoutine.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__StartIoRoutine.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__StartIoRoutine.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__DanglingDeviceObjectReference.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__DanglingDeviceObjectReference.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__DanglingDeviceObjectReference.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__DanglingDeviceObjectReference.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__ControlDeviceDeleted.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__ControlDeviceDeleted.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__ControlDeviceDeleted.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__ControlDeviceDeleted.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/p-reason.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/p-reason.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/p-reason.fp.yes.bp.NWAOBDDTest.out
+arguments	= p-reason.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlExAllocatePool.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlExAllocatePool.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlExAllocatePool.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__IrqlExAllocatePool.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__IoCompletion.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__IoCompletion.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__IoCompletion.no.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__IoCompletion.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__CancelRoutine.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__CancelRoutine.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__CancelRoutine.no.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__CancelRoutine.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__KeDpcRoutine.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__KeDpcRoutine.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__KeDpcRoutine.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__KeDpcRoutine.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_cdrom__PagedCodeAtD0.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_cdrom__PagedCodeAtD0.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_cdrom__PagedCodeAtD0.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_cdrom__PagedCodeAtD0.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__MarkCancOnCancReqLocal.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__MarkCancOnCancReqLocal.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__MarkCancOnCancReqLocal.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__MarkCancOnCancReqLocal.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__ExclusiveResourceAccessRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__ExclusiveResourceAccessRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__ExclusiveResourceAccessRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__ExclusiveResourceAccessRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedIntIoctl.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedIntIoctl.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedIntIoctl.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedIntIoctl.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedIoctlA.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedIoctlA.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedIoctlA.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__MemAfterReqCompletedIoctlA.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlKeApcLte1.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlKeApcLte1.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlKeApcLte1.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__IrqlKeApcLte1.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__CheckDriverUnload.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__CheckDriverUnload.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__CheckDriverUnload.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__CheckDriverUnload.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__BufAfterReqCompletedReadA.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__BufAfterReqCompletedReadA.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__BufAfterReqCompletedReadA.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__BufAfterReqCompletedReadA.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedReadA.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedReadA.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedReadA.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__BufAfterReqCompletedReadA.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__DanglingDeviceObjectReference.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__DanglingDeviceObjectReference.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__DanglingDeviceObjectReference.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__DanglingDeviceObjectReference.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedReadA.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedReadA.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedReadA.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__MemAfterReqCompletedReadA.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__IoCompletion.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__IoCompletion.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__IoCompletion.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__IoCompletion.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__DeviceInitAllocate.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__DeviceInitAllocate.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__DeviceInitAllocate.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__DeviceInitAllocate.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__WdfWaitlockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__WdfWaitlockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__WdfWaitlockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__WdfWaitlockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__WmiComplete.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__WmiComplete.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__WmiComplete.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__WmiComplete.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__IrpCancelField.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__IrpCancelField.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__IrpCancelField.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__IrpCancelField.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/p-compress-recurse.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/p-compress-recurse.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/p-compress-recurse.yes.bp.NWAOBDDTest.out
+arguments	= p-compress-recurse.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__WdfSpinlock.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__WdfSpinlock.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__WdfSpinlock.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__WdfSpinlock.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__EvtIoStopResume.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__EvtIoStopResume.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__EvtIoStopResume.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__EvtIoStopResume.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedIoctl.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedIoctl.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedIoctl.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__BufAfterReqCompletedIoctl.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__DispatchRoutine.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__DispatchRoutine.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__DispatchRoutine.no.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__DispatchRoutine.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__IrqlKeRaiseLower2.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__IrqlKeRaiseLower2.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__IrqlKeRaiseLower2.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__IrqlKeRaiseLower2.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__RequestCompleted.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__RequestCompleted.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__RequestCompleted.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__RequestCompleted.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__KeDpcRoutine.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__KeDpcRoutine.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__KeDpcRoutine.no.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__KeDpcRoutine.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/p-proc-bypass3.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/p-proc-bypass3.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/p-proc-bypass3.fp.yes.bp.NWAOBDDTest.out
+arguments	= p-proc-bypass3.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__SpinLockSafe.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__SpinLockSafe.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__SpinLockSafe.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__SpinLockSafe.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__WdfWaitlockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__WdfWaitlockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__WdfWaitlockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__WdfWaitlockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_classpnp__IrqlDispatch.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_classpnp__IrqlDispatch.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_classpnp__IrqlDispatch.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__IrqlDispatch.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__WmiForward.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__WmiForward.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__WmiForward.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__WmiForward.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__IrqlKeRaiseLower2.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__IrqlKeRaiseLower2.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__IrqlKeRaiseLower2.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__IrqlKeRaiseLower2.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_toaster_wdm_func_featured1__DanglingDeviceObjectReference.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_toaster_wdm_func_featured1__DanglingDeviceObjectReference.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_toaster_wdm_func_featured1__DanglingDeviceObjectReference.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_toaster_wdm_func_featured1__DanglingDeviceObjectReference.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__KmdfIrql.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__KmdfIrql.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__KmdfIrql.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__KmdfIrql.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_class_disk__SpinlockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_class_disk__SpinlockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_class_disk__SpinlockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__SpinlockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/n-proc-bypass3.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/n-proc-bypass3.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/n-proc-bypass3.no.bp.NWAOBDDTest.out
+arguments	= n-proc-bypass3.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedWrite.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedWrite.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__BufAfterReqCompletedWrite.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__BufAfterReqCompletedWrite.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__CheckIrpMjPnp.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__CheckIrpMjPnp.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__CheckIrpMjPnp.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__CheckIrpMjPnp.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__StartIoRecursion.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__StartIoRecursion.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__StartIoRecursion.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__StartIoRecursion.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__MarkingInterlockedQueuedIrps.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__MarkingInterlockedQueuedIrps.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__MarkingInterlockedQueuedIrps.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__MarkingInterlockedQueuedIrps.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__IrpProcessingComplete.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__IrpProcessingComplete.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__IrpProcessingComplete.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__IrpProcessingComplete.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__WdfSpinlockRelease.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__WdfSpinlockRelease.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__WdfSpinlockRelease.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__WdfSpinlockRelease.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__OutputBufferAPI.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__OutputBufferAPI.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__OutputBufferAPI.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__OutputBufferAPI.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__InvalidReqAccess.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__InvalidReqAccess.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_AutoSync__InvalidReqAccess.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_AutoSync__InvalidReqAccess.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__IrqlKeSetEvent.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__IrqlKeSetEvent.no.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__IrqlKeSetEvent.no.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__IrqlKeSetEvent.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__InvalidReqAccess.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__InvalidReqAccess.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__InvalidReqAccess.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__InvalidReqAccess.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedReadA.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedReadA.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_ramdisk__MemAfterReqCompletedReadA.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_ramdisk__MemAfterReqCompletedReadA.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__InputBufferAPI.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__InputBufferAPI.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__InputBufferAPI.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__InputBufferAPI.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_storage_sfloppy__DoubleCompletion.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_storage_sfloppy__DoubleCompletion.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_storage_sfloppy__DoubleCompletion.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__DoubleCompletion.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__IrqlIoPassive2.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__IrqlIoPassive2.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_pcidrv_wdm_hw__IrqlIoPassive2.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__IrqlIoPassive2.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__BufAfterReqCompletedWriteA.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__BufAfterReqCompletedWriteA.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_general_echo_kmdf_DriverSync__BufAfterReqCompletedWriteA.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_echo_kmdf_DriverSync__BufAfterReqCompletedWriteA.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlKeReleaseSpinLock.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlKeReleaseSpinLock.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec0to1/src_7600_input_hiddigi_wacompen__IrqlKeReleaseSpinLock.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_input_hiddigi_wacompen__IrqlKeReleaseSpinLock.fp.yes.bp 1
+queue
+
+
