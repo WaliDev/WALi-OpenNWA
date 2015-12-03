@@ -5,9 +5,9 @@
 
 #include "wali/domains/matrix/Matrix.hpp"
 
-#include "fixtures.hpp"
+#include "fixtures-boolmatrix.hpp"
 
-using namespace testing;
+using namespace testing::boolmatrix;
 
 namespace boost {
 namespace numeric {

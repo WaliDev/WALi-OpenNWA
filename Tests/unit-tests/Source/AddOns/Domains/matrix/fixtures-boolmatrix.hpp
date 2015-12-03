@@ -3,6 +3,9 @@
 
 namespace testing
 {
+namespace boolmatrix
+{
+
 using namespace boost::numeric::ublas;
 using namespace wali::domains;
 
@@ -128,6 +131,7 @@ struct MatrixFixtures_3x3
 };
 
 
+}
 }
 
 #endif
