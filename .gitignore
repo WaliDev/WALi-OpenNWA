@@ -14,6 +14,14 @@
 *.o
 *.os
 
+# Test output
+/*.output
+/unit-tests.INFO
+/unit-tests.WARNING
+/logs.INFO*
+/logs.WARNING*
+/dusty_bdd
+
 # Not sure why these aren't going to _build...
 /AddOns/Domains/ThirdParty/buddy-2.4/src/*.o
 /AddOns/Domains/ThirdParty/buddy-2.4/src/*.gcda
