@@ -52,6 +52,18 @@ namespace wali {
     //---------------------
     ShortestPathSemiring() : v(0) { }
     ShortestPathSemiring(unsigned int _v) : v(_v) {}
+
+    static
+    ShortestPathSemiring *
+    make_one() {
+      return new ShortestPathSemiring(0);
+    }
+
+    static
+    ShortestPathSemiring *
+    make_zero() {
+      return new ShortestPathSemiring((unsigned)-1);
+    }
   };
 
 
