@@ -6,24 +6,9 @@
 #include "wali/domains/matrix/Matrix.hpp"
 
 #include "fixtures-boolmatrix.hpp"
+#include "matrix-equal.hpp"
 
 using namespace testing::boolmatrix;
-
-namespace boost {
-namespace numeric {
-namespace ublas {
-
-template<typename T, typename O, typename S>
-bool operator==(matrix<T,O,S> const & m, matrix<T,O,S> const & n)
-{
-    // norm_inf(m) = max(abs(m_ij))
-    return norm_inf(m - n) == 0;
-}
-
-}
-}
-}
-
 
 namespace wali {
 namespace domains {
