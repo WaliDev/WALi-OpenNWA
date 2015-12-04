@@ -55,3 +55,4 @@
 ## Text editor temporary files
 .*.swp
 *~
+.gdb_history
