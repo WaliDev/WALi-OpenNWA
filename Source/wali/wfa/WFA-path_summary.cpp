@@ -386,7 +386,12 @@ namespace wali
         if (trans != NULL) {
           weight = trans->weight();
         } else {
-          weight = wt->zero();
+          if (getQuery() == INORDER) {
+            weight = new domains::ReversedSemElem(wt->zero());
+          }
+          else {
+            weight = wt->zero();
+          }
         }
 
         if (getQuery() == INORDER) {
