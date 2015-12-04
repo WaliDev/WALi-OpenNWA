@@ -325,7 +325,7 @@ namespace wali
       pds.print(std::cerr);
 #endif
 
-      WFA query;
+      WFA query(INORDER, progress);
       query.addState(pkey, wt->zero());
       query.setInitialState(pkey);
       Key fin = getKey("__done");
@@ -349,8 +349,7 @@ namespace wali
       query.print(std::cerr);
 #endif
 
-      WFA ans;
-      pds.poststar(query, ans);
+      WFA ans = pds.poststar(query);
 
 #ifdef JAMDEBUG
       fstream foo;
