@@ -45,6 +45,7 @@ namespace wali
   {
 
     public:
+      typedef T element_type;
       typedef unsigned int count_t;
 
       ref_ptr( T *t = 0 ) {
