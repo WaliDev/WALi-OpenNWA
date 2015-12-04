@@ -95,7 +95,7 @@ namespace wali {
         infinity() const {
 #define INHIBIT_MACRO_EXPANSION
           return std::numeric_limits<value_type>::max INHIBIT_MACRO_EXPANSION ();
-#udef INHIBIT_MACRO_EXPANSION
+#undef INHIBIT_MACRO_EXPANSION
         }
 
         bool
