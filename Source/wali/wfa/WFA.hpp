@@ -584,7 +584,7 @@ namespace wali
          * Assumes that path_summary has been called on the WFA
          */
         std::map<wali::Key, sem_elem_t>
-        readOutCombineOverAllPathsValues(std::set<Key> const & alpha);
+        readOutCombineOverAllPathsValues(std::set<Key> const & alpha) const;
 
         /** Return the results of an analysis
          *
@@ -594,7 +594,7 @@ namespace wali
          * Assumes that path_summary has been called on the WFA
          */
         std::map<wali::Key, sem_elem_t>
-        readOutCombineOverAllPathsValues();
+        readOutCombineOverAllPathsValues() const;
 
 
       protected:

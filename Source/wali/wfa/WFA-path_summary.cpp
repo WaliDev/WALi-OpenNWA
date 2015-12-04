@@ -405,13 +405,13 @@ namespace wali
 
 
     std::map<Key, sem_elem_t>
-    WFA::readOutCombineOverAllPathsValues()
+    WFA::readOutCombineOverAllPathsValues() const
     {
       return readOutCombineOverAllPathsValues(alphabet());
     }
 
     std::map<Key, sem_elem_t>
-    WFA::readOutCombineOverAllPathsValues(std::set<Key> const & alpha)
+    WFA::readOutCombineOverAllPathsValues(std::set<Key> const & alpha) const
     {
       Key const init = getInitialState();
       sem_elem_t weight = getSomeWeight()->zero();
