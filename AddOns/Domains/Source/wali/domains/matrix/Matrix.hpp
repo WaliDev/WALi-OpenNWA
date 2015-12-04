@@ -3,12 +3,14 @@
 
 #include "wali/domains/matrix/Matrix_template.hpp"
 #include "wali/domains/matrix/MinPlus.hpp"
+#include "wali/domains/matrix/SemElemWrapper.hpp"
 
 namespace wali {
   namespace domains {
 
     typedef Matrix<bool> BoolMatrix;
     typedef Matrix<details::MinPlus<int> > MinPlusIntMatrix;
+    typedef Matrix<details::SemElemWrapper> SemElemMatrix;
 
   }
 }

@@ -116,6 +116,7 @@ test_files = Split("""
     Source/AddOns/Domains/binrel/nwa_detensor.cpp
     Source/AddOns/Domains/matrix/class-boolmatrix.cpp
     Source/AddOns/Domains/matrix/class-minplusmatrix.cpp
+    Source/AddOns/Domains/matrix/class-semelemmatrix.cpp
     """)
 
 cpp11_test_files = Split("""
