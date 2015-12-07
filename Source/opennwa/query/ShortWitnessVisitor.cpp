@@ -1,6 +1,9 @@
 
 #include "opennwa/query/ShortWitnessVisitor.hpp"
 
+#include <iostream>
+using std::cerr;
+
 namespace opennwa {
 
   namespace query {
@@ -18,9 +21,10 @@ namespace opennwa {
     // Chooses the shortest child.
     witness_t ShortWitnessVisitor::calculateCombine(WitnessCombine * w, std::list<witness_t>& children) {
       (void) w;
-      
+
       // Track the minimum length of a child.
-      unsigned long min = UINT_MAX;
+      unsigned long min_length = ULONG_MAX;
+      unsigned long min_rank = ULONG_MAX;
       witness_t ret;
 
       std::list<witness_t>::const_iterator wit;
@@ -28,9 +32,14 @@ namespace opennwa {
         witness_t ptr = *wit;
         assert (ptr.is_valid() && "Invalid combine child pointer");
         unsigned long len = ptr->getMinimumLength();
-        //std::cerr << "LEN: " << len << std::endl;
-        if (len <= min) {
-          min = len;
+        unsigned long rank = get_rank(ptr.get_ptr());
+
+        if (rank < min_rank
+            ||
+            (rank == min_rank && len < min_length))
+        {
+          min_length = len;
+          min_rank = rank;
           ret = ptr;
         }
       }

@@ -1,12 +1,16 @@
 #include "gtest/gtest.h"
+
 #include <string>
 #include <sstream>
+
+#include <boost/numeric/ublas/io.hpp>
 
 #include "wali/wpds/WPDS.hpp"
 #include "wali/wfa/WFA.hpp"
 #include "wali/witness/Witness.hpp"
 #include "wali/witness/WitnessWrapper.hpp"
 #include "wali/domains/matrix/Matrix.hpp"
+#include "wali/domains/matrix/MatrixRanker.hpp"
 
 #include "opennwa/query/ShortWitnessVisitor.hpp"
 #include "opennwa/query/PathVisitor.hpp"
@@ -238,20 +242,56 @@ TEST(example$matrix$shortest$path, no$witness$gets$right$matrix)
     EXPECT_EQ(m->matrix(), f.weights.bm_expected);
 }
 
-TEST(example$matrix$shortest$path, witness$gets$shortest$path)
+
+static std::string s_get_path(
+    MatrixRanker<MinPlusIntMatrix> const * ranker)
 {
     WpdsWfa f(new WitnessWrapper());
     ref_ptr<Witness> w = f.poststar_finish_witness();
-
-    opennwa::query::ShortWitnessVisitor swv;
+    
+    opennwa::query::ShortWitnessVisitor swv(ranker);
     w->accept(swv);
 
     PathVisitor pv;
     swv.answer()->accept(pv);
 
+    return pv.answer();
+}
+
+
+TEST(example$matrix$shortest$path, witness$gets$shortest$path)
+{
     EXPECT_EQ(
         "[start->loop][loop->finish]",
-        pv.answer());
+        s_get_path(NULL));
+}
+
+TEST(example$matrix$shortest$path, witness$gets$shortest$path$to$state$0)
+{
+    details::MinPlus<int> d_zero;
+    d_zero.set_value(0);
+
+    MatrixRanker<MinPlusIntMatrix> ranker(2);
+    ranker.set_initial(0, d_zero);
+    ranker.set_final(0, d_zero);
+
+    EXPECT_EQ(
+        "[start->loop][loop->finish]",
+        s_get_path(&ranker));
+}
+
+TEST(example$matrix$shortest$path, witness$gets$shortest$path$to$state$1)
+{
+    details::MinPlus<int> d_zero;
+    d_zero.set_value(0);
+
+    MatrixRanker<MinPlusIntMatrix> ranker(2);
+    ranker.set_initial(0, d_zero);
+    ranker.set_final(1, d_zero);
+
+    EXPECT_EQ(
+        "[start->loop][loop->loop][loop->finish]",
+        s_get_path(&ranker));
 }
 
 

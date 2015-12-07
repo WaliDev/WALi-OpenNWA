@@ -15,10 +15,33 @@
 
 namespace opennwa {
   namespace query {
+
+    struct WitnessRanker
+    {
+      // Lower rank = has priority
+      virtual unsigned long
+      get_rank(wali::witness::Witness * w) const = 0;
+    };
+
+
     class ShortWitnessVisitor : public wali::witness::CalculatingVisitor<wali::witness::witness_t> {
+    private:
+      WitnessRanker const * m_ranker;
+
+      unsigned long get_rank(wali::witness::Witness * w) const
+      {
+        if (m_ranker == NULL) {
+          return 0;
+        }
+        else {
+          return m_ranker->get_rank(w);
+        }
+      }
 
     public:
-      ShortWitnessVisitor() {}
+      ShortWitnessVisitor(WitnessRanker const * ranker = NULL)
+        : m_ranker(ranker)
+      {}
 
       ~ShortWitnessVisitor() {}
 
