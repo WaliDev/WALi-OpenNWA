@@ -1,4 +1,6 @@
 #include "gtest/gtest.h"
+#include <string>
+#include <sstream>
 
 #include "wali/wpds/WPDS.hpp"
 #include "wali/wfa/WFA.hpp"
@@ -6,7 +8,12 @@
 #include "wali/witness/WitnessWrapper.hpp"
 #include "wali/domains/matrix/Matrix.hpp"
 
+#include "opennwa/query/ShortWitnessVisitor.hpp"
+#include "opennwa/query/PathVisitor.hpp"
+
 #include "matrix-equal.hpp"
+
+using namespace wali::witness;
 
 namespace wali {
 namespace domains {
@@ -157,6 +164,66 @@ struct WpdsWfa
         return dynamic_cast<MinPlusIntMatrix*>(
             poststar_finish_weight().get_ptr());
     }
+
+    ref_ptr<Witness>
+    poststar_finish_witness()
+    {
+        return dynamic_cast<Witness*>(
+            poststar_finish_weight().get_ptr());
+    }
+};
+
+
+class PathVisitor
+    : public CalculatingVisitor<std::string>
+{
+public:
+    //! Overload to calculate the value of an extend node. Modifications to
+    //! the AnswerType& parameters will not persist.
+    virtual std::string calculateExtend(
+        WitnessExtend * w ATTR_UNUSED, std::string & leftValue, std::string & rightValue )
+    {
+        return leftValue + rightValue;
+    }
+
+    //! Overload to calculate the value of an combine node. Modifications to
+    //! the list parameter will not persist.
+    virtual std::string calculateCombine(
+        WitnessCombine * w ATTR_UNUSED,
+        std::list<std::string> & childrenValues ATTR_UNUSED)
+    {
+        return "[!COMBINE NODE!]";
+    }
+
+    //! Overload to calculate the value of an merge node. Modifications to
+    //! the std::string& parameters will not persist.
+    virtual std::string calculateMerge(
+        WitnessMerge * w ATTR_UNUSED,
+        std::string & callerValue ATTR_UNUSED,
+        std::string & ruleValue ATTR_UNUSED,
+        std::string & calleeValue ATTR_UNUSED)
+    {
+        return "[!MERGE NODE!]";
+    }
+
+    //! Overload to calculate the value of a rule node.
+    virtual std::string calculateRule( WitnessRule * w)
+    {
+        std::stringstream ss;
+        ss << "[" << key2str(w->getRuleStub().from_stack())
+           << "->" << key2str(w->getRuleStub().to_stack1())
+           << "]";
+        if (w->getRuleStub().to_stack2() != WALI_EPSILON) {
+            ss << " !! " << key2str(w->getRuleStub().to_stack2());
+        }
+        return ss.str();
+    }
+
+    //! Overload to calculate the value of a trans node.
+    virtual std::string calculateTrans( WitnessTrans * w ATTR_UNUSED)
+    {
+        return "";
+    }
 };
 
 }
@@ -168,8 +235,23 @@ TEST(example$matrix$shortest$path, no$witness$gets$right$matrix)
     ref_ptr<MinPlusIntMatrix> m = f.poststar_finish_matrix();
 
     ASSERT_TRUE(m.is_valid());
-
     EXPECT_EQ(m->matrix(), f.weights.bm_expected);
+}
+
+TEST(example$matrix$shortest$path, witness$gets$shortest$path)
+{
+    WpdsWfa f(new WitnessWrapper());
+    ref_ptr<Witness> w = f.poststar_finish_witness();
+
+    opennwa::query::ShortWitnessVisitor swv;
+    w->accept(swv);
+
+    PathVisitor pv;
+    swv.answer()->accept(pv);
+
+    EXPECT_EQ(
+        "[start->loop][loop->finish]",
+        pv.answer());
 }
 
 
