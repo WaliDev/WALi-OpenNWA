@@ -364,7 +364,7 @@ namespace wali
         /**
          * @brief For each t \in fa, t->setConfig(0)
          */
-        virtual void unlinkOutput( wfa::WFA& fa );
+        virtual void unlinkOutput( wfa::WFA& fa ) const;
 
         /**
          * @brief Gets WPDS ready for fixpoint

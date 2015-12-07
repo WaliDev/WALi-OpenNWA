@@ -244,7 +244,7 @@ namespace wali
         }
     };
 
-    void WPDS::unlinkOutput( WFA& fa) 
+    void WPDS::unlinkOutput( WFA& fa) const
     {
       Unlinker unlinker;
       fa.for_each(unlinker);
