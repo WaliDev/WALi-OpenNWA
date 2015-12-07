@@ -117,6 +117,7 @@ test_files = Split("""
     Source/AddOns/Domains/matrix/class-boolmatrix.cpp
     Source/AddOns/Domains/matrix/class-minplusmatrix.cpp
     Source/AddOns/Domains/matrix/class-semelemmatrix.cpp
+    Source/AddOns/Domains/matrix/example-matrix-shortest-path.cpp
     """)
 
 cpp11_test_files = Split("""
