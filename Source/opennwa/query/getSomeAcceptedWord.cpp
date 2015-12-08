@@ -135,7 +135,6 @@ namespace opennwa {
       assert(wit);
 
       if (!wit->isZero()) {
-
         // Find a shortest single-path witness.
         ShortWitnessVisitor swv;
         wit->accept(swv, false);
