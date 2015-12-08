@@ -248,9 +248,13 @@ static std::string s_get_path(
 {
     WpdsWfa f(new WitnessWrapper());
     ref_ptr<Witness> w = f.poststar_finish_witness();
-    
+
     opennwa::query::ShortWitnessVisitor swv(ranker);
     w->accept(swv);
+
+    if (swv.answer()->equal(swv.answer()->zero())) {
+        return "[!!ZERO WITNESS!!]";
+    }
 
     PathVisitor pv;
     swv.answer()->accept(pv);
