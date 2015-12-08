@@ -94,6 +94,10 @@ namespace wali
          */
         virtual bool equal( SemElem * se ) const;
 
+        virtual bool equal( sem_elem_t se ) const {
+            return equal(se.get_ptr());
+        }
+
         //! Print the Witness to the parameter o. 
         virtual std::ostream& print( std::ostream& o ) const;
 
