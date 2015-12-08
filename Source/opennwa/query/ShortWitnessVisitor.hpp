@@ -30,6 +30,7 @@ namespace opennwa {
     private:
       WitnessRanker const * m_ranker;
       wali::witness::witness_t m_answer;
+      wali::sem_elem_t m_ancestor_weight;
 
       unsigned long get_rank(wali::witness::Witness * w) const
       {

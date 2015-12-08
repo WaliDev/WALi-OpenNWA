@@ -26,14 +26,23 @@ namespace opennwa {
       fast_assert(w->hasLeft());
       fast_assert(w->hasRight());
 
+      sem_elem_t saved_ancestor_weight = m_ancestor_weight;
+
       m_answer = NULL;
       w->left()->accept(*this);
       witness_t left = m_answer;
 
+      if (saved_ancestor_weight.is_valid()) {
+        m_ancestor_weight = w->right()->weight()->extend(saved_ancestor_weight);
+      }
+      else {
+        m_ancestor_weight = w->right()->weight();
+      }
       m_answer = NULL;
       w->right()->accept(*this);
       witness_t right = m_answer;
 
+      m_ancestor_weight = NULL;
       m_answer = left->extend(right.get_ptr());
 
       return false;
@@ -42,6 +51,8 @@ namespace opennwa {
     bool
     ShortWitnessVisitor::visitCombine( WitnessCombine * w )
     {
+      sem_elem_t saved_ancestor_weight = m_ancestor_weight;
+
       // Track the minimum length of a child.
       unsigned long min_length = ULONG_MAX;
       unsigned long min_rank = ULONG_MAX;
@@ -53,6 +64,7 @@ namespace opennwa {
       {
         assert ((*wit).is_valid() && "Invalid combine child pointer");
 
+        m_ancestor_weight = saved_ancestor_weight;
         m_answer = NULL;
         (*wit)->accept(*this);
         witness_t ptr = m_answer;
@@ -72,6 +84,7 @@ namespace opennwa {
 
       assert (ret.is_valid() && "Invalid result of combine");
 
+      m_ancestor_weight = NULL;
       m_answer = ret;
 
       return false;
@@ -80,6 +93,7 @@ namespace opennwa {
     bool
     ShortWitnessVisitor::visitRule( WitnessRule * w )
     {
+      m_ancestor_weight = NULL;
       m_answer = w;
       return false;
     }
@@ -87,6 +101,7 @@ namespace opennwa {
     bool
     ShortWitnessVisitor::visitTrans( WitnessTrans * w )
     {
+      m_ancestor_weight = NULL;
       m_answer = w;
       return false;
     }
@@ -96,6 +111,7 @@ namespace opennwa {
     {
       abort();
       fast_assert(false);
+      m_ancestor_weight = NULL;
       m_answer = w;
       return false;
     }
