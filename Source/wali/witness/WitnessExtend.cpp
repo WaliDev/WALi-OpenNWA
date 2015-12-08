@@ -51,7 +51,7 @@ namespace wali
     std::ostream& WitnessExtend::prettyPrint( std::ostream& o, size_t depth ) const
     {
       formatDepth(o,depth);
-      o << "WitnessExtend: " << std::endl;
+      o << "WitnessExtend: ";
       user_se->print(o) << std::endl;
       // Dumps out to much information.
       // TODO. Make a compile or runtime flag.
