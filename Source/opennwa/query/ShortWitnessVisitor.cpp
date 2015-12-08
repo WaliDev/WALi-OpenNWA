@@ -11,26 +11,52 @@ namespace opennwa {
     using namespace wali;
     using namespace wali::witness;
 
-    witness_t ShortWitnessVisitor::calculateExtend(WitnessExtend * w, witness_t& left, witness_t& right) {
-      (void) w;
-      // Extend together the trimmed version of this extend node's
-      // original children.
-      return left->extend(right.get_ptr());
+    bool
+    ShortWitnessVisitor::visit( Witness * w )
+    {
+      abort();
+      fast_assert(false);
+      m_answer = w;
+      return false;
     }
 
-    // Chooses the shortest child.
-    witness_t ShortWitnessVisitor::calculateCombine(WitnessCombine * w, std::list<witness_t>& children) {
-      (void) w;
+    bool
+    ShortWitnessVisitor::visitExtend( WitnessExtend * w )
+    {
+      fast_assert(w->hasLeft());
+      fast_assert(w->hasRight());
 
+      m_answer = NULL;
+      w->left()->accept(*this);
+      witness_t left = m_answer;
+
+      m_answer = NULL;
+      w->right()->accept(*this);
+      witness_t right = m_answer;
+
+      m_answer = left->extend(right.get_ptr());
+
+      return false;
+    }
+
+    bool
+    ShortWitnessVisitor::visitCombine( WitnessCombine * w )
+    {
       // Track the minimum length of a child.
       unsigned long min_length = ULONG_MAX;
       unsigned long min_rank = ULONG_MAX;
       witness_t ret;
 
-      std::list<witness_t>::const_iterator wit;
-      for (wit=children.begin(); wit!=children.end(); wit++) {
-        witness_t ptr = *wit;
-        assert (ptr.is_valid() && "Invalid combine child pointer");
+      for (std::list<witness_t>::const_iterator wit=w->children().begin();
+           wit!=w->children().end();
+           wit++)
+      {
+        assert ((*wit).is_valid() && "Invalid combine child pointer");
+
+        m_answer = NULL;
+        (*wit)->accept(*this);
+        witness_t ptr = m_answer;
+
         unsigned long len = ptr->getMinimumLength();
         unsigned long rank = get_rank(ptr.get_ptr());
 
@@ -45,30 +71,36 @@ namespace opennwa {
       }
 
       assert (ret.is_valid() && "Invalid result of combine");
-      
-      return ret;
+
+      m_answer = ret;
+
+      return false;
     }
 
-    // Not implemented.
-    witness_t ShortWitnessVisitor::calculateMerge(WitnessMerge* w, witness_t& callerValue, witness_t& ruleValue, witness_t& calleeValue) {
-      (void) w;
-      (void) callerValue;
-      (void) calleeValue;
-
-      assert (0 && "Merge not implemented!");
-      return ruleValue;
+    bool
+    ShortWitnessVisitor::visitRule( WitnessRule * w )
+    {
+      m_answer = w;
+      return false;
     }
 
-    witness_t ShortWitnessVisitor::calculateRule(WitnessRule * w) {
-      return w;
+    bool
+    ShortWitnessVisitor::visitTrans( WitnessTrans * w )
+    {
+      m_answer = w;
+      return false;
     }
 
-    witness_t ShortWitnessVisitor::calculateTrans(WitnessTrans * w) {
-      return w;
+    bool
+    ShortWitnessVisitor::visitMerge( WitnessMerge * w )
+    {
+      abort();
+      fast_assert(false);
+      m_answer = w;
+      return false;
     }
 
   }
-
 }
 
 // Yo, Emacs!

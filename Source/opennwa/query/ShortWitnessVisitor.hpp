@@ -24,9 +24,12 @@ namespace opennwa {
     };
 
 
-    class ShortWitnessVisitor : public wali::witness::CalculatingVisitor<wali::witness::witness_t> {
+    class ShortWitnessVisitor
+        : public wali::witness::Visitor
+    {
     private:
       WitnessRanker const * m_ranker;
+      wali::witness::witness_t m_answer;
 
       unsigned long get_rank(wali::witness::Witness * w) const
       {
@@ -39,17 +42,24 @@ namespace opennwa {
       }
 
     public:
-      ShortWitnessVisitor(WitnessRanker const * ranker = NULL)
+      ShortWitnessVisitor(
+          WitnessRanker const * ranker = NULL)
         : m_ranker(ranker)
       {}
 
       ~ShortWitnessVisitor() {}
 
-      virtual wali::witness::witness_t calculateExtend(wali::witness::WitnessExtend * w, wali::witness::witness_t& left, wali::witness::witness_t& right);
-      virtual wali::witness::witness_t calculateCombine(wali::witness::WitnessCombine * w, std::list<wali::witness::witness_t>& children);
-      virtual wali::witness::witness_t calculateMerge(wali::witness::WitnessMerge* w, wali::witness::witness_t& callerValue, wali::witness::witness_t& ruleValue, wali::witness::witness_t& calleeValue);
-      virtual wali::witness::witness_t calculateRule(wali::witness::WitnessRule * w);
-      virtual wali::witness::witness_t calculateTrans(wali::witness::WitnessTrans * w);
+      wali::witness::witness_t answer() const {
+        return m_answer;
+      }
+
+      virtual bool visit(wali::witness::Witness * w);
+      virtual bool visitExtend(wali::witness::WitnessExtend * w);
+      virtual bool visitCombine(wali::witness::WitnessCombine * w);
+      virtual bool visitRule(wali::witness::WitnessRule * w);
+      virtual bool visitTrans(wali::witness::WitnessTrans * w);
+      virtual bool visitMerge(wali::witness::WitnessMerge * w);
+
     };
   }
 }
