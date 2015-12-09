@@ -5,6 +5,7 @@
 
 #include <boost/numeric/ublas/io.hpp>
 
+#include "wali/QueueWorklist.hpp"
 #include "wali/wpds/WPDS.hpp"
 #include "wali/wfa/WFA.hpp"
 #include "wali/witness/Witness.hpp"
@@ -97,12 +98,16 @@ struct Weights1
 
 struct Keys
 {
-    Key start, loop, finish, p, acc;
+    Key start, loop, finish, top, bottom, join, middle, p, acc;
 
     Keys()
         : start(getKey("start"))
         , loop(getKey("loop"))
         , finish(getKey("finish"))
+        , top(getKey("top"))
+        , bottom(getKey("bottom"))
+        , join(getKey("join"))
+        , middle(getKey("middle"))
         , p(getKey("p"))
         , acc(getKey("acc"))
     {}
@@ -177,6 +182,7 @@ struct WpdsWfa1
     }
 };
 
+///////////////////////
 
 class PathVisitor
     : public CalculatingVisitor<std::string>
@@ -295,7 +301,177 @@ TEST(example$matrix$shortest$path, witness$gets$shortest$path$to$state$1)
 
     EXPECT_EQ(
         "[start->loop][loop->loop][loop->finish]",
-        s_get_path(&ranker));
+        s_get_path1(&ranker));
+}
+
+
+
+/////////////////////////
+
+struct Weights2
+{
+    MinPlusIntMatrix::BackingMatrix
+        bm_s1_to_s1,
+        bm_s2_to_s2,
+        bm_reverse;
+
+    ref_ptr<MinPlusIntMatrix>
+        id,
+        s1_to_s1,
+        s2_to_s2,
+        reverse,
+        zero;
+
+    Weights2()
+        : bm_s1_to_s1(2,2)
+        , bm_s2_to_s2(2,2)
+        , bm_reverse(2,2)
+    {
+        int m_s1[2][2] = {
+            {   1, inf},
+            { inf, inf},
+        };
+
+        int m_s2[2][2] = {
+            { inf, inf},
+            { inf,   1},
+        };
+
+        int m_reverse[2][2] = {
+            { inf,   1},
+            {   1, inf},
+        };
+
+        for (size_t i = 0; i < 2; ++i) {
+            for (size_t j = 0; j < 2; ++j) {
+                bm_s1_to_s1(i, j).set_value(m_s1[i][j]);
+                bm_s2_to_s2(i, j).set_value(m_s2[i][j]);
+                bm_reverse(i, j).set_value(m_reverse[i][j]);
+            }
+        }
+
+        s1_to_s1  = new MinPlusIntMatrix(bm_s1_to_s1);
+        s2_to_s2  = new MinPlusIntMatrix(bm_s2_to_s2);
+        reverse   = new MinPlusIntMatrix(bm_reverse);
+
+        Weights1 w1;
+        id = w1.id;
+        zero = w1.zero;
+    }
+};
+
+struct WpdsWfa2
+{
+    wpds::WPDS wpds;
+    wfa::WFA wfa;
+
+    Weights2 weights;
+    Keys keys;
+
+    WpdsWfa2(ref_ptr<wpds::Wrapper> wrapper)
+        : wpds(wrapper)
+    {
+        wpds.setWorklist(new QueueWorklist<wali::wfa::ITrans>());
+
+        // WPDS for the following CFG:
+        //
+        //       <1 to 1>       <id>
+        //         /--> (top) --\.
+        //        /              \.
+        // (start)               (join)---->(middle)---->(finish)
+        //        \             /      <id>        <reverse>
+        //         \->(bottom)-/
+        //      <2 to 2>      <id>
+        //
+        // <...> indicate the weight.
+        //
+        // If you want to wind up in state 1, it looks like you should
+        // take the top path if you don't look past
+        // join/middle.
+
+        wpds.add_rule(keys.p, keys.start,  keys.p, keys.top,    weights.s1_to_s1);
+        wpds.add_rule(keys.p, keys.start,  keys.p, keys.bottom, weights.s2_to_s2);
+
+        wpds.add_rule(keys.p, keys.top,    keys.p, keys.join,   weights.id);
+        wpds.add_rule(keys.p, keys.bottom, keys.p, keys.join,   weights.id);
+
+        wpds.add_rule(keys.p, keys.join,   keys.p, keys.middle, weights.id);
+        wpds.add_rule(keys.p, keys.middle, keys.p, keys.finish, weights.reverse);
+
+        // And the automaton for poststar:
+        //
+        //          (start) <id>
+        //  (p) ----------------------> (acc)
+
+        wfa.addState(keys.p,   weights.zero);
+        wfa.addState(keys.acc, weights.zero);
+
+        wfa.setInitialState(keys.p);
+        wfa.addFinalState(keys.acc);
+
+        wfa.addTrans(keys.p, keys.start, keys.acc, weights.id);
+    }
+
+    sem_elem_t
+    poststar_finish_weight()
+    {
+        wfa::WFA ps_wfa = wpds.poststar(wfa);
+
+        wfa::TransSet ts = ps_wfa.match(keys.p, keys.finish);
+
+        if (ts.size() != 1) {
+            return NULL;
+        }
+        else {
+            return (*ts.begin())->weight();
+        }
+    }
+
+    ref_ptr<Witness>
+    poststar_finish_witness()
+    {
+        return dynamic_cast<Witness*>(
+            poststar_finish_weight().get_ptr());
+    }
+};
+
+static std::string s_get_path2(
+    MatrixRanker<MinPlusIntMatrix> const * ranker)
+{
+    WpdsWfa2 f(new WitnessWrapper());
+    ref_ptr<Witness> w = f.poststar_finish_witness();
+
+
+    opennwa::query::ShortWitnessVisitor swv(ranker);
+    w->accept(swv);
+
+    if (swv.answer()->equal(swv.answer()->zero())) {
+        return "[!!ZERO WITNESS!!]";
+    }
+
+    PathVisitor pv;
+    swv.answer()->accept(pv);
+
+    return pv.answer();
+}
+
+
+TEST(example$matrix$shortest$path$midpath$combine, witness$gets$shortest$path$to$state$1)
+{
+    details::MinPlus<int> d_zero;
+    d_zero.set_value(0);
+
+    MatrixRanker<MinPlusIntMatrix> ranker(2);
+    ranker.set_initial(0, d_zero);
+    ranker.set_final(0, d_zero);
+
+    EXPECT_EQ(
+        // This is wrong:
+        "[start->top][top->join][join->middle][middle->finish]",
+        // the top path winds up in a state index 1, not state index 0
+        // like we said we are interestedi n with
+        // 'set_final(0,..)'. It should go start->bottom instead.
+        s_get_path2(&ranker));
 }
 
 
