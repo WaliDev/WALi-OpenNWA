@@ -2,6 +2,7 @@
 #include "opennwa/query/ShortWitnessVisitor.hpp"
 
 #include <iostream>
+#include <sstream>
 using std::cerr;
 
 namespace opennwa {
@@ -29,8 +30,8 @@ namespace opennwa {
       sem_elem_t saved_ancestor_weight = m_ancestor_weight;
 
       m_answer = NULL;
-      w->left()->accept(*this);
-      witness_t left = m_answer;
+      w->right()->accept(*this);
+      witness_t right = m_answer;
 
       if (saved_ancestor_weight.is_valid()) {
         m_ancestor_weight = w->right()->weight()->extend(saved_ancestor_weight);
@@ -38,9 +39,10 @@ namespace opennwa {
       else {
         m_ancestor_weight = w->right()->weight();
       }
+
       m_answer = NULL;
-      w->right()->accept(*this);
-      witness_t right = m_answer;
+      w->left()->accept(*this);
+      witness_t left = m_answer;
 
       m_ancestor_weight = NULL;
       m_answer = left->extend(right.get_ptr());
@@ -51,7 +53,13 @@ namespace opennwa {
     bool
     ShortWitnessVisitor::visitCombine( WitnessCombine * w )
     {
-      sem_elem_t saved_ancestor_weight = m_ancestor_weight;
+      sem_elem_t saved_ancestor_weight;
+      if (m_ancestor_weight.is_valid()) {
+        saved_ancestor_weight = m_ancestor_weight;
+      }
+      else {
+        saved_ancestor_weight = w->weight()->one();
+      }
 
       // Track the minimum length of a child.
       unsigned long min_length = ULONG_MAX;
@@ -70,7 +78,7 @@ namespace opennwa {
         witness_t ptr = m_answer;
 
         unsigned long len = ptr->getMinimumLength();
-        unsigned long rank = get_rank(ptr.get_ptr());
+        unsigned long rank = get_rank(ptr.get_ptr(), saved_ancestor_weight);
 
         if (rank < min_rank
             ||

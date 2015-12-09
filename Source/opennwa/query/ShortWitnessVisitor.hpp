@@ -20,7 +20,9 @@ namespace opennwa {
     {
       // Lower rank = has priority
       virtual unsigned long
-      get_rank(wali::witness::Witness * w) const = 0;
+      get_rank(
+        wali::witness::Witness * witness,
+        sem_elem_t ancestor_weight) const = 0;
     };
 
 
@@ -32,13 +34,15 @@ namespace opennwa {
       wali::witness::witness_t m_answer;
       wali::sem_elem_t m_ancestor_weight;
 
-      unsigned long get_rank(wali::witness::Witness * w) const
+      unsigned long get_rank(
+        wali::witness::Witness * witness,
+        sem_elem_t ancestor_weight) const
       {
         if (m_ranker == NULL) {
           return 0;
         }
         else {
-          return m_ranker->get_rank(w);
+          return m_ranker->get_rank(witness, ancestor_weight);
         }
       }
 

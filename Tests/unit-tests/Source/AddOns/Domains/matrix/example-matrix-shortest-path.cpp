@@ -441,7 +441,6 @@ static std::string s_get_path2(
     WpdsWfa2 f(new WitnessWrapper());
     ref_ptr<Witness> w = f.poststar_finish_witness();
 
-
     opennwa::query::ShortWitnessVisitor swv(ranker);
     w->accept(swv);
 
@@ -463,14 +462,11 @@ TEST(example$matrix$shortest$path$midpath$combine, witness$gets$shortest$path$to
 
     MatrixRanker<MinPlusIntMatrix> ranker(2);
     ranker.set_initial(0, d_zero);
+    ranker.set_initial(1, d_zero);
     ranker.set_final(0, d_zero);
 
     EXPECT_EQ(
-        // This is wrong:
-        "[start->top][top->join][join->middle][middle->finish]",
-        // the top path winds up in a state index 1, not state index 0
-        // like we said we are interestedi n with
-        // 'set_final(0,..)'. It should go start->bottom instead.
+        "[start->bottom][bottom->join][join->middle][middle->finish]",
         s_get_path2(&ranker));
 }
 
