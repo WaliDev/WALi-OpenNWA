@@ -26,7 +26,7 @@ namespace {
 
 const int inf = std::numeric_limits<MinPlusIntMatrix::value_type::value_type>::max();
 
-struct Weights
+struct Weights1
 {
     MinPlusIntMatrix::BackingMatrix
         bm_id,
@@ -43,7 +43,7 @@ struct Weights
         step,
         expected;
 
-    Weights()
+    Weights1()
         : bm_id(2,2)
         , bm_initial(2,2)
         , bm_loop(2,2)
@@ -108,15 +108,15 @@ struct Keys
     {}
 };
 
-struct WpdsWfa
+struct WpdsWfa1
 {
     wpds::WPDS wpds;
     wfa::WFA wfa;
 
-    Weights weights;
+    Weights1 weights;
     Keys keys;
 
-    WpdsWfa(ref_ptr<wpds::Wrapper> wrapper)
+    WpdsWfa1(ref_ptr<wpds::Wrapper> wrapper)
         : wpds(wrapper)
     {
         // WPDS for the following CFG:
@@ -235,7 +235,7 @@ public:
 
 TEST(example$matrix$shortest$path, no$witness$gets$right$matrix)
 {
-    WpdsWfa f(NULL);
+    WpdsWfa1 f(NULL);
     ref_ptr<MinPlusIntMatrix> m = f.poststar_finish_matrix();
 
     ASSERT_TRUE(m.is_valid());
@@ -243,10 +243,10 @@ TEST(example$matrix$shortest$path, no$witness$gets$right$matrix)
 }
 
 
-static std::string s_get_path(
+static std::string s_get_path1(
     MatrixRanker<MinPlusIntMatrix> const * ranker)
 {
-    WpdsWfa f(new WitnessWrapper());
+    WpdsWfa1 f(new WitnessWrapper());
     ref_ptr<Witness> w = f.poststar_finish_witness();
 
     opennwa::query::ShortWitnessVisitor swv(ranker);
@@ -267,7 +267,7 @@ TEST(example$matrix$shortest$path, witness$gets$shortest$path)
 {
     EXPECT_EQ(
         "[start->loop][loop->finish]",
-        s_get_path(NULL));
+        s_get_path1(NULL));
 }
 
 TEST(example$matrix$shortest$path, witness$gets$shortest$path$to$state$0)
@@ -281,7 +281,7 @@ TEST(example$matrix$shortest$path, witness$gets$shortest$path$to$state$0)
 
     EXPECT_EQ(
         "[start->loop][loop->finish]",
-        s_get_path(&ranker));
+        s_get_path1(&ranker));
 }
 
 TEST(example$matrix$shortest$path, witness$gets$shortest$path$to$state$1)
