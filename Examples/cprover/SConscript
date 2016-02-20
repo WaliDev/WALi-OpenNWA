@@ -52,7 +52,7 @@ else:
 built = [env.Install(LibInstallDir, bpparser)]
 
 penv = env.Clone()
-penv.Append(LIBS = ['bpparser', 'walidomains', 'glog', 'bdd', 'pthread']); #'tcmalloc_minimal'
+penv.Append(LIBS = ['bpparser', 'walidomains', 'glog', 'bdd', 'pthread', 'cra']); #'tcmalloc_minimal'
 
 #penv.Append(LIBPATH = ['/unsup/gperftools-2.0/lib'])
 #penv.Append(RPATH = ['/unsup/gperftools-2.0/lib'])

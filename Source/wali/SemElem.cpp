@@ -78,8 +78,8 @@ namespace wali
     }
     else {
       assert(this->count >= 1); // try to make sure 'this' is already a refptr
-      rp.second = this;
-      //rp.second = rp.first;
+      //rp.second = this;
+      rp.second = rp.first;
     }
     return rp;
   }

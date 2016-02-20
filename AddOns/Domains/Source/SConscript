@@ -24,7 +24,9 @@ walidomains_files = Split("""
 ./wali/domains/reach/Reach.cpp
 ./wali/domains/lh/LH.cpp
 ./wali/domains/lh/PhaseLH.cpp
+./wali/domains/duet/DuetRel.cpp
 ./wali/domains/name_weight/nameWeight.cpp
+./wali/domains/tsl_weight/TSLWeight.cpp
 """)
 
 env = BaseEnv.Clone()
@@ -36,7 +38,7 @@ ListOfBuilds = ['glog']
 [(glog_lib,glog_inc)] = SConscript(os.path.join(ThirdPartyDir,'SConscript'), 'ListOfBuilds')
 
 # Disable warnings because of BuDDy
-env["WARNING_FLAGS"]="-Werror"
+env["WARNING_FLAGS"]="-Werror -Wno-unused"
 
 #buddy headers include path
 env.Append(CPPPATH=[os.path.join(WaliDir , 'AddOns', 'Domains' , 'ThirdParty', 'include')]) 
@@ -44,6 +46,7 @@ env.Append(CPPPATH=[os.path.join(WaliDir , 'AddOns', 'Domains' , 'ThirdParty', '
 #env.Append(CPPPATH=[os.path.join(ThirdPartyDir, 'include')])
 env.Append(CPPPATH=[os.path.join(WaliDir , 'AddOns', 'Domains' , 'Source')])
 env.Append(CPPPATH=[glog_inc])
+env.Append(LIBs=['camlrun'])
 
 if MkStatic:
   walidomains = env.StaticLibrary('walidomains' , walidomains_files)

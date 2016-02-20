@@ -42,7 +42,7 @@ vars.Add(EnumVariable('arch', 'Architecture', 'default',
          allowed_values=ThirtyTwoBitAliases+SixtyFourBitAliases+['default']))
 vars.Add(PathVariable('CXX', 'Path to compiler', BaseEnv['CXX'], PathVariable.PathAccept))
 vars.Add(BoolVariable('strong_warnings', 'Enable (on by default) to get strong warning flags', True))
-vars.Add(BoolVariable('optimize', 'Turn on optimization', True))
+vars.Add(BoolVariable('optimize', 'Turn on optimization', False))
 vars.Add(EnumVariable('checking', "Level of checking. 'slow' gives full checking, e.g. checked iterators. 'fast' gives only quick checks. 'none' removes all assertions. NOTE: On Windows, this also controls whether the library builds with /MTd (under 'slow') or /MT (under 'fast' and 'none').", None, allowed_values=('slow', 'fast', 'none')))
 vars.Add(BoolVariable('profile', 'Compile so that grpof can profile the exectuables', False))
 vars.Add(BoolVariable('coverage', 'Compile so that gcov can profile the execution', False))
@@ -90,7 +90,7 @@ def unquoting_requoting_WhereIs(possibly_relative_path_with_arguments):
 
 BaseEnv['CC']  = unquoting_requoting_WhereIs(BaseEnv['CC']) 
 BaseEnv['CXX'] = unquoting_requoting_WhereIs(BaseEnv['CXX']) 
-
+BaseEnv['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME']=1
 
 (dummy, BaseEnv['compiler']) = os.path.split(BaseEnv['CC'])
 if BaseEnv['compiler'][0] == '"':
@@ -117,6 +117,7 @@ assert 'CPPDEFINES' not in BaseEnv
 BaseEnv['CPPDEFINES'] = {
    'BOOST_NO_DEFAULTED_FUNCTIONS': 1,
    '__TSL_REGEXP': 1,
+   'USE_DUET': 1,
    'REGEXP_TEST': 1,
    'TSL_DETENSOR': 1,
    'PRATHMEHS_NWA_DETENSOR': 0,
@@ -139,7 +140,7 @@ if 'gcc' == BaseEnv['compiler']:
         BaseEnv['CPPDEFINES']['_GLIBCXX_DEBUG'] = 1
     if strong_warnings:
         BaseEnv.Append(CCFLAGS='-Wextra $WARNING_FLAGS -fdiagnostics-show-option')
-        BaseEnv.Append(WARNING_FLAGS='-Wformat=2 -Winit-self -Wunused -Wfloat-equal -Wpointer-arith -Wcast-align -Wwrite-strings -Wconversion -Woverloaded-virtual')
+        BaseEnv.Append(WARNING_FLAGS='-Wformat=2 -Winit-self -Wfloat-equal -Wpointer-arith -Wcast-align -Wwrite-strings -Wconversion -Woverloaded-virtual')
     else:
         BaseEnv.Append(WARNING_FLAGS='')
     if profile:
@@ -168,7 +169,12 @@ elif BaseEnv['compiler'] in ['cl', 'cl.EXE']:
     else:
        BaseEnv.Append(CCFLAGS=' /MT')
 
-BaseEnv.Append(CPPPATH = [os.path.join(WaliDir, '../../tsl-sandbox')])
+# Modified by Jason Breck
+# The original TSL sandbox path was:
+#BaseEnv.Append(CPPPATH = [os.path.join(WaliDir, '../wali_sandbox/tsl-sandbox')])
+# Jason's new TSL sandbox path is:
+BaseEnv.Append(CPPPATH = [os.path.join(WaliDir, 'Examples/cprover/libtslre/redist-tsl-sandbox')])
+
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
 #if os.path.isdir(os.path.join(WaliDir, '..', 'third-party', 'boost')):
 #    BaseEnv.Append(CPPPATH = [os.path.join(WaliDir, '..', 'third-party', 'boost')])
@@ -178,6 +184,11 @@ BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
 BaseEnv.Append(CPPPATH = ['/unsup/boost-1.55.0/amd64_rhel6/include'])
 BaseEnv.Append(LIBPATH = ['/unsup/boost-1.55.0/amd64_rhel6/lib'])
 BaseEnv.Append(RPATH = ['/unsup/boost-1.55.0/amd64_rhel6/lib'])
+BaseEnv.Append(CPPPath = ['/usr/include'])
+BaseEnv.Append(LIBPATH = ['/home/turetsky/OCamlTest'])
+BaseEnv.Append(RPATH = ['/home/turetsky/OCamlTest'])
+
+
 #except KeyError:
 #    pass
 
@@ -197,7 +208,7 @@ if os.path.split(BaseEnv['CXX'])[1] == 'pathCC':
 if os.path.split(BaseEnv['CXX'])[1] == 'icpc':
    BaseEnv.Append(RPATH=['/s/intel_cc-11.0/lib/intel64'])
 
-BaseEnv.Append(LIBS=["rt"])
+BaseEnv.Append(LIBS=["rt","dl","m"])
 
 ## Only supporting 32 bit on Darwin to not deal w/ Leopard/Snow Leopard diffs
 if 'Darwin' == Platform and not MkStatic:

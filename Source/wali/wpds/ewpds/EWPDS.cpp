@@ -244,7 +244,6 @@ namespace wali
 	    }
           }
         }
-
 	// Need to wrap the merge function if the rule is new or
 	// if the rule existed before, but replace_weight was set, in
 	// which case the old wrapped merge function got replaced

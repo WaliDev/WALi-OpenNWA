@@ -93,7 +93,9 @@ namespace wali
       setupFixpoint(wl, &preds, NULL, wt);
       while (!wl.empty()) {
         State* q = wl.get();
+
         sem_elem_t the_delta = q->delta();
+
         q->delta() = the_delta->zero();
 
         { // BEGIN DEBUGGING
@@ -120,7 +122,9 @@ namespace wali
         for ( ; transit != incoming.end() ; ++transit)
         {
           ITrans* t = *transit;
-          
+#if ET_DBG == 1
+	  std::cout << "Transition: " << "(" << key2str(t->from()) << "," << key2str(t->stack()) << "," << key2str(t->to()) << ")" << std::endl;
+#endif          
           // We are looking at a transition (q', _, q)
           State* qprime = state_map[t->from()];
 
@@ -131,7 +135,11 @@ namespace wali
           } // END DEBUGGING
 
           assert(t->to() == q->name());
-
+#if ET_DBG == 1
+	  std::cout << "TransWeight: ";
+	  std::cout << t->weight()->print(std::cout);
+	  std::cout << std::endl;
+#endif
           sem_elem_t extended;
           if (query == INORDER) {
             extended = t->weight()->extend(the_delta);
@@ -139,8 +147,12 @@ namespace wali
           else {
             extended = the_delta->extend(t->weight());
           }
+#if ET_DBG == 1
+	  std::cout << "ResultantWeight: ";
+	  std::cout << extended->print(std::cout);
           newW = newW->combine(extended);
-
+	  std::cout << std::endl;
+#endif
           // delta => (w+se,w-se)
           // Use extended->delta b/c we want the diff b/w the new
           // weight (extended) and what was there before

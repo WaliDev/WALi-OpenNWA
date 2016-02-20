@@ -1,6 +1,6 @@
 #ifndef WALI_TSLWEIGHT_GUARD
 #define WALI_TSLWEIGHT_GUARD 1
-#include "src/lang/gtr_config.h"
+#include "gtr/src/lang/gtr_config.h"
 #include "wali/ref_ptr.hpp"
 #include "wali/SemElemTensor.hpp"
 #include "tsl/analysis_components/src/reinterps/emul/conc_externs.hpp"

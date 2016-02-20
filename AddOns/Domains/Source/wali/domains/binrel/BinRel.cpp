@@ -423,19 +423,12 @@ void BddContext::setIntVars(const std::map<std::string, int>& flatvars)
 
 void BddContext::addVarList(std::pair<int, int> loc, std::vector<std::string> lVars1, std::vector<std::string> lVars2)
 {
-<<<<<<< HEAD
-	mergeVars[loc] = std::pair<std::vector<std::string>, std::vector<std::string> >(lVars1, lVars2);
-}
-
-std::pair<std::vector<std::string>, std::vector<std::string> > BddContext::getLocalVars(std::pair<int, int> loc) const
-=======
 	merge_fn_t merge = new MeetMergeFn(this, lVars1, lVars2);
 	merge_fn_t merge2 = new TensorMergeFn(this, lVars1, lVars2);
 	mergeVars[loc] = std::pair<merge_fn_t,merge_fn_t>(merge,merge2);
 }
 
 std::pair<wali::ref_ptr<wali::IMergeFn>, wali::ref_ptr<wali::IMergeFn> > BddContext::getLocalVars(std::pair<int, int> loc) const
->>>>>>> origin/binrel_merge_fn
 {
 	return mergeVars.at(loc);
 }
@@ -1303,39 +1296,8 @@ binrel_t BinRel::Merge(int v, int c) const
 	bdd constrainLocalsBdd = con->getBaseTop()->getBdd();
 	binrel_t current = new BinRel(*this);
 
-<<<<<<< HEAD
-	std::pair<std::vector<std::string>, std::vector<std::string> > sList = con->getLocalVars(std::pair<int, int>(v, c));
-	std::vector<std::string> localVars = sList.first;
-	std::vector<std::string> localVars2 = sList.second;
-	for (std::vector<std::string>::const_iterator cit = localVars.begin(); cit != localVars.end(); ++cit){
-		BddContext::const_iterator vocIter = con->find(*cit);
-		if (vocIter == con->end()){
-			std::cerr << "Unknown variable " << *cit << endl;
-			assert(0);
-		}
-		// for each local variable:
-		// havoc the post vocabulary for that variables
-		rel0 = bdd_exist(rel0, fdd_ithset(vocIter->second->baseRhs));
-	}
-	for (std::vector<std::string>::const_iterator cit2 = localVars2.begin(); cit2 != localVars2.end(); ++cit2){
-		BddContext::const_iterator vocIter2 = con->find(*cit2);
-		if (vocIter2 == con->end()){
-			std::cerr << "Unknown variable " << *cit2 << endl;
-			assert(0);
-		}
-		// enforce id across that variables
-		constrainLocalsBdd = constrainLocalsBdd & bdd_biimp(fdd_ithset(vocIter2->second->baseLhs), fdd_ithset(vocIter2->second->baseRhs));
-	}
-
-	binrel_t rel_t = new BinRel(con, rel0);
-	binrel_t constrainLocals = new BinRel(con, constrainLocalsBdd);
-	binrel_t ret;
-	ret = rel_t->Intersect(constrainLocals);
-
-=======
 	meet_merge_fn_t mf = dynamic_cast<MeetMergeFn*>(con->getLocalVars(std::pair<int, int>(v, c)).first.get_ptr());
 	binrel_t ret = dynamic_cast<BinRel*>(mf->apply_f(this->one().get_ptr(), current).get_ptr());
->>>>>>> origin/binrel_merge_fn
 	return ret;
 }
 
@@ -1343,39 +1305,8 @@ binrel_t BinRel::Merge(int v, int c) const
 binrel_t BinRel::TensorMerge(int v, int c) const
 {
 	// start with top
-<<<<<<< HEAD
-	bdd constrainLocalsBdd = con->getTensorTop()->getBdd();
-
-	std::pair<std::vector<std::string>, std::vector<std::string> > sList = con->getLocalVars(std::pair<int, int>(v, c));
-	std::vector<std::string> localVars = sList.first;
-	std::vector<std::string> localVars2 = sList.second;
-	for (std::vector<std::string>::const_iterator cit = localVars.begin(); cit != localVars.end(); ++cit){
-		BddContext::const_iterator vocIter = con->find(*cit);
-		if (vocIter == con->end()){
-			std::cerr << "Unknown variable " << *cit << endl;
-			assert(0);
-		}
-		// for each local variable:
-		// havoc the post vocabulary for that variables
-		rel0 = bdd_exist(rel0, fdd_ithset(vocIter->second->tensor2Rhs));
-	}
-	for (std::vector<std::string>::const_iterator cit2 = localVars2.begin(); cit2 != localVars2.end(); ++cit2){
-		BddContext::const_iterator vocIter2 = con->find(*cit2);
-		if (vocIter2 == con->end()){
-			std::cerr << "Unknown variable " << *cit2 << endl;
-			assert(0);
-		}
-		// enforce id across that variables
-		constrainLocalsBdd = constrainLocalsBdd & bdd_biimp(fdd_ithset(vocIter2->second->baseRhs), fdd_ithset(vocIter2->second->tensor2Rhs));
-	}
-	binrel_t rel_n = new BinRel(con, rel0, true);
-	binrel_t constrainLocals = new BinRel(con, constrainLocalsBdd, true);
-	binrel_t ret;
-	ret = rel_n->Intersect(constrainLocals);
-=======
 	bdd constrainLocalsBdd = con->getBaseTop()->getBdd();
 	binrel_t current = new BinRel(*this);
->>>>>>> origin/binrel_merge_fn
 
 	tensor_merge_fn_t mf = dynamic_cast<TensorMergeFn*>(con->getLocalVars(std::pair<int, int>(v, c)).second.get_ptr());
 	binrel_t ret = dynamic_cast<BinRel*>(mf->apply_f(this->one().get_ptr(), current).get_ptr());

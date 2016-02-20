@@ -487,8 +487,8 @@ namespace wali {
 			}
 			bool currentL = n.LP;
 			std::list<int> children = cg.edges[n.node_no];
-			std::list<int>::iterator ch = children.begin();
-			for (ch; ch != children.end(); ch++)
+			std::list<int>::iterator ch;
+			for (ch = children.begin(); ch != children.end(); ch++)
 			{
 				currentL = findGLPs(cg, cg.nodes[*ch], GLPs) && currentL;
 			}
@@ -1339,7 +1339,9 @@ namespace wali {
 		//For each inter hyperedge - edge between two graphs
 		for (it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
 			//gr = graph associated with the target edge
+			IntraGraph *gr = nodes[(*it2).tgt].gr;
 			//eno - edgenumber associated with edge in the graph (create a new one if it allready exists)
+			gr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, sem->zero(), true);
 			//uno - number of the node this edge depends on - it's a hyperedge, so it must
 			// gr2 is the graph associated with the 2nd src of the hyperedge
 			IntraGraph *gr2 = nodes[(*it2).src2].gr;
@@ -1385,7 +1387,7 @@ namespace wali {
 	*  first - True if this is the first time this function has been called
 	*  oMap - a map from the outgoing node id associated with the whole intergraph to the new unique id of the node
 	*/
-	double InterGraph::getOutnodeRegExps(map<int, reg_exp_t>& outNodeRegExps, std::map<int, reg_exp_t> & GLPRegExps, map<int, int>& uMap, map<int, int>& oMap, map<int, std::pair< std::pair<int, int>, int> >& mapBack, std::map<std::pair<std::pair<int, int>, int>, int> & transMap, vector<int>& eps, map<std::pair<int, int>, std::pair<int, int>>& mergeSrcMap)
+	double InterGraph::getOutnodeRegExps(map<int, reg_exp_t>& outNodeRegExps, std::map<int, reg_exp_t> & GLPRegExps, map<int, int>& uMap, map<int, int>& oMap, map<int, std::pair< std::pair<int, int>, int> >& mapBack, std::map<std::pair<std::pair<int, int>, int>, int> & transMap, vector<int>& eps, map<std::pair<int, int>, std::pair<int, int> >& mergeSrcMap)
 	{
 	  wali::util::GoodTimer * t = new wali::util::GoodTimer("graphTime");
 	  //t->start();
@@ -1549,7 +1551,7 @@ namespace wali {
 
 		  std::list<IntraGraph *> gr_sorted;
 		  std::map<IntraGraph *, std::list<IntraGraph *> > rev_edges;
-		  unsigned components = SCC(gr_list, gr_sorted, rev_edges);
+		  SCC(gr_list, gr_sorted, rev_edges);
 		  std::map<int, std::list<IntraGraph *> > components_list;
 		  build_components_list(gr_sorted, components_list);
 		  CondensationGraph cg;

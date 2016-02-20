@@ -289,7 +289,7 @@ namespace wali {
             void setESource(Transition t, wali::sem_elem_t wtAtCall, wali::sem_elem_t wtAfterCall);
 
             void setupInterSolution(std::list<Transition> *wt_required = NULL);
-			double getOutnodeRegExps(std::map<int, reg_exp_t> & outNodes, std::map<int, reg_exp_t> & GLPRegExps, std::map<int, int> & uMap, std::map<int, int> & oMap, std::map<int, std::pair< std::pair<int, int>, int> > & mapBack, std::map<std::pair<std::pair<int, int>, int>, int> & transMap, std::vector<int> & eps, std::map<std::pair<int, int>, std::pair<int, int>> & mergeMap);
+			double getOutnodeRegExps(std::map<int, reg_exp_t> & outNodes, std::map<int, reg_exp_t> & GLPRegExps, std::map<int, int> & uMap, std::map<int, int> & oMap, std::map<int, std::pair< std::pair<int, int>, int> > & mapBack, std::map<std::pair<std::pair<int, int>, int>, int> & transMap, std::vector<int> & eps, std::map<std::pair<int, int>, std::pair<int, int> > & mergeMap);
 			double getOutnodeRegExpsSimple(std::map<int, reg_exp_t> & outNodes);
             /**
              * @brief From the given TDG (The original InterGraph), create linearized TDGs corresponding
@@ -347,8 +347,8 @@ namespace wali {
 
 			void build_components_list(std::list<IntraGraph *> &grsorted, std::map<int, std::list<IntraGraph *> > & componentsList);
 			void build_condensation_graph(std::map<int, std::list<IntraGraph *> > & components_list, CondensationGraph & cg, std::map<IntraGraph *, std::list<IntraGraph *> > &rev_edges);
-			bool InterGraph::findGLPs(CondensationGraph & cg, CGraphNode & n, std::list<int> & GLPs);
-			void InterGraph::findGLPsTop(CondensationGraph & cg, std::list<int> & GLPs);
+			bool findGLPs(CondensationGraph & cg, CGraphNode & n, std::list<int> & GLPs);
+			void findGLPsTop(CondensationGraph & cg, std::list<int> & GLPs);
 			unsigned SCC(std::list<IntraGraph *> &grlist, std::list<IntraGraph *> &grsorted, std::map<IntraGraph *, std::list<IntraGraph *> > &rev_edges);
 
             /**
