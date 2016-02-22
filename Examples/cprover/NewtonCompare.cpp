@@ -119,7 +119,7 @@ static pthread_t worker;
 extern "C" 
 */
 
-bool nonRec, pNonLin, linAfterGLP;
+bool nonRec, pNonLin;
 
 #ifdef USE_NWAOBDD
 NWAOBDDContext * con = NULL;
@@ -2706,159 +2706,32 @@ namespace goals {
 	  }
   }	
 
-  /*  Evaluates the GLPs (used because the RegExp evaluate does not evaluate called regexps
-  *
-  *
-  *
-  *  Author:  Emma Turetsky
-  */
-  sem_elem_t evaluateGLP(int reID, reg_exp_t exp, std::map<int, reg_exp_t> & outNodeRegExpsMap, std::map<int, reg_exp_t> & GLP, std::map<int, int> & updateableMap, std::map<int, int> &oMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, std::map<std::pair<int, int>, std::pair<int, int> > & mergeSrcMap)
-  {
-	  if (exp->isSeenByGLP())
-	  {
-		  return exp->getValue();
-	  }
-
-	  std::stack<cFrame> todo;
-
-	  todo.push(cFrame(exp));
-	  while (!todo.empty())
-	  {
-		  cFrame & frame = todo.top();
-		  if (frame.is_new){ //We haven't seen the frame before
-			  if (frame.e->isSeenByGLP())
-			  {
-				  todo.pop();
-				  continue;
-			  }
-			  frame.is_new = false;
-			  if (frame.e->isConstant())
-			  {
-				  frame.e->setGLPWeight(frame.e->get_weight());
-				  todo.pop();
-			  }
-			  else if (frame.e->isUpdatable())  //This means it's a call
-			  {
-				  //Check to see if the variable is in the GLP map
-				  int node_no = frame.e->updatableNumber();
-				  int mNum = oMap[updateableMap[node_no]];
-				  reg_exp_t nRE = GLP[mNum];
-				  if (nRE == NULL)
-				  {
-					  nRE = outNodeRegExpsMap[oMap[updateableMap[node_no]]];
-					  GLP[oMap[updateableMap[node_no]]] = nRE;
-				  }
-				  int t1 = mapBack[reID].first.second;
-				  int t2 = mapBack[mNum].first.second;
-				  std::pair<int, int> mergePair = mergeSrcMap[std::pair<int, int>(t1, t2)];
-				  domain_t val = dynamic_cast<Relation*>(evaluateGLP(mNum, nRE, outNodeRegExpsMap, GLP, updateableMap, oMap, mapBack, mergeSrcMap).get_ptr());
-				  domain_t mergeVal = val->Merge(mergePair.first, mergePair.second);
-				  frame.e->setGLPWeight(mergeVal);
-				  todo.pop();
-			  }
-			  //Determine if the children of this reg_exp_t have been seen before.  If so evaluate frame.e, otherwise push the children on the stack
-			  else if (frame.e->isStar())
-			  {
-				  frame.op = 0;
-				  reg_exp_t child = frame.e->getChildren().front();
-				  frame.left = child;
-				  if (child->isSeenByGLP())
-				  {
-					  frame.e->setGLPWeight(child->getValue()->star());
-					  todo.pop();
-					  continue;
-				  }
-				  else
-				  {
-					  todo.push(cFrame(child));
-					  continue;
-				  }
-			  }
-			  else
-			  {
-				  if (frame.e->isExtend())
-					  frame.op = 1;
-				  else
-					  frame.op = 2;
-
-				  list<reg_exp_t>::iterator ch = frame.e->children.begin();
-				  frame.left = *ch;
-				  ch++;
-				  frame.right = *ch;
-				  if (frame.left->isSeenByGLP())
-				  {
-					  if (frame.right->isSeenByGLP())
-					  {
-						  if (frame.op == 1)
-							  frame.e->setGLPWeight(frame.left->getValue()->extend(frame.right->getValue()));
-						  else
-							  frame.e->setGLPWeight(frame.left->getValue()->combine(frame.right->getValue()));
-						  todo.pop();
-						  continue;
-					  }
-					  else
-					  {
-						  todo.push(cFrame(frame.right));
-						  continue;
-					  }
-				  }
-				  else
-				  {
-					  todo.push(cFrame(frame.left));
-					  if (!frame.right->isSeenByGLP())
-					  {
-						  todo.push(cFrame(frame.right));
-						  continue;
-					  }
-				  }
-			  }
-		  }
-		  else  //We've seen this reg_exp_t before, so it's children have been converted
-		  {
-			  //Look up the children and evaluate
-			  RTG::regExpRefPtr ret;
-			  if (frame.op == 0)  //Kleene
-			  {
-				  frame.e->setGLPWeight(frame.left->getValue()->star());;
-			  }
-			  else  //Dot or Plus
-			  {
-				  if (frame.op == 1)  //Dot
-				  {
-					  frame.e->setGLPWeight(frame.left->getValue()->extend(frame.right->getValue()));
-				  }
-				  else  //Plus
-				  {
-					  frame.e->setGLPWeight(frame.left->getValue()->combine(frame.right->getValue()));
-				  }
-			  }
-			  todo.pop();
-		  }
-	  }
-
-	  return exp->getValue();
-  }
-
   /*
-  *  Converts from a reg_exp_t to a simplified reg_exp_t after we have identified the generalized leaf procedures
+  *  Converts from a reg_exp_t to a RTG::regExpRefPtr
   *
-  *  @param: exp - the expression to be converted
-  *			 glpMap - a map from nodeID to the regular expression of the generalized leaf procefure
+  *  @param: reID - the varID the regular expressiosn
+  *          exp - the expression to be converted
+  *          varDependencies - a map from reID to the set of variabels it depends on that will be populated as we convert, used for the newton round later
+  *			 updateableMap - a map from updateable node to the intergraph node number it depends on (that node number is still associated with the inter graph)
+  *			 oMap - a map from the intergraph node number to the correct unique number for the tsl regexps
   *			 mapBack - a map for associating different variables with the appropriate variableID, needed because of the different node names
   *                     in the fwpds IGR - should try to eliminate this need if possible]
-  *		     double elapsedTime - the time the evaluation of the weights takes on simplify
+  *          elapsedTime - Total time done on possible calculations in the conversion (due to simplification in MkDot
   *
   *   Author: Emma Turetsky
   */
-  reg_exp_t simplify(int reID, reg_exp_t exp, std::map<int, reg_exp_t> & outNodeRegExpsMap, std::map<int, reg_exp_t> & GLP, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, std::map<std::pair<int, int>, std::pair<int, int> > & mergeSrcMap)
+  RTG::regExpRefPtr convertToRegExp(int reID, reg_exp_t exp, std::map<int, reg_exp_t> & outNodeRegExpsMap, std::map<int, std::set<int> > & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, std::map<std::pair<int, int>, std::pair<int, int> > & mergeSrcMap, std::vector<int> & wl, std::set<int> & vl, double * elapsedTime)
   {
 	  std::stack<cFrame> todo;
-	  std::map<reg_exp_t, reg_exp_t> seen; //map of regExps that have allready been seen (should change to an unordered_map for speedup)
-	  std::map<reg_exp_t, reg_exp_t>::iterator it;
-	  std::map<int, reg_exp_t>::iterator gIt;
-	 
+	  std::map<reg_exp_t, RTG::regExpRefPtr> seen; //map of regExps that have allready been seen (should change to an unordered_map for speedup)
+	  std::map<reg_exp_t, RTG::regExpRefPtr>::iterator it;
+	  wali::util::GoodTimer * tC = new wali::util::GoodTimer("temp");
+	  tC->stop();
+	  double extraTime = tC->total_time();
 
-	  todo.push(cFrame(exp));
+	  reg_exp_t simpl_exp = exp;
+	  todo.push(cFrame(simpl_exp));
+	  std::set<int> vDep;
 	  while (!todo.empty())
 	  {
 		  cFrame & frame = todo.top();
@@ -2872,41 +2745,41 @@ namespace goals {
 			  frame.is_new = false;
 			  if (frame.e->isConstant())
 			  {
-				  seen[frame.e] = frame.e;
+				  if (frame.e->isOne())
+					  seen[frame.e] = RTG::One::make();
+				  else if (frame.e->isZero())
+					  seen[frame.e] = RTG::Zero::make();
+				  else {  //If the expresssion isn't a simple constant, make an external TSL wrapper around the constant and create a TSL weight
+					  domain_t w = dynamic_cast<Relation*>(frame.e->get_weight().get_ptr());
+					  EXTERN_TYPES::sem_elem_wrapperRefPtr wt = EXTERN_TYPES::sem_elem_wrapper(w);
+					  seen[frame.e] = RTG::Weight::make(wt);
+				  }
 				  todo.pop();
 				  continue;
 			  }
-			  else if (frame.e->isUpdatable())
+			  else if (frame.e->isUpdatable())  //This means it's a call
 			  {
-				  //Check to see if the variable is in the GLP map
+				  //If the expression is updatable/is a variable
+				  //Then look up the node it depends on - and make a variable associated with it
 				  int node_no = frame.e->updatableNumber();
+				  //std::cout << "node_no: " << node_no;
 				  int mNum = oMap[updateableMap[node_no]];
-				  gIt = GLP.find(mNum);
-				  if (gIt != GLP.end())
+				  //std::cout << " mNum: " << mNum << std::endl;
+				  int t1 = mapBack[reID].first.second;
+				  int t2 = mapBack[mNum].first.second;
+				  std::pair<int, int> mergePair = mergeSrcMap[std::pair<int, int>(t1, t2)];
+				  if (vl.find(mNum) == vl.end())
 				  {
-					  //std::cout << "Before GLP" << std::endl;
-					  //gIt->second->print(std::cout);
-					  //std::cout << std::endl;
-					  domain_t val = dynamic_cast<Relation*>(evaluateGLP(mNum, gIt->second, outNodeRegExpsMap, GLP, updateableMap, oMap, mapBack, mergeSrcMap).get_ptr());
-					  int t1 = mapBack[reID].first.second;
-					  int t2 = mapBack[mNum].first.second;
-					  std::pair<int, int> mergePair = mergeSrcMap[std::pair<int, int>(t1, t2)];
-					  domain_t mergeVal = val->Merge(mergePair.first, mergePair.second);
-					  //std::cout << "After GLP" << std::endl;
-					  //val->print(std::cout);
-					  //std::cout << std::endl;
-					  //std::cout << "After Merge" << std::endl;
-					  //mergeVal->print(std::cout);
-					 // std::cout << std::endl;
-					  frame.e->setGLPWeight(mergeVal);
-					  seen[frame.e] = new wali::graph::RegExp(frame.e->getSatProcess(), frame.e->getDag(), mergeVal);
+					  wl.push_back(mNum);
+					  vl.insert(mNum);
 				  }
-				  else {
-					  seen[frame.e] = frame.e;
-				  }
+				  vDep.insert(mNum);  //This regExp is dependent on the regExp represented by mNum
+				  seen[frame.e] = RTG::Project::make(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), RTG::Var::make(CBTI::INT32(mNum)));
 				  todo.pop();
 				  continue;
 			  }
+			  //Determine if the children of this reg_exp_t have been seen before.  If so convert to the TSLRegExp, otherwise
+			  //push the children reg_exp_t onto the stack
 			  else if (frame.e->isStar())
 			  {
 				  frame.op = 0;
@@ -2915,7 +2788,10 @@ namespace goals {
 				  it = seen.find(child);
 				  if (it != seen.end())
 				  {
-					  seen[frame.e] = new wali::graph::RegExp(frame.e->getSatProcess(), frame.e->getDag(), wali::graph::Star, it->second);
+					  tC->start();
+					  RTG::regExpRefPtr ret = CIR::mkKleene(it->second);
+					  tC->stop();
+					  seen[frame.e] = ret;
 					  todo.pop();
 					  continue;
 				  }
@@ -2939,17 +2815,18 @@ namespace goals {
 				  it = seen.find(frame.left);
 				  if (it != seen.end())
 				  {
-					  reg_exp_t lch = it->second;
+					  RTG::regExpRefPtr lch = it->second;
 					  it = seen.find(frame.right);
 					  if (it != seen.end())
 					  {
-						  reg_exp_t rch = it->second;
-						  reg_exp_t ret;
-						  int type = 0;
+						  RTG::regExpRefPtr rch = it->second;
+						  RTG::regExpRefPtr ret;
+						  tC->start();
 						  if (frame.op == 1)
-							  ret = new wali::graph::RegExp(frame.e->getSatProcess(), frame.e->getDag(), wali::graph::Extend, lch, rch);
+							  ret = CIR::mkDot(lch, rch);
 						  else
-							  ret = new wali::graph::RegExp(frame.e->getSatProcess(), frame.e->getDag(), wali::graph::Combine, lch, rch);
+							  ret = CIR::mkPlus(lch, rch);
+						  tC->stop();
 						  seen[frame.e] = ret;
 						  todo.pop();
 						  continue;
@@ -2973,232 +2850,39 @@ namespace goals {
 		  }
 		  else  //We've seen this reg_exp_t before, so it's children have been converted
 		  {
-			  //Look up the children and call the appropriate RegExp constructor
-			  reg_exp_t lch = seen[frame.left];
-			  reg_exp_t ret;
+			  //Look up the children and call the appropriate constructor for TSL
+			  RTG::regExpRefPtr lch = seen[frame.left];
+			  RTG::regExpRefPtr ret;
 			  if (frame.op == 0)  //Kleene
 			  {
-				  ret = new wali::graph::RegExp(frame.e->getSatProcess(), frame.e->getDag(), wali::graph::Star, lch);
+				  tC->start();
+				  ret = CIR::mkKleene(lch);
+				  tC->stop();
 			  }
 			  else  //Dot or Plus
 			  {
-				  reg_exp_t rch = seen[frame.right];
+				  RTG::regExpRefPtr rch = seen[frame.right];
 				  if (frame.op == 1)  //Dot
 				  {
-					  ret = new wali::graph::RegExp(frame.e->getSatProcess(), frame.e->getDag(), wali::graph::Extend, lch, rch);
+					  tC->start();
+					  ret = CIR::mkDot(lch, rch);
+					  tC->stop();
 				  }
 				  else  //Plus
 				  {
-					  ret = new wali::graph::RegExp(frame.e->getSatProcess(), frame.e->getDag(), wali::graph::Combine, lch, rch);
+					  tC->start();
+					  ret = CIR::mkPlus(lch, rch);
+					  tC->stop();
 				  }
 			  }
 			  seen[frame.e] = ret;
 			  todo.pop();
-			  continue;
 		  }
 	  }
-	  return seen[exp];
-  }
 
-  /*
-  *  Converts from a reg_exp_t to a RTG::regExpRefPtr
-  *
-  *  @param: reID - the varID the regular expressiosn
-  *          exp - the expression to be converted
-  *          varDependencies - a map from reID to the set of variabels it depends on that will be populated as we convert, used for the newton round later
-  *			 updateableMap - a map from updateable node to the intergraph node number it depends on (that node number is still associated with the inter graph)
-  *			 oMap - a map from the intergraph node number to the correct unique number for the tsl regexps
-  *			 mapBack - a map for associating different variables with the appropriate variableID, needed because of the different node names
-  *                     in the fwpds IGR - should try to eliminate this need if possible]
-  *          elapsedTime - Total time done on possible calculations in the conversion (due to simplification in MkDot
-  *
-  *   Author: Emma Turetsky
-  */
-  RTG::regExpRefPtr convertToRegExp(int reID, reg_exp_t exp, std::map<int, reg_exp_t> & outNodeRegExpsMap, std::map<int, reg_exp_t> & GLPRegExps, std::map<int, std::set<int> > & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, std::map<std::pair<int, int>, std::pair<int, int> > & mergeSrcMap, std::vector<int> & wl, std::set<int> & vl, double * elapsedTime)
-  {
-	  std::stack<cFrame> todo;
-	  std::map<reg_exp_t, RTG::regExpRefPtr> seen; //map of regExps that have allready been seen (should change to an unordered_map for speedup)
-	  std::map<reg_exp_t, RTG::regExpRefPtr>::iterator it;
-	  wali::util::GoodTimer * tC = new wali::util::GoodTimer("temp");
-	  tC->stop();
-	  double extraTime = tC->total_time();
-
-	  /*if (GLPRegExps.find(reID) != GLPRegExps.end())
-	  {
-		  tC->start();
-		  exp->setGLPWeight(evaluateGLP(reID, exp, outNodeRegExpsMap, GLPRegExps, updateableMap, oMap, mapBack, mergeSrcMap));
-		  tC->stop();
-		  domain_t w = dynamic_cast<Relation*>(exp->getValue().get_ptr());
-		  EXTERN_TYPES::sem_elem_wrapperRefPtr wt = EXTERN_TYPES::sem_elem_wrapper(w);
-		  seen[exp] = RTG::Weight::make(wt);
-		  *elapsedTime = tC->total_time() - extraTime;
-		  return seen[exp];
-	  }
-	  else
-	  {*/
-		 // std::cout << "Before Simple" << std::endl;
-		 // exp->print(std::cout);
-		 // std::cout << std::endl;
-		  tC->start();
-		  reg_exp_t simpl_exp = exp; //simplify(reID, exp, outNodeRegExpsMap, GLPRegExps, updateableMap, oMap, mapBack, mergeSrcMap);
-		  tC->stop();
-		 // std::cout << "After Simple" << std::endl;
-		 // simpl_exp->print(std::cout);
-		 // std::cout << std::endl;
-		  todo.push(cFrame(simpl_exp));
-		  std::set<int> vDep;
-		  while (!todo.empty())
-		  {
-			  cFrame & frame = todo.top();
-			  if (frame.is_new){ //We haven't seen the frame before
-				  it = seen.find(frame.e);
-				  if (it != seen.end())
-				  {
-					  todo.pop();
-					  continue;
-				  }
-				  frame.is_new = false;
-				  if (frame.e->isConstant())
-				  {
-					  if (frame.e->isOne())
-						  seen[frame.e] = RTG::One::make();
-					  else if (frame.e->isZero())
-						  seen[frame.e] = RTG::Zero::make();
-					  else {  //If the expresssion isn't a simple constant, make an external TSL wrapper around the constant and create a TSL weight
-						  domain_t w = dynamic_cast<Relation*>(frame.e->get_weight().get_ptr());
-						  EXTERN_TYPES::sem_elem_wrapperRefPtr wt = EXTERN_TYPES::sem_elem_wrapper(w);
-						  seen[frame.e] = RTG::Weight::make(wt);
-					  }
-					  todo.pop();
-					  continue;
-				  }
-				  else if (frame.e->isUpdatable())  //This means it's a call
-				  {
-					  //If the expression is updatable/is a variable
-					  //Then look up the node it depends on - and make a variable associated with it
-					  int node_no = frame.e->updatableNumber();
-					  //std::cout << "node_no: " << node_no;
-					  int mNum = oMap[updateableMap[node_no]];
-					  //std::cout << " mNum: " << mNum << std::endl;
-					  int t1 = mapBack[reID].first.second;
-					  int t2 = mapBack[mNum].first.second;
-					  std::pair<int, int> mergePair = mergeSrcMap[std::pair<int, int>(t1, t2)];
-					  if (vl.find(mNum) == vl.end())
-					  {
-						  wl.push_back(mNum);
-						  vl.insert(mNum);
-					  }
-					  vDep.insert(mNum);  //This regExp is dependent on the regExp represented by mNum
-					  seen[frame.e] = RTG::Project::make(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), RTG::Var::make(CBTI::INT32(mNum)));
-					  todo.pop();
-					  continue;
-				  }
-				  //Determine if the children of this reg_exp_t have been seen before.  If so convert to the TSLRegExp, otherwise
-				  //push the children reg_exp_t onto the stack
-				  else if (frame.e->isStar())
-				  {
-					  frame.op = 0;
-					  reg_exp_t child = frame.e->getChildren().front();
-					  frame.left = child;
-					  it = seen.find(child);
-					  if (it != seen.end())
-					  {
-						  tC->start();
-						  RTG::regExpRefPtr ret = CIR::mkKleene(it->second);
-						  tC->stop();
-						  seen[frame.e] = ret;
-						  todo.pop();
-						  continue;
-					  }
-					  else
-					  {
-						  todo.push(cFrame(child));
-						  continue;
-					  }
-				  }
-				  else
-				  {
-					  if (frame.e->isExtend())
-						  frame.op = 1;
-					  else
-						  frame.op = 2;
-
-					  list<reg_exp_t>::iterator ch = frame.e->children.begin();
-					  frame.left = *ch;
-					  ch++;
-					  frame.right = *ch;
-					  it = seen.find(frame.left);
-					  if (it != seen.end())
-					  {
-						  RTG::regExpRefPtr lch = it->second;
-						  it = seen.find(frame.right);
-						  if (it != seen.end())
-						  {
-							  RTG::regExpRefPtr rch = it->second;
-							  RTG::regExpRefPtr ret;
-							  tC->start();
-							  if (frame.op == 1)
-								  ret = CIR::mkDot(lch, rch);
-							  else
-								  ret = CIR::mkPlus(lch, rch);
-							  tC->stop();
-							  seen[frame.e] = ret;
-							  todo.pop();
-							  continue;
-						  }
-						  else
-						  {
-							  todo.push(cFrame(frame.right));
-							  continue;
-						  }
-					  }
-					  else
-					  {
-						  todo.push(cFrame(frame.left));
-						  if (seen.find(frame.right) == seen.end())
-						  {
-							  todo.push(cFrame(frame.right));
-							  continue;
-						  }
-					  }
-				  }
-			  }
-			  else  //We've seen this reg_exp_t before, so it's children have been converted
-			  {
-				  //Look up the children and call the appropriate constructor for TSL
-				  RTG::regExpRefPtr lch = seen[frame.left];
-				  RTG::regExpRefPtr ret;
-				  if (frame.op == 0)  //Kleene
-				  {
-					  tC->start();
-					  ret = CIR::mkKleene(lch);
-					  tC->stop();
-				  }
-				  else  //Dot or Plus
-				  {
-					  RTG::regExpRefPtr rch = seen[frame.right];
-					  if (frame.op == 1)  //Dot
-					  {
-						  tC->start();
-						  ret = CIR::mkDot(lch, rch);
-						  tC->stop();
-					  }
-					  else  //Plus
-					  {
-						  tC->start();
-						  ret = CIR::mkPlus(lch, rch);
-						  tC->stop();
-					  }
-				  }
-				  seen[frame.e] = ret;
-				  todo.pop();
-			  }
-		  }
-
-		  varDependencies[reID] = vDep;   //Put the dependant variable set into varDependencies
-		  *elapsedTime = tC->total_time() - extraTime;
-		  return seen[simpl_exp];
-	  //}
+	  varDependencies[reID] = vDep;   //Put the dependant variable set into varDependencies
+	  *elapsedTime = tC->total_time() - extraTime;
+	  return seen[simpl_exp];
   }
 	  
   /*
@@ -3213,12 +2897,12 @@ namespace goals {
   *
   *  Author:  Emma Turetsky
   */
-  double convertToTSLRegExps(int reg, std::map<int, reg_exp_t> & outNodeRegExpMap, std::map<int, reg_exp_t> & GLPRegExps, tslRegExpMap & regExpMap, std::map<int, std::set<int> > & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, std::map<std::pair<int, int>, std::pair<int, int > >  & mergeSrcMap, std::vector<int> & wl, std::set<int> & vl)
+  double convertToTSLRegExps(int reg, std::map<int, reg_exp_t> & outNodeRegExpMap, tslRegExpMap & regExpMap, std::map<int, std::set<int> > & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, std::map<std::pair<int, int>, std::pair<int, int > >  & mergeSrcMap, std::vector<int> & wl, std::set<int> & vl)
   {
 	  //std::cout << "REID: " << reg << endl;
 	  //outNodeRegExpMap[reg]->print(std::cout) << std::endl;
 	  double evalTime = 0;
-	  RTG::regExpRefPtr rExp = convertToRegExp(reg, outNodeRegExpMap[reg], outNodeRegExpMap, GLPRegExps, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl, &evalTime);
+	  RTG::regExpRefPtr rExp = convertToRegExp(reg, outNodeRegExpMap[reg], outNodeRegExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl, &evalTime);
 	  //rExp->print(std::cout) << std::endl;
 	  //std::cout << "src: " << mapBack[reg].first.first << "tgt: " << mapBack[reg].first.second << "stack: " << mapBack[reg].second << endl << endl;
       regExpMap[reg] = rExp;
@@ -3555,7 +3239,6 @@ namespace goals {
 
 	nonRec = false;
 	pNonLin = false;
-	linAfterGLP = false;
     
 	//Step 1 - Convert the program 'pg' into an fpds where the weights are nwaobdds.
 	FWPDS * fpds;
@@ -3571,7 +3254,6 @@ namespace goals {
 
 	int dummy = -1;
 	map<int, reg_exp_t> outNodeRegExpMap; // A map from a unique id of an outgoing node to the regular expression associated with it
-	map<int, reg_exp_t> GLPRegExps; //A map from a unique id (in the intergraph) to the regular expressions associated with it
 	map<int, reg_exp_t> rNew; // A map from the node ids to the regexps representing the full differentials associated with that node id
 	map<int, int> updateableMap;  //A map from an upadateable node number to the id of the node it depends on 
 	map<int, int> oMap;
@@ -3624,7 +3306,7 @@ namespace goals {
 	//The boolean means this is the first time the functions is called and will generate unique ids as needed
 	double curTime = t->total_time();
 	t->stop();
-	double t1 = fpds->getOutRegExps(fa, outfa, outNodeRegExpMap, GLPRegExps, updateableMap, oMap, mapBack, transMap, differentiatedList, mergeSrcMap);
+	double t1 = fpds->getOutRegExps(fa, outfa, outNodeRegExpMap, updateableMap, oMap, mapBack, transMap, differentiatedList, mergeSrcMap);
 	t->start();
 	int testSize = mapBack.size();
 	int testSize2 = transMap.size();
@@ -3698,7 +3380,7 @@ namespace goals {
 			int rToConvert = wl.back();
 			//std::cout << rToConvert << endl;
 			wl.pop_back();
-			baseEvalTime += convertToTSLRegExps(rToConvert, outNodeRegExpMap, GLPRegExps, regExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl);
+			baseEvalTime += convertToTSLRegExps(rToConvert, outNodeRegExpMap, regExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl);
 		}
 		//std::cout << "ESIZE: " << E.size() << std::endl;
 		//std::cout << "DSIZE: " << differentiatedList.size() << std::endl;
@@ -3708,14 +3390,11 @@ namespace goals {
 		for (vector<int>::iterator eit = differentiatedList.begin(); eit != differentiatedList.end(); eit++)
 		{
 			// std::cout << "D: " << *eit << endl;
-			//if (GLPRegExps.find(*eit) == GLPRegExps.end())
-			//{
 				RTG::regExpRefPtr tmpReg = regExpMap[(*eit)];
 				if (tmpReg != NULL)
 				{
 					diffMap[(*eit)] = regExpMap[(*eit)];
 				}
-			//}
 			//  std::cout << "RE: " << *eit;
 			//  std::cout << " ";
 			//  E[(*eit)].print(std::cout) << std::endl;
@@ -3737,10 +3416,9 @@ namespace goals {
 		if (diffMap.size() != 0)
 		{
 			bool linear = createDifferentials(diffMap, differentialMap);
-			linAfterGLP = linear;
 			if (linear)
 			{
-				std::cout << "linAfterGLP";
+				std::cout << "linear";
 				std::cout << std::endl;
 			}
 			else
@@ -3902,8 +3580,7 @@ namespace goals {
   */
   double run_newton_noTensor(WFA& outfa, FWPDS * originalPds = NULL)
   {
-	/*  cout << "#################################################" << endl;
-	  cout << "[Newton Compare] Goal VIII: end-to-end newton_merge_notensor_fwpds run" << endl;
+	  cout << "#################################################" << endl;
 
 	  //Step 1 - Convert the program 'pg' into an fpds where the weights are nwaobdds.
 	  FWPDS * fpds;
@@ -3923,7 +3600,6 @@ namespace goals {
 
 
 	  map<int, reg_exp_t> outNodeRegExpMap; // A map from a unique id of an outgoing node to the regular expression associated with it
-	  map<int, reg_exp_t> GLPRegExps;
 	  map<int, int> updateableMap;  //A map from an upadateable node number to the id of the node it depends on 
 	  map<int, int> oMap;
 	  map<int, pair< pair<int, int>, int> > mapBack;  //A map from the node index to the struct of the <<src,tgt>,stack> - used to insert weights back into wfa
@@ -3968,14 +3644,14 @@ namespace goals {
 		  outfile.close();
 	  }
 
-	  *//* Step 2 - Perform poststar on the fpds get the regular expressions associated with
+	  /* Step 2 - Perform poststar on the fpds get the regular expressions associated with
 	  *			the outgoing nodes in the intra_graph associated with the fwpds
 	  */
 	  //This function performs postar on the fa using the fpds and populations the maps as described above
 	  //The boolean means this is the first time the functions is called and will generate unique ids as needed
-	 /* double curTime = t->total_time();
+	  double curTime = t->total_time();
 	  t->stop();
-	  double t1 = fpds->getOutRegExps(fa, outfa, outNodeRegExpMap, GLPRegExps, updateableMap, oMap, mapBack, transMap, differentiatedList, mergeSrcMap);
+	  double t1 = fpds->getOutRegExps(fa, outfa, outNodeRegExpMap, updateableMap, oMap, mapBack, transMap, differentiatedList, mergeSrcMap);
 	  t->start();
 
 	  //Get the key to the error state
@@ -4027,10 +3703,10 @@ namespace goals {
 			  outfile.close();
 		  }
 
-		 */ /*Step 3 - Convert these regexps into TSL regular expressions and get the partial differentials
+		 /*Step 3 - Convert these regexps into TSL regular expressions and get the partial differentials
 		  *		   with respect their variables
 		  */
-		 /* cout << "[Newton Compare] converting to TSL" << endl;
+		  cout << "[Newton Compare] converting to TSL" << endl;
 		  while (!wl.empty())
 		  {
 			  int wlSzie = wl.size();
@@ -4040,7 +3716,7 @@ namespace goals {
 			  int rToConvert = wl.back();
 			  //std::cout << rToConvert << endl;
 			  wl.pop_back();
-			  baseEvalTime += convertToTSLRegExps(rToConvert, outNodeRegExpMap, GLPRegExps, regExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl);
+			  baseEvalTime += convertToTSLRegExps(rToConvert, outNodeRegExpMap, regExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl);
 		  }
 
 
@@ -4168,7 +3844,7 @@ namespace goals {
 			  }
 
 
-			 */ /*std::map<std::pair<std::pair<Key, Key>, Key>, merge_fn_t>::iterator mfmIt;
+			  /*std::map<std::pair<std::pair<Key, Key>, Key>, merge_fn_t>::iterator mfmIt;
 			  for (mfmIt = mfMap.begin(); mfmIt != mfMap.end(); mfmIt++)
 			  {
 			  std::cout << "Key: (" << mfmIt->first.first.first << "," << mfmIt->first.first.second << "," << mfmIt->first.second << ")" << std::endl;
@@ -4176,7 +3852,7 @@ namespace goals {
 			  std::cout << std::endl;
 			  }*/
 
-			/*  std::cout << "Creating Domain FWPDS" << std::endl;
+			 std::cout << "Creating Domain FWPDS" << std::endl;
 			  //tslFwpds->print(std::cout);
 
 			  //Create an assignmentlist of 0
@@ -4397,7 +4073,7 @@ namespace goals {
 				  tt->setWeight(w.v);
 			  }
 		  }
-		  *//*for(map<int,pair<pair<int,int>,int> >::iterator mbit = mapBack.begin(); mbit != mapBack.end(); mbit++)
+		  /*for(map<int,pair<pair<int,int>,int> >::iterator mbit = mapBack.begin(); mbit != mapBack.end(); mbit++)
 		  {
 		  int src = mbit->second.first.first;
 		  int tgt = mbit->second.first.second;
@@ -4412,7 +4088,7 @@ namespace goals {
 		  // w->print(std::cout);
 		  tt->setWeight(w);
 		  }
-		  }*//*
+		  }*/
 		  t->start();
 		  //sem_elem_t fWt = computePathSummary(fpds, outfa);
 		  outfa.path_summary_tarjan_fwpds(true);
