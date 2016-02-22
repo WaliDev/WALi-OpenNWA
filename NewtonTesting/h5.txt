@@ -1,0 +1,66 @@
+executable	= Release/Newton.exe
+universe	= vanilla
+notification	= Error
+notify_user	= turetsky@cs.wisc.edu
+periodic_remove	= (CommittedTime - CumulativeSuspensionTime) > 600
+when_to_transfer_output	= ON_EXIT_OR_EVICT
+should_transfer_files	= yes
+environment	= LD_LIBRARY_PATH=.
+request_memory = 2*1024
+
+
+transfer_input_files	= ../collection/nonrec20to120/src_7600_serial_serenum__LowerDriverReturn.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/nonrec20to120/src_7600_serial_serenum__LowerDriverReturn.yes.bp.NWAOBDDTest.err
+output	= ../collection/nonrec20to120/src_7600_serial_serenum__LowerDriverReturn.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_serial_serenum__LowerDriverReturn.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/nonrec20to120/src_7600_general_toaster_kmdf_bus_static__PdoInitFreeDeviceCreateType2.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/nonrec20to120/src_7600_general_toaster_kmdf_bus_static__PdoInitFreeDeviceCreateType2.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/nonrec20to120/src_7600_general_toaster_kmdf_bus_static__PdoInitFreeDeviceCreateType2.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_toaster_kmdf_bus_static__PdoInitFreeDeviceCreateType2.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/nonrec20to120/src_7600_general_toaster_wdm_func_featured1__MarkIrpPending.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/nonrec20to120/src_7600_general_toaster_wdm_func_featured1__MarkIrpPending.yes.bp.NWAOBDDTest.err
+output	= ../collection/nonrec20to120/src_7600_general_toaster_wdm_func_featured1__MarkIrpPending.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_toaster_wdm_func_featured1__MarkIrpPending.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/nonrec20to120/src_7600_general_registry_regfltr_sys__ZwRegistryOpen.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/nonrec20to120/src_7600_general_registry_regfltr_sys__ZwRegistryOpen.no.bp.NWAOBDDTest.err
+output	= ../collection/nonrec20to120/src_7600_general_registry_regfltr_sys__ZwRegistryOpen.no.bp.NWAOBDDTest.out
+arguments	= src_7600_general_registry_regfltr_sys__ZwRegistryOpen.no.bp 1
+queue
+
+transfer_input_files	= ../collection/nonrec20to120/src_7600_general_toaster_wdm_func_featured1__IrqlKeDispatchLte.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/nonrec20to120/src_7600_general_toaster_wdm_func_featured1__IrqlKeDispatchLte.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/nonrec20to120/src_7600_general_toaster_wdm_func_featured1__IrqlKeDispatchLte.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_toaster_wdm_func_featured1__IrqlKeDispatchLte.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/nonrec20to120/src_7600_bth_bthecho_bthcli_sys__ReqCompletionRoutine.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/nonrec20to120/src_7600_bth_bthecho_bthcli_sys__ReqCompletionRoutine.yes.bp.NWAOBDDTest.err
+output	= ../collection/nonrec20to120/src_7600_bth_bthecho_bthcli_sys__ReqCompletionRoutine.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_bth_bthecho_bthcli_sys__ReqCompletionRoutine.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/nonrec20to120/src_7600_general_toaster_wdm_func_featured1__IrqlReturn.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/nonrec20to120/src_7600_general_toaster_wdm_func_featured1__IrqlReturn.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/nonrec20to120/src_7600_general_toaster_wdm_func_featured1__IrqlReturn.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_toaster_wdm_func_featured1__IrqlReturn.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/nonrec20to120/src_7600_storage_filters_diskperf__LowerDriverReturn.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/nonrec20to120/src_7600_storage_filters_diskperf__LowerDriverReturn.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/nonrec20to120/src_7600_storage_filters_diskperf__LowerDriverReturn.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_filters_diskperf__LowerDriverReturn.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/nonrec20to120/src_7600_general_toaster_wdm_bus__PendedCompletedRequest.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/nonrec20to120/src_7600_general_toaster_wdm_bus__PendedCompletedRequest.yes.bp.NWAOBDDTest.err
+output	= ../collection/nonrec20to120/src_7600_general_toaster_wdm_bus__PendedCompletedRequest.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_toaster_wdm_bus__PendedCompletedRequest.yes.bp 1
+queue
+
+

@@ -1,0 +1,137 @@
+executable	= Release/Newton.exe
+universe	= vanilla
+notification	= Error
+notify_user	= turetsky@cs.wisc.edu
+periodic_remove	= (CommittedTime - CumulativeSuspensionTime) > 600
+when_to_transfer_output	= ON_EXIT_OR_EVICT
+should_transfer_files	= yes
+environment	= LD_LIBRARY_PATH=.
+request_memory = 2*1024
+
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/n-bt.unsafe.bp
+error	= ../collection/unsafe/n-bt.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/n-bt.unsafe.bp.TestNWAOBDD.out
+arguments	= n-bt.unsafe.bp 1
+queue
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/src_7600_storage_class_disk__IrqlIoApcLte.unsafe.bp
+error	= ../collection/unsafe/src_7600_storage_class_disk__IrqlIoApcLte.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/src_7600_storage_class_disk__IrqlIoApcLte.unsafe.bp.TestNWAOBDD.out
+arguments	= src_7600_storage_class_disk__IrqlIoApcLte.unsafe.bp 1
+queue
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/n-watch-deref3.unsafe.bp
+error	= ../collection/unsafe/n-watch-deref3.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/n-watch-deref3.unsafe.bp.TestNWAOBDD.out
+arguments	= n-watch-deref3.unsafe.bp 1
+queue
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/src_7600_network_ndis_athwifi_driver_atheros__Pre_MiniportCheckForHang_Return.unsafe.bp
+error	= ../collection/unsafe/src_7600_network_ndis_athwifi_driver_atheros__Pre_MiniportCheckForHang_Return.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/src_7600_network_ndis_athwifi_driver_atheros__Pre_MiniportCheckForHang_Return.unsafe.bp.TestNWAOBDD.out
+arguments	= src_7600_network_ndis_athwifi_driver_atheros__Pre_MiniportCheckForHang_Return.unsafe.bp 1
+queue
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/n-newton2.unsafe.bp
+error	= ../collection/unsafe/n-newton2.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/n-newton2.unsafe.bp.TestNWAOBDD.out
+arguments	= n-newton2.unsafe.bp 1
+queue
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/n-dist12.unsafe.bp
+error	= ../collection/unsafe/n-dist12.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/n-dist12.unsafe.bp.TestNWAOBDD.out
+arguments	= n-dist12.unsafe.bp 1
+queue
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/n-mutex2.unsafe.bp
+error	= ../collection/unsafe/n-mutex2.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/n-mutex2.unsafe.bp.TestNWAOBDD.out
+arguments	= n-mutex2.unsafe.bp 1
+queue
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/src_7600_storage_sfloppy__PnpSurpriseRemove.unsafe.bp
+error	= ../collection/unsafe/src_7600_storage_sfloppy__PnpSurpriseRemove.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/src_7600_storage_sfloppy__PnpSurpriseRemove.unsafe.bp.TestNWAOBDD.out
+arguments	= src_7600_storage_sfloppy__PnpSurpriseRemove.unsafe.bp 1
+queue
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/n-call_byron.unsafe.bp
+error	= ../collection/unsafe/n-call_byron.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/n-call_byron.unsafe.bp.TestNWAOBDD.out
+arguments	= n-call_byron.unsafe.bp 1
+queue
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/src_7600_storage_sfloppy__IrqlIoApcLte.unsafe.bp
+error	= ../collection/unsafe/src_7600_storage_sfloppy__IrqlIoApcLte.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/src_7600_storage_sfloppy__IrqlIoApcLte.unsafe.bp.TestNWAOBDD.out
+arguments	= src_7600_storage_sfloppy__IrqlIoApcLte.unsafe.bp 1
+queue
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/enforce3.unsafe.bp
+error	= ../collection/unsafe/enforce3.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/enforce3.unsafe.bp.TestNWAOBDD.out
+arguments	= enforce3.unsafe.bp 1
+queue
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/n-toughone.unsafe.bp
+error	= ../collection/unsafe/n-toughone.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/n-toughone.unsafe.bp.TestNWAOBDD.out
+arguments	= n-toughone.unsafe.bp 1
+queue
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/src_7600_network_modem_fakemodem__ManualQueueDispatching.unsafe.bp
+error	= ../collection/unsafe/src_7600_network_modem_fakemodem__ManualQueueDispatching.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/src_7600_network_modem_fakemodem__ManualQueueDispatching.unsafe.bp.TestNWAOBDD.out
+arguments	= src_7600_network_modem_fakemodem__ManualQueueDispatching.unsafe.bp 1
+queue
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/n-dist11.unsafe.bp
+error	= ../collection/unsafe/n-dist11.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/n-dist11.unsafe.bp.TestNWAOBDD.out
+arguments	= n-dist11.unsafe.bp 1
+queue
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/src_7600_storage_class_classpnp__PnpSurpriseRemove.unsafe.bp
+error	= ../collection/unsafe/src_7600_storage_class_classpnp__PnpSurpriseRemove.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/src_7600_storage_class_classpnp__PnpSurpriseRemove.unsafe.bp.TestNWAOBDD.out
+arguments	= src_7600_storage_class_classpnp__PnpSurpriseRemove.unsafe.bp 1
+queue
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/src_7600_storage_class_disk__PnpSurpriseRemove.unsafe.bp
+error	= ../collection/unsafe/src_7600_storage_class_disk__PnpSurpriseRemove.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/src_7600_storage_class_disk__PnpSurpriseRemove.unsafe.bp.TestNWAOBDD.out
+arguments	= src_7600_storage_class_disk__PnpSurpriseRemove.unsafe.bp 1
+queue
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/enforce6.unsafe.bp
+error	= ../collection/unsafe/enforce6.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/enforce6.unsafe.bp.TestNWAOBDD.out
+arguments	= enforce6.unsafe.bp 1
+queue
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/src_7600_storage_class_classpnp__IrqlIoApcLte.unsafe.bp
+error	= ../collection/unsafe/src_7600_storage_class_classpnp__IrqlIoApcLte.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/src_7600_storage_class_classpnp__IrqlIoApcLte.unsafe.bp.TestNWAOBDD.out
+arguments	= src_7600_storage_class_classpnp__IrqlIoApcLte.unsafe.bp 1
+queue
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/n-mutex3.unsafe.bp
+error	= ../collection/unsafe/n-mutex3.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/n-mutex3.unsafe.bp.TestNWAOBDD.out
+arguments	= n-mutex3.unsafe.bp 1
+queue
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/enforce1.unsafe.bp
+error	= ../collection/unsafe/enforce1.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/enforce1.unsafe.bp.TestNWAOBDD.out
+arguments	= enforce1.unsafe.bp 1
+queue
+
+transfer_input_files = Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll, ../collection/unsafe/n-doubleinitfree.unsafe.bp
+error	= ../collection/unsafe/n-doubleinitfree.unsafe.bp.TestNWAOBDD.err
+output	= ../collection/unsafe/n-doubleinitfree.unsafe.bp.TestNWAOBDD.out
+arguments	= n-doubleinitfree.unsafe.bp 1
+queue
+

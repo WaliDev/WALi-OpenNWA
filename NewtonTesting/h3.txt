@@ -1,0 +1,60 @@
+executable	= Release/Newton.exe
+universe	= vanilla
+notification	= Error
+notify_user	= turetsky@cs.wisc.edu
+periodic_remove	= (CommittedTime - CumulativeSuspensionTime) > 600
+when_to_transfer_output	= ON_EXIT_OR_EVICT
+should_transfer_files	= yes
+environment	= LD_LIBRARY_PATH=.
+request_memory = 2*1024
+
+
+transfer_input_files	= ../collection/nonrec120to300/src_7600_serial_serenum__IrqlExAllocatePool.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/nonrec120to300/src_7600_serial_serenum__IrqlExAllocatePool.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/nonrec120to300/src_7600_serial_serenum__IrqlExAllocatePool.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_serial_serenum__IrqlExAllocatePool.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/nonrec120to300/src_7600_general_toaster_kmdf_bus_static__PdoDeviceInitAPI.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/nonrec120to300/src_7600_general_toaster_kmdf_bus_static__PdoDeviceInitAPI.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/nonrec120to300/src_7600_general_toaster_kmdf_bus_static__PdoDeviceInitAPI.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_toaster_kmdf_bus_static__PdoDeviceInitAPI.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/nonrec120to300/src_7600_general_pcidrv_kmdf_HW__WdfSpinlock.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/nonrec120to300/src_7600_general_pcidrv_kmdf_HW__WdfSpinlock.no.bp.NWAOBDDTest.err
+output	= ../collection/nonrec120to300/src_7600_general_pcidrv_kmdf_HW__WdfSpinlock.no.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_kmdf_HW__WdfSpinlock.no.bp 1
+queue
+
+transfer_input_files	= ../collection/nonrec120to300/src_7600_serial_serenum__IrqlReturn.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/nonrec120to300/src_7600_serial_serenum__IrqlReturn.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/nonrec120to300/src_7600_serial_serenum__IrqlReturn.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_serial_serenum__IrqlReturn.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/nonrec120to300/src_7600_general_toaster_wdm_func_featured1__PnpSurpriseRemove.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/nonrec120to300/src_7600_general_toaster_wdm_func_featured1__PnpSurpriseRemove.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/nonrec120to300/src_7600_general_toaster_wdm_func_featured1__PnpSurpriseRemove.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_toaster_wdm_func_featured1__PnpSurpriseRemove.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/nonrec120to300/src_7600_bth_bthecho_bthcli_sys__InvalidReqAccess.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/nonrec120to300/src_7600_bth_bthecho_bthcli_sys__InvalidReqAccess.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/nonrec120to300/src_7600_bth_bthecho_bthcli_sys__InvalidReqAccess.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_bth_bthecho_bthcli_sys__InvalidReqAccess.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/nonrec120to300/src_7600_usb_osrusbfx2_kmdf_sys_final__EvtIoStopResume.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/nonrec120to300/src_7600_usb_osrusbfx2_kmdf_sys_final__EvtIoStopResume.no.bp.NWAOBDDTest.err
+output	= ../collection/nonrec120to300/src_7600_usb_osrusbfx2_kmdf_sys_final__EvtIoStopResume.no.bp.NWAOBDDTest.out
+arguments	= src_7600_usb_osrusbfx2_kmdf_sys_final__EvtIoStopResume.no.bp 1
+queue
+
+transfer_input_files	= ../collection/nonrec120to300/src_7600_general_toaster_wdm_func_featured2__PnpSurpriseRemove.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/nonrec120to300/src_7600_general_toaster_wdm_func_featured2__PnpSurpriseRemove.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/nonrec120to300/src_7600_general_toaster_wdm_func_featured2__PnpSurpriseRemove.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_toaster_wdm_func_featured2__PnpSurpriseRemove.fp.yes.bp 1
+queue
+
+

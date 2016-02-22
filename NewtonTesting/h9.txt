@@ -1,0 +1,90 @@
+executable	= Release/Newton.exe
+universe	= vanilla
+notification	= Error
+notify_user	= turetsky@cs.wisc.edu
+periodic_remove	= (CommittedTime - CumulativeSuspensionTime) > 600
+when_to_transfer_output	= ON_EXIT_OR_EVICT
+should_transfer_files	= yes
+environment	= LD_LIBRARY_PATH=.
+request_memory = 2*1024
+
+
+transfer_input_files	= ../collection/rec20to120/src_7600_storage_sfloppy__PendedCompletedRequest.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec20to120/src_7600_storage_sfloppy__PendedCompletedRequest.no.bp.NWAOBDDTest.err
+output	= ../collection/rec20to120/src_7600_storage_sfloppy__PendedCompletedRequest.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__PendedCompletedRequest.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec20to120/src_7600_general_pcidrv_wdm_hw__IrqlZwPassive.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec20to120/src_7600_general_pcidrv_wdm_hw__IrqlZwPassive.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec20to120/src_7600_general_pcidrv_wdm_hw__IrqlZwPassive.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__IrqlZwPassive.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec20to120/src_7600_storage_sfloppy__IrqlIoPassive5.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec20to120/src_7600_storage_sfloppy__IrqlIoPassive5.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec20to120/src_7600_storage_sfloppy__IrqlIoPassive5.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__IrqlIoPassive5.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec20to120/src_7600_storage_class_disk__IrqlIoPassive5.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec20to120/src_7600_storage_class_disk__IrqlIoPassive5.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec20to120/src_7600_storage_class_disk__IrqlIoPassive5.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__IrqlIoPassive5.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec20to120/src_7600_general_pcidrv_wdm_hw__SpinLockSafe.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec20to120/src_7600_general_pcidrv_wdm_hw__SpinLockSafe.no.bp.NWAOBDDTest.err
+output	= ../collection/rec20to120/src_7600_general_pcidrv_wdm_hw__SpinLockSafe.no.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__SpinLockSafe.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec20to120/src_7600_general_pcidrv_wdm_hw__IrqlExPassive.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec20to120/src_7600_general_pcidrv_wdm_hw__IrqlExPassive.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec20to120/src_7600_general_pcidrv_wdm_hw__IrqlExPassive.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_general_pcidrv_wdm_hw__IrqlExPassive.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec20to120/src_7600_storage_class_classpnp__ZwRegistryOpen.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec20to120/src_7600_storage_class_classpnp__ZwRegistryOpen.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec20to120/src_7600_storage_class_classpnp__ZwRegistryOpen.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__ZwRegistryOpen.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec20to120/src_7600_storage_sfloppy__IrqlKeRaiseLower.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec20to120/src_7600_storage_sfloppy__IrqlKeRaiseLower.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec20to120/src_7600_storage_sfloppy__IrqlKeRaiseLower.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__IrqlKeRaiseLower.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec20to120/src_7600_storage_class_disk__IrqlKeRaiseLower.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec20to120/src_7600_storage_class_disk__IrqlKeRaiseLower.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec20to120/src_7600_storage_class_disk__IrqlKeRaiseLower.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_disk__IrqlKeRaiseLower.fp.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec20to120/src_7600_storage_class_classpnp__PendedCompletedRequest.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec20to120/src_7600_storage_class_classpnp__PendedCompletedRequest.no.bp.NWAOBDDTest.err
+output	= ../collection/rec20to120/src_7600_storage_class_classpnp__PendedCompletedRequest.no.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__PendedCompletedRequest.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec20to120/src_7600_storage_sfloppy__AddDeviceBus.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec20to120/src_7600_storage_sfloppy__AddDeviceBus.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec20to120/src_7600_storage_sfloppy__AddDeviceBus.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_sfloppy__AddDeviceBus.yes.bp 1
+queue
+
+transfer_input_files	= ../collection/rec20to120/src_7600_network_ndis_athwifi_driver_atheros__Irql_Timer_Function.no.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec20to120/src_7600_network_ndis_athwifi_driver_atheros__Irql_Timer_Function.no.bp.NWAOBDDTest.err
+output	= ../collection/rec20to120/src_7600_network_ndis_athwifi_driver_atheros__Irql_Timer_Function.no.bp.NWAOBDDTest.out
+arguments	= src_7600_network_ndis_athwifi_driver_atheros__Irql_Timer_Function.no.bp 1
+queue
+
+transfer_input_files	= ../collection/rec20to120/src_7600_storage_class_classpnp__IrqlKeRaiseLower.fp.yes.bp,Release/libglog.dll, C:\windows\system32\KERNEL32.dll, C:\windows\system32\msvcp120.dll,	 C:\windows\system32\msvcr120.dll
+error	= ../collection/rec20to120/src_7600_storage_class_classpnp__IrqlKeRaiseLower.fp.yes.bp.NWAOBDDTest.err
+output	= ../collection/rec20to120/src_7600_storage_class_classpnp__IrqlKeRaiseLower.fp.yes.bp.NWAOBDDTest.out
+arguments	= src_7600_storage_class_classpnp__IrqlKeRaiseLower.fp.yes.bp 1
+queue
+
+
