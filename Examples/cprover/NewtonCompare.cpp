@@ -2616,23 +2616,53 @@ namespace goals {
   }
 
 
-  /*
-  *  Convert a wali NameWeight regexp to a tensored regular expressions
+ /*
+  *  convertToRegExpT
   *
-  *  The wali regexp represents a differentiated value.  The weight represents a regexp in eMap
-  *  differentiated with respect to a given variable (or not differentiated, depending) or is
-  *  the representation of "one"
+  *  Convert a WALi NameWeight regexp to a tensored regular expression
   *
+  *  This procedure implements Step (5) of Algorithm NPA-TP from TR-1825 (page 33)
+  *  http://research.cs.wisc.edu/wpis/papers/tr1825.pdf
   *
-  *  params:  reg_exp_t exp - Wali regExp of the sem_elem
-  *			  tslRegExpMap & regExpMap - map from varId to the TSL regExpRepresenting it
-  *			  tslDiffMap & differentialMap - map from varId to list of partial differentials representing varId differentiated with
-  *			  respect to different variables
-  *			  mapBack - a map for associating different variables with the appropriate variableID, needed because of the different node names
-  *                     in the fwpds IGR - should try to eliminate this need if possible
-  *           bool call - true if it's possible that this reg_exp_t is a call
+  *  In the terms of that paper, this procedure is used to create the
+  *  set of regular expressions that will be used to evaluate the
+  *  variables Z_i in the left-linear equation system over the vector
+  *  of variables Z:
   *
-  *  return:  RTG::regExpTRefPtr - a tensored TSLRegexp representing the tensored differential of exp
+  *    Z = (1^t tensor f(0)) combine_T D_T f|_nu(Z).       (*)
+  *
+  *  At top-level, the value of parameter "exp" is a WALi regular
+  *  expression over constants of type NameWeight (for some variable
+  *  Z_i). It will be converted into a tensored regular expression
+  *  that expresses how to compute the solution for Z_i on a given
+  *  Newton round.
+  *
+  *  Method. Recursively traverse exp:
+  *
+  *   o convert each regular-expression operator into the analogous
+  *     tensored operator
+  *
+  *   o convert each leaf NameWeight(j,i) into the tensored regular
+  *     expression RE_T[j,i], where RE_T[j,i] is the tensored regular
+  *     expression in the i-th equation of equation-system (*)
+  *
+  *       Z_i = ... combine_T (Z_j *_T RE_T[j,i]) combine_T ...
+  *
+  *  params: reg_exp_t exp - a WALi NameWeight regular expression
+  *          tslRegExpMap & regExpMap - map from varId to the TSL regExp representing it
+  *          tslDiffMap & differentialMap - map from varId to list of partial differentials
+  *                                         representing varId differentiated with
+  *                                         respect to different variables
+  *          mapBack - a map for associating different variables with the
+  *                    appropriate variableID, needed because of the different node names
+  *                    in the fwpds IGR - should try to eliminate this need if possible
+  *          bool call - true if it is possible that exp is a call
+  *
+  *  return: RTG::regExpTRefPtr - the tensored TSLRegexp that
+  *           represents exp converted in the manner described
+  *           above. The return value at top-level expresses how to
+  *           compute the solution for some variable Z_i on a given
+  *           Newton round.
   *
   *  Author:  Emma Turetsky
   */
@@ -2643,32 +2673,38 @@ namespace goals {
 		  NameWeight * nw = static_cast<wali::domains::name_weight::NameWeight*>(exp->get_weight().get_ptr());
 		  int var = nw->getName1();
 		  int reID = nw->getName2();
-		  if (var == -1){
-			  if (reID == -1){
-				  return RTG::OneT::make();  //The value isn't a variable, so make it a tensored one
+                // Create the tensored regular expression RE_T[var,reID] for the dependence of reID on var in the Z equation-system
+		  if (var == -1){ // Case for NameWeight(dummy, reID) in the FWPDS encoding of the Z equation-system's dependence graph
+			  if (reID == -1){  // Should never occur; return (1^t tensor 1)
+				  return RTG::OneT::make();
 			  }
-			  else {
-				  RTG::regExpRefPtr d = regExpMap[reID]; //lookup the appropraite regexp and evaluate at 0
+			  else { // From the regular expression d for reID, create (1^t tensor d(0))
+                               // Look up the appropriate regexp for reID and evaluate at 0
+				  RTG::regExpRefPtr d = regExpMap[reID];
 				  EXTERN_TYPES::sem_elem_wrapperRefPtr newVal = evalNonRecAt0(d);
-				  return CIR::mkTensorTranspose(RTG::One::make(), RTG::Weight::make(newVal));  //Create a tensored weight with the regexp
+                               // Return (1^t tensor newVal)
+				  return CIR::mkTensorTranspose(RTG::One::make(), RTG::Weight::make(newVal));
 			  }
 		  }
-		  else {
-			  RTG::regExpTRefPtr d = CIR::getTFromRegList(differentialMap[reID], var); //the NameWeight represents reID differentiated with respect to Variable var (note the regExps contain
-			  //the updateable variables
+		  else { // Case for variable reID depending on variable var
+                       // NameWeight(var,reID) represents RE_T[var,reID] in a component of the Z equation-system:
+                       //    Z_reID = ... combine_T (Z_var *_T RE_T[var,reID]) combine_T ...
+			  RTG::regExpTRefPtr d = CIR::getTFromRegList(differentialMap[reID], var);
 			  return d;
 		  }
 	  }
-	  else if (exp->isUpdatable()){  //This is a placeholder, it will never occur due to linear nature of the nameweight fwpd
+	  else if (exp->isUpdatable()){  // This case is a placeholder; it will never occur due to
+                                        // linear nature of the Z equation-system
+                assert(false, "A representation of a tensored variable occurred in a nameweight\n");
 		  int node_no = exp->updatableNumber();
 		  return RTG::VarT::make(CBTI::INT32(node_no));
 	  }
-	  else if (exp->isStar()){ //A Star operation only has one child in the children list 
-		  list<reg_exp_t> children = exp->getChildren();
+	  else if (exp->isStar()){ // Convert a Kleene node to a KleeneT node
+		  list<reg_exp_t> children = exp->getChildren(); // A Star operation only has one child in the children list
 		  RTG::regExpTRefPtr c = convertToRegExpT(children.front(), regExpMap, differentialMap, mapBack, mergeSrcMap, false);
 		  return CIR::mkKleeneT(c);
 	  }
-	  else if (exp->isExtend()){ //Convert an extend to a Dot regExpT using recursive calls and the left and right children of the regexp
+	  else if (exp->isExtend()){ // Convert a Dot node to a DotT node
 		  if (call)
 		  {
 			  list<reg_exp_t> children = exp->getChildren();
@@ -2696,7 +2732,7 @@ namespace goals {
 			  return CIR::mkDotT(lch, rch);
 		  }
 	  }
-	  else if (exp->isCombine()){ //Convert an combine to a Plus regExpT using recursive calls and the left and right children of the regexp
+	  else if (exp->isCombine()){ // Convert an Plus node to a PlusT node
 		  list<reg_exp_t> children = exp->getChildren();
 		  list<reg_exp_t>::iterator ch = children.begin();
 		  RTG::regExpTRefPtr lch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap, true);
@@ -3028,59 +3064,113 @@ namespace goals {
     return getKey(k);
   }
 
-  /*
-  *  Creates a new fwpds using differentials generated from regular expressions
-  *  
-  *  pds - the new fwpds that's being generated
-  *  differentialMap - the map of differentials
-  *  varDependencies - A map from reID to the set of variables it depends on
+ /*
+  *  fwpdsFromDifferential
   *
+  *  pds - the new fwpds that is being generated
+  *  differentialMap - a map of differentials
+  *  varDependencies - a map from an reID (a variable) to the set of
+  *                    variables it depends on
+  *
+  *  This procedure implements Step (3) of Algorithm NPA-TP from TR-1825 (page 33)
+  *  http://research.cs.wisc.edu/wpis/papers/tr1825.pdf
+  *
+  *  In the terms of that paper, we are creating the dependence graph
+  *  G for the left-linear equation system over the vector Z:
+  *
+  *    Z = (1^t tensor f(0)) combine_T D_T f|_nu(Z).       (*)
+  *
+  *  In terms of the implementation, the procedure is really taking
+  *  one encoding of G (namely, varDependencies + differentialMap),
+  *  and converting it into another encoding of G. Procedure
+  *  fwpdsFromDifferential returns an encoding of G as an FWPDS, which
+  *  allows us to use the FWPDS operations that implement Tarjan's
+  *  path-expression method to create an appropriate set of tensored
+  *  regular expressions for the nodes of G (i.e., for the variables
+  *  {Z_i}, where each Z_i corresponds to some procedure i).
+  *
+  *  However, the encoding is slightly indirect because we have not
+  *  yet actually created the tensored regular expressions of the
+  *  Z-equations.  (We have various auxiliary maps from which the
+  *  appropriate tensored regular expressions will be created later.)
+  *  Instead, we just create an FWPDS that represents the dependences
+  *  of the Z system, along with "NameWeights" that stand for the
+  *  (so-far still missing) tensored regular expressions.  (The
+  *  NameWeights have enough information in them so that, using the
+  *  aforementioned auxiliary data structures, the correct tensored
+  *  regular expressions can be constructed later; see procedure
+  *  convertToRegExpT.)
+  *
+  *  Because the Z system is left-linear, and hence regular,
+  *  dependence graph G is a normal graph, and hence we only use
+  *  Delta-1 rules.  In particular, if the equation system contains
+  *  Z_i = ... combine_T (Z_j *_T RE_T[j,i]) combine_T ...,
+  *
+  *   o variable Z_i (corresponding to some procedure i) is represented by i
+  *
+  *   o the dependence of i on j is encoded by the Delta-1 rule
+  *     (st1, j) -> (st1, i)
+  *
+  *   o the weight on such a rule is NameWeight(j,i), which stands
+  *     for the tensored regular expression RE_T[j,i] that contributes
+  *     to the i-th equation of equation-system (*)
+  *
+  *  In addition, G has additional Delta-1 rules of the form
+  *
+  *     (st1, dummy) -> (st1, i), with weight NameWeight(dummy,i).
+  *
+  *  Such a rule represents the equation with the constant right-hand side
+  *
+  *     Z_i = (1^t tensor f_i(0))
+  *
+  *  that appears in the i-th component of equation-system (*).
+  *  
   *  Author: Emma Turetsky
   */
-  void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies)
-  {
-	//For each differential
+void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies)
+{
+    // For each component of the equation system
     for(tslDiffMap::iterator it = differentialMap.begin(); it!=differentialMap.end(); ++it)
     {
-      int dummy = -1;
-      int tgt = it->first;
-	  //Get the list of variable IDs which are depended on by this differential
-	  set<int> srcList = varDependencies[it->first];
+        int dummy = -1;
+        int tgt = it->first;
+        // Get the list of variable IDs on which this component of the equation system depends
+        set<int> srcList = varDependencies[it->first];
 
-	  //For each variable in the differential, create a rule where the from stack is
-	  //that variable ID and the to stack is the id representing the regexp that
-	  //generated the differential
-	  //
-	  //The weight on the rule is of type NameWeight - (the variable name, the regexp id)
-      for(set<int>::iterator i = srcList.begin(); i != srcList.end(); i++)
-      {
-        int src = *i;
-        pds->add_rule(st1(), stk(src),st1(),stk(tgt), new NameWeight(src,tgt));
-      }
-	  //Also add a rule a dummy rule
-      pds->add_rule(st1(), stk(dummy), st1(), stk(tgt), new NameWeight(dummy,tgt));
+        // For each variable src in srcList, create a Delta-1 rule (st1, src) -> (st1, tgt)
+        // with weight NameWeight(src,tgt)
+        for(set<int>::iterator i = srcList.begin(); i != srcList.end(); i++)
+        {
+            int src = *i;
+            pds->add_rule(st1(), stk(src),st1(),stk(tgt), new NameWeight(src,tgt));
+        }
+        // Add the Delta-1 rule (st1, dummy) -> (st1, tgt), with weight NameWeight(dummy,tgt)
+        pds->add_rule(st1(), stk(dummy), st1(), stk(tgt), new NameWeight(dummy,tgt));
     }
+}
 
-  }
-
-  /*
-  *  Runs the Newton method on on the various maps until we have reached a fix point
-  *  differentialMap - a list of differentials
-  *  aList - an initial assignments for variables
-  *  varDependencies - A map from reID to the set of variables it depends on
-  *  tensoredRegExpMap - A map from reID to the tensored regular expression representing it
+ /*
+  *  runNewton
+  *
+  *  Run Newton's method on the various maps until we have reached a fix point
+  *
+  *  differentialMap - a map of differentials
+  *  aList - an initial assignment for the variables
+  *  varDependencies - a map from a variable (an reID) to the set of variables it depends on
+  *  tensoredRegExpMap - a map from a variable (an reID) to the tensored regular expression
+  *                      that defines its value
   *
   *  Author:  Emma Turetsky
   */
   void runNewton(RTG::assignmentRefPtr & aList, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies, tslRegExpTMap & tensoredRegExpMap, bool linear)
   {
 	int rnd = 0;
-    bool newton = true;
+       bool newton = true;
 	// A map of dependencies
-    std::set<int> changedVars; //The set of possible dirty regexps IDs
+       std::set<int> changedVars; // The set of possible dirty regexps IDs
 	std::set<int> C;
-    RTG::assignmentRefPtr aPrime = aList;
-    tslDiffMap::iterator dIt;
+       RTG::assignmentRefPtr aPrime = aList;
+       tslDiffMap::iterator dIt;
 	int pV = 0;
 	tslRegExpTMap::iterator assignIt;
 
@@ -3091,17 +3181,17 @@ namespace goals {
 		// dependenceMap - Map from regular expression ID to the set variables that regexps differentials depend on
 		for (dIt = differentialMap.begin(); dIt != differentialMap.end(); dIt++)
 		{
-			changedVars.insert(dIt->first); //Insert into retPtSet because at start all variable values are potentially "dirty"
+			changedVars.insert(dIt->first); //Insert into changedVars because at the start all variable values are potentially "dirty"
 		}
 
-		bool first = true; //So we know we are on the first Newton Round
+		bool first = true; // "true" indicates that we are on the first Newton Round
 
-		//While the set of changed variables != empty, continue iterating through NewtonRounds
-		//This is the actual workhorse of the Newton Rounds
+		// Perform the rounds of Newton's method
+		// While the set of changed variables != empty, continue iterating
 		while (changedVars.size() != 0){
 			rnd++;
 			std::set<int>::iterator pIt;
-			//For each of the variables whose dependencies changed, get their new assignement from aList
+			// For each of the variables whose dependencies changed, get their new assignement from aList
 			for (pIt = changedVars.begin(); pIt != changedVars.end(); pIt++)
 			{
 				aPrime = CIR::updateAssignment(aPrime, CBTI_INT32(*pIt), CIR::getAssignment(CBTI_INT32(*pIt), aList));
@@ -3110,18 +3200,18 @@ namespace goals {
 			C = changedVars;
 			changedVars.clear();
 
-			//For each outgoing regular expression
+			// For each outgoing regular expression
 			for (assignIt = tensoredRegExpMap.begin(); assignIt != tensoredRegExpMap.end(); assignIt++)
 			{
-				//Get the list of variables this regexp's differentials depend on
+				// Get the list of variables this regexp's differentials depend on
 				int var = assignIt->first;
 				std::set<int> varsUsedInP = varDependencies[var];
 
-				//Now determine if any of the variables on which the program return point at assignIt depends have been changed
+				// Now determine if any of the variables on which the program return point at assignIt depends have been changed
 				bool found = false; //True if a variable has been altered
 				std::set<int>::iterator sIt1 = C.begin();
 				std::set<int>::iterator sIt2 = varsUsedInP.begin();
-				//Check to see if C intersect VarsUsedIn(p) is empty
+				// Check to see if C intersect VarsUsedIn(p) is empty
 				if (!first){
 					while ((sIt1 != C.end()) && (sIt2 != varsUsedInP.end()) && !found)
 					{
@@ -3207,7 +3297,7 @@ namespace goals {
 	}
   }
 
-  /*
+ /*
   *  This runs a fixed point error finding method using Newton rounds.
   *
   *	 Step 1 - Convert the program 'pg' into an fpds where the weights are nwaobdds.
@@ -3215,19 +3305,19 @@ namespace goals {
   *  Step 2 - Perform poststar on the fpds get the regular expressions associated with
   *			  the outgoing nodes in the intra_graph associated with the fwpds
   *
-  *	 Step 3 - Convert these regexps into TSL regular expressions and get the differentials
+  *  Step 3 - Convert these regexps into TSL regular expressions and get the differentials
   *			  with respect their variables
   *
-  *	 Step 4 - Create a new fwpds using these differentials - run poststar on the fwpds in
+  *  Step 4 - Create a new fwpds using these differentials - run poststar on the fwpds in
   *			  order to get new regular expressions representing the return points for Newton
   *
   *  Step 5 - Use the reg exps representing the differentials, the partial differentials, and the original
   *			  tsl regular expressions to get the tensored regular expressions we need to run the newton rounds
   *
-  *  Step 6 - Use newton's method to find the fixed point of the weights
+  *  Step 6 - Use Newton's Method to find the fixed point of the weights
   *
-  *  Step 7 - Insert the new weights into the original outfa and perform the iterative path summary in order to
-  *			  determine if the error weight is reachable
+  *  Step 7 - Insert the new weights into the original outfa and perform the iterative path summary
+  *			  to determine if the error weight is reachable
   *
   *  Author:  Emma Turetsky
   */
