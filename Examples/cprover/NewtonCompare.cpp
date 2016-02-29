@@ -831,11 +831,6 @@ namespace goals {
   *
   *  This is based on the recursive TDifferential in regExp.tsl and uses that function's hashtable
   *
-  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
-  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
-  *			the case, then it will return an error.  Should be fixed in the future using
-  *		    a different has table (ETTODO)
-  *
   *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be differentiated
   *  @return:  RTG::regExpTListRefPtr - A list of the tensored differentials with respect to
   *									    all the variables in exp
@@ -1108,11 +1103,6 @@ namespace goals {
   *  It takes in a TSL regular expression and returns a non-tensored differential
   *
   *  This is based on the recursive Differential in regExp.tsl and uses that function's hashtable
-  *
-  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
-  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
-  *			the case, then it will return an error.  Should be fixed in the future using
-  *		    a different has table (ETTODO)
   *
   *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be differentiated
   *  @return:  RTG::regExpListRefPtr - A list of the non-tensored differentials with respect to
@@ -1390,11 +1380,6 @@ namespace goals {
   *
   *  This is based on the recursive evalAt0 in regExp.tsl and uses that function's hastable
   *
-  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
-  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
-  *			the case, then it will return an error.  Should be fixed in the future using
-  *		    a different has table (ETTODO)
-  *
   *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be evaluated
   *  @return:  EXTERN_TYPES::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
   *
@@ -1403,7 +1388,6 @@ namespace goals {
   */
    EXTERN_TYPES::sem_elem_wrapperRefPtr evalNonRecAt0(RTG::regExpRefPtr exp)
   {
-	  return CIR::evalRegExpAt0(exp);
 	  //std::cout << hits << std::endl;
 	  std::stack<dFrame> todo;
 	  std::map<RTG::regExpRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr>::iterator it;
@@ -1637,11 +1621,6 @@ namespace goals {
   *  A non recursive version of evalRegExpFin used to eval TSLRegExps given the final assignment a.
   *
   *  This is based on the recursive evalRegExpFin in regExp.tsl and uses that function's hastable
-  *
-  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
-  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
-  *			the case, then it will return an error.  Should be fixed in the future using
-  *		    a different has table (ETTODO)
   *
   *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be evaluated
   *			  RTG::assignmentRefPtr a - The final values for the variables in the regExp
@@ -1901,11 +1880,6 @@ namespace goals {
   *
   *  This is based on the recursive evalRegExp in regExp.tsl and uses that function's hashtable
   *
-  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
-  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
-  *			the case, then it will return an error.  Should be fixed in the future using
-  *		    a different has table (ETTODO)
-  *
   *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be evaluated
   *           RTG::assignmentRefPtr a - The final values for the variables in the regExp
   *  @return:  EXTERN_TYPES::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
@@ -2135,11 +2109,6 @@ namespace goals {
   /*
   *  A non recursive test to check the linearity of the untensored portiona of a differential
   *
-  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
-  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
-  *			the case, then it will return an error.  Should be fixed in the future using
-  *		    a different hash table (ETTODO)
-  *
   *  @param:  RTG::regExpRefPtr rExp - The top level regular expression to be looked at
   *  @return:  bool linear - returns true if the elements of tList pass the test
   *
@@ -2190,11 +2159,6 @@ namespace goals {
 
   /*
   *  A non recursive test to check the linearity of tensored partial differential
-  *
-  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
-  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
-  *			the case, then it will return an error.  Should be fixed in the future using
-  *		    a different hash table (ETTODO)
   *
   *  @param:  RTG::regExpTRefPtr rExpT - The top level regular expression to be looked at
   *  @return:  bool linear - returns true if the elements of tList pass the test
@@ -2256,11 +2220,6 @@ namespace goals {
   /*
   *  A non recursive test to check the linearity of tensored differential
   *
-  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
-  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
-  *			the case, then it will return an error.  Should be fixed in the future using
-  *		    a different hash table (ETTODO)
-  *
   *  @param:  RTG::regExpTListRefPtr tList - The top level regularexpression list to be looked at
   *  @return:  bool linear - returns true if the elements of tList pass the test
   *
@@ -2294,11 +2253,6 @@ namespace goals {
   *  given the assignment a.
   *
   *  This is based on the recursive evalT in regExp.tsl and uses that function's hashtable
-  *
-  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
-  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
-  *			the case, then it will return an error.  Should be fixed in the future using
-  *		    a different has table (ETTODO)
   *
   *  @param:  RTG::regExpTRefPtr exp - The top level tensored regular expression to be evaluated
   *           RTG::assignmentRefPtr a - The final values for the variables in the regExp
@@ -4169,6 +4123,8 @@ CAMLprim value compare_weights(Trans t) {
     }
     CAMLreturn(Val_unit);
 }
+
+#endif
 
 void runFwpds(FWPDS * pds)
 {
