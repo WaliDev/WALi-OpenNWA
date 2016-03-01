@@ -3278,7 +3278,7 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
   *
   *  Step 1 - Convert the program 'pg' into an fpds where the weights are nwaobdds.
   *
-  *  Step 2 - Perform poststar on the fpds get the regular expressions associated with
+  *  Step 2 - Perform poststar on the fpds to obtain the regular expressions associated with
   *           the outgoing nodes in the intra_graph associated with the fwpds
   *
   *  Step 3 - Convert these regexps into TSL regular expressions and get the differentials
@@ -3501,7 +3501,7 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 			FWPDS * fnew = new FWPDS();
 			fwpdsFromDifferential(fnew, differentialMap, varDependencies);
 
-			//Now create another finite automata
+			//Now create another finite automaton
 			WFA fa2;
 			wali::Key acc2 = wali::getKeySpace()->getKey("accept2");
 			fa2.addTrans(getPdsState(), stk(dummy), acc2, fnew->get_theZero()->one());
