@@ -3287,7 +3287,7 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
   *  Step 6 - Perform Newton rounds until a fixed-point is reached
   *
   *  Step 7 - Insert the new weights into the original outfa and perform the iterative path summary
-  *           to determine if the error weight is reachable
+  *           to determine if the error weight is reachable [Vestigial/optional]
   *
   *  Author:  Emma Turetsky
   */
