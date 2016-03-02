@@ -2610,7 +2610,6 @@ namespace goals {
   *          mapBack - a map for associating different variables with the
   *                    appropriate variableID, needed because of the different node names
   *                    in the fwpds IGR - should try to eliminate this need if possible
-  *          bool call - true if it is possible that exp is a call
   *
   *  return: RTG::regExpTRefPtr - the tensored TSLRegexp that
   *           represents exp converted in the manner described
@@ -2620,7 +2619,7 @@ namespace goals {
   *
   *  Author:  Emma Turetsky
   */
-  RTG::regExpTRefPtr convertToRegExpT(reg_exp_t exp, tslRegExpMap & regExpMap, tslDiffMap & differentialMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, map<std::pair<int, int>, std::pair<int, int> >  & mergeSrcMap, bool call)
+  RTG::regExpTRefPtr convertToRegExpT(reg_exp_t exp, tslRegExpMap & regExpMap, tslDiffMap & differentialMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, map<std::pair<int, int>, std::pair<int, int> >  & mergeSrcMap)
   {
 	  if (exp->isConstant()) // Encountered a NameWeight
                                 // Create an appropriate tensored regular expression that reflects the NameWeight's
@@ -2629,6 +2628,9 @@ namespace goals {
 		  NameWeight * nw = static_cast<wali::domains::name_weight::NameWeight*>(exp->get_weight().get_ptr());
 		  int var = nw->getName1();
 		  int reID = nw->getName2();
+		  //std::cout << "Looking Up: " << reID << "," << var << std::endl;
+
+		  RTG::regExpTRefPtr d;
                 // The Z equation-system has an equation of the form
                 //    Z_reID = f_reId(0) combine ... combine_T (Z_var *_T RE_T[var,reID]) combine_T ...
 		  if (var == -1){ // Create f_reId(0): NameWeight(dummy, reID) stands for f_reId(0)
@@ -2636,12 +2638,11 @@ namespace goals {
 			  if (reID == -1){  // Should never occur; return (1^t tensor 1)
 				  return RTG::OneT::make();
 			  }
-			  else { // From the regular expression d for reID, create (1^t tensor d(0))
+			  else { // From the regular expression r for reID, create (1^t tensor r(0))
                                // Look up the appropriate regexp for reID and evaluate at 0
-				  RTG::regExpRefPtr d = regExpMap[reID];
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr newVal = evalNonRecAt0(d);
-                               // Return (1^t tensor newVal)
-				  return CIR::mkTensorTranspose(RTG::One::make(), RTG::Weight::make(newVal));
+				  RTG::regExpRefPtr r = regExpMap[reID];
+				  EXTERN_TYPES::sem_elem_wrapperRefPtr newVal = evalNonRecAt0(r);
+				  d = CIR::mkTensorTranspose(RTG::One::make(), RTG::Weight::make(newVal));
 			  }
 		  }
 		  else { // Create the tensored regular expression RE_T[var,reID]
@@ -2650,9 +2651,15 @@ namespace goals {
                        // represents RE_T[var,reID] in an equation in the Z equation-system
                        // of the form
                        //    Z_reID = f_reId(0) combine ... combine_T (Z_var *_T RE_T[var,reID]) combine_T ...
-			  RTG::regExpTRefPtr d = CIR::getTFromRegList(differentialMap[reID], var);
-			  return d;
+			  d = CIR::getTFromRegList(differentialMap[reID], var);
 		  }
+
+		  // Create and return ProjectT(_, _, d) (with appropriate first and second components)
+		  int t1 = mapBack[reID].first.second;
+		  int t2 = mapBack[var].first.second;
+		  //std::cout << "newMerge: " << t1 << "," << t2 << std::endl;
+		  std::pair<int, int> mergePair = mergeSrcMap[std::pair<int, int>(t1, t2)];
+		  return RTG::ProjectT::make(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), d);
 	  }
 	  else if (exp->isUpdatable()){  // This case is a placeholder; it will never occur due to
                                         // linear nature of the Z equation-system
@@ -2662,44 +2669,23 @@ namespace goals {
 	  }
 	  else if (exp->isStar()){ // Convert a Kleene node to a KleeneT node
 		  list<reg_exp_t> children = exp->getChildren(); // The list of children of a Star operation has a only a single element
-		  RTG::regExpTRefPtr c = convertToRegExpT(children.front(), regExpMap, differentialMap, mapBack, mergeSrcMap, false);
+		  RTG::regExpTRefPtr c = convertToRegExpT(children.front(), regExpMap, differentialMap, mapBack, mergeSrcMap);
 		  return CIR::mkKleeneT(c);
 	  }
 	  else if (exp->isExtend()){ // Convert a Dot node to a DotT node
-		  if (call)
-		  {
-			  list<reg_exp_t> children = exp->getChildren();
-			  list<reg_exp_t>::iterator ch = children.begin();
-			  RTG::regExpTRefPtr lch = convertToRegExpT(children.front(), regExpMap, differentialMap, mapBack, mergeSrcMap, false);
-			  ch++;
-                        // Claim: second child must be a NameWeight for RE[var,reID]
-			  NameWeight * nw = static_cast<wali::domains::name_weight::NameWeight*>((*ch)->get_weight().get_ptr());
-			  int var = nw->getName1();
-			  int reID = nw->getName2();
-			  //std::cout << "Looking Up: " << reID << "," << var << std::endl;
-			  int t1 = mapBack[reID].first.second;
-			  int t2 = mapBack[var].first.second;
-			  //std::cout << "newMerge: " << t1 << "," << t2 << std::endl;
-			  std::pair<int, int> mergePair = mergeSrcMap[std::pair<int, int>(t1, t2)];
-			  // Return DotT(ProjectT(mergePair.first,mergePair.second,lch), RE[var,reID])
-			  return CIR::mkDotT(RTG::ProjectT::make(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), lch), CIR::getTFromRegList(differentialMap[reID], var));
-		  }
-		  else
-		  {
-			  list<reg_exp_t> children = exp->getChildren();
-			  list<reg_exp_t>::iterator ch = children.begin();
-			  RTG::regExpTRefPtr lch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap, false);
-			  ch++;
-			  RTG::regExpTRefPtr rch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap, false);
-			  return CIR::mkDotT(lch, rch);
-		  }
+		  list<reg_exp_t> children = exp->getChildren();
+		  list<reg_exp_t>::iterator ch = children.begin();
+		  RTG::regExpTRefPtr lch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap);
+		  ch++;
+		  RTG::regExpTRefPtr rch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap);
+		  return CIR::mkDotT(lch, rch);
 	  }
 	  else if (exp->isCombine()){ // Convert a Plus node to a PlusT node
 		  list<reg_exp_t> children = exp->getChildren();
 		  list<reg_exp_t>::iterator ch = children.begin();
-		  RTG::regExpTRefPtr lch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap, true);
+		  RTG::regExpTRefPtr lch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap);
 		  ch++;
-		  RTG::regExpTRefPtr rch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap, true);
+		  RTG::regExpTRefPtr rch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap);
 		  return CIR::mkPlusT(lch, rch);
 	  }
   }	
@@ -2940,7 +2926,7 @@ namespace goals {
 			  // std::cout << "Converting RegExp: " << it->first << std::endl;
 			  // it->second->print(std::cout);
 			  // std::cout << std::endl;
-			  RTG::regExpTRefPtr rExp = convertToRegExpT(it->second, regExpMap, differentialMap, mapBack, mergeSrcMap, false);
+			  RTG::regExpTRefPtr rExp = convertToRegExpT(it->second, regExpMap, differentialMap, mapBack, mergeSrcMap);
 			  //rExp->print(std::cout) << endl;
 			  tensoredRegExpMap[it->first] = rExp;
 		  }
@@ -3276,13 +3262,21 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
   *  This procedure implements Algorithm NPA-TP from TR-1825 (page 33)
   *  http://research.cs.wisc.edu/wpis/papers/tr1825.pdf
   *
-  *  Step 1 - Convert the program 'pg' into an fpds where the weights are nwaobdds.
+  *  Step 1 - Convert the program 'pg' into an fpds, whose rules
+  *           encode the edges of the program's ICFG in the standard manner, e.g., see
+  *           Fig. 3 of http://research.cs.wisc.edu/wpis/papers/fsttcs07.invited.pdf.
+  *           A rule's weight represents the abstract transformer (in some abstract domain)
+  *           of the corresponding ICFG edge.  The merge function on a call-rule (a.k.a.
+  *           Delta-2 rule) must obey the properties given in Section 8 of TR-1825.
   *
-  *  Step 2 - Perform poststar on the fpds to obtain the regular expressions associated with
-  *           the outgoing nodes in the intra_graph associated with the fwpds
+  *  Step 2 - Apply Tarjan's path-expression algorithm to the CFG of each procedure of pg.
+  *           Method: Perform poststar on the fpds to obtain the regular expressions associated with
+  *           the outgoing nodes in the intra_graph associated with the fwpds.
+  *           Each such node represents one procedure of pg.  Taken together, the
+  *           regular expressions represent the equation system E = {Xj = Rhs_j(vec{X}) | Xj in vec{X}}.
   *
-  *  Step 3 - Convert these regexps into TSL regular expressions and get the differentials
-  *           with respect their variables
+  *  Step 3 - Convert these regexps into TSL regular expressions and obtain the differentials
+  *           with respect to the variables
   *
   *  Step 4 - Create a new fwpds using these differentials - run poststar on the fwpds in
   *           order to get new regular expressions representing the return points for Newton
@@ -3368,8 +3362,8 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 	/* Step 2 - Perform poststar on the fpds get the regular expressions associated with
 	*			the outgoing nodes in the intra_graph associated with the fwpds
 	*/
-	//This function performs postar on the fa using the fpds and populations the maps as described above
-	//The boolean means this is the first time the functions is called and will generate unique ids as needed
+	// This function performs poststar on fpds w.r.t. fa, and populates the maps as described above
+	// The Boolean indicates whether this is the first time the function is called and will generate unique ids as needed
 	double curTime = t->total_time();
 	t->stop();
 	double t1 = fpds->getOutRegExps(fa, outfa, outNodeRegExpMap, updateableMap, oMap, mapBack, transMap, differentiatedList, mergeSrcMap);
@@ -3377,7 +3371,7 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 	int testSize = mapBack.size();
 	int testSize2 = transMap.size();
 
-	//Find the key to the error state
+	// Find the key to the error state
 	Key errKey = wali::getKeySpace()->getKey("error");
 	Key iKey = wali::getKeySpace()->getKey("Unique State Name");
 	Key pErrKey = wali::getKeySpace()->getKey(iKey, errKey);
@@ -3385,7 +3379,7 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 	Key fKey = wali::getKeySpace()->getKey(esrc);
 	bool prune = false;
 
-	//If the error state is in the wfa, then prune, otherwise the error is not reachable  -- ETTODO (prune check is redundant)
+	// If the error state is in the wfa, then prune, otherwise the error is not reachable  -- ETTODO (prune check is redundant)
 	if (outfa.getState(fKey) != NULL)
 	{
 		prune = true;
@@ -3441,7 +3435,7 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 		{
 			int wlSzie = wl.size();
 			//convertToTSLRegExp
-			//if in convertion an updatable node is hit
+			//if in conversion an updatable node is hit
 			//add that regexp to wl if not already in visitedList
 			int rToConvert = wl.back();
 			//std::cout << rToConvert << endl;
@@ -3450,9 +3444,10 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 		}
 		//std::cout << "ESIZE: " << E.size() << std::endl;
 		//std::cout << "DSIZE: " << differentiatedList.size() << std::endl;
-		//Create a map from unique IDs to tsl regular expressions with variables
-		//Currently doing this by iterating through the regular expressions and copying
-		//the tsl regular expression whose ids match the nodes in the differentiatedMap
+
+		// Create a map from unique IDs to tsl regular expressions with variables
+		// Currently doing this by iterating through the regular expressions and copying
+		// the tsl regular expression whose ids match the nodes in the differentiatedMap
 		for (vector<int>::iterator eit = differentiatedList.begin(); eit != differentiatedList.end(); eit++)
 		{
 			// std::cout << "D: " << *eit << endl;
@@ -3464,8 +3459,8 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 			//  std::cout << "RE: " << *eit;
 			//  std::cout << " ";
 			//  E[(*eit)].print(std::cout) << std::endl;
-			//This is used  in debugging to compare the epsilon transitions with those generated by non-newton methods
-			//and make sure they match
+			// This is used in debugging to compare the epsilon transitions with those generated by non-newton methods
+			// to make sure they match
 #if defined(NEWTON_DEBUG)
 			int src = mapBack[(*eit)].first.first;
 			int tgt = mapBack[(*eit)].first.second;
@@ -3497,7 +3492,7 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 			/* Step 4 - Create a new fwpds using these partial differentials - run poststar on the fwpds in
 			*	        order to get the full differentials representing the values of the program return points
 			*/
-			//Now we create new fwpds using these differentials, this fwpds has the weight type of nameweight
+			//Now we create new fwpds using these differentials, this fwpds has the weight type of NameWeight
 			FWPDS * fnew = new FWPDS();
 			fwpdsFromDifferential(fnew, differentialMap, varDependencies);
 
