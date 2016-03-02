@@ -2663,7 +2663,7 @@ namespace goals {
 	  }
 	  else if (exp->isUpdatable()){  // This case is a placeholder; it will never occur due to
                                         // linear nature of the Z equation-system
-                assert(false, "A representation of a tensored variable occurred in a nameweight\n");
+                assert(false && "A representation of a tensored variable occurred in a nameweight\n");
 		  int node_no = exp->updatableNumber();
 		  return RTG::VarT::make(CBTI::INT32(node_no));
 	  }
@@ -4295,7 +4295,9 @@ void runFwpds(FWPDS * pds)
     #undef flush
     std::cout << "Finished Printing" << std::endl << std::flush;
 }
-#endif
+// Jason is commenting out what he believes to be a dangling
+//   preprocessor directive here:
+//#endif
 
 }
 
