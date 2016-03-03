@@ -1,0 +1,62 @@
+Only in my_experiments/: a.out
+Only in my_experiments/: apache-escape-absolute_true-unreach-call.c
+Only in my_experiments/: assert.h
+Only in my_experiments/: bhmr2007_true-unreach-call.c
+Only in my_experiments/: count_by_nondet_true-unreach-call.c
+Files my_experiments/cubic_with_square.c and snlee_tests/cubic_with_square.c are identical
+Only in snlee_tests: cubic_with_square_err.c
+Only in my_experiments/: cubic_with_square_false.c
+Files my_experiments/cubic_with_square_nonlinear.c and snlee_tests/cubic_with_square_nonlinear.c are identical
+Only in snlee_tests: cubic_with_square_nonlinear_err.c
+Only in my_experiments/: cubic_with_square_nonlinear_false.c
+Only in my_experiments/: exponential.c
+Only in my_experiments/: functions_false-unreach-call1.c
+Only in my_experiments/: HoffmanF1.c
+Only in my_experiments/: KincaidStratified.c
+Files my_experiments/multi-input.c and snlee_tests/multi-input.c are identical
+Files my_experiments/multi-input-false.c and snlee_tests/multi-input-false.c are identical
+Only in my_experiments/: multivar.c
+Only in my_experiments/: nested_loop.c
+Only in my_experiments/: nested_true-unreach-call.c
+Files my_experiments/nondet_loop_bound.c and snlee_tests/nondet_loop_bound.c are identical
+Only in snlee_tests: nondet_loop_bound_err.c
+Only in my_experiments/: nondet_loop_bound_false.c
+Files my_experiments/nondet_loop_bound_quartic.c and snlee_tests/nondet_loop_bound_quartic.c are identical
+Only in snlee_tests: nondet_loop_bound_quartic_err.c
+Only in my_experiments/: nondet_loop_bound_quartic_false.c
+Files my_experiments/nonlinear_stratified.c and snlee_tests/nonlinear_stratified.c are identical
+Files my_experiments/nonlinear_stratified-false.c and snlee_tests/nonlinear_stratified-false.c are identical
+Only in my_experiments/: pow.c
+Only in my_experiments/: quadratic_multivar_incr.c
+Only in my_experiments/: quadratic_multivar_incr-false.c
+Files my_experiments/quartic_with_cube.c and snlee_tests/quartic_with_cube.c are identical
+Only in snlee_tests: quartic_with_cube_err.c
+Only in my_experiments/: quartic_with_cube_false.c
+Files my_experiments/quartic_with_cube_nonlinear.c and snlee_tests/quartic_with_cube_nonlinear.c are identical
+Only in snlee_tests: quartic_with_cube_nonlinear_err.c
+Only in my_experiments/: quartic_with_cube_nonlinear_false.c
+Only in my_experiments/: quick_test.c
+Only in my_experiments/: quick_test2.c
+Files my_experiments/quintic_with_quartic.c and snlee_tests/quintic_with_quartic.c are identical
+Only in snlee_tests: quintic_with_quartic_err.c
+Only in my_experiments/: quintic_with_quartic_false.c
+diff -s -c my_experiments/quintic_with_quartic_nonlinear.c snlee_tests/quintic_with_quartic_nonlinear.c
+*** my_experiments/quintic_with_quartic_nonlinear.c     2015-12-16 15:17:42.000000000 -0600
+--- snlee_tests/quintic_with_quartic_nonlinear.c        2015-12-04 11:20:54.000000000 -0600
+***************
+*** 18,25 ****
+
+      //printf("\n final yyy %d\n", yyy);
+      assert(yyy == 92983);
+-     int result = x * (34 + x * (-45 + x * (70 + x * (-55 + 16 * x))));
+-     assert(20 * yyy == result)
+      //assert(20 * yyy == x * (34 + x * (-45 + x * (70 + x * (-55 + 16 * x)))));
+
+      return 0;
+--- 18,23 ----
+Only in snlee_tests: quintic_with_quartic_nonlinear_err.c
+Only in my_experiments/: quintic_with_quartic_nonlinear_false.c
+Only in my_experiments/: simple.c
+Only in my_experiments/: two_functions.c
+Only in my_experiments/: two_linear.c
+(END)
