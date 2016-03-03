@@ -4145,17 +4145,33 @@ duetrel_t compareWeight;
 CAMLprim value compare_weights(Trans t) {
     CAMLparam0();
     CAMLlocal4(bval, nval, nCVal, sval);
-    value * n_func = caml_named_value("normalize_callback");
-    nCVal = caml_callback(*n_func, compareWeight->getValue());
     value * eq_func = caml_named_value("eq_callback");
     value * p_func = caml_named_value("print_callback");
-    nval = caml_callback(*n_func, ((DuetRel*)(t.weight().get_ptr()))->getValue());
+    value * n_func = caml_named_value("normalize_callback");
+    nCVal = compareWeight->getValue();	//not normalized
+    sval = caml_callback(*p_func, nCVal);
+    std::cout << "Duet Weight (Not Normalized): " << std::endl;
+    std::cout << String_val(sval) << std::endl;
+
+    nCVal = caml_callback(*n_func, nCVal);   // normalize it
+
+    // Next line changed by Jason
+   // sval = caml_callback(*p_func, nCVal);
+    
+    // first print the unnormalized weight
+    nval = ((DuetRel*)(t.weight().get_ptr()))->getValue();
     sval = caml_callback(*p_func, nval);
-    std::cout << "WALI Weight: " << std::endl;
+    std::cout << "WALI Weight (Not Normalized): " << std::endl;
+    std::cout << String_val(sval) << std::endl;
+    nval = caml_callback(*n_func, nval);
+    sval = caml_callback(*p_func, nval);
+    
+    std::cout << "WALI Weight (Normalized): " << std::endl;
     std::cout << String_val(sval) << std::endl;
     sval = caml_callback(*p_func, nCVal);
     std::cout << "Duet Weight: " << std::endl;
     std::cout << String_val(sval) << std::endl;
+
     bval = caml_callback2(*eq_func, nval, nCVal);
 
 
@@ -4275,7 +4291,7 @@ void * work(void *)
 
 #ifdef USE_DUET
 
-int main(int argc, char **argv)
+int runBasicNewtonFromBelow(char **argv)
 {
     caml_startup(argv);
     FWPDS * pds = new FWPDS();
@@ -4310,7 +4326,35 @@ int main(int argc, char **argv)
     std::cout << "Finished Printing" << std::endl << std::flush;
 
     return 0;
+}	
+
+int main(int argc, char **argv)
+{
+    if (argc < 3) {
+        std::cerr << "Error: Incorrect usage!" << std::endl;
+    }
+    else {
+    	stringstream ss;
+    	ss << argv[1];
+    	string runningMode = ss.str();
+    	if (runningMode == "-cra_newton_basic") {
+    	    runBasicNewtonFromBelow(argv);
+    	}
+    	else if (runningMode == "-cra_newton_star") {
+    	    std::cout << "Newton from below, with equivalence checks extracted from Kleene stars" << std::endl;
+    	    std::cout << "Not implemented yet." << std::endl;
+    	}
+    	else if (runningMode == "-cra_newton_above") {
+    	    std::cout << "Newton from above." << std::endl;
+    	    std::cout << "Not implemented yet." << std::endl;
+    	}
+    	else {
+    	    std::cerr << "Error: invalid mode!" << std::endl;
+    	}
+    }    
 }
+
+
 
 #else
 
