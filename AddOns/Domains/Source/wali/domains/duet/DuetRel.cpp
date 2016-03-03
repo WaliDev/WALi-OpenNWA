@@ -28,6 +28,15 @@ namespace wali
   {
     namespace duetrel
     {
+
+      duetrelpair_t DuetRelPair::MkDuetRelPair(duetrel_t v1, duetrel_t v2) {
+          duetrelpair_t d = new DuetRelPair(v1, v2);
+          return d;
+      }
+
+
+
+
       static duetrel_t convert(wali::SemElem* se)
       {
           duetrel_t dr = dynamic_cast<DuetRel *>(se);
@@ -308,6 +317,34 @@ wali::sem_elem_t DuetRel::star()
   d = MkDuetRel(retVal, true);
   }
   CAMLreturnT(duetrel_t,d);
+}
+
+
+duetrelpair_t DuetRel::alphaHatStar()
+{
+  CAMLparam0();
+  CAMLlocal4(dval, temp, lin_formula, star_formula);
+
+  dval = this->getValue();
+  duetrel_t d1, d2;
+  duetrelpair_t d;
+  
+  assert(isTensored);
+ 
+  value * star_func = caml_named_value("tensor_linearize_star_callback");
+  temp = caml_callback(*star_func, dval);
+
+  // Decompose temp into lin_formula and star_formula
+  value * fst_func = caml_named_value("fst_callback");
+  lin_formula = caml_callback(*fst_func, temp);
+  value * snd_func = caml_named_value("snd_callback");
+  star_formula = caml_callback(*snd_func, temp);
+
+  d1 = MkDuetRel(lin_formula, true);
+  d2 = MkDuetRel(star_formula, true);
+  d = DuetRelPair::MkDuetRelPair(d1, d2);
+  
+  CAMLreturnT(duetrelpair_t,d);
 }
 
 

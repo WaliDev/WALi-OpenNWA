@@ -33,6 +33,22 @@ namespace wali
     {
       class DuetRel;
       typedef wali::ref_ptr<DuetRel> duetrel_t;
+
+      class DuetRelPair;
+      typedef wali::ref_ptr<DuetRelPair> duetrelpair_t;
+      class DuetRelPair : public Countable {
+        public:
+          duetrel_t first;
+          duetrel_t second;
+
+          DuetRelPair(duetrel_t v1, duetrel_t v2) : Countable(), 
+                                                    first(v1), 
+                                                    second(v2) {}
+
+          ~DuetRelPair() {}
+
+          static duetrelpair_t MkDuetRelPair(duetrel_t v1, duetrel_t v2);
+      };
       
       class DuetRel : public wali::SemElemTensor
       {
@@ -81,6 +97,8 @@ namespace wali
           sem_elem_t extend(SemElem* se);
 
           sem_elem_t star();
+
+          duetrelpair_t alphaHatStar();
 
           /** @return [this]->Equal( cast<DuetRel*>(se) ) */
           bool equal(SemElem* se) const;

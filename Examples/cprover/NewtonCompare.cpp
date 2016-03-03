@@ -831,11 +831,6 @@ namespace goals {
   *
   *  This is based on the recursive TDifferential in regExp.tsl and uses that function's hashtable
   *
-  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
-  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
-  *			the case, then it will return an error.  Should be fixed in the future using
-  *		    a different has table (ETTODO)
-  *
   *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be differentiated
   *  @return:  RTG::regExpTListRefPtr - A list of the tensored differentials with respect to
   *									    all the variables in exp
@@ -1046,7 +1041,7 @@ namespace goals {
 				  continue;
 			  }
 		  }
-		  else  //This stack fram has been seen before, this means it's children will have been differentiated allready and is not a leaf
+		  else  //This stack fram has been seen before, this means it's children will have been differentiated already and is not a leaf
 		  {
 			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForTDifferentialHash(frame.e);
 			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForTDifferentialHashL(frame.left);
@@ -1108,11 +1103,6 @@ namespace goals {
   *  It takes in a TSL regular expression and returns a non-tensored differential
   *
   *  This is based on the recursive Differential in regExp.tsl and uses that function's hashtable
-  *
-  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
-  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
-  *			the case, then it will return an error.  Should be fixed in the future using
-  *		    a different has table (ETTODO)
   *
   *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be differentiated
   *  @return:  RTG::regExpListRefPtr - A list of the non-tensored differentials with respect to
@@ -1328,7 +1318,7 @@ namespace goals {
 					  continue;
 			  }
 		  }
-		  else //This stack fram has been seen before, this means it's children will have been differentiated allready and is not a leaf
+		  else //This stack fram has been seen before, this means it's children will have been differentiated already and is not a leaf
 		  {
 			  //Get the left child differentiated value (as all non leaves have a left child) and assign it to lch
 			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForDifferentialHash(frame.e);
@@ -1390,11 +1380,6 @@ namespace goals {
   *
   *  This is based on the recursive evalAt0 in regExp.tsl and uses that function's hastable
   *
-  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
-  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
-  *			the case, then it will return an error.  Should be fixed in the future using
-  *		    a different has table (ETTODO)
-  *
   *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be evaluated
   *  @return:  EXTERN_TYPES::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
   *
@@ -1403,7 +1388,6 @@ namespace goals {
   */
    EXTERN_TYPES::sem_elem_wrapperRefPtr evalNonRecAt0(RTG::regExpRefPtr exp)
   {
-	  return CIR::evalRegExpAt0(exp);
 	  //std::cout << hits << std::endl;
 	  std::stack<dFrame> todo;
 	  std::map<RTG::regExpRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr>::iterator it;
@@ -1414,7 +1398,7 @@ namespace goals {
 	  {
 		  dFrame & frame = todo.top();
 		  if (frame.is_new){  //See if we've seen this frame before
-			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0Hash(frame.e);  //See if we've evaluated this regexp allready, if so, return evaluated value
+			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0Hash(frame.e);  //See if we've evaluated this regexp already, if so, return evaluated value
 			  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0Hash);
 			  if (evalRegExpAt0___it != EvalMap0.end()) {
 				  todo.pop();
@@ -1463,7 +1447,7 @@ namespace goals {
 					  //The right child has been evaluated before
 					  if (evalRegExpAt0___it != EvalMap0.end())
 					  {
-						  //Both children have been evaluated at 0 allready, so evaluate the Dot expression and put the value into the hash table
+						  //Both children have been evaluated at 0 already, so evaluate the Dot expression and put the value into the hash table
 						  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalRegExpAt0___it->second;
 						  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
 						  ret = EXTERNS::evalDotSemElem(lch, rch);
@@ -1506,7 +1490,7 @@ namespace goals {
 					  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashR);
 					  if (evalRegExpAt0___it != EvalMap0.end())  //The right child has been evaluated before
 					  {
-						  //Both children have been evaluated at 0 allready, so evaluate the Plus expression and put the value into the hash table
+						  //Both children have been evaluated at 0 already, so evaluate the Plus expression and put the value into the hash table
 						  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalRegExpAt0___it->second;
 						  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
 						  ret = EXTERNS::evalPlusSemElem(lch, rch);
@@ -1638,11 +1622,6 @@ namespace goals {
   *
   *  This is based on the recursive evalRegExpFin in regExp.tsl and uses that function's hastable
   *
-  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
-  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
-  *			the case, then it will return an error.  Should be fixed in the future using
-  *		    a different has table (ETTODO)
-  *
   *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be evaluated
   *			  RTG::assignmentRefPtr a - The final values for the variables in the regExp
   *  @return:  EXTERN_TYPES::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
@@ -1660,7 +1639,7 @@ namespace goals {
 	  {
 		  dFrame & frame = todo.top();
 		  if (frame.is_new){ //See if we've seen this frame before
-			  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHash(frame.e, a); //See if we've evaluated this regexp allready, if so, return evaluated value
+			  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHash(frame.e, a); //See if we've evaluated this regexp already, if so, return evaluated value
 			  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHash);
 			  if (evalRegExpFin___it != EvalMap2.end()) {
 				  todo.pop();
@@ -1708,7 +1687,7 @@ namespace goals {
 					  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
 					  if (evalRegExpFin___it != EvalMap2.end()) //The right child has been evaluated before
 					  {
-						  //Both children have been evaluated allready, so evaluate the Dot expression and put the value into the hash table
+						  //Both children have been evaluated already, so evaluate the Dot expression and put the value into the hash table
 						  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalRegExpFin___it->second;
 						  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
 						  ret = EXTERNS::evalDotSemElem(lch, rch);
@@ -1750,7 +1729,7 @@ namespace goals {
 					  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
 					  if (evalRegExpFin___it != EvalMap2.end()) //The right child has been evaluated before
 					  {
-						  //Both children have been evaluated allready, so evaluate the Plus expression and put the value into the hash table
+						  //Both children have been evaluated already, so evaluate the Plus expression and put the value into the hash table
 						  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalRegExpFin___it->second;
 						  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
 						  ret = EXTERNS::evalPlusSemElem(lch, rch);
@@ -1837,7 +1816,7 @@ namespace goals {
 				  continue;
 			  }
 		  }
-		  else  //This is the second time we've seen this value, so the children must have been evaluated at a, allready
+		  else  //This is the second time we've seen this value, so the children must have been evaluated at a, already
 		  {
 			  //Look up the children's evaluated values
 			  //Determine the op code
@@ -1900,11 +1879,6 @@ namespace goals {
   *  A non recursive version of evalRegExp used to eval TSLRegExps given the assignment a.
   *
   *  This is based on the recursive evalRegExp in regExp.tsl and uses that function's hashtable
-  *
-  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
-  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
-  *			the case, then it will return an error.  Should be fixed in the future using
-  *		    a different has table (ETTODO)
   *
   *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be evaluated
   *           RTG::assignmentRefPtr a - The final values for the variables in the regExp
@@ -2135,11 +2109,6 @@ namespace goals {
   /*
   *  A non recursive test to check the linearity of the untensored portiona of a differential
   *
-  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
-  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
-  *			the case, then it will return an error.  Should be fixed in the future using
-  *		    a different hash table (ETTODO)
-  *
   *  @param:  RTG::regExpRefPtr rExp - The top level regular expression to be looked at
   *  @return:  bool linear - returns true if the elements of tList pass the test
   *
@@ -2190,11 +2159,6 @@ namespace goals {
 
   /*
   *  A non recursive test to check the linearity of tensored partial differential
-  *
-  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
-  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
-  *			the case, then it will return an error.  Should be fixed in the future using
-  *		    a different hash table (ETTODO)
   *
   *  @param:  RTG::regExpTRefPtr rExpT - The top level regular expression to be looked at
   *  @return:  bool linear - returns true if the elements of tList pass the test
@@ -2256,11 +2220,6 @@ namespace goals {
   /*
   *  A non recursive test to check the linearity of tensored differential
   *
-  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
-  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
-  *			the case, then it will return an error.  Should be fixed in the future using
-  *		    a different hash table (ETTODO)
-  *
   *  @param:  RTG::regExpTListRefPtr tList - The top level regularexpression list to be looked at
   *  @return:  bool linear - returns true if the elements of tList pass the test
   *
@@ -2294,11 +2253,6 @@ namespace goals {
   *  given the assignment a.
   *
   *  This is based on the recursive evalT in regExp.tsl and uses that function's hashtable
-  *
-  *  Note:  So far must change the LRUcache due to the fact that it has size limitations
-  *         and must be compiled with TSL_DETENSOR defined in BinRel.hpp.  If this is not
-  *			the case, then it will return an error.  Should be fixed in the future using
-  *		    a different has table (ETTODO)
   *
   *  @param:  RTG::regExpTRefPtr exp - The top level tensored regular expression to be evaluated
   *           RTG::assignmentRefPtr a - The final values for the variables in the regExp
@@ -2616,106 +2570,138 @@ namespace goals {
   }
 
 
-  /*
-  *  Convert a wali NameWeight regexp to a tensored regular expressions
+ /*
+  *  convertToRegExpT
   *
-  *  The wali regexp represents a differentiated value.  The weight represents a regexp in eMap
-  *  differentiated with respect to a given variable (or not differentiated, depending) or is
-  *  the representation of "one"
+  *  Convert a WALi NameWeight regexp to a tensored regular expression
   *
+  *  This procedure implements Step (5) of Algorithm NPA-TP from TR-1825 (page 33)
+  *  http://research.cs.wisc.edu/wpis/papers/tr1825.pdf
   *
-  *  params:  reg_exp_t exp - Wali regExp of the sem_elem
-  *			  tslRegExpMap & regExpMap - map from varId to the TSL regExpRepresenting it
-  *			  tslDiffMap & differentialMap - map from varId to list of partial differentials representing varId differentiated with
-  *			  respect to different variables
-  *			  mapBack - a map for associating different variables with the appropriate variableID, needed because of the different node names
-  *                     in the fwpds IGR - should try to eliminate this need if possible
-  *           bool call - true if it's possible that this reg_exp_t is a call
+  *  In the terms of that paper, this procedure is used to create the
+  *  set of regular expressions that are used to evaluate the
+  *  variables Z_i in the left-linear equation system over the vector
+  *  of variables Z:
   *
-  *  return:  RTG::regExpTRefPtr - a tensored TSLRegexp representing the tensored differential of exp
+  *    Z = (1^t tensor f(0)) combine_T D_T f|_nu(Z).       (*)
+  *
+  *  At top-level, the value of parameter "exp" is a WALi regular
+  *  expression over constants of type NameWeight (for some variable
+  *  Z_i). It will be converted into a tensored regular expression
+  *  that expresses how to compute the solution for Z_i on a given
+  *  Newton round.
+  *
+  *  Method. Recursively traverse exp:
+  *
+  *   o convert each regular-expression operator into the analogous
+  *     tensored operator
+  *
+  *   o convert each leaf NameWeight(j,i) into the tensored regular
+  *     expression RE_T[j,i], where RE_T[j,i] is the tensored regular
+  *     expression in the i-th equation of equation-system (*)
+  *
+  *       Z_i = (1^t tensor f_i(0)) combine_T ... combine_T (Z_j *_T RE_T[j,i]) combine_T ...
+  *
+  *  params: reg_exp_t exp - a WALi NameWeight regular expression
+  *          tslRegExpMap & regExpMap - map from varId to the TSL regExp representing it
+  *          tslDiffMap & differentialMap - map from varId to list of partial differentials
+  *                                         representing varId differentiated with
+  *                                         respect to different variables
+  *          mapBack - a map for associating different variables with the
+  *                    appropriate variableID, needed because of the different node names
+  *                    in the fwpds IGR - should try to eliminate this need if possible
+  *
+  *  return: RTG::regExpTRefPtr - the tensored TSLRegexp that
+  *           represents exp converted in the manner described
+  *           above. The return value at top-level expresses how to
+  *           compute the solution for some variable Z_i on a given
+  *           Newton round.
   *
   *  Author:  Emma Turetsky
   */
-  RTG::regExpTRefPtr convertToRegExpT(reg_exp_t exp, tslRegExpMap & regExpMap, tslDiffMap & differentialMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, map<std::pair<int, int>, std::pair<int, int> >  & mergeSrcMap, bool call)
+  RTG::regExpTRefPtr convertToRegExpT(reg_exp_t exp, tslRegExpMap & regExpMap, tslDiffMap & differentialMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, map<std::pair<int, int>, std::pair<int, int> >  & mergeSrcMap)
   {
-	  if (exp->isConstant())
+	  if (exp->isConstant()) // Encountered a NameWeight
+                                // Create an appropriate tensored regular expression that reflects the NameWeight's
+                                // role in the Z equation system
 	  {
 		  NameWeight * nw = static_cast<wali::domains::name_weight::NameWeight*>(exp->get_weight().get_ptr());
 		  int var = nw->getName1();
 		  int reID = nw->getName2();
-		  if (var == -1){
-			  if (reID == -1){
-				  return RTG::OneT::make();  //The value isn't a variable, so make it a tensored one
+		  //std::cout << "Looking Up: " << reID << "," << var << std::endl;
+
+		  RTG::regExpTRefPtr d;
+                // The Z equation-system has an equation of the form
+                //    Z_reID = f_reId(0) combine ... combine_T (Z_var *_T RE_T[var,reID]) combine_T ...
+		  if (var == -1){ // Create f_reId(0): NameWeight(dummy, reID) stands for f_reId(0)
+                                // in the FWPDS encoding of the Z equation-system's dependence graph
+			  if (reID == -1){  // Should never occur; return (1^t tensor 1)
+				  return RTG::OneT::make();
 			  }
-			  else {
-				  RTG::regExpRefPtr d = regExpMap[reID]; //lookup the appropraite regexp and evaluate at 0
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr newVal = evalNonRecAt0(d);
-				  return CIR::mkTensorTranspose(RTG::One::make(), RTG::Weight::make(newVal));  //Create a tensored weight with the regexp
+			  else { // From the regular expression r for reID, create (1^t tensor r(0))
+                               // Look up the appropriate regexp for reID and evaluate at 0
+				  RTG::regExpRefPtr r = regExpMap[reID];
+				  EXTERN_TYPES::sem_elem_wrapperRefPtr newVal = evalNonRecAt0(r);
+				  d = CIR::mkTensorTranspose(RTG::One::make(), RTG::Weight::make(newVal));
 			  }
 		  }
-		  else {
-			  RTG::regExpTRefPtr d = CIR::getTFromRegList(differentialMap[reID], var); //the NameWeight represents reID differentiated with respect to Variable var (note the regExps contain
-			  //the updateable variables
-			  return d;
+		  else { // Create the tensored regular expression RE_T[var,reID]
+                       // that corresponds to the dependence of reID on var in
+                       // the Z equation-system. That is, NameWeight(var,reID)
+                       // represents RE_T[var,reID] in an equation in the Z equation-system
+                       // of the form
+                       //    Z_reID = f_reId(0) combine ... combine_T (Z_var *_T RE_T[var,reID]) combine_T ...
+			  d = CIR::getTFromRegList(differentialMap[reID], var);
 		  }
+
+		  // Create and return ProjectT(_, _, d) (with appropriate first and second components)
+		  int t1 = mapBack[reID].first.second;
+		  int t2 = mapBack[var].first.second;
+		  //std::cout << "newMerge: " << t1 << "," << t2 << std::endl;
+		  std::pair<int, int> mergePair = mergeSrcMap[std::pair<int, int>(t1, t2)];
+		  return RTG::ProjectT::make(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), d);
 	  }
-	  else if (exp->isUpdatable()){  //This is a placeholder, it will never occur due to linear nature of the nameweight fwpd
+	  else if (exp->isUpdatable()){  // This case is a placeholder; it will never occur due to
+                                        // linear nature of the Z equation-system
+                assert(false && "A representation of a tensored variable occurred in a nameweight\n");
 		  int node_no = exp->updatableNumber();
 		  return RTG::VarT::make(CBTI::INT32(node_no));
 	  }
-	  else if (exp->isStar()){ //A Star operation only has one child in the children list 
-		  list<reg_exp_t> children = exp->getChildren();
-		  RTG::regExpTRefPtr c = convertToRegExpT(children.front(), regExpMap, differentialMap, mapBack, mergeSrcMap, false);
+	  else if (exp->isStar()){ // Convert a Kleene node to a KleeneT node
+		  list<reg_exp_t> children = exp->getChildren(); // The list of children of a Star operation has a only a single element
+		  RTG::regExpTRefPtr c = convertToRegExpT(children.front(), regExpMap, differentialMap, mapBack, mergeSrcMap);
 		  return CIR::mkKleeneT(c);
 	  }
-	  else if (exp->isExtend()){ //Convert an extend to a Dot regExpT using recursive calls and the left and right children of the regexp
-		  if (call)
-		  {
-			  list<reg_exp_t> children = exp->getChildren();
-			  list<reg_exp_t>::iterator ch = children.begin();
-			  RTG::regExpTRefPtr lch = convertToRegExpT(children.front(), regExpMap, differentialMap, mapBack, mergeSrcMap, false);
-			  ch++;
-			  NameWeight * nw = static_cast<wali::domains::name_weight::NameWeight*>((*ch)->get_weight().get_ptr());
-			  int var = nw->getName1();
-			  int reID = nw->getName2();
-			  //std::cout << "Looking Up: " << reID << "," << var << std::endl;
-			  int t1 = mapBack[reID].first.second;
-			  int t2 = mapBack[var].first.second;
-			  //std::cout << "newMerge: " << t1 << "," << t2 << std::endl;
-			  std::pair<int, int> mergePair = mergeSrcMap[std::pair<int, int>(t1, t2)];
-			  return CIR::mkDotT(RTG::ProjectT::make(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), lch), CIR::getTFromRegList(differentialMap[reID], var)); //the NameWeight represents reID differentiated with respect to Variable var (note the regExps contain
-			  //the updateable variables
-		  }
-		  else
-		  {
-			  list<reg_exp_t> children = exp->getChildren();
-			  list<reg_exp_t>::iterator ch = children.begin();
-			  RTG::regExpTRefPtr lch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap, false);
-			  ch++;
-			  RTG::regExpTRefPtr rch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap, false);
-			  return CIR::mkDotT(lch, rch);
-		  }
-	  }
-	  else if (exp->isCombine()){ //Convert an combine to a Plus regExpT using recursive calls and the left and right children of the regexp
+	  else if (exp->isExtend()){ // Convert a Dot node to a DotT node
 		  list<reg_exp_t> children = exp->getChildren();
 		  list<reg_exp_t>::iterator ch = children.begin();
-		  RTG::regExpTRefPtr lch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap, true);
+		  RTG::regExpTRefPtr lch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap);
 		  ch++;
-		  RTG::regExpTRefPtr rch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap, true);
+		  RTG::regExpTRefPtr rch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap);
+		  return CIR::mkDotT(lch, rch);
+	  }
+	  else if (exp->isCombine()){ // Convert a Plus node to a PlusT node
+		  list<reg_exp_t> children = exp->getChildren();
+		  list<reg_exp_t>::iterator ch = children.begin();
+		  RTG::regExpTRefPtr lch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap);
+		  ch++;
+		  RTG::regExpTRefPtr rch = convertToRegExpT(*ch, regExpMap, differentialMap, mapBack, mergeSrcMap);
 		  return CIR::mkPlusT(lch, rch);
 	  }
   }	
 
-  /*
-  *  Converts from a reg_exp_t to a RTG::regExpRefPtr
+ /*
+  *  convertToRegExp
   *
-  *  @param: reID - the varID the regular expressiosn
+  *  Convert regular expression reID to a TSL regular expression (RTG::regExpRefPtr)
+  *
+  *  @param: reID - the varID of the regular expressiosn
   *          exp - the expression to be converted
   *          varDependencies - a map from reID to the set of variabels it depends on that will be populated as we convert, used for the newton round later
   *			 updateableMap - a map from updateable node to the intergraph node number it depends on (that node number is still associated with the inter graph)
   *			 oMap - a map from the intergraph node number to the correct unique number for the tsl regexps
   *			 mapBack - a map for associating different variables with the appropriate variableID, needed because of the different node names
-  *                     in the fwpds IGR - should try to eliminate this need if possible]
+  *                             in the fwpds IGR - should try to eliminate this need if possible]
   *          elapsedTime - Total time done on possible calculations in the conversion (due to simplification in MkDot
   *
   *   Author: Emma Turetsky
@@ -2723,7 +2709,7 @@ namespace goals {
   RTG::regExpRefPtr convertToRegExp(int reID, reg_exp_t exp, std::map<int, reg_exp_t> & outNodeRegExpsMap, std::map<int, std::set<int> > & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, std::map<std::pair<int, int>, std::pair<int, int> > & mergeSrcMap, std::vector<int> & wl, std::set<int> & vl, double * elapsedTime)
   {
 	  std::stack<cFrame> todo;
-	  std::map<reg_exp_t, RTG::regExpRefPtr> seen; //map of regExps that have allready been seen (should change to an unordered_map for speedup)
+	  std::map<reg_exp_t, RTG::regExpRefPtr> seen; //map of regExps that have already been seen (should change to an unordered_map for speedup)
 	  std::map<reg_exp_t, RTG::regExpRefPtr>::iterator it;
 	  wali::util::GoodTimer * tC = new wali::util::GoodTimer("temp");
 	  tC->stop();
@@ -2885,9 +2871,12 @@ namespace goals {
 	  return seen[simpl_exp];
   }
 	  
-  /*
-  *  For each element in the list of regular expressions, convert it to a TSL regular expression and put it in a map from
-  *  RegExp ID to TSL regular expressions
+ /*
+  *  convertToTSLRegExps
+  *
+  *  Convert regular expression reg to a TSL regular expression, and
+  *  put it in the map regExpMap, which maps from RegExp IDs to TSL
+  *  regular expressions
   *
   *  outNodeRegExpMap - A map from reID to the wali reg_exp_t that represents it
   *  updateableMap - A map of updateable node numbers to the intergraph node they depend on
@@ -2905,27 +2894,27 @@ namespace goals {
 	  RTG::regExpRefPtr rExp = convertToRegExp(reg, outNodeRegExpMap[reg], outNodeRegExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl, &evalTime);
 	  //rExp->print(std::cout) << std::endl;
 	  //std::cout << "src: " << mapBack[reg].first.first << "tgt: " << mapBack[reg].first.second << "stack: " << mapBack[reg].second << endl << endl;
-      regExpMap[reg] = rExp;
+	  regExpMap[reg] = rExp;
 	  return evalTime;
   }
 
 
-   /*
-  *  For each wali NameWeight regexp create a tensored regular expressions
+ /*
+  *  convertToTSLRegExpsT
+  *
+  *  For each WALi NameWeight regexp in rList, convert it to a tensored regular expression
   *
   *  The wali regexp represents a differentiated value.  The weight represents a regexp in eMap
   *  differentiated with respect to a given variable (or not differentiated, depending) or is
   *  the representation of "one"
   *
   *
-  *  params:  rList - Map from reID to the appropriate NameWeight regExp
-  *			  tslRegExpMap & regExpMap - map from varId to the TSL regExpRepresenting it
-  *			  tslDiffMap & differentialMap - map from varId to list of partial differentials representing varId differentiated with
-  *			  respect to different variables
-  *			  mapBack - a map for associating different variables with the appropriate variableID, needed because of the different node names
+  *  params:  rList -  a map from reID to the appropriate NameWeight regExp
+  *           tslRegExpMap & regExpMap - map from varId to the TSL regExpRepresenting it
+  *           tslDiffMap & differentialMap - map from varId to list of partial differentials representing varId
+  *			  differentiated with respect to different variables
+  *	       mapBack - a map for associating different variables with the appropriate variableID, needed because of the different node names
   *                     in the fwpds IGR - should try to eliminate this need if possible
-  *
-  *  return:  RTG::regExpTRefPtr - a tensored TSLRegexp representing the tensored differential of exp
   *
   *  Author:  Emma Turetsky
   */
@@ -2937,7 +2926,7 @@ namespace goals {
 			  // std::cout << "Converting RegExp: " << it->first << std::endl;
 			  // it->second->print(std::cout);
 			  // std::cout << std::endl;
-			  RTG::regExpTRefPtr rExp = convertToRegExpT(it->second, regExpMap, differentialMap, mapBack, mergeSrcMap, false);
+			  RTG::regExpTRefPtr rExp = convertToRegExpT(it->second, regExpMap, differentialMap, mapBack, mergeSrcMap);
 			  //rExp->print(std::cout) << endl;
 			  tensoredRegExpMap[it->first] = rExp;
 		  }
@@ -3028,80 +3017,137 @@ namespace goals {
     return getKey(k);
   }
 
-  /*
-  *  Creates a new fwpds using differentials generated from regular expressions
-  *  
-  *  pds - the new fwpds that's being generated
-  *  differentialMap - the map of differentials
-  *  varDependencies - A map from reID to the set of variables it depends on
+ /*
+  *  fwpdsFromDifferential
   *
+  *  pds - the new fwpds that is being generated
+  *  differentialMap - a map of differentials
+  *  varDependencies - a map from an reID (a variable) to the set of
+  *                    variables it depends on
+  *
+  *  This procedure implements Step (3) of Algorithm NPA-TP from TR-1825 (page 33)
+  *  http://research.cs.wisc.edu/wpis/papers/tr1825.pdf
+  *
+  *  In the terms of that paper, we are creating the dependence graph
+  *  G for the left-linear equation system over the vector Z:
+  *
+  *    Z = (1^t tensor f(0)) combine_T D_T f|_nu(Z).       (*)
+  *
+  *  In terms of the implementation, the procedure is really taking
+  *  one encoding of G (namely, varDependencies + differentialMap),
+  *  and converting it into another encoding of G. Procedure
+  *  fwpdsFromDifferential returns an encoding of G as an FWPDS, which
+  *  allows us to use the FWPDS operations that implement Tarjan's
+  *  path-expression method to create an appropriate set of tensored
+  *  regular expressions for the nodes of G (i.e., for the variables
+  *  {Z_i}, where each Z_i corresponds to some procedure i).
+  *
+  *  However, the encoding is slightly indirect because we have not
+  *  yet actually created the tensored regular expressions of the
+  *  Z-equations.  (We have various auxiliary maps from which the
+  *  appropriate tensored regular expressions will be created later.)
+  *  Instead, we just create an FWPDS that represents the dependences
+  *  of the Z system, along with "NameWeights" that stand for the
+  *  (so-far still missing) tensored regular expressions.  (The
+  *  NameWeights have enough information in them so that, using the
+  *  aforementioned auxiliary data structures, the correct tensored
+  *  regular expressions can be constructed later; see procedure
+  *  convertToRegExpT.)
+  *
+  *  Because the Z system is left-linear, and hence regular,
+  *  dependence graph G is a normal graph, and hence we only use
+  *  Delta-1 rules.  In particular, if the equation system contains
+  *  Z_i = ... combine_T (Z_j *_T RE_T[j,i]) combine_T ...,
+  *
+  *   o variable Z_i (corresponding to some procedure i) is represented by i
+  *
+  *   o the dependence of i on j is encoded by the Delta-1 rule
+  *     (st1, j) -> (st1, i)
+  *
+  *   o the weight on such a rule is NameWeight(j,i), which stands
+  *     for the tensored regular expression RE_T[j,i] that contributes
+  *     to the i-th equation of equation-system (*)
+  *
+  *  In addition, G has additional Delta-1 rules of the form
+  *
+  *     (st1, dummy) -> (st1, i), with weight NameWeight(dummy,i).
+  *
+  *  Such a rule represents the equation with the constant right-hand side
+  *
+  *     Z_i = (1^t tensor f_i(0))
+  *
+  *  that appears in the i-th component of equation-system (*).
+  *  
   *  Author: Emma Turetsky
   */
-  void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies)
-  {
-	//For each differential
+void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies)
+{
+    // For each component of the equation system
     for(tslDiffMap::iterator it = differentialMap.begin(); it!=differentialMap.end(); ++it)
     {
-      int dummy = -1;
-      int tgt = it->first;
-	  //Get the list of variable IDs which are depended on by this differential
-	  set<int> srcList = varDependencies[it->first];
+        int dummy = -1;
+        int tgt = it->first;
+        // Get the list of variable IDs on which this component of the equation system depends
+        set<int> srcList = varDependencies[it->first];
 
-	  //For each variable in the differential, create a rule where the from stack is
-	  //that variable ID and the to stack is the id representing the regexp that
-	  //generated the differential
-	  //
-	  //The weight on the rule is of type NameWeight - (the variable name, the regexp id)
-      for(set<int>::iterator i = srcList.begin(); i != srcList.end(); i++)
-      {
-        int src = *i;
-        pds->add_rule(st1(), stk(src),st1(),stk(tgt), new NameWeight(src,tgt));
-      }
-	  //Also add a rule a dummy rule
-      pds->add_rule(st1(), stk(dummy), st1(), stk(tgt), new NameWeight(dummy,tgt));
+        // For each variable src in srcList, create a Delta-1 rule (st1, src) -> (st1, tgt)
+        // with weight NameWeight(src,tgt)
+        for(set<int>::iterator i = srcList.begin(); i != srcList.end(); i++)
+        {
+            int src = *i;
+            pds->add_rule(st1(), stk(src),st1(),stk(tgt), new NameWeight(src,tgt));
+        }
+        // Add the Delta-1 rule (st1, dummy) -> (st1, tgt), with weight NameWeight(dummy,tgt)
+        pds->add_rule(st1(), stk(dummy), st1(), stk(tgt), new NameWeight(dummy,tgt));
     }
+}
 
-  }
-
-  /*
-  *  Runs the Newton method on on the various maps until we have reached a fix point
-  *  differentialMap - a list of differentials
-  *  aList - an initial assignments for variables
-  *  varDependencies - A map from reID to the set of variables it depends on
-  *  tensoredRegExpMap - A map from reID to the tensored regular expression representing it
+ /*
+  *  runNewton
+  *
+  *  This procedure implements Steps (6)-(8) of Algorithm NPA-TP from TR-1825 (page 33)
+  *  http://research.cs.wisc.edu/wpis/papers/tr1825.pdf
+  *
+  *  Perform Newton rounds until a fixed-point is reached
+  *
+  *  differentialMap - a map of differentials
+  *  aList - an initial assignment for the variables
+  *  varDependencies - a map from a variable (an reID) to the set of variables it depends on
+  *  tensoredRegExpMap - a map from a variable (an reID) to the tensored regular expression
+  *                      that defines its value
   *
   *  Author:  Emma Turetsky
   */
   void runNewton(RTG::assignmentRefPtr & aList, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies, tslRegExpTMap & tensoredRegExpMap, bool linear)
   {
 	int rnd = 0;
-    bool newton = true;
+       bool newton = true;
 	// A map of dependencies
-    std::set<int> changedVars; //The set of possible dirty regexps IDs
+       std::set<int> changedVars; // The set of possible dirty regexps IDs
 	std::set<int> C;
-    RTG::assignmentRefPtr aPrime = aList;
-    tslDiffMap::iterator dIt;
+       RTG::assignmentRefPtr aPrime = aList;
+       tslDiffMap::iterator dIt;
 	int pV = 0;
 	tslRegExpTMap::iterator assignIt;
 
 	if (!linear)
 	{
-		// For each set of differentials, get the list of variables they depend on
-		// Put those into dependeceMap
-		// dependenceMap - Map from regular expression ID to the set variables that regexps differentials depend on
+		// Insert all variables into changedVars because for the first Newton round
+		// we will treat all variables has having "dirty" values
 		for (dIt = differentialMap.begin(); dIt != differentialMap.end(); dIt++)
 		{
-			changedVars.insert(dIt->first); //Insert into retPtSet because at start all variable values are potentially "dirty"
+			changedVars.insert(dIt->first);
 		}
 
-		bool first = true; //So we know we are on the first Newton Round
+		bool first = true; // "true" indicates that we are on the first Newton round
 
-		//While the set of changed variables != empty, continue iterating through NewtonRounds
-		//This is the actual workhorse of the Newton Rounds
+		// Perform Newton rounds until convergence:
+		// While the set of changed variables != empty, perform one round of Newton's method
 		while (changedVars.size() != 0){
 			rnd++;
 			std::set<int>::iterator pIt;
-			//For each of the variables whose dependencies changed, get their new assignement from aList
+			// Update aPrime to match aList: For each variable whose value changed on the
+			// previous round, insert the value from aList into aPrime.
 			for (pIt = changedVars.begin(); pIt != changedVars.end(); pIt++)
 			{
 				aPrime = CIR::updateAssignment(aPrime, CBTI_INT32(*pIt), CIR::getAssignment(CBTI_INT32(*pIt), aList));
@@ -3110,18 +3156,20 @@ namespace goals {
 			C = changedVars;
 			changedVars.clear();
 
-			//For each outgoing regular expression
+			// For each variable in the equation system, evaluate its regular expression only if
+			// it depends on a variable whose value changed in the previous Newton round
 			for (assignIt = tensoredRegExpMap.begin(); assignIt != tensoredRegExpMap.end(); assignIt++)
 			{
-				//Get the list of variables this regexp's differentials depend on
+				// Obtain the set of variables on which this variable depends
 				int var = assignIt->first;
 				std::set<int> varsUsedInP = varDependencies[var];
 
-				//Now determine if any of the variables on which the program return point at assignIt depends have been changed
-				bool found = false; //True if a variable has been altered
+				// Determine if any of the variables on which var depends changed value
+				// on the previous Newton round
+				bool found = false; // Set to true below if some predecessor of var has a changed value
 				std::set<int>::iterator sIt1 = C.begin();
 				std::set<int>::iterator sIt2 = varsUsedInP.begin();
-				//Check to see if C intersect VarsUsedIn(p) is empty
+				// Check whether (C intersect VarsUsedIn(p)) == emptyset
 				if (!first){
 					while ((sIt1 != C.end()) && (sIt2 != varsUsedInP.end()) && !found)
 					{
@@ -3136,34 +3184,35 @@ namespace goals {
 						}
 					}
 				}
-				else  //It's the first time doing a NewtonRound, so all variables have been altered
+				else  // This is the first NewtonRound, so all variables are considered
+				      // as having been altered
 				{
 					found = true;
 				}
-				if (found){
+				if (found){ // Reevaluate the regular expression associated with variable var,
+					     // using aPrime for the quantity \vec{nu} of Algorithm NPA-TP, and
+					     // apply detensorTranspose
 					//v = Tdetensor(evalT(Mmap[p],aPrime))
-					//The variable representing the regexp is potentially dirty, so reevaluate it using the
-					//new assignment in aPrime
 					//std::cout << "Eval: " << assignIt->first << std::endl;
 					//assignIt->second.print(std::cout);
 					//std::cout << std::endl;
 					EXTERN_TYPES::sem_elem_wrapperRefPtr newVal = evalTNonRec(assignIt->second, aPrime);
-					//DetensorTranspose the new value
 					//std::cout << std::endl << "Result: ";
 					//newVal.v->print(std::cout);
 					EXTERN_TYPES::sem_elem_wrapperRefPtr rep = EXTERNS::detensorTranspose(newVal);
 					//std::cout << std::endl << "Detensored Val: ";
 					//rep.v->print(std::cout);
-					//Perform the computation needed for merge functions by computing rep = M(1,rep)
-					//FIXME - what is applied here has to be a global merge function that applies at all procedure exits
-					//		- we don't have the information to perform exit-specific merge functions
-					//Check to see if the new value is the same as the previous one
+
+					// Perform the computation needed for merge functions by computing rep = M(1,rep)
+					// FIXME - what is applied here has to be a global merge function that applies at all procedure exits
+					//	  - we don't have the information to perform exit-specific merge functions
+
+					// Check whether the new (untensored) value of var is the same
+					// as on the previous round; if not, mark var as changed and insert
+					// <var,rep> into aList
 					EXTERN_TYPES::sem_elem_wrapperRefPtr oldVal = CIR::getAssignment(CBTI_INT32(var), aPrime);
-					//if A'[p] != v`
-					//Add v' to the changedVar set and updated the assignmentList
 					if (!(oldVal.v->Equal(rep.v))){
-						changedVars.insert(var); //C' = {p}
-						//A[p] = v
+						changedVars.insert(var);
 						aList = CIR::updateAssignment(aList, CBTI_INT32(var), rep);
 					}
 				}
@@ -3207,27 +3256,38 @@ namespace goals {
 	}
   }
 
-  /*
-  *  This runs a fixed point error finding method using Newton rounds.
+ /*
+  *  run_newton
   *
-  *	 Step 1 - Convert the program 'pg' into an fpds where the weights are nwaobdds.
+  *  This procedure implements Algorithm NPA-TP from TR-1825 (page 33)
+  *  http://research.cs.wisc.edu/wpis/papers/tr1825.pdf
   *
-  *  Step 2 - Perform poststar on the fpds get the regular expressions associated with
-  *			  the outgoing nodes in the intra_graph associated with the fwpds
+  *  Step 1 - Convert the program 'pg' into an fpds, whose rules
+  *           encode the edges of the program's ICFG in the standard manner, e.g., see
+  *           Fig. 3 of http://research.cs.wisc.edu/wpis/papers/fsttcs07.invited.pdf.
+  *           A rule's weight represents the abstract transformer (in some abstract domain)
+  *           of the corresponding ICFG edge.  The merge function on a call-rule (a.k.a.
+  *           Delta-2 rule) must obey the properties given in Section 8 of TR-1825.
   *
-  *	 Step 3 - Convert these regexps into TSL regular expressions and get the differentials
-  *			  with respect their variables
+  *  Step 2 - Apply Tarjan's path-expression algorithm to the CFG of each procedure of pg.
+  *           Method: Perform poststar on the fpds to obtain the regular expressions associated with
+  *           the outgoing nodes in the intra_graph associated with the fwpds.
+  *           Each such node represents one procedure of pg.  Taken together, the
+  *           regular expressions represent the equation system E = {Xj = Rhs_j(vec{X}) | Xj in vec{X}}.
   *
-  *	 Step 4 - Create a new fwpds using these differentials - run poststar on the fwpds in
-  *			  order to get new regular expressions representing the return points for Newton
+  *  Step 3 - Convert these regexps into TSL regular expressions and obtain the differentials
+  *           with respect to the variables
+  *
+  *  Step 4 - Create a new fwpds using these differentials - run poststar on the fwpds in
+  *           order to get new regular expressions representing the return points for Newton
   *
   *  Step 5 - Use the reg exps representing the differentials, the partial differentials, and the original
-  *			  tsl regular expressions to get the tensored regular expressions we need to run the newton rounds
+  *           tsl regular expressions to get the tensored regular expressions we need to run the newton rounds
   *
-  *  Step 6 - Use newton's method to find the fixed point of the weights
+  *  Step 6 - Perform Newton rounds until a fixed-point is reached
   *
-  *  Step 7 - Insert the new weights into the original outfa and perform the iterative path summary in order to
-  *			  determine if the error weight is reachable
+  *  Step 7 - Insert the new weights into the original outfa and perform the iterative path summary
+  *           to determine if the error weight is reachable [Vestigial/optional]
   *
   *  Author:  Emma Turetsky
   */
@@ -3255,7 +3315,7 @@ namespace goals {
 	int dummy = -1;
 	map<int, reg_exp_t> outNodeRegExpMap; // A map from a unique id of an outgoing node to the regular expression associated with it
 	map<int, reg_exp_t> rNew; // A map from the node ids to the regexps representing the full differentials associated with that node id
-	map<int, int> updateableMap;  //A map from an upadateable node number to the id of the node it depends on 
+	map<int, int> updateableMap;  //A map from an updateable node number to the id of the node it depends on 
 	map<int, int> oMap;
 	map<int, pair< pair<int, int>, int> > mapBack;  //A map from the node index to the struct of the <<src,tgt>,stack> - used to insert weights back into wfa
 	map<pair<pair<int, int>, int>, int> transMap;
@@ -3302,8 +3362,8 @@ namespace goals {
 	/* Step 2 - Perform poststar on the fpds get the regular expressions associated with
 	*			the outgoing nodes in the intra_graph associated with the fwpds
 	*/
-	//This function performs postar on the fa using the fpds and populations the maps as described above
-	//The boolean means this is the first time the functions is called and will generate unique ids as needed
+	// This function performs poststar on fpds w.r.t. fa, and populates the maps as described above
+	// The Boolean indicates whether this is the first time the function is called and will generate unique ids as needed
 	double curTime = t->total_time();
 	t->stop();
 	double t1 = fpds->getOutRegExps(fa, outfa, outNodeRegExpMap, updateableMap, oMap, mapBack, transMap, differentiatedList, mergeSrcMap);
@@ -3311,7 +3371,7 @@ namespace goals {
 	int testSize = mapBack.size();
 	int testSize2 = transMap.size();
 
-	//Find the key to the error state
+	// Find the key to the error state
 	Key errKey = wali::getKeySpace()->getKey("error");
 	Key iKey = wali::getKeySpace()->getKey("Unique State Name");
 	Key pErrKey = wali::getKeySpace()->getKey(iKey, errKey);
@@ -3319,7 +3379,7 @@ namespace goals {
 	Key fKey = wali::getKeySpace()->getKey(esrc);
 	bool prune = false;
 
-	//If the error state is in the wfa, then prune, otherwise the error is not reachable  -- ETTODO (prune check is redundant)
+	// If the error state is in the wfa, then prune, otherwise the error is not reachable  -- ETTODO (prune check is redundant)
 	if (outfa.getState(fKey) != NULL)
 	{
 		prune = true;
@@ -3375,8 +3435,8 @@ namespace goals {
 		{
 			int wlSzie = wl.size();
 			//convertToTSLRegExp
-			//if in convertion an updatable node is hit
-			//add that regexp to wl if not allready in visitedList
+			//if in conversion an updatable node is hit
+			//add that regexp to wl if not already in visitedList
 			int rToConvert = wl.back();
 			//std::cout << rToConvert << endl;
 			wl.pop_back();
@@ -3384,9 +3444,10 @@ namespace goals {
 		}
 		//std::cout << "ESIZE: " << E.size() << std::endl;
 		//std::cout << "DSIZE: " << differentiatedList.size() << std::endl;
-		//Create a map from unique IDs to tsl regular expressions with variables
-		//Currently doing this by iterating through the regular expressions and copying
-		//the tsl regular expression whose ids match the nodes in the differentiatedMap
+
+		// Create a map from unique IDs to tsl regular expressions with variables
+		// Currently doing this by iterating through the regular expressions and copying
+		// the tsl regular expression whose ids match the nodes in the differentiatedMap
 		for (vector<int>::iterator eit = differentiatedList.begin(); eit != differentiatedList.end(); eit++)
 		{
 			// std::cout << "D: " << *eit << endl;
@@ -3398,8 +3459,8 @@ namespace goals {
 			//  std::cout << "RE: " << *eit;
 			//  std::cout << " ";
 			//  E[(*eit)].print(std::cout) << std::endl;
-			//This is used  in debugging to compare the epsilon transitions with those generated by non-newton methods
-			//and make sure they match
+			// This is used in debugging to compare the epsilon transitions with those generated by non-newton methods
+			// to make sure they match
 #if defined(NEWTON_DEBUG)
 			int src = mapBack[(*eit)].first.first;
 			int tgt = mapBack[(*eit)].first.second;
@@ -3431,11 +3492,11 @@ namespace goals {
 			/* Step 4 - Create a new fwpds using these partial differentials - run poststar on the fwpds in
 			*	        order to get the full differentials representing the values of the program return points
 			*/
-			//Now we create new fwpds using these differentials, this fwpds has the weight type of nameweight
+			//Now we create new fwpds using these differentials, this fwpds has the weight type of NameWeight
 			FWPDS * fnew = new FWPDS();
 			fwpdsFromDifferential(fnew, differentialMap, varDependencies);
 
-			//Now create another finite automata
+			//Now create another finite automaton
 			WFA fa2;
 			wali::Key acc2 = wali::getKeySpace()->getKey("accept2");
 			fa2.addTrans(getPdsState(), stk(dummy), acc2, fnew->get_theZero()->one());
@@ -3477,7 +3538,7 @@ namespace goals {
 			convertToTSLRegExpsT(rNew, regExpMap, tensoredRegExpMap, differentialMap, mapBack, mergeSrcMap);
 			aList = CIR::initializeAssignment();
 
-			/*Step 6 - Use newton's method to find the fixed point of the weights and then reevaluate the values of all the regexps*/
+			/* Step 6 - Perform Newton rounds until a fixed-point is reached */
 			cout << "[Newton Compare] Running Newton" << endl;
 			runNewton(aList, differentialMap, varDependencies, tensoredRegExpMap,linear);
 
@@ -3712,7 +3773,7 @@ namespace goals {
 			  int wlSzie = wl.size();
 			  //convertToTSLRegExp
 			  //if in convertion an updatable node is hit
-			  //add that regexp to wl if not allready in visitedList
+			  //add that regexp to wl if not already in visitedList
 			  int rToConvert = wl.back();
 			  //std::cout << rToConvert << endl;
 			  wl.pop_back();
@@ -4186,6 +4247,8 @@ CAMLprim value compare_weights(Trans t) {
     CAMLreturn(Val_unit);
 }
 
+#endif
+
 void runFwpds(FWPDS * pds)
 {
   #if ET_DBG == 1
@@ -4248,7 +4311,9 @@ void runFwpds(FWPDS * pds)
     #undef flush
     std::cout << "Finished Printing" << std::endl << std::flush;
 }
-#endif
+// Jason is commenting out what he believes to be a dangling
+//   preprocessor directive here:
+//#endif
 
 }
 
