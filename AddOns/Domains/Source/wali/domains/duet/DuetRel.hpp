@@ -99,6 +99,7 @@ namespace wali
           sem_elem_t star();
 
           duetrelpair_t alphaHatStar();
+          bool Equivalent(duetrel_t that) const;
 
           /** @return [this]->Equal( cast<DuetRel*>(se) ) */
           bool equal(SemElem* se) const;

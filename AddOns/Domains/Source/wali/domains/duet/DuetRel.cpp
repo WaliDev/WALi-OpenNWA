@@ -323,7 +323,7 @@ wali::sem_elem_t DuetRel::star()
 duetrelpair_t DuetRel::alphaHatStar()
 {
   CAMLparam0();
-  CAMLlocal4(dval, temp, lin_formula, star_formula);
+  CAMLlocal5(dval, temp, lin_formula, lin_formula_qelme, star_formula);
 
   dval = this->getValue();
   duetrel_t d1, d2;
@@ -337,16 +337,38 @@ duetrelpair_t DuetRel::alphaHatStar()
   // Decompose temp into lin_formula and star_formula
   value * fst_func = caml_named_value("fst_callback");
   lin_formula = caml_callback(*fst_func, temp);
+  // We call a quantifier elimination procedure on the linearized formula
+  //   in preparation for later calling to DuetRel::Equivalent.
+  value * qelme_func = caml_named_value("tensorQELME_callback");
+  lin_formula_qelme = caml_callback(*qelme_func, lin_formula);
   value * snd_func = caml_named_value("snd_callback");
   star_formula = caml_callback(*snd_func, temp);
 
-  d1 = MkDuetRel(lin_formula, true);
+  d1 = MkDuetRel(lin_formula_qelme, true);
   d2 = MkDuetRel(star_formula, true);
   d = DuetRelPair::MkDuetRelPair(d1, d2);
   
   CAMLreturnT(duetrelpair_t,d);
 }
 
+bool DuetRel::Equivalent(duetrel_t that) const
+{
+  // We assume that a quantifier elimination procedure
+  //   has been called on both arguments of the equivalence check.
+
+  // I copied this call to CAMLparam0 from Equiv; I'm not sure
+  //   if we should use CAMLparam0 or CAMLparam1 here.
+  CAMLparam0();
+  CAMLlocal3(retVal, dval0, dval1);
+
+  dval0 = this->getValue();
+  dval1 = that->getValue();
+
+  value * eq_func = caml_named_value("tensorEquiv_callback");
+  retVal = caml_callback2(*eq_func, dval0, dval1);
+
+  CAMLreturnT(bool,Bool_val(retVal));
+}
 
 wali::sem_elem_t DuetRel::combine(wali::SemElem* se) 
 {
