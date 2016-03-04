@@ -41,11 +41,11 @@ CAMLprim value compare_weights(Trans t) {
     value * p_func = caml_named_value("print_callback");
     nval = caml_callback(*n_func, ((DuetRel*)(t.weight().get_ptr()))->getValue());
     sval = caml_callback(*p_func, nval);
-    std::cout << "WALI Weight: " << std::endl;
-    std::cout << String_val(sval) << std::endl;
+    //std::cout << "WALI Weight: " << std::endl;
+    //std::cout << String_val(sval) << std::endl;
     sval = caml_callback(*p_func, nCVal);
-    std::cout << "Duet Weight: " << std::endl;
-    std::cout << String_val(sval) << std::endl;
+    //std::cout << "Duet Weight: " << std::endl;
+    //std::cout << String_val(sval) << std::endl;
     bval = caml_callback2(*eq_func, nval, nCVal);
 
 

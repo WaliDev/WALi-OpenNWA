@@ -483,6 +483,7 @@ namespace goals {
 		EvalTMap;
 	
 	EvalTMap EvalMapT;
+	
 
 	// Stack frames needed by the non-recursive versions of convertToTSL and Eval and EvalT
 
@@ -3117,125 +3118,97 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
   *                      that defines its value
   *
   *  Author:  Emma Turetsky
+  *  
+  *  
+  *  
+  *  newVal = lambda var.bottom
+  *  newStarval = empty map
+  *  while true {
+  *     NEWROUND:
+  *	oldval = newval
+  *	clear (newval)
+  *	oldstarval = newstarval
+  *	clear (newstarval)
+  *	
+  *	for each variable v { 
+  *		evaluete tensored re for v with the side effect of tabulating in newstarval the linear abstraction of each star body
+  *	}
+  *	for each star location s {
+  *		if oldstarval(s) != newstarval(s)
+  *			goto NEWROUND
+  *	}
+  *	break
+  *  }
   */
-  void runNewton(RTG::assignmentRefPtr & aList, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies, tslRegExpTMap & tensoredRegExpMap, bool linear)
+  void runNewton(RTG::assignmentRefPtr & newVal, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies, tslRegExpTMap & tensoredRegExpMap, bool linear)
   {
 	int rnd = 0;
        bool newton = true;
 	// A map of dependencies
-       std::set<int> changedVars; // The set of possible dirty regexps IDs
-	std::set<int> C;
-       RTG::assignmentRefPtr aPrime = aList;
-       tslDiffMap::iterator dIt;
+        RTG::assignmentRefPtr oldVal;
+        tslDiffMap::iterator dIt;
 	int pV = 0;
 	tslRegExpTMap::iterator assignIt;
+	
+	EvalTMap oldStarVal;
+	EvalTMap newStarVal;
 
-	if (!linear)
-	{
-		// Insert all variables into changedVars because for the first Newton round
-		// we will treat all variables has having "dirty" values
-		for (dIt = differentialMap.begin(); dIt != differentialMap.end(); dIt++)
+	
+	// Perform Newton rounds until convergence:
+	while (rnd < 2){
+		std::cout << "Round " << rnd << ":" << std::endl;
+		rnd++;
+			
+			
+		oldVal = newVal;
+		newVal = CIR::initializeAssignment();
+			
+		oldStarVal = newStarVal;
+		newStarVal.clear();
+
+		// For each variable in the equation system, evaluate its regular expression
+		for (assignIt = tensoredRegExpMap.begin(); assignIt != tensoredRegExpMap.end(); assignIt++)
 		{
-			changedVars.insert(dIt->first);
+			int var = assignIt->first;
+			
+			// Reevaluate the regular expression associated with variable var,
+			//    using oldVal for the quantity \vec{nu} of Algorithm NPA-TP, and
+			//    apply detensorTranspose
+			//v = Tdetensor(evalT(Mmap[p],oldVal))
+			std::cout << "Eval: " << assignIt->first << std::endl;
+			assignIt->second.print(std::cout);
+			std::cout << std::endl;
+			EXTERN_TYPES::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal);
+			//std::cout << std::endl << "Result: ";
+			//newVal.v->print(std::cout);
+			EXTERN_TYPES::sem_elem_wrapperRefPtr rep = EXTERNS::detensorTranspose(newValue);
+			std::cout << std::endl << "Detensored Val: ";
+			rep.v->print(std::cout);
+			std::cout << std::endl;
+
+			// Insert <var,rep> into newVal
+			newVal = CIR::updateAssignment(newVal, CBTI_INT32(var), rep);
+			
+			
 		}
-
-		bool first = true; // "true" indicates that we are on the first Newton round
-
-		// Perform Newton rounds until convergence:
-		// While the set of changed variables != empty, perform one round of Newton's method
-		while (changedVars.size() != 0){
-			rnd++;
-			std::set<int>::iterator pIt;
-			// Update aPrime to match aList: For each variable whose value changed on the
-			// previous round, insert the value from aList into aPrime.
-			for (pIt = changedVars.begin(); pIt != changedVars.end(); pIt++)
-			{
-				aPrime = CIR::updateAssignment(aPrime, CBTI_INT32(*pIt), CIR::getAssignment(CBTI_INT32(*pIt), aList));
-			}
-
-			C = changedVars;
-			changedVars.clear();
-
-			// For each variable in the equation system, evaluate its regular expression only if
-			// it depends on a variable whose value changed in the previous Newton round
-			for (assignIt = tensoredRegExpMap.begin(); assignIt != tensoredRegExpMap.end(); assignIt++)
-			{
-				// Obtain the set of variables on which this variable depends
-				int var = assignIt->first;
-				std::set<int> varsUsedInP = varDependencies[var];
-
-				// Determine if any of the variables on which var depends changed value
-				// on the previous Newton round
-				bool found = false; // Set to true below if some predecessor of var has a changed value
-				std::set<int>::iterator sIt1 = C.begin();
-				std::set<int>::iterator sIt2 = varsUsedInP.begin();
-				// Check whether (C intersect VarsUsedIn(p)) == emptyset
-				if (!first){
-					while ((sIt1 != C.end()) && (sIt2 != varsUsedInP.end()) && !found)
-					{
-						if (*sIt1 < *sIt2)
-							++sIt1;
-						else if (*sIt2 < *sIt1)
-							++sIt2;
-						else
-						{
-							found = true;
-							break;
-						}
-					}
-				}
-				else  // This is the first NewtonRound, so all variables are considered
-				      // as having been altered
-				{
-					found = true;
-				}
-				if (found){ // Reevaluate the regular expression associated with variable var,
-					     // using aPrime for the quantity \vec{nu} of Algorithm NPA-TP, and
-					     // apply detensorTranspose
-					//v = Tdetensor(evalT(Mmap[p],aPrime))
-					//std::cout << "Eval: " << assignIt->first << std::endl;
-					//assignIt->second.print(std::cout);
-					//std::cout << std::endl;
-					EXTERN_TYPES::sem_elem_wrapperRefPtr newVal = evalTNonRec(assignIt->second, aPrime);
-					//std::cout << std::endl << "Result: ";
-					//newVal.v->print(std::cout);
-					EXTERN_TYPES::sem_elem_wrapperRefPtr rep = EXTERNS::detensorTranspose(newVal);
-					//std::cout << std::endl << "Detensored Val: ";
-					//rep.v->print(std::cout);
-
-					// Perform the computation needed for merge functions by computing rep = M(1,rep)
-					// FIXME - what is applied here has to be a global merge function that applies at all procedure exits
-					//	  - we don't have the information to perform exit-specific merge functions
-
-					// Check whether the new (untensored) value of var is the same
-					// as on the previous round; if not, mark var as changed and insert
-					// <var,rep> into aList
-					EXTERN_TYPES::sem_elem_wrapperRefPtr oldVal = CIR::getAssignment(CBTI_INT32(var), aPrime);
-					if (!(oldVal.v->Equal(rep.v))){
-						changedVars.insert(var);
-						aList = CIR::updateAssignment(aList, CBTI_INT32(var), rep);
-					}
-				}
-			}
-			first = false;
-			EvalMap2.clear();
-			EvalMapT.clear();
-		}
-		std::cout << std::endl << "NumRnds: " << rnd << std::endl;
+		EvalMap2.clear();
+		EvalMapT.clear();
 	}
-	else
+	std::cout << std::endl << "NumRnds: " << rnd << std::endl;
+	
+	/*else
 	{
 		rnd++;
 		for (assignIt = tensoredRegExpMap.begin(); assignIt != tensoredRegExpMap.end(); assignIt++)
 		{
 			    int var = assignIt->first;
-				//v = Tdetensor(evalT(Mmap[p],aPrime))
+				//v = Tdetensor(evalT(Mmap[p],oldVal))
 				//The variable representing the regexp is potentially dirty, so reevaluate it using the
-				//new assignment in aPrime
+				//new assignment in oldVal
 				//std::cout << "Eval: " << assignIt->first << std::endl;
 				//assignIt->second.print(std::cout);
 				//std::cout << std::endl;
-				EXTERN_TYPES::sem_elem_wrapperRefPtr newVal = evalTNonRec(assignIt->second, aPrime);
+				EXTERN_TYPES::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal);
 				//DetensorTranspose the new value
 				//std::cout << std::endl << "Result: ";
 				//newVal.v->print(std::cout);
@@ -3248,12 +3221,12 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 				//Check to see if the new value is the same as the previous one
 				//if A'[p] != v`
 				//Add v' to the changedVar set and updated the assignmentList
-				aList = CIR::updateAssignment(aList, CBTI_INT32(var), rep);
+				newVal = CIR::updateAssignment(newVal, CBTI_INT32(var), rep);
 		}
 		EvalMap2.clear();
 		EvalMapT.clear();
 	std::cout << std::endl << "NumRnds: " << rnd << std::endl;
-	}
+	}*/
   }
 
  /*
@@ -4375,6 +4348,8 @@ int runBasicNewtonFromBelow(char **argv)
     {
 	pds->add_rule(st1(), ite->first, st1(), ite->second);
     }
+    
+    pds->print(std::cout);
 
     WFA outfaNewton;
     goals::run_newton(outfaNewton, entry_key, pds, false);
@@ -4392,6 +4367,7 @@ int runBasicNewtonFromBelow(char **argv)
 
     return 0;
 }	
+
 
 int main(int argc, char **argv)
 {
