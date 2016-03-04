@@ -2261,7 +2261,7 @@ namespace goals {
   *
   *  Author: Emma Turetsky
   */
-  EXTERN_TYPES::sem_elem_wrapperRefPtr evalTNonRec(RTG::regExpTRefPtr exp, RTG::assignmentRefPtr a)
+  EXTERN_TYPES::sem_elem_wrapperRefPtr evalTNonRec(RTG::regExpTRefPtr exp, RTG::assignmentRefPtr a, EvalTMap &newStarVal)
   {
 	  //std::cout << hits << std::endl;
 	  std::stack<sFrame> todo;
@@ -2291,9 +2291,11 @@ namespace goals {
 				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
 				  if (evalT___it != EvalMapT.end())
 				  {
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-					  ret = EXTERNS::evalKleeneSemElemT(evalT___it->second);
-					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
+				  	std::cout << "New code!" << std::endl;
+					  duetrelpair_t ret;
+					  ret = ((evalT___it->second.v))->alphaHatStar();
+					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret->second));
+					  newStarVal.insert(std::make_pair(lookupKeyForevalTHash, ret->first));
 					  todo.pop();
 					  continue;
 				  }
@@ -2474,8 +2476,13 @@ namespace goals {
 			  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
 			  if (frame.op == 0) //Kleene
 			  {
-				  ret = EXTERNS::evalKleeneSemElemT(lch);
-				  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
+			  	  std::cout << "New code!" << std::endl;
+				  duetrelpair_t ret;
+				  ret = ((evalT___it->second.v))->alphaHatStar();
+				  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret->second));
+				  newStarVal.insert(std::make_pair(lookupKeyForevalTHash, ret->first));
+				  //ret = EXTERNS::evalKleeneSemElemT(lch);
+				  //EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
 				  todo.pop();
 				  continue;
 			  }
@@ -2707,7 +2714,7 @@ namespace goals {
   *
   *   Author: Emma Turetsky
   */
-  RTG::regExpRefPtr convertToRegExp(int reID, reg_exp_t exp, std::map<int, reg_exp_t> & outNodeRegExpsMap, std::map<int, std::set<int> > & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, std::map<std::pair<int, int>, std::pair<int, int> > & mergeSrcMap, std::vector<int> & wl, std::set<int> & vl, double * elapsedTime)
+  RTG::regExpRefPtr convertToRegExp(int reID, reg_exp_t exp, std::map<int, reg_exp_t> & outNodeRegExpsMap, std::map<int, std::set<int> > & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, std::map<std::pair<int, int>, std::pair<int, int> > & mergeSrcMap, std::vector<int> & wl, std::set<int> & vl, double * elapsedTime, bool insertProjects = true)
   {
 	  std::stack<cFrame> todo;
 	  std::map<reg_exp_t, RTG::regExpRefPtr> seen; //map of regExps that have already been seen (should change to an unordered_map for speedup)
@@ -2761,7 +2768,9 @@ namespace goals {
 					  vl.insert(mNum);
 				  }
 				  vDep.insert(mNum);  //This regExp is dependent on the regExp represented by mNum
-				  seen[frame.e] = RTG::Project::make(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), RTG::Var::make(CBTI::INT32(mNum)));
+				  seen[frame.e] = insertProjects
+				                      ? RTG::Project::make(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), RTG::Var::make(CBTI::INT32(mNum)))
+				                      : RTG::Var::make(CBTI::INT32(mNum));
 				  todo.pop();
 				  continue;
 			  }
@@ -2887,12 +2896,13 @@ namespace goals {
   *
   *  Author:  Emma Turetsky
   */
-  double convertToTSLRegExps(int reg, std::map<int, reg_exp_t> & outNodeRegExpMap, tslRegExpMap & regExpMap, std::map<int, std::set<int> > & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, std::map<std::pair<int, int>, std::pair<int, int > >  & mergeSrcMap, std::vector<int> & wl, std::set<int> & vl)
+  double convertToTSLRegExps(int reg, std::map<int, reg_exp_t> & outNodeRegExpMap, tslRegExpMap & regExpMap, std::map<int, std::set<int> > & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, std::map<std::pair<int, int>, std::pair<int, int > >  & mergeSrcMap, std::vector<int> & wl, std::set<int> & vl
+  , bool insertProjects = true)
   {
 	  //std::cout << "REID: " << reg << endl;
 	  //outNodeRegExpMap[reg]->print(std::cout) << std::endl;
 	  double evalTime = 0;
-	  RTG::regExpRefPtr rExp = convertToRegExp(reg, outNodeRegExpMap[reg], outNodeRegExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl, &evalTime);
+	  RTG::regExpRefPtr rExp = convertToRegExp(reg, outNodeRegExpMap[reg], outNodeRegExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl, &evalTime, insertProjects);
 	  //rExp->print(std::cout) << std::endl;
 	  //std::cout << "src: " << mapBack[reg].first.first << "tgt: " << mapBack[reg].first.second << "stack: " << mapBack[reg].second << endl << endl;
 	  regExpMap[reg] = rExp;
@@ -3175,22 +3185,31 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 			//    using oldVal for the quantity \vec{nu} of Algorithm NPA-TP, and
 			//    apply detensorTranspose
 			//v = Tdetensor(evalT(Mmap[p],oldVal))
-			std::cout << "Eval: " << assignIt->first << std::endl;
-			assignIt->second.print(std::cout);
-			std::cout << std::endl;
-			EXTERN_TYPES::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal);
+			
+			// std::cout << "Eval: " << assignIt->first << std::endl;
+			//assignIt->second.print(std::cout);
+			//std::cout << std::endl;
+			
+			EXTERN_TYPES::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal, newStarVal);
+			
 			//std::cout << std::endl << "Result: ";
 			//newVal.v->print(std::cout);
+			
 			EXTERN_TYPES::sem_elem_wrapperRefPtr rep = EXTERNS::detensorTranspose(newValue);
-			std::cout << std::endl << "Detensored Val: ";
-			rep.v->print(std::cout);
-			std::cout << std::endl;
+			
+			//std::cout << std::endl << "Detensored Val: ";
+			//rep.v->print(std::cout);
+			//std::cout << std::endl;
 
 			// Insert <var,rep> into newVal
 			newVal = CIR::updateAssignment(newVal, CBTI_INT32(var), rep);
 			
 			
+			
+			
 		}
+		
+		
 		EvalMap2.clear();
 		EvalMapT.clear();
 	}
@@ -3413,7 +3432,7 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 			int rToConvert = wl.back();
 			//std::cout << rToConvert << endl;
 			wl.pop_back();
-			baseEvalTime += convertToTSLRegExps(rToConvert, outNodeRegExpMap, regExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl);
+			baseEvalTime += convertToTSLRegExps(rToConvert, outNodeRegExpMap, regExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl, false);
 		}
 		//std::cout << "ESIZE: " << E.size() << std::endl;
 		//std::cout << "DSIZE: " << differentiatedList.size() << std::endl;
@@ -4360,6 +4379,18 @@ int runBasicNewtonFromBelow(char **argv)
     outfaNewton.find(st1(), exit_key, acc, t);
 
     compare_weights(t);
+    
+  /*  if(dump){
+        FWPDS * originalPds = new FWPDS();
+	con = pds_from_prog(originalPds, pg);
+    cout << "[Newton Compare] Dumping PDS to pds.dot..." << endl;
+    fstream pds_stream("pds.dot", fstream::out);
+    RuleDotty rd(pds_stream);
+    pds_stream << "digraph{" << endl;
+    originalPds->for_each(rd);
+    pds_stream << "}" << endl;
+    delete(originalPds);
+    }*/
 
 
     #undef flush
