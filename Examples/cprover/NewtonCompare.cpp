@@ -3150,6 +3150,7 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
   *	break
   *  }
   */
+#define MAX_ROUNDS 50
   void runNewton(RTG::assignmentRefPtr & newVal, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies, tslRegExpTMap & tensoredRegExpMap, bool linear)
   {
 	int rnd = 0;
@@ -3164,8 +3165,14 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 	EvalTMap newStarVal;
 
 	
-	// Perform Newton rounds until convergence:
-	while (rnd < 2){
+	// Perform Newton rounds until convergence, with a maximum of MAX_ROUNDS rounds
+	while (true){
+NEWROUND:
+		if (rnd >= MAX_ROUNDS) {
+			std::cout << "Maximum number of rounds reached. ------------------------------------------" << std::endl;
+			break;
+		}
+		std::cout << "-------------------------------------------------------------------------------" << std::endl;
 		std::cout << "Round " << rnd << ":" << std::endl;
 		rnd++;
 			
@@ -3186,9 +3193,9 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 			//    apply detensorTranspose
 			//v = Tdetensor(evalT(Mmap[p],oldVal))
 			
-			// std::cout << "Eval: " << assignIt->first << std::endl;
-			//assignIt->second.print(std::cout);
-			//std::cout << std::endl;
+			std::cout << "Eval: " << assignIt->first << std::endl;
+			assignIt->second.print(std::cout);
+			std::cout << std::endl;
 			
 			EXTERN_TYPES::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal, newStarVal);
 			
@@ -3197,9 +3204,9 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 			
 			EXTERN_TYPES::sem_elem_wrapperRefPtr rep = EXTERNS::detensorTranspose(newValue);
 			
-			//std::cout << std::endl << "Detensored Val: ";
-			//rep.v->print(std::cout);
-			//std::cout << std::endl;
+			std::cout << std::endl << "Detensored Val: ";
+			rep.v->print(std::cout);
+			std::cout << std::endl;
 
 			// Insert <var,rep> into newVal
 			newVal = CIR::updateAssignment(newVal, CBTI_INT32(var), rep);
@@ -3212,7 +3219,22 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 		
 		EvalMap2.clear();
 		EvalMapT.clear();
+
+		// Test to see whether all abstracted Kleene star bodies have converged
+		for(EvalTMap::const_iterator newStar_it = newStarVal.begin(); newStar_it != newStarVal.end(); ++newStar_it) 
+		{
+			EvalTMap::const_iterator oldStarValue = oldStarVal.find(newStar_it->first);
+			if (oldStarValue == oldStarVal.end()) {
+				// On the first round, we have no previous value to compare against
+				goto NEWROUND;
+			}
+			if (!newStar_it->second.v->Equivalent(oldStarValue->second.v)) {
+				goto NEWROUND;
+			}
+		}
+		break; // Exit the Newton loop because all abstracted Kleene star bodies have converged
 	}
+		
 	std::cout << std::endl << "NumRnds: " << rnd << std::endl;
 	
 	/*else
@@ -4379,6 +4401,20 @@ int runBasicNewtonFromBelow(char **argv)
     outfaNewton.find(st1(), exit_key, acc, t);
 
     compare_weights(t);
+
+    // Set exit_transitions to the set of all transitions in outfaNewton
+    // of the form (st1,WALI_EPSILON,<st1,e>), where e is an entry node
+    wali::wfa::TransSet exit_transitions;
+    exit_transitions = outfaNewton.match(st1(), WALI_EPSILON);
+    for(wali::wfa::TransSet::iterator tsit = exit_transitions.begin(); tsit != exit_transitions.end(); tsit++)
+    {
+        std::cout << "Procedure summary for (some as yet unidentified -- FIXME) procedure" << std::endl;
+        DuetRel *nval = ((DuetRel*)((*tsit)->weight().get_ptr()));
+        //DuetRel *nval = ((DuetRel*)((*tsit)->weight().get_ptr()))->getValue();
+        nval->print(std::cout);
+        std::cout << std::endl << std::endl;
+    }
+
     
   /*  if(dump){
         FWPDS * originalPds = new FWPDS();
