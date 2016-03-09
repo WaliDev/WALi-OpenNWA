@@ -329,18 +329,31 @@ duetrelpair_t DuetRel::alphaHatStar()
   duetrel_t d1, d2;
   duetrelpair_t d;
   
-  assert(isTensored);
+  if (isTensored) {
  
-  value * star_func = caml_named_value("tensor_linearize_star_callback");
-  temp = caml_callback(*star_func, dval);
+    value * star_func = caml_named_value("tensor_linearize_star_callback");
+    temp = caml_callback(*star_func, dval); 
 
-  // Decompose temp into lin_formula and star_formula
-  value * fst_func = caml_named_value("fst_callback");
-  lin_formula = caml_callback(*fst_func, temp);
-  // We call a quantifier elimination procedure on the linearized formula
-  //   in preparation for later calling to DuetRel::Equivalent.
-  value * qelme_func = caml_named_value("tensorQELME_callback");
-  lin_formula_qelme = caml_callback(*qelme_func, lin_formula);
+    // Decompose temp into lin_formula and star_formula
+    value * fst_func = caml_named_value("fst_callback");
+    lin_formula = caml_callback(*fst_func, temp);
+    // We call a quantifier elimination procedure on the linearized formula
+    //   in preparation for later calling to DuetRel::Equivalent.
+    value * qelme_func = caml_named_value("tensorQELME_callback");
+    lin_formula_qelme = caml_callback(*qelme_func, lin_formula);
+  } else {
+    value * star_func = caml_named_value("linearize_star_callback");
+    temp = caml_callback(*star_func, dval); 
+
+    // Decompose temp into lin_formula and star_formula
+    value * fst_func = caml_named_value("fst_callback");
+    lin_formula = caml_callback(*fst_func, temp);
+    // We call a quantifier elimination procedure on the linearized formula
+    //   in preparation for later calling to DuetRel::Equivalent.
+    value * qelme_func = caml_named_value("QELME_callback");
+    lin_formula_qelme = caml_callback(*qelme_func, lin_formula);
+  }
+  
   value * snd_func = caml_named_value("snd_callback");
   star_formula = caml_callback(*snd_func, temp);
 
@@ -363,9 +376,14 @@ bool DuetRel::Equivalent(duetrel_t that) const
 
   dval0 = this->getValue();
   dval1 = that->getValue();
-
-  value * eq_func = caml_named_value("tensorEquiv_callback");
-  retVal = caml_callback2(*eq_func, dval0, dval1);
+  
+  if (isTensored) {
+    value * eq_func = caml_named_value("tensorEquiv_callback");
+    retVal = caml_callback2(*eq_func, dval0, dval1);
+  } else {
+    value * eq_func = caml_named_value("equiv_callback");
+    retVal = caml_callback2(*eq_func, dval0, dval1);
+  }
 
   CAMLreturnT(bool,Bool_val(retVal));
 }
@@ -513,7 +531,7 @@ duetrel_t DuetRel::getTensorOne()
 std::ostream& DuetRel::print( std::ostream& o ) const 
 {
   CAMLparam0();
-  CAMLlocal2(dval,sval);
+  CAMLlocal3(dval,sval,simpval);
 
   if(!isTensored)
     o << "Base relation: ";
@@ -525,12 +543,18 @@ std::ostream& DuetRel::print( std::ostream& o ) const
   //value * norm_func = caml_named_value("normalize_callback");
   //ival = caml_callback(*norm_func,dval);
   if(!isTensored) {
+  value * simplify_func = caml_named_value("simplify_callback");
+  simpval = caml_callback(*simplify_func, dval);
   value * print_func = caml_named_value("print_callback");
-  sval = caml_callback(*print_func, dval);
+  sval = caml_callback(*print_func, simpval);
+  //sval = caml_callback(*print_func, dval);
   }
   else {
-    value * print_func = caml_named_value("printTensored_callback");
-  sval = caml_callback(*print_func, dval);
+  value * simplify_func = caml_named_value("tensorSimplify_callback");
+  simpval = caml_callback(*simplify_func, dval);
+  value * print_func = caml_named_value("printTensored_callback");
+  sval = caml_callback(*print_func, simpval);
+  //sval = caml_callback(*print_func, dval);
   }
   o << String_val(sval);
   CAMLreturnT(std::ostream&, o);

@@ -484,6 +484,10 @@ namespace goals {
 	
 	EvalTMap EvalMapT;
 	
+	EvalRMap newStarVal;
+	EvalTMap newStarValT;
+	
+	
 
 	// Stack frames needed by the non-recursive versions of convertToTSL and Eval and EvalT
 
@@ -1919,9 +1923,15 @@ namespace goals {
 				  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
 				  if (evalRegExp___it != EvalMap2.end())
 				  {
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-					  ret = EXTERNS::evalKleeneSemElem(evalRegExp___it->second);
-					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
+					  //EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
+					  //ret = EXTERNS::evalKleeneSemElem(evalRegExp___it->second);
+					  //EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
+					  //todo.pop();
+					  std::cout << "New code! (U)" << std::endl;
+					  duetrelpair_t ret;
+					  ret = ((evalRegExp___it->second.v))->alphaHatStar();
+					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret->second));
+					  newStarVal.insert(std::make_pair(lookupKeyForevalRegExpHash, ret->first));
 					  todo.pop();
 					  continue;
 				  }
@@ -2060,9 +2070,15 @@ namespace goals {
 			  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
 			  if (frame.op == 0) //Kleene
 			  {
-				  ret = EXTERNS::evalKleeneSemElem(lch);
-				  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
-				  todo.pop();
+				  //ret = EXTERNS::evalKleeneSemElem(lch);
+				  //EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
+				  //todo.pop();
+				  std::cout << "New code! (U)" << std::endl;
+				  duetrelpair_t ret;
+				  ret = ((evalRegExp___it->second.v))->alphaHatStar();
+				  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret->second));
+				  newStarVal.insert(std::make_pair(lookupKeyForevalRegExpHash, ret->first));
+                                  todo.pop();
 				  continue;
 			  }
 			  else if (frame.op == 3)
@@ -2261,7 +2277,7 @@ namespace goals {
   *
   *  Author: Emma Turetsky
   */
-  EXTERN_TYPES::sem_elem_wrapperRefPtr evalTNonRec(RTG::regExpTRefPtr exp, RTG::assignmentRefPtr a, EvalTMap &newStarVal)
+  EXTERN_TYPES::sem_elem_wrapperRefPtr evalTNonRec(RTG::regExpTRefPtr exp, RTG::assignmentRefPtr a)
   {
 	  //std::cout << hits << std::endl;
 	  std::stack<sFrame> todo;
@@ -2291,11 +2307,11 @@ namespace goals {
 				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
 				  if (evalT___it != EvalMapT.end())
 				  {
-				  	std::cout << "New code!" << std::endl;
+				  	  std::cout << "New code! (T)" << std::endl;
 					  duetrelpair_t ret;
 					  ret = ((evalT___it->second.v))->alphaHatStar();
 					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret->second));
-					  newStarVal.insert(std::make_pair(lookupKeyForevalTHash, ret->first));
+					  newStarValT.insert(std::make_pair(lookupKeyForevalTHash, ret->first));
 					  todo.pop();
 					  continue;
 				  }
@@ -2476,11 +2492,11 @@ namespace goals {
 			  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
 			  if (frame.op == 0) //Kleene
 			  {
-			  	  std::cout << "New code!" << std::endl;
+			  	  std::cout << "New code! (T)" << std::endl;
 				  duetrelpair_t ret;
 				  ret = ((evalT___it->second.v))->alphaHatStar();
 				  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret->second));
-				  newStarVal.insert(std::make_pair(lookupKeyForevalTHash, ret->first));
+				  newStarValT.insert(std::make_pair(lookupKeyForevalTHash, ret->first));
 				  //ret = EXTERNS::evalKleeneSemElemT(lch);
 				  //EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
 				  todo.pop();
@@ -3161,8 +3177,11 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 	int pV = 0;
 	tslRegExpTMap::iterator assignIt;
 	
-	EvalTMap oldStarVal;
-	EvalTMap newStarVal;
+	EvalRMap oldStarVal;
+	EvalTMap oldStarValT;
+	
+	newStarVal.clear();
+	newStarValT.clear();
 
 	
 	// Perform Newton rounds until convergence, with a maximum of MAX_ROUNDS rounds
@@ -3181,7 +3200,9 @@ NEWROUND:
 		newVal = CIR::initializeAssignment();
 			
 		oldStarVal = newStarVal;
+		oldStarValT = newStarValT;
 		newStarVal.clear();
+		newStarValT.clear();
 
 		// For each variable in the equation system, evaluate its regular expression
 		for (assignIt = tensoredRegExpMap.begin(); assignIt != tensoredRegExpMap.end(); assignIt++)
@@ -3197,7 +3218,7 @@ NEWROUND:
 			assignIt->second.print(std::cout);
 			std::cout << std::endl;
 			
-			EXTERN_TYPES::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal, newStarVal);
+			EXTERN_TYPES::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal);
 			
 			//std::cout << std::endl << "Result: ";
 			//newValue.v->print(std::cout);
@@ -3224,10 +3245,21 @@ NEWROUND:
 		EvalMapT.clear();
 
 		// Test to see whether all abstracted Kleene star bodies have converged
-		for(EvalTMap::const_iterator newStar_it = newStarVal.begin(); newStar_it != newStarVal.end(); ++newStar_it) 
+		for(EvalRMap::const_iterator newStar_it = newStarVal.begin(); newStar_it != newStarVal.end(); ++newStar_it) 
 		{
-			EvalTMap::const_iterator oldStarValue = oldStarVal.find(newStar_it->first);
+			EvalRMap::const_iterator oldStarValue = oldStarVal.find(newStar_it->first);
 			if (oldStarValue == oldStarVal.end()) {
+				// On the first round, we have no previous value to compare against
+				goto NEWROUND;
+			}
+			if (!newStar_it->second.v->Equivalent(oldStarValue->second.v)) {
+				goto NEWROUND;
+			}
+		}
+		for(EvalTMap::const_iterator newStar_it = newStarValT.begin(); newStar_it != newStarValT.end(); ++newStar_it) 
+		{
+			EvalTMap::const_iterator oldStarValue = oldStarValT.find(newStar_it->first);
+			if (oldStarValue == oldStarValT.end()) {
 				// On the first round, we have no previous value to compare against
 				goto NEWROUND;
 			}
