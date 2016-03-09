@@ -3154,7 +3154,7 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
   void runNewton(RTG::assignmentRefPtr & newVal, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies, tslRegExpTMap & tensoredRegExpMap, bool linear)
   {
 	int rnd = 0;
-       bool newton = true;
+        bool newton = true;
 	// A map of dependencies
         RTG::assignmentRefPtr oldVal;
         tslDiffMap::iterator dIt;
@@ -3200,22 +3200,25 @@ NEWROUND:
 			EXTERN_TYPES::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal, newStarVal);
 			
 			//std::cout << std::endl << "Result: ";
-			//newVal.v->print(std::cout);
+			//newValue.v->print(std::cout);
 			
 			EXTERN_TYPES::sem_elem_wrapperRefPtr rep = EXTERNS::detensorTranspose(newValue);
 			
 			std::cout << std::endl << "Detensored Val: ";
 			rep.v->print(std::cout);
 			std::cout << std::endl;
+			
+			/*EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
+			
+			ret = EXTERNS::evalDotSemElem(rep, EXTERNS::getOneWt());
+			std::cout << std::endl << "After extend one: " << std::endl;
+			ret.v->print(std::cout);
+			std::cout << std::endl;*/
 
 			// Insert <var,rep> into newVal
 			newVal = CIR::updateAssignment(newVal, CBTI_INT32(var), rep);
-			
-			
-			
-			
+
 		}
-		
 		
 		EvalMap2.clear();
 		EvalMapT.clear();
@@ -3575,7 +3578,7 @@ NEWROUND:
 		}
 		t->stop();
 
-		//Map the evaluated wts back to the transitions the regexps came from
+		//Map the evaluated weights back to the transitions the regexps came from
 		for (stateIter = faStates.begin(); stateIter != faStates.end(); stateIter++)
 		{
 			TransSet & transSet = outfa.getState(*stateIter)->getTransSet();
@@ -4223,28 +4226,29 @@ CAMLprim value compare_weights(Trans t) {
     value * eq_func = caml_named_value("eq_callback");
     value * p_func = caml_named_value("print_callback");
     value * n_func = caml_named_value("normalize_callback");
-    nCVal = compareWeight->getValue();	//not normalized
-    sval = caml_callback(*p_func, nCVal);
-    std::cout << "Duet Weight (Not Normalized): " << std::endl;
-    std::cout << String_val(sval) << std::endl;
-
-    nCVal = caml_callback(*n_func, nCVal);   // normalize it
-
-    // Next line changed by Jason
-   // sval = caml_callback(*p_func, nCVal);
     
-    // first print the unnormalized weight
-    nval = ((DuetRel*)(t.weight().get_ptr()))->getValue();
+    // not normalized (WALI value)
+    nval = ((DuetRel*)(t.weight().get_ptr()))->getValue();	
     sval = caml_callback(*p_func, nval);
-    std::cout << "WALI Weight (Not Normalized): " << std::endl;
+    std::cout << std::endl << "WALI Weight (Not Normalized): " << std::endl;
     std::cout << String_val(sval) << std::endl;
+    
+    //not normalized (Duet value)
+    nCVal = compareWeight->getValue();	
+    sval = caml_callback(*p_func, nCVal);
+    std::cout << std::endl << "Duet Weight (Not Normalized): " << std::endl;
+    std::cout << String_val(sval) << std::endl; 
+    
+    // normalize WALI value
     nval = caml_callback(*n_func, nval);
     sval = caml_callback(*p_func, nval);
-    
-    std::cout << "WALI Weight (Normalized): " << std::endl;
+    std::cout << std::endl << "WALI Weight (Normalized): " << std::endl;
     std::cout << String_val(sval) << std::endl;
+    
+    // normalize Duet value
+    nCVal = caml_callback(*n_func, nCVal);   
     sval = caml_callback(*p_func, nCVal);
-    std::cout << "Duet Weight: " << std::endl;
+    std::cout << std::endl << "Duet Weight: " << std::endl;
     std::cout << String_val(sval) << std::endl;
 
     bval = caml_callback2(*eq_func, nval, nCVal);
