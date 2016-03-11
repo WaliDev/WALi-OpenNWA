@@ -357,8 +357,8 @@ duetrelpair_t DuetRel::alphaHatStar()
   value * snd_func = caml_named_value("snd_callback");
   star_formula = caml_callback(*snd_func, temp);
 
-  d1 = MkDuetRel(lin_formula_qelme, true);
-  d2 = MkDuetRel(star_formula, true);
+  d1 = MkDuetRel(lin_formula_qelme, isTensored);
+  d2 = MkDuetRel(star_formula, isTensored);
   d = DuetRelPair::MkDuetRelPair(d1, d2);
   
   CAMLreturnT(duetrelpair_t,d);
@@ -552,7 +552,7 @@ std::ostream& DuetRel::print( std::ostream& o ) const
   else {
   value * simplify_func = caml_named_value("tensorSimplify_callback");
   simpval = caml_callback(*simplify_func, dval);
-  value * print_func = caml_named_value("printTensored_callback");
+  value * print_func = caml_named_value("tensoredPrint_callback");
   sval = caml_callback(*print_func, simpval);
   //sval = caml_callback(*print_func, dval);
   }
