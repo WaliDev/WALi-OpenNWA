@@ -258,10 +258,15 @@ duetrel_t DuetRel::Merge(int v, int c) const
 
   dval = this->getValue();
 
-  value * merge_func = caml_named_value("merge_callback");
+  value * merge_func;
+  if (isTensored) {
+    merge_func = caml_named_value("tensorMerge_callback");
+  } else {
+    merge_func = caml_named_value("merge_callback");
+  }
   retval = caml_callback(*merge_func, dval);
 
-  duetrel_t d = MkDuetRel(retval);
+  duetrel_t d = MkDuetRel(retval, isTensored);
   CAMLreturnT(duetrel_t,d);
 }
 
@@ -384,6 +389,13 @@ bool DuetRel::Equivalent(duetrel_t that) const
     value * eq_func = caml_named_value("equiv_callback");
     retVal = caml_callback2(*eq_func, dval0, dval1);
   }
+  // WARNING: The following print code causes segfaults.
+  //   I haven't yet debugged the reason for this. -- Jason
+  // std::cout << "Equivalence check of this:" << std::endl;
+  // print(std::cout);
+  // std::cout << std::endl << "against that:" << std::endl;
+  // that->print(std::cout);
+  // std::cout << std::endl << "Test result is:" << Bool_val(retVal) << std::endl;
 
   CAMLreturnT(bool,Bool_val(retVal));
 }
