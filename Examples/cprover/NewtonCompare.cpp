@@ -483,9 +483,25 @@ namespace goals {
 		EvalTMap;
 	
 	EvalTMap EvalMapT;
-	
-	EvalRMap newStarVal;
-	EvalTMap newStarValT;
+
+	typedef boost::unordered_map<
+		MemoCacheKey1<RTG::regExpRefPtr >,
+		EXTERN_TYPES::sem_elem_wrapperRefPtr,
+		boost::hash<MemoCacheKey1<RTG::regExpRefPtr > >,
+		std::equal_to<MemoCacheKey1<RTG::regExpRefPtr > >,
+		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, EXTERN_TYPES::sem_elem_wrapperRefPtr> > >
+		StarMap;
+
+	typedef boost::unordered_map<
+		MemoCacheKey1<RTG::regExpTRefPtr >,
+		EXTERN_TYPES::sem_elem_wrapperRefPtr,
+		boost::hash<MemoCacheKey1<RTG::regExpTRefPtr > >,
+		std::equal_to<MemoCacheKey1<RTG::regExpTRefPtr > >,
+		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpTRefPtr >, EXTERN_TYPES::sem_elem_wrapperRefPtr> > >
+		StarMapT;
+
+	StarMap newStarVal;
+	StarMapT newStarValT;
 	
 	
 
@@ -1931,7 +1947,9 @@ namespace goals {
 					  duetrelpair_t ret;
 					  ret = ((evalRegExp___it->second.v))->alphaHatStar();
 					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret->second));
-					  newStarVal.insert(std::make_pair(lookupKeyForevalRegExpHash, ret->first));
+				          MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(child);
+					  //std::cout << "  Hash key is: " << hash_value(lookupKeyForStar) << std::endl;
+					  newStarVal.insert(std::make_pair(lookupKeyForStar, ret->first));
 					  todo.pop();
 					  continue;
 				  }
@@ -2077,7 +2095,9 @@ namespace goals {
 				  duetrelpair_t ret;
 				  ret = ((evalRegExp___it->second.v))->alphaHatStar();
 				  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret->second));
-				  newStarVal.insert(std::make_pair(lookupKeyForevalRegExpHash, ret->first));
+				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(frame.e);
+				  //std::cout << "  Hash key is: " << hash_value(lookupKeyForStar) << std::endl;
+				  newStarVal.insert(std::make_pair(lookupKeyForStar, ret->first));
                                   todo.pop();
 				  continue;
 			  }
@@ -2307,11 +2327,22 @@ namespace goals {
 				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
 				  if (evalT___it != EvalMapT.end())
 				  {
-				  	  std::cout << "New code! (T)" << std::endl;
+				  	  std::cout << "New code! (T1)" << std::endl;
 					  duetrelpair_t ret;
 					  ret = ((evalT___it->second.v))->alphaHatStar();
+					  // std::cout << "  Body value is: " << std::endl;
+					  // evalT___it->second.v->print(std::cout);
+					  // std::cout << std::endl;
+					  // std::cout << "  Linearized value is: " << std::endl;
+					  // ret->first->print(std::cout);
+					  // std::cout << std::endl;
+					  // std::cout << "  Star value is: " << std::endl;
+					  // ret->second->print(std::cout);
+					  // std::cout << std::endl;
+
 					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret->second));
-					  newStarValT.insert(std::make_pair(lookupKeyForevalTHash, ret->first));
+				  	  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(child);
+					  newStarValT.insert(std::make_pair(lookupKeyForStar, ret->first));
 					  todo.pop();
 					  continue;
 				  }
@@ -2410,11 +2441,18 @@ namespace goals {
 					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
 					  if (evalT___it != EvalMapT.end())
 					  {
+						  // std::cout << "This value appears inside a ProjectT:" << std::endl;
+						  // evalT___it->second.print(std::cout);
+						  // std::cout << std::endl;
 						  EXTERN_TYPES::sem_elem_wrapperRefPtr ret = EXTERNS::evalProjectSemElemT(e_ProjectT_1, e_ProjectT_2, evalT___it->second);
+						  // std::cout << "Evaluating ProjectT gave us:" << std::endl;
+						  // ret.print(std::cout);
+						  // std::cout << std::endl;
 						  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
 						  todo.pop();
 						  continue;
 					  }
+					  /*
 					 else if (CIR::isDotT(e_ProjectT_3).get_data())
 					  {
 						  RTG::regExpTRefPtr aDot = CIR::getLChildT(e_ProjectT_3);
@@ -2442,6 +2480,7 @@ namespace goals {
 							  }
 						  }
 					  }
+					  */
 					  todo.push(frame.left);
 					  continue;
 				  }
@@ -2492,11 +2531,21 @@ namespace goals {
 			  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
 			  if (frame.op == 0) //Kleene
 			  {
-			  	  std::cout << "New code! (T)" << std::endl;
+			  	  std::cout << "New code! (T2)" << std::endl;
 				  duetrelpair_t ret;
 				  ret = ((evalT___it->second.v))->alphaHatStar();
+				  // std::cout << "  Body value is: " << std::endl;
+				  // evalT___it->second.v->print(std::cout);
+				  // std::cout << std::endl;
+				  // std::cout << "  Linearized value is: " << std::endl;
+				  // ret->first->print(std::cout);
+				  // std::cout << std::endl;
+				  // std::cout << "  Star value is: " << std::endl;
+				  // ret->second->print(std::cout);
+				  // std::cout << std::endl;
 				  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret->second));
-				  newStarValT.insert(std::make_pair(lookupKeyForevalTHash, ret->first));
+				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(frame.e);
+				  newStarValT.insert(std::make_pair(lookupKeyForStar, ret->first));
 				  //ret = EXTERNS::evalKleeneSemElemT(lch);
 				  //EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
 				  todo.pop();
@@ -2507,7 +2556,13 @@ namespace goals {
 				  RTG::ProjectTRefPtr t_T_b1_scast__1 = static_cast<RTG::ProjectT*>(frame.e.get_ptr());
 				  BASETYPE::INT32 e_ProjectT_1 = t_T_b1_scast__1->Get_MS();
 				  BASETYPE::INT32 e_ProjectT_2 = t_T_b1_scast__1->Get_MT();
+				  // std::cout << "This value appears inside a ProjectT:" << std::endl;
+				  // lch.print(std::cout);
+				  // std::cout << std::endl;
 				  ret = EXTERNS::evalProjectSemElemT(e_ProjectT_1, e_ProjectT_2, lch);
+				  // std::cout << "Evaluating ProjectT gave us:" << std::endl;
+				  // ret.print(std::cout);
+				  // std::cout << std::endl;
 				  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
 				  todo.pop();
 				  continue;
@@ -3177,8 +3232,8 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 	int pV = 0;
 	tslRegExpTMap::iterator assignIt;
 	
-	EvalRMap oldStarVal;
-	EvalTMap oldStarValT;
+	StarMap oldStarVal;
+	StarMapT oldStarValT;
 	
 	newStarVal.clear();
 	newStarValT.clear();
@@ -3220,8 +3275,8 @@ NEWROUND:
 			
 			EXTERN_TYPES::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal);
 			
-			//std::cout << std::endl << "Result: ";
-			//newValue.v->print(std::cout);
+			std::cout << std::endl << "Tensored Value: ";
+			newValue.v->print(std::cout);
 			
 			EXTERN_TYPES::sem_elem_wrapperRefPtr rep = EXTERNS::detensorTranspose(newValue);
 			
@@ -3244,29 +3299,52 @@ NEWROUND:
 		EvalMap2.clear();
 		EvalMapT.clear();
 
+		// std::cout << "Beginning main-loop exit test:" << std::endl;
+		// std::cout << "Old untensored star keys are:" << std::endl;
+                // for(StarMap::const_iterator oldStar_it = oldStarVal.begin(); oldStar_it != oldStarVal.end(); ++oldStar_it)
+		// {
+		// 	std::cout << "  Hash Key: " << hash_value((*oldStar_it).first) << std::endl;
+		// 	//std::cout << (*oldStar_it).second << std::endl; // segfault!
+		// }
+		// std::cout << "New untensored star keys are:" << std::endl;
+                // for(StarMap::const_iterator newStar_it = newStarVal.begin(); newStar_it != newStarVal.end(); ++newStar_it)
+		// {
+		// 	std::cout << "  Hash Key: " << hash_value((*newStar_it).first) << std::endl;
+		// 	//std::cout << (*oldStar_it).second << std::endl; // segfault!
+		// }
+		// std::cout << "End of untensored map keys." << std::endl;
 		// Test to see whether all abstracted Kleene star bodies have converged
-		for(EvalRMap::const_iterator newStar_it = newStarVal.begin(); newStar_it != newStarVal.end(); ++newStar_it) 
+		for(StarMap::const_iterator newStar_it = newStarVal.begin(); newStar_it != newStarVal.end(); ++newStar_it) 
 		{
-			EvalRMap::const_iterator oldStarValue = oldStarVal.find(newStar_it->first);
+			// std::cout << "  Checking an untensored Kleene star." << std::endl;
+			StarMap::const_iterator oldStarValue = oldStarVal.find(newStar_it->first);
 			if (oldStarValue == oldStarVal.end()) {
 				// On the first round, we have no previous value to compare against
+				// std::cout << "    Nothing to compare against: continuing loop." << std::endl;
 				goto NEWROUND;
 			}
 			if (!newStar_it->second.v->Equivalent(oldStarValue->second.v)) {
+				// std::cout << "    Inequivalent: continuing loop." << std::endl;
 				goto NEWROUND;
 			}
+			// std::cout << "  Equivalent." << std::endl;
 		}
-		for(EvalTMap::const_iterator newStar_it = newStarValT.begin(); newStar_it != newStarValT.end(); ++newStar_it) 
+		for(StarMapT::const_iterator newStar_it = newStarValT.begin(); newStar_it != newStarValT.end(); ++newStar_it) 
 		{
-			EvalTMap::const_iterator oldStarValue = oldStarValT.find(newStar_it->first);
+			// std::cout << "  Checking a tensored Kleene star." << std::endl;
+			StarMapT::const_iterator oldStarValue = oldStarValT.find(newStar_it->first);
 			if (oldStarValue == oldStarValT.end()) {
 				// On the first round, we have no previous value to compare against
+				// std::cout << "    Nothing to compare against: continuing loop." << std::endl;
 				goto NEWROUND;
 			}
 			if (!newStar_it->second.v->Equivalent(oldStarValue->second.v)) {
+				// std::cout << "    Inequivalent: continuing loop." << std::endl;
 				goto NEWROUND;
 			}
+			// std::cout << "  Equivalent." << std::endl;
 		}
+		// std::cout << "  All stars are equivalent: exiting loop." << std::endl;
 		break; // Exit the Newton loop because all abstracted Kleene star bodies have converged
 	}
 		
@@ -3344,7 +3422,7 @@ NEWROUND:
   double run_newton(WFA& outfa, wali::Key entry_key, FWPDS * originalPds = NULL, bool canPrune = true)
   { 
     cout << "#################################################" << endl;
-    cout << "[Newton Compare] Goal VIII: end-to-end newton_merge_notensor_fwpds run" << endl;
+    //cout << "[Newton Compare] Goal VIII: end-to-end newton_merge_notensor_fwpds run" << endl;
 
 	nonRec = false;
 	pNonLin = false;
