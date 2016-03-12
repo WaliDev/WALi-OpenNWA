@@ -14,5 +14,4 @@ TSLRE_INCLUDE_PATH=Examples/cprover/libtslre/redist-tsl-sandbox
 
 /usr/bin/g++ -g -o _build64/Examples/cprover/NewtonOcaml -Wl,-rpath=/unsup/boost-1.55.0/amd64_rhel6/lib -Wl,-rpath=/home/turetsky/duet/_build/duet/src -Wl,-rpath=/home/turetsky/WALi-OpenNWA -Wl,-rpath=/home/turetsky/WALi-OpenNWA/lib64 -Wl,--start-group _build64/Examples/cprover/NewtonCompare.o -L/unsup/boost-1.55.0/amd64_rhel6/lib -Llib64 -L"`ocamlc -where`" -L/home/turetsky/duet/_build/duet/src -L/home/turetsky/WALi-OpenNWA -L$TSLRE_LIB_PATH -ltslre -lboost_filesystem -lboost_system -lboost_serialization -lrt -lduet -locamlinterface -lwali -lbpparser -lwalidomains -lglog -lbdd -Wl,--end-group || exit 1
 
-
-
+echo "Successful end of duet_build.sh"
