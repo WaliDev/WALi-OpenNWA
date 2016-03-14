@@ -46,6 +46,8 @@ env.Append(CPPPATH=[os.path.join(WaliDir , 'AddOns', 'Domains' , 'ThirdParty', '
 #env.Append(CPPPATH=[os.path.join(ThirdPartyDir, 'include')])
 env.Append(CPPPATH=[os.path.join(WaliDir , 'AddOns', 'Domains' , 'Source')])
 env.Append(CPPPATH=[glog_inc])
+# This line added by Jason Breck to get OCaml C headers (e.g., "caml/mlvalues.h") for DuetRel:
+env.Append(CPPPATH=[os.path.join(os.environ['HOME'],'include')])
 env.Append(LIBs=['camlrun'])
 
 if MkStatic:
