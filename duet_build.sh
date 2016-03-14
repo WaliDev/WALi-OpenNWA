@@ -6,7 +6,7 @@ TSLRE_INCLUDE_PATH=Examples/cprover/libtslre/redist-tsl-sandbox
 
 g++ -o newton_interface.os -c -Wall -g -O0 -Wextra -fdiagnostics-show-option -fPIC -DBOOST_NO_DEFAULTED_FUNCTIONS=1 -DCHECKED_LEVEL=1 -DEXPORT_GTR_SYMBOLS=0 -DPRATHMEHS_NWA_DETENSOR=0 -DREGEXP_TEST=1 -DTSL_DETENSOR=1 -D__TSL_REGEXP=1 -ISource -I/unsup/boost-1.55.0/amd64_rhel6/include -IAddOns/Domains/ThirdParty/include -IAddOns/Domains/Source -IThirdParty/include -I"`ocamlc -where`" Examples/cprover/NewtonOcamlInterface.cpp || exit 1
 
-g++ -o libocamlinterface.so -rdynamic -shared -Wl,-rpath=/unsup/boost-1.55.0/amd64_rhel6/lib -Wl,-rpath=$NEWTON_SANDBOX/OCamlTest newton_interface.os -L/unsup/boost-1.55.0/amd64_rhel6/lib -L$NEWTON_SANDBOX/OCamlTest -lboost_filesystem -lboost_system -lboost_serialization -lrt || exit 1
+g++ -o libocamlinterface.so -rdynamic -shared -Wl,-rpath=/unsup/boost-1.55.0/amd64_rhel6/lib -Wl,-rpath=/home/turetsky/OCamlTest newton_interface.os -L/unsup/boost-1.55.0/amd64_rhel6/lib -L/home/turetsky/OCamlTest -lboost_filesystem -lboost_system -lboost_serialization -lrt || exit 1
 
 g++ -o _build64/Examples/cprover/NewtonCompare.o -c -O0 -Wall -g -Wextra -Wformat=2 -Winit-self -Wfloat-equal -Wpointer-arith -Wcast-align -Wwrite-strings -Wconversion -Woverloaded-virtual -fdiagnostics-show-option -DBOOST_NO_DEFAULTED_FUNCTIONS=1 -DCHECKED_LEVEL=2 -DEXPORT_GTR_SYMBOLS=0 -DPRATHMEHS_NWA_DETENSOR=0 -DREGEXP_TEST=1 -DTSL_DETENSOR=1 -DUSE_DUET=1 -D_GLIBCXX_DEBUG=1 -D__TSL_REGEXP=1 -I$TSLRE_INCLUDE_PATH -ISource -I/unsup/boost-1.55.0/amd64_rhel6/include -IExamples/cprover -IAddOns/Domains/Source -IAddOns/Domains/ThirdParty/include -I"`ocamlc -where`" Examples/cprover/NewtonCompare.cpp || exit 1
 
