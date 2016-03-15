@@ -464,22 +464,34 @@ namespace goals {
 
 	EvalMap EvalMap0;
 
+	// typedef boost::unordered_map<
+	// 	MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr >,
+	// 	EXTERN_TYPES::sem_elem_wrapperRefPtr,
+	// 	boost::hash<MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr > >,
+	// 	std::equal_to<MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr > >,
+	// 	std::allocator<std::pair<const MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr>, EXTERN_TYPES::sem_elem_wrapperRefPtr> > >
 	typedef boost::unordered_map<
-		MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr >,
+		MemoCacheKey1<RTG::regExpRefPtr >,
 		EXTERN_TYPES::sem_elem_wrapperRefPtr,
-		boost::hash<MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr > >,
-		std::equal_to<MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr > >,
-		std::allocator<std::pair<const MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr>, EXTERN_TYPES::sem_elem_wrapperRefPtr> > >
+		boost::hash<MemoCacheKey1<RTG::regExpRefPtr > >,
+		std::equal_to<MemoCacheKey1<RTG::regExpRefPtr > >,
+		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, EXTERN_TYPES::sem_elem_wrapperRefPtr> > >
 		EvalRMap;
 
 	EvalRMap EvalMap2;
 
+	// typedef boost::unordered_map<
+	// 	MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr >,
+	// 	EXTERN_TYPES::sem_elem_wrapperRefPtr,
+	// 	boost::hash<MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr > >,
+	// 	std::equal_to<MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr > >,
+	// 	std::allocator<std::pair<const MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr >, EXTERN_TYPES::sem_elem_wrapperRefPtr> > >
 	typedef boost::unordered_map<
-		MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr >,
+		MemoCacheKey1<RTG::regExpTRefPtr >,
 		EXTERN_TYPES::sem_elem_wrapperRefPtr,
-		boost::hash<MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr > >,
-		std::equal_to<MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr > >,
-		std::allocator<std::pair<const MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr >, EXTERN_TYPES::sem_elem_wrapperRefPtr> > >
+		boost::hash<MemoCacheKey1<RTG::regExpTRefPtr > >,
+		std::equal_to<MemoCacheKey1<RTG::regExpTRefPtr > >,
+		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpTRefPtr >, EXTERN_TYPES::sem_elem_wrapperRefPtr> > >
 		EvalTMap;
 	
 	EvalTMap EvalMapT;
@@ -1660,7 +1672,9 @@ namespace goals {
 	  {
 		  dFrame & frame = todo.top();
 		  if (frame.is_new){ //See if we've seen this frame before
-			  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHash(frame.e, a); //See if we've evaluated this regexp already, if so, return evaluated value
+			  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHash(frame.e, a); //See if we've evaluated this regexp already, if so, return evaluated value
+			  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHash);
+			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHash(frame.e); //See if we've evaluated this regexp already, if so, return evaluated value
 			  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHash);
 			  if (evalRegExpFin___it != EvalMap2.end()) {
 				  todo.pop();
@@ -1674,7 +1688,9 @@ namespace goals {
 				  //Determine if the child has been seen before
 				  RTG::regExpRefPtr child = CIR::getLChild(frame.e);
 				  frame.left = child;
-				  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(child, a);
+				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(child, a);
+				  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
+				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashL(child);
 				  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
 				  if (evalRegExpFin___it != EvalMap2.end())
 				  {
@@ -1699,12 +1715,16 @@ namespace goals {
 				  //Determine if either child has been seen before
 				  frame.left = CIR::getLChild(frame.e);
 				  frame.right = CIR::getRChild(frame.e);
-				  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(frame.left, a);
+				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(frame.left, a);
+				  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
+				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashL(frame.left);
 				  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
 				  if (evalRegExpFin___it != EvalMap2.end()) //The left child has been evaluated before
 				  {
 					  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExpFin___it->second;
-					  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
+					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
+					  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
+					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashR(frame.right);
 					  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
 					  if (evalRegExpFin___it != EvalMap2.end()) //The right child has been evaluated before
 					  {
@@ -1725,7 +1745,9 @@ namespace goals {
 				  else
 				  {
 					  todo.push(dFrame(frame.left)); //Push the unevaluated left expression onto the stack
-					  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
+					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
+					  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
+					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashR(frame.right);
 					  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
 					  if (evalRegExpFin___it == EvalMap2.end())
 					  {
@@ -1741,12 +1763,16 @@ namespace goals {
 				  //Determine if either child has been seen before
 				  frame.left = CIR::getLChild(frame.e);
 				  frame.right = CIR::getRChild(frame.e);
-				  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(frame.left, a);
+				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(frame.left, a);
+				  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
+				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashL(frame.left);
 				  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
 				  if (evalRegExpFin___it != EvalMap2.end()) //The left child has been evaluated before
 				  {
 					  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExpFin___it->second;
-					  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
+					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
+					  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
+					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashR(frame.right);
 					  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
 					  if (evalRegExpFin___it != EvalMap2.end()) //The right child has been evaluated before
 					  {
@@ -1768,7 +1794,9 @@ namespace goals {
 				  else
 				  {
 					  todo.push(dFrame(frame.left)); //Push the unevaluated left expression onto the stack
-					  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
+					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
+					  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
+					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashR(frame.right);
 					  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
 					  if (evalRegExpFin___it == EvalMap2.end())
 					  {
@@ -1788,7 +1816,9 @@ namespace goals {
 				  RTG::regExpRefPtr e_Project_3 = t_T_c1_scast__1->Get_child();
 				  frame.left = e_Project_3;
 				  //if the child has been evaluated before
-				  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(frame.left, a);
+				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(frame.left, a);
+				  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
+				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashL(frame.left);
 				  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
 				  if (evalRegExpFin___it != EvalMap2.end())
 				  {
@@ -1842,8 +1872,11 @@ namespace goals {
 			  //Look up the children's evaluated values
 			  //Determine the op code
 			  //Call the appropriate evaluattion function depending on frame.op
-			  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHash(frame.e, a);
-			  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(frame.left, a);
+			  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHash(frame.e, a);
+			  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(frame.left, a);
+			  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
+			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHash(frame.e);
+			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashL(frame.left);
 			  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
 			  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExpFin___it->second;
 			  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
@@ -1866,7 +1899,10 @@ namespace goals {
 			  }
 			  else //Dot or Plus
 			  {
-				  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
+				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
+				  // //frame.right->print(std::cout) << std::endl;
+				  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
+				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashR(frame.right);
 				  //frame.right->print(std::cout) << std::endl;
 				  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
 
@@ -1891,7 +1927,8 @@ namespace goals {
 	  }
 
 	  //This will start with a lookup on the hash_map for exp, which has been evaluated in the loop above, so will not re-evaluate using evalRegExpFin
-	  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > fin(exp, a);
+	  //MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > fin(exp, a);
+	  MemoCacheKey1<RTG::regExpRefPtr > fin(exp);
 	  
 	  return EvalMap2[fin];
   }
@@ -1921,7 +1958,9 @@ namespace goals {
 		  //Determine if this frame has been seen before
 		  if (frame.is_new){
 			  //The frame has not been seen before, but frame.e may be pointing to a regexp that's been previously evaluated.  If so, return that result
-			  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHash(frame.e, a);
+			  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHash(frame.e, a);
+			  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHash);
+			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHash(frame.e);
 			  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHash);
 			  if (evalRegExp___it != EvalMap2.end()) {
 				  todo.pop();
@@ -1935,7 +1974,9 @@ namespace goals {
 				  frame.op = 0;
 				  RTG::regExpRefPtr child = CIR::getLChild(frame.e);
 				  frame.left = child;
-				  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashL(child, a);
+				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashL(child, a);
+				  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
+				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashL(child);
 				  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
 				  if (evalRegExp___it != EvalMap2.end())
 				  {
@@ -1964,12 +2005,16 @@ namespace goals {
 				  frame.op = 1;
 				  frame.left = CIR::getLChild(frame.e);
 				  frame.right = CIR::getRChild(frame.e);
-				  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashL(frame.left, a);
+				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashL(frame.left, a);
+				  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
+				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashL(frame.left);
 				  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
 				  if (evalRegExp___it != EvalMap2.end())
 				  {
 					  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExp___it->second;
-					  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
+					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
+					  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
+					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashR(frame.right);
 					  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
 					  if (evalRegExp___it != EvalMap2.end())
 					  {
@@ -1989,7 +2034,9 @@ namespace goals {
 				  else
 				  {
 					  todo.push(dFrame(frame.left));
-					  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
+					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
+					  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
+					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashR(frame.right);
 					  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
 					  if (evalRegExp___it == EvalMap2.end())
 					  {
@@ -2003,12 +2050,16 @@ namespace goals {
 				  frame.op = 2;
 				  frame.left = CIR::getLChild(frame.e);
 				  frame.right = CIR::getRChild(frame.e);
-				  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashL(frame.left, a);
+				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashL(frame.left, a);
+				  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
+				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashL(frame.left);
 				  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
 				  if (evalRegExp___it != EvalMap2.end())
 				  {
 					  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExp___it->second;
-					  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
+					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
+					  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
+					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashR(frame.right);
 					  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
 					  if (evalRegExp___it != EvalMap2.end())
 					  {
@@ -2028,7 +2079,9 @@ namespace goals {
 				  else
 				  {
 					  todo.push(dFrame(frame.left));
-					  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
+					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
+					  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
+					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashR(frame.right);
 					  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
 					  if (evalRegExp___it == EvalMap2.end())
 					  {
@@ -2081,8 +2134,11 @@ namespace goals {
 		  {
 			  //This frame has been seen before, so it's children have all previously been evaluated.  So lookup the children in the hashtable and evaluate
 			  //frame.e as appropriate based on what type of operation it is (determined in frame.op)
-			  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHash(frame.e, a);
-			  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashL(frame.left, a);
+			  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHash(frame.e, a);
+			  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashL(frame.left, a);
+			  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
+			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHash(frame.e);
+			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashL(frame.left);
 			  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
 			  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExp___it->second;
 			  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
@@ -2113,7 +2169,10 @@ namespace goals {
 			  }
 			  else
 			  {
-				  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
+				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
+				  // //frame.right->print(std::cout) << std::endl;
+				  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
+				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashR(frame.right);
 				  //frame.right->print(std::cout) << std::endl;
 				  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
 
@@ -2137,7 +2196,8 @@ namespace goals {
 		  }
 	  }
 
-	  MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > fin(exp, a);
+	  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > fin(exp, a);
+	  MemoCacheKey1<RTG::regExpRefPtr > fin(exp);
 
 	  //This will start with a lookup on the hash_map for exp, which has been evaluated in the loop above, so will not re-evaluate using evalRegExp
 	  return EvalMap2[fin];
@@ -2309,7 +2369,9 @@ namespace goals {
 		  sFrame & frame = todo.top();
 		  if (frame.is_new){  //Determine if this is the first time looking at this frame
 			  //Check frame.e see if it's been evaluated before.
-			  MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHash(frame.e, a);
+			  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHash(frame.e, a);
+			  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHash);
+			  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHash(frame.e);
 			  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHash);
 			  if (evalT___it != EvalMapT.end()) {
 				  todo.pop();
@@ -2323,7 +2385,9 @@ namespace goals {
 				  frame.op = 0;
 				  RTG::regExpTRefPtr child = CIR::getLChildT(frame.e);
 				  frame.left = child;
-				  MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(child, a);
+				  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(child, a);
+				  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(child);
 				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
 				  if (evalT___it != EvalMapT.end())
 				  {
@@ -2357,12 +2421,16 @@ namespace goals {
 				  frame.op = 1;
 				  frame.left = CIR::getLChildT(frame.e);
 				  frame.right = CIR::getRChildT(frame.e);
-				  MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
+				  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
+				  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(frame.left);
 				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
 				  if (evalT___it != EvalMapT.end())
 				  {
 					  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalT___it->second;
-					  MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
+					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
+					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
 					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
 					  if (evalT___it != EvalMapT.end())
 					  {
@@ -2382,7 +2450,9 @@ namespace goals {
 				  else
 				  {
 					  todo.push(sFrame(frame.left));
-					  MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
+					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
+					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
 					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
 					  if (evalT___it == EvalMapT.end())
 					  {
@@ -2396,12 +2466,16 @@ namespace goals {
 				  frame.op = 2;
 				  frame.left = CIR::getLChildT(frame.e);
 				  frame.right = CIR::getRChildT(frame.e);
-				  MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
+				  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
+				  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(frame.left);
 				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
 				  if (evalT___it != EvalMapT.end())
 				  {
 					  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalT___it->second;
-					  MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
+					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
+					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
 					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
 					  if (evalT___it != EvalMapT.end())
 					  {
@@ -2421,7 +2495,9 @@ namespace goals {
 				  else
 				  {
 					  todo.push(sFrame(frame.left));
-					  MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
+					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
+					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
 					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
 					  if (evalT___it == EvalMapT.end())
 					  {
@@ -2437,7 +2513,9 @@ namespace goals {
 					  BASETYPE::INT32 e_ProjectT_1 = t_T_b1_scast__1->Get_MS();
 					  BASETYPE::INT32 e_ProjectT_2 = t_T_b1_scast__1->Get_MT();
 					  frame.left = e_ProjectT_3;
-					  MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
+					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
+					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(frame.left);
 					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
 					  if (evalT___it != EvalMapT.end())
 					  {
@@ -2524,8 +2602,11 @@ namespace goals {
 		  else  //We've seen this stack frame before
 		  {
 			  //All the children of frame.e have been evaluated, so evaluate frame.e as appropriate
-			  MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHash(frame.e, a);
-			  MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
+			  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHash(frame.e, a);
+			  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
+			  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+			  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHash(frame.e);
+			  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(frame.left);
 			  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
 			  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalT___it->second;
 			  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
@@ -2544,7 +2625,7 @@ namespace goals {
 				  // ret->second->print(std::cout);
 				  // std::cout << std::endl;
 				  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret->second));
-				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(frame.e);
+				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(frame.e); // FIXME this variable is now redundant with lookupKeyForevalTHash
 				  newStarValT.insert(std::make_pair(lookupKeyForStar, ret->first));
 				  //ret = EXTERNS::evalKleeneSemElemT(lch);
 				  //EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
@@ -2569,7 +2650,10 @@ namespace goals {
 			  }
 			  else //Dot or Plust
 			  {
-				  MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
+				  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
+				  // //frame.right->print(std::cout) << std::endl;
+				  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
 				  //frame.right->print(std::cout) << std::endl;
 				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
 
@@ -2593,7 +2677,8 @@ namespace goals {
 		  }
 	  }
 
-	  MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > fin(exp, a);
+	  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > fin(exp, a);
+	  MemoCacheKey1<RTG::regExpTRefPtr > fin(exp);
 	  return EvalMapT[fin];  //Grabs exp evaluated at assignment a from the hash_map
   }
 
