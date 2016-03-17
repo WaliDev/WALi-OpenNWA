@@ -14,11 +14,18 @@
 #                    BplToPds.cpp
 # Its output is:
 #   lib64/libbpparser.so
-flex -t Examples/cprover/bp_scanner.l > _build64/Examples/cprover/bp_scanner.c || exit 1
+if [ ! -d "_build64/Examples/cprover" ]; then
+    mkdir -p _build64/Examples/cprover
+fi
+#bison --defines -o _build64/Examples/cprover/bp_parser.tab.c Examples/cprover/bp_parser.y -d || exit 1
+bison --defines -o _build64/Examples/cprover/bp_parser.c Examples/cprover/bp_parser.y -d || exit 1
+
+#cp Examples/cprover/bp_scanner.l _build64/Examples/cprover/
+flex -t _build64/Examples/cprover/bp_scanner.l > _build64/Examples/cprover/bp_scanner.c || exit 1
+
 
 /usr/bin/gcc -o _build64/Examples/cprover/bp_scanner.os -c -Wall -g -Wextra -fdiagnostics-show-option -fPIC -DBOOST_NO_DEFAULTED_FUNCTIONS=1 -DCHECKED_LEVEL=2 -DEXPORT_GTR_SYMBOLS=0 -DPRATHMEHS_NWA_DETENSOR=0 -DREGEXP_TEST=1 -DTSL_DETENSOR=1 -D_GLIBCXX_DEBUG=1 -D__TSL_REGEXP=1 -I/home/tsl-sandbox -ISource -I/unsup/boost-1.55.0/amd64_rhel6/include -IExamples/cprover -IAddOns/Domains/Source -IAddOns/Domains/ThirdParty/include _build64/Examples/cprover/bp_scanner.c || exit 1
 
-bison --defines -o _build64/Examples/cprover/bp_parser.c Examples/cprover/bp_parser.y || exit 1
 
 /usr/bin/gcc -o _build64/Examples/cprover/bp_parser.os -c -Wall -g -Wextra -fdiagnostics-show-option -fPIC -DBOOST_NO_DEFAULTED_FUNCTIONS=1 -DCHECKED_LEVEL=2 -DEXPORT_GTR_SYMBOLS=0 -DPRATHMEHS_NWA_DETENSOR=0 -DREGEXP_TEST=1 -DTSL_DETENSOR=1 -D_GLIBCXX_DEBUG=1 -D__TSL_REGEXP=1 -I/home/tsl-sandbox -ISource -I/unsup/boost-1.55.0/amd64_rhel6/include -IExamples/cprover -IAddOns/Domains/Source -IAddOns/Domains/ThirdParty/include _build64/Examples/cprover/bp_parser.c || exit 1
 

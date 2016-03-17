@@ -13,6 +13,9 @@ if [ "x$NEWTON_DUET_ROOT" == "x" ]; then
         exit 1
     fi
 fi
+if [ ! -d "_build64/Examples/cprover" ]; then
+    mkdir -p _build64/Examples/cprover
+fi
 
 scons addons || exit 1
 
