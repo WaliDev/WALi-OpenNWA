@@ -14,13 +14,13 @@
 #                    BplToPds.cpp
 # Its output is:
 #   lib64/libbpparser.so
+scons addons
 if [ ! -d "_build64/Examples/cprover" ]; then
     mkdir -p _build64/Examples/cprover
 fi
-#bison --defines -o _build64/Examples/cprover/bp_parser.tab.c Examples/cprover/bp_parser.y -d || exit 1
 bison --defines -o _build64/Examples/cprover/bp_parser.c Examples/cprover/bp_parser.y -d || exit 1
 
-#cp Examples/cprover/bp_scanner.l _build64/Examples/cprover/
+cp Examples/cprover/bp_scanner.l _build64/Examples/cprover/
 flex -t _build64/Examples/cprover/bp_scanner.l > _build64/Examples/cprover/bp_scanner.c || exit 1
 
 
