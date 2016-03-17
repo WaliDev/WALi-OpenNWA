@@ -328,7 +328,7 @@ wali::sem_elem_t DuetRel::star()
 duetrelpair_t DuetRel::alphaHatStar()
 {
   CAMLparam0();
-  CAMLlocal5(dval, temp, lin_formula, lin_formula_qelme, star_formula);
+  CAMLlocal4(dval, temp, hull, star_formula);
 
   dval = this->getValue();
   duetrel_t d1, d2;
@@ -339,30 +339,22 @@ duetrelpair_t DuetRel::alphaHatStar()
     value * star_func = caml_named_value("tensor_linearize_star_callback");
     temp = caml_callback(*star_func, dval); 
 
-    // Decompose temp into lin_formula and star_formula
-    value * fst_func = caml_named_value("fst_callback");
-    lin_formula = caml_callback(*fst_func, temp);
-    // We call a quantifier elimination procedure on the linearized formula
-    //   in preparation for later calling to DuetRel::Equivalent.
-    value * qelme_func = caml_named_value("tensorQELME_callback");
-    lin_formula_qelme = caml_callback(*qelme_func, lin_formula);
+    // Decompose temp into hull and star_formula
+    value * ls_hull_func = caml_named_value("ls_hull_callback");
+    hull = caml_callback(*ls_hull_func, temp);
   } else {
     value * star_func = caml_named_value("linearize_star_callback");
     temp = caml_callback(*star_func, dval); 
 
-    // Decompose temp into lin_formula and star_formula
-    value * fst_func = caml_named_value("fst_callback");
-    lin_formula = caml_callback(*fst_func, temp);
-    // We call a quantifier elimination procedure on the linearized formula
-    //   in preparation for later calling to DuetRel::Equivalent.
-    value * qelme_func = caml_named_value("QELME_callback");
-    lin_formula_qelme = caml_callback(*qelme_func, lin_formula);
+    // Decompose temp into hull and star_formula
+    value * ls_hull_func = caml_named_value("ls_hull_callback");
+    hull = caml_callback(*ls_hull_func, temp);
   }
   
-  value * snd_func = caml_named_value("snd_callback");
-  star_formula = caml_callback(*snd_func, temp);
+  value * ls_star_func = caml_named_value("ls_star_callback");
+  star_formula = caml_callback(*ls_star_func, temp);
 
-  d1 = MkDuetRel(lin_formula_qelme, isTensored);
+  d1 = MkDuetRel(hull, isTensored);
   d2 = MkDuetRel(star_formula, isTensored);
   d = DuetRelPair::MkDuetRelPair(d1, d2);
   
@@ -383,10 +375,10 @@ bool DuetRel::Equivalent(duetrel_t that) const
   dval1 = that->getValue();
   
   if (isTensored) {
-    value * eq_func = caml_named_value("tensorEquiv_callback");
+    value * eq_func = caml_named_value("tensor_hull_equiv_callback");
     retVal = caml_callback2(*eq_func, dval0, dval1);
   } else {
-    value * eq_func = caml_named_value("equiv_callback");
+    value * eq_func = caml_named_value("hull_equiv_callback");
     retVal = caml_callback2(*eq_func, dval0, dval1);
   }
   // WARNING: The following print code causes segfaults.
