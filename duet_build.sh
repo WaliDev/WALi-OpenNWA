@@ -6,11 +6,14 @@ if [ "x$WALI_ROOT" == "x" ]; then
     WALI_ROOT=.
 fi
 if [ "x$NEWTON_DUET_ROOT" == "x" ]; then
-    NEWTON_DUET_ROOT=/home/turetsky/duet
-    if [ ! -d "$NEWTON_DUET_ROOT" ]; then
-        echo "Please set NEWTON_DUET_ROOT to the base directory of Duet."
-        echo "  (We must link against NEWTON_DUET_ROOT/_build/duet/src/libduet.so)"
-        exit 1
+    NEWTON_DUET_ROOT=../duet
+    if [ ! -d "$NEWTON_DUET_ROOT/duet/src" ]; then
+        NEWTON_DUET_ROOT=./duet
+        if [ ! -d "$NEWTON_DUET_ROOT/duet/src" ]; then
+            echo "Please set NEWTON_DUET_ROOT to the base directory of Duet."
+            echo "  (We must link against NEWTON_DUET_ROOT/_build/duet/src/libduet.so)"
+            exit 1
+        fi
     fi
 fi
 if [ ! -d "_build64/Examples/cprover" ]; then
