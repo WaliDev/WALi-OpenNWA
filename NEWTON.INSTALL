@@ -5,6 +5,12 @@ to run it on a different platform, you will need to arrange for a non-Linux
 version of the "libtslre" library to be created.  (Alternatively, you could
 substitute a full installation of TSL.)
 
+Currently, we have dependencies on:
+
+  flex
+  bison
+  boost (tested with version 1.55)
+
 You will need to clone three repositories:
 
   WALi-OpenNWA
@@ -59,17 +65,29 @@ proceed to build the WALi side of Newton-Duet.
 To build the WALi side:
 
 First (this is a temporary measure) you need to manually download a binary
- for one of WALi's dependencies.  Go to your WALi-OpenNWA directory and run:
+for one of WALi's dependencies.  Go to your WALi-OpenNWA directory and run:
 
  curl http://pages.cs.wisc.edu/~jbreck/xerces-c-3.1.1-x86_64-linux-gcc-3.4.tar.gz -o AddOns/Parse/ThirdParty/xerces-c-3.1.1-x86_64-linux-gcc-3.4.tar.gz
 
  (You would need a different file if you were on a non-Linux platform.)
 
+For the next command, you'll need to have flex and bison installed, so
+please install flex and bison now.
+
 The next step is to run:
 
  ./rebuild_parser.sh
 
-If that step is successful, you can run:
+If you receive errors related to boost, you may need to change the path to the
+boost headers found in:
+
+  SConstruct
+  rebuild_parser.sh
+  duet_build.sh
+
+  (Please report this error to jbreck@cs.wisc.edu if you encounter it.)
+
+After successfully completing "rebuild_parser.sh", you can run:
 
  ./duet_build.sh
 
