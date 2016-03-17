@@ -1,0 +1,87 @@
+These instructions describe the installation of Newton-Duet.
+
+First, please note that Newton-Duet has only been set up on Linux; if you need
+to run it on a different platform, you will need to arrange for a non-Linux
+version of the "libtslre" library to be created.  (Alternatively, you could
+substitute a full installation of TSL.)
+
+You will need to clone three repositories:
+
+  WALi-OpenNWA
+    https://github.com/WaliDev/WALi-OpenNWA.git
+    You need the "NewtonDuet" branch
+
+  duet (the Newton branch)
+    https://github.com/zkincaid/duet.git
+    You need the "Newton" branch
+
+  libtslre
+    https://github.com/Grammatech/libtslre.git
+
+We recommend that you position the Duet directory as either a sibling of the 
+WALi-OpenNWA directory, or a child of the WALi-OpenNWA directory, so that
+it is either located at "../duet" or "./duet" relative to WALi-OpenNWA.
+(If it is at a different location, you'll need to set up an environment
+variable, NEWTON_DUET_ROOT to point to your duet directory.)
+
+The libtslre directory must be in a particular position, at:
+  "Examples/cprover/libtslre" under your WALi-OpenNWA directory.
+
+That is, you should clone that repository with a command like:
+  cd WALi-OpenNWA/Examples/cprover
+  git clone https://github.com/Grammatech/libtslre.git
+
+In addition to the instructions for building Duet, we place one additional
+constraint on your OCaml installation: You need an OCaml compiler with the
+"PIC" option, which allows it to produce shared libraries.  This can be
+accomplished with a command like:
+
+  opam switch 4.02.1+PIC  (or similar, for some different version number)
+
+This command must be executed before running the installation steps for
+Duet, so that Duet's required packages are installed for this compiler.
+
+After that step, you are ready to set up Duet, but note that Duet will not
+compile cleanly-- you should expect to see an error referring to
+"caml_startup".  This is not a problem.  If that is the only error that you
+receive, you should nevertheless be able to successfully run the script called
+"make_libduet.sh" in the root directory of Duet, which produces a shared
+library file, "_build/duet/src/libduet.so".  (At this point, please follow
+the installation instructions found in Duet's README file.  Then, try 
+running "make_libduet.sh".)
+
+
+Once you've completed the setup of duet and run "make_libduet.sh", and
+you've cloned the "libtslre" repository in the place described above, you can 
+proceed to build the WALi side of Newton-Duet.
+
+
+To build the WALi side:
+
+First (this is a temporary measure) you need to manually download a binary
+ for one of WALi's dependencies.  Go to your WALi-OpenNWA directory and run:
+
+ curl http://pages.cs.wisc.edu/~jbreck/xerces-c-3.1.1-x86_64-linux-gcc-3.4.tar.gz -o AddOns/Parse/ThirdParty/xerces-c-3.1.1-x86_64-linux-gcc-3.4.tar.gz
+
+ (You would need a different file if you were on a non-Linux platform.)
+
+The next step is to run:
+
+ ./rebuild_parser.sh
+
+If that step is successful, you can run:
+
+ ./duet_build.sh
+
+(Note that this last step is the only one that you will usually need to re-run
+after making a modification to the Newton-Duet source code.)
+
+
+If that step is successful, you are ready to run Newton-Duet.
+
+You can try a command like:
+
+ _build64/Examples/cprover/NewtonOcaml -cra_newton_basic
+ Examples/cprover/tests/sas03_bothbranches.c
+
+More input programs are stored in "Examples/cprover/tests".
