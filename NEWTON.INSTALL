@@ -85,7 +85,7 @@ boost headers found in:
   rebuild_parser.sh
   duet_build.sh
 
-  (Please report this error to jbreck@cs.wisc.edu if you encounter it.)
+  (Please report such errors to jbreck@cs.wisc.edu if you encounter them.)
 
 After successfully completing "rebuild_parser.sh", you can run:
 
