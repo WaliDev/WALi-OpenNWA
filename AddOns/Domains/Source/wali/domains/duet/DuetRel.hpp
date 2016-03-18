@@ -141,6 +141,7 @@ namespace wali
           // Printing functions
           //static void printHandler(FILE *o, int var);
           int relId;
+          static bool simplify;
         protected:
 	  bool isTensored;
           static int wCnt;

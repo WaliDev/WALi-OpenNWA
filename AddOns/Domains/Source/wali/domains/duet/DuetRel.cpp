@@ -94,6 +94,7 @@ namespace wali{
 
 
 int DuetRel::wCnt = 0;
+bool DuetRel::simplify = false;
 value DuetRel::caml_weights[MAX_WEIGHT_COUNT];
 // ////////////////////////////
 
@@ -149,17 +150,27 @@ duetrel_t DuetRel::Compose( duetrel_t that ) const
   duetrel_t d;
 
   if (!isTensored){  
-  value * com_func = caml_named_value("compose_callback");
-  retval = caml_callback2(*com_func, dval0, dval1);
+    value * com_func = caml_named_value("compose_callback");
+    retval = caml_callback2(*com_func, dval0, dval1);
+    
+    if (simplify) {
+      value * simp_func = caml_named_value("simplify_callback");
+      retval = caml_callback(*simp_func, retval);
+    }
 
-  d = MkDuetRel(retval);
+    d = MkDuetRel(retval);
   }
   else
   {
-  value * com_func = caml_named_value("tensorCompose_callback");
-  retval = caml_callback2(*com_func, dval0, dval1);
+    value * com_func = caml_named_value("tensorCompose_callback");
+    retval = caml_callback2(*com_func, dval0, dval1);
+   
+    if (simplify) {
+      value * simp_func = caml_named_value("tensorSimplify_callback");
+      retval = caml_callback(*simp_func, retval);
+    }
 
-  d = MkDuetRel(retval, true);
+    d = MkDuetRel(retval, true);
   }
   CAMLreturnT(duetrel_t,d);
 }
@@ -173,18 +184,29 @@ duetrel_t DuetRel::Union( duetrel_t that ) const
   dval1 = that->getValue();
   duetrel_t d;  
 
-  if (!isTensored){
-  value * union_func = caml_named_value("union_callback");
-  retval = caml_callback2(*union_func, dval0, dval1);
 
-  d = MkDuetRel(retval);
+  if (!isTensored){
+    value * union_func = caml_named_value("union_callback");
+    retval = caml_callback2(*union_func, dval0, dval1);
+   
+    if (simplify) {
+      value * simp_func = caml_named_value("simplify_callback");
+      retval = caml_callback(*simp_func, retval);
+    }
+
+    d = MkDuetRel(retval);
   }
   else
   {
-  value * union_func = caml_named_value("tensorUnion_callback");
-  retval = caml_callback2(*union_func, dval0, dval1);
+    value * union_func = caml_named_value("tensorUnion_callback");
+    retval = caml_callback2(*union_func, dval0, dval1);
 
-  d = MkDuetRel(retval, true);
+    if (simplify) {
+      value * simp_func = caml_named_value("tensorSimplify_callback");
+      retval = caml_callback(*simp_func, retval);
+    }
+ 
+    d = MkDuetRel(retval, true);
   }
   CAMLreturnT(duetrel_t,d);
 }

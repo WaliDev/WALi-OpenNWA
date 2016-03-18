@@ -42,6 +42,7 @@ typedef CBTI BASETYPE;
 #include <fstream>
 #include <ctime>
 #include <stack>
+#include <getopt.h>
 // ::wali
 #include "wali/KeySpace.hpp"
 #include "wali/Key.hpp"
@@ -4569,9 +4570,9 @@ void * work(void *)
 
 #ifdef USE_DUET
 
-int runBasicNewtonFromBelow(char **argv)
+int runBasicNewtonFromBelow(char **args)
 {
-    caml_startup(argv);
+    caml_startup(args);
     FWPDS * pds = new FWPDS();
 
     for (std::vector<caml_rule>::iterator it = ruleHolder.begin(); it != ruleHolder.end(); it++)
@@ -4634,31 +4635,68 @@ int runBasicNewtonFromBelow(char **argv)
     return 0;
 }	
 
+void printUsageInstr() {
+	std::cout << "Error: Incorrect Usage!" << std::endl;
+	std::cout << "Correct usage: TBD" << std::endl;
+}
 
 int main(int argc, char **argv)
 {
-    if (argc < 3) {
-        std::cerr << "Error: Incorrect usage!" << std::endl;
+    int runningMode = 0;
+    static struct option long_options[] = {
+        {"cra_newton_basic", no_argument,       &runningMode,  1  },
+        {"cra_newton_star",  no_argument,       &runningMode,  2  },
+        {"cra_newton_above", no_argument,       &runningMode,  3  },
+        {"simplify",         no_argument,       0,            's' },
+        {"dump",             no_argument,       0,            'd' },
+        {"verbosity",        required_argument, 0,            'v' },
+        {0,                  0,                 0,             0  }
+    };
+
+    int long_index = 0, opt = 0;	
+    while ((opt = getopt_long_only(argc, argv,"sdv:", 
+                   long_options, &long_index )) != -1) {
+    	switch (opt) {
+			case 0:
+				break;
+    		case 's':
+    			DuetRel::simplify = true;
+    			break;
+    		case 'd':
+    			dump = true;
+    			break;
+    		default:
+    			printUsageInstr();
+    			return -1;
+    	}	
     }
+
+    if (runningMode == 0) {
+        std::cerr << "running mode not set!" << std::endl;
+		printUsageInstr();
+    }
+    else if (optind == argc) {
+        printUsageInstr();
+    }
+	
     else {
-    	stringstream ss;
-    	ss << argv[1];
-    	string runningMode = ss.str();
-    	if (runningMode == "-cra_newton_basic") {
-    	    runBasicNewtonFromBelow(argv);
+    	if (runningMode == 1) {
+			char **ocamlArgs = new char *[4];
+			ocamlArgs[0] = argv[0];
+			ocamlArgs[1] = "-cra_newton_basic";
+			ocamlArgs[2] = argv[optind];
+			ocamlArgs[3] = 0;
+    	    runBasicNewtonFromBelow(ocamlArgs);
     	}
-    	else if (runningMode == "-cra_newton_star") {
+    	else if (runningMode == 2) {
     	    std::cout << "Newton from below, with equivalence checks extracted from Kleene stars" << std::endl;
     	    std::cout << "Not implemented yet." << std::endl;
     	}
-    	else if (runningMode == "-cra_newton_above") {
+    	else if (runningMode == 3) {
     	    std::cout << "Newton from above." << std::endl;
     	    std::cout << "Not implemented yet." << std::endl;
     	}
-    	else {
-    	    std::cerr << "Error: invalid mode!" << std::endl;
-    	}
-    }    
+    }   
 }
 
 
