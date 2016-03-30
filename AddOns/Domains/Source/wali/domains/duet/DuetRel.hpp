@@ -105,6 +105,7 @@ namespace wali
           bool equal(SemElem* se) const;
 
           std::ostream& print( std::ostream& o ) const;
+          std::ostream& printIndented( std::ostream& o, unsigned int indent ) const;
 
           // ////////////////////////////////
           // SemElemTensor methods
@@ -142,6 +143,7 @@ namespace wali
           //static void printHandler(FILE *o, int var);
           int relId;
           static bool simplify;
+          static bool simplifyOnPrint;
         protected:
 	  bool isTensored;
           static int wCnt;

@@ -13,6 +13,7 @@
 //
 ////// Jason Breck added the following lines (up to //////////////////////////)
 typedef CBTI BASETYPE;
+#include "tsl/analysis_components/src/utils/prettyprint/RegExpPrettyPrint.hpp"
 /////////////////////////////////////////
 // ::wali::wpds::fwpds
 #include "wali/wpds/fwpds/FWPDS.hpp"
@@ -2807,6 +2808,13 @@ namespace goals {
                                // Look up the appropriate regexp for reID and evaluate at 0
 				  RTG::regExpRefPtr r = regExpMap[reID];
 				  EXTERN_TYPES::sem_elem_wrapperRefPtr newVal = evalNonRecAt0(r);
+                  std::cout << "***Output with evalNonRecAt0:" << std::endl;
+			      newVal.v->print(std::cout);
+                  std::cout << std::endl;
+				  EXTERN_TYPES::sem_elem_wrapperRefPtr temp = CIR::evalRegExpAt0(r);
+                  std::cout << "***Output with evalRegExpAt0:" << std::endl;
+      			  temp.v->print(std::cout);
+                  std::cout << std::endl;
 				  d = CIR::mkTensorTranspose(RTG::One::make(), RTG::Weight::make(newVal));
 			  }
 		  }
@@ -3356,7 +3364,8 @@ NEWROUND:
 			//v = Tdetensor(evalT(Mmap[p],oldVal))
 			
 			std::cout << "Eval: " << assignIt->first << std::endl;
-			assignIt->second.print(std::cout);
+			//assignIt->second.print(std::cout);
+            tsl_regexp::regExpTPrettyPrint(assignIt->second, std::cout);
 			std::cout << std::endl;
 			
 			EXTERN_TYPES::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal);
@@ -3668,6 +3677,7 @@ NEWROUND:
 				if (tmpReg != NULL)
 				{
 					diffMap[(*eit)] = regExpMap[(*eit)];
+                    tsl_regexp::regExpPrettyPrint(tmpReg, std::cout);
 				}
 			//  std::cout << "RE: " << *eit;
 			//  std::cout << " ";
@@ -4648,6 +4658,7 @@ int main(int argc, char **argv)
         {"cra_newton_star",  no_argument,       &runningMode,  2  },
         {"cra_newton_above", no_argument,       &runningMode,  3  },
         {"simplify",         no_argument,       0,            's' },
+        {"no_simplify_on_print",no_argument,    0,            'P' },
         {"dump",             no_argument,       0,            'd' },
         {"verbosity",        required_argument, 0,            'v' },
         {0,                  0,                 0,             0  }
@@ -4659,6 +4670,9 @@ int main(int argc, char **argv)
     	switch (opt) {
 			case 0:
 				break;
+    		case 'P':
+    			DuetRel::simplifyOnPrint = false;
+    			break;
     		case 's':
     			DuetRel::simplify = true;
     			break;

@@ -95,6 +95,7 @@ namespace wali{
 
 int DuetRel::wCnt = 0;
 bool DuetRel::simplify = false;
+bool DuetRel::simplifyOnPrint = true;
 value DuetRel::caml_weights[MAX_WEIGHT_COUNT];
 // ////////////////////////////
 
@@ -556,6 +557,11 @@ duetrel_t DuetRel::getTensorOne()
 
 std::ostream& DuetRel::print( std::ostream& o ) const 
 {
+  return printIndented(o, 0);
+}
+
+std::ostream& DuetRel::printIndented( std::ostream& o, unsigned int indent ) const 
+{
   CAMLparam0();
   CAMLlocal3(dval,sval,simpval);
 
@@ -568,20 +574,25 @@ std::ostream& DuetRel::print( std::ostream& o ) const
   dval = this->getValue();
   //value * norm_func = caml_named_value("normalize_callback");
   //ival = caml_callback(*norm_func,dval);
+  value * simplify_func;
+  value * print_func;
+
   if(!isTensored) {
-  value * simplify_func = caml_named_value("simplify_callback");
-  simpval = caml_callback(*simplify_func, dval);
-  value * print_func = caml_named_value("print_callback");
-  sval = caml_callback(*print_func, simpval);
-  //sval = caml_callback(*print_func, dval);
+    simplify_func = caml_named_value("simplify_callback");
+    print_func = caml_named_value("print_robust_callback");
+  } else {
+    simplify_func = caml_named_value("tensorSimplify_callback");
+    print_func = caml_named_value("tensor_print_robust_callback");
+
   }
-  else {
-  value * simplify_func = caml_named_value("tensorSimplify_callback");
-  simpval = caml_callback(*simplify_func, dval);
-  value * print_func = caml_named_value("tensoredPrint_callback");
-  sval = caml_callback(*print_func, simpval);
-  //sval = caml_callback(*print_func, dval);
+
+  if (simplifyOnPrint) {
+    simpval = caml_callback(*simplify_func, dval);
+    sval = caml_callback2(*print_func, Val_int(indent), simpval);
+  } else {
+    sval = caml_callback2(*print_func, Val_int(indent), dval);
   }
+
   o << String_val(sval);
   CAMLreturnT(std::ostream&, o);
 }
