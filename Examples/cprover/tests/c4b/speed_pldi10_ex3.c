@@ -3,14 +3,13 @@ unsigned int tick = 0;
 
 void start(int n)
 {
-  int x=0;
-
-  while (x<n) {
-	tick++;
-    if (__VERIFIER_nondet_int())
-      x=x+1;
-    else 
-      x=x+1;
+  while (n>0) {
+    n=n-1;
+    while (n>0) {
+	  tick++;
+      if (__VERIFIER_nondet_int()) break;
+      n=n-1;
+    }
   }
 }
 

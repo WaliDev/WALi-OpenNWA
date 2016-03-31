@@ -1,16 +1,19 @@
-int __VERIFIER_nondet_int();
 unsigned int tick = 0;
 
 void start(int n)
 {
   int x=0;
+  int y=0;
 
-  while (x<n) {
+  for (;;) {
 	tick++;
-    if (__VERIFIER_nondet_int())
+    if (x < n) {
+      y=y+1;
       x=x+1;
-    else 
-      x=x+1;
+    } else if (y > 0)
+      y=y-1;
+    else
+      break;
   }
 }
 
@@ -19,3 +22,4 @@ int main()
 	start(20);
 	return 0;
 }
+
