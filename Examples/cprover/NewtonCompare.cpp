@@ -4646,26 +4646,47 @@ int runBasicNewtonFromBelow(char **args)
 }	
 
 void printUsageInstr() {
-	std::cout << "Error: Incorrect Usage!" << std::endl;
-	std::cout << "Correct usage: TBD" << std::endl;
+	std::cout << "Newton Duet" << std::endl;
+	std::cout << std::endl << "Correct usage:\tNewtonOcaml running_mode [options] input_file [duet options]" << std::endl;
+	std::cout << std::endl << "Running modes:" << std::endl;
+	std::cout << "\t-cra_newton_basic\t[currently, this mode is the only one working]" << std::endl;
+	std::cout << "\t-cra_newton_star" << std::endl;
+	std::cout << "\t-cra_newton_above" << std::endl;
+	std::cout << std::endl << "Available options:" << std::endl;
+	std::cout << "\t-D,\t--dump" << std::endl;
+	std::cout << "\t-H,\t--help" << std::endl;
+	std::cout << "\t-P,\t--no_simplify_on_print" << std::endl;
+	std::cout << "\t-S,\t--simplify" << std::endl;
+}
+
+void printHelp() {
+	printUsageInstr();	
+	std::cout << "\n\nDuet Options:\n\n";
+	char **ocamlArgs = new char *[3];
+	ocamlArgs[0] = "";
+	ocamlArgs[1] = "-help";
+	ocamlArgs[2] = 0;
+	caml_startup(ocamlArgs);
 }
 
 int main(int argc, char **argv)
 {
     int runningMode = 0;
+	std::vector <char *> unrecognizedArgs;
     static struct option long_options[] = {
         {"cra_newton_basic", no_argument,       &runningMode,  1  },
         {"cra_newton_star",  no_argument,       &runningMode,  2  },
         {"cra_newton_above", no_argument,       &runningMode,  3  },
-        {"simplify",         no_argument,       0,            's' },
+        {"simplify",         no_argument,       0,            'S' },
         {"no_simplify_on_print",no_argument,    0,            'P' },
-        {"dump",             no_argument,       0,            'd' },
-        {"verbosity",        required_argument, 0,            'v' },
+        {"help",	         no_argument,       0,            'H' },
+        {"dump",             no_argument,       0,            'D' },
+        {"verbosity",        required_argument, 0,            'V' },
         {0,                  0,                 0,             0  }
     };
 
     int long_index = 0, opt = 0;	
-    while ((opt = getopt_long_only(argc, argv,"sdv:", 
+    while ((opt = getopt_long_only(argc, argv, "SPDH", 
                    long_options, &long_index )) != -1) {
     	switch (opt) {
 			case 0:
@@ -4673,34 +4694,44 @@ int main(int argc, char **argv)
     		case 'P':
     			DuetRel::simplifyOnPrint = false;
     			break;
-    		case 's':
+    		case 'S':
     			DuetRel::simplify = true;
     			break;
-    		case 'd':
+    		case 'D':
     			dump = true;
     			break;
-    		default:
-    			printUsageInstr();
-    			return -1;
-    	}	
+			case 'H':
+				printHelp();
+				return 0;
+			// unrecognized option, currently we just pass it to duet
+    		case '?':		    			
+				std::cout << "Passing command-line option " << 	argv[optind - 1] << " to duet." << std::endl;
+				unrecognizedArgs.push_back(argv[optind - 1]);
+				break;
+		}	
     }
-
     if (runningMode == 0) {
-        std::cerr << "running mode not set!" << std::endl;
+        std::cerr << "Error : Running mode not set!" << std::endl;
 		printUsageInstr();
     }
     else if (optind == argc) {
-        printUsageInstr();
+		std::cout << "Error : No input file detected!" << std::endl;
+		printUsageInstr();
     }
 	
     else {
     	if (runningMode == 1) {
-			char **ocamlArgs = new char *[4];
+			char **ocamlArgs = new char *[argc];
 			ocamlArgs[0] = argv[0];
 			ocamlArgs[1] = "-cra_newton_basic";
 			ocamlArgs[2] = argv[optind];
-			ocamlArgs[3] = 0;
-    	    runBasicNewtonFromBelow(ocamlArgs);
+			for (int i = 0; i < unrecognizedArgs.size(); i++) {
+				ocamlArgs[3 + i] = unrecognizedArgs[i];
+			}
+			for (int i = 0; i < argc - optind; i++) {
+				ocamlArgs[3 + unrecognizedArgs.size() + i] = argv[optind + i + 1];
+			}
+			runBasicNewtonFromBelow(ocamlArgs);
     	}
     	else if (runningMode == 2) {
     	    std::cout << "Newton from below, with equivalence checks extracted from Kleene stars" << std::endl;
