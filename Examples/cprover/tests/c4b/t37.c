@@ -1,3 +1,5 @@
+// C4B output: 3+2|[0,x]|+|[0,y]|
+
 unsigned int tick = 0;
 
 void count_down(int x) {

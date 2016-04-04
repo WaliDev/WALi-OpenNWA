@@ -1,3 +1,5 @@
+// C4B output: |[0,x]|+|[0,y]|
+
 unsigned int tick = 0;
 
 void start(int x, int y)

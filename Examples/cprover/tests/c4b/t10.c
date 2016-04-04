@@ -1,3 +1,5 @@
+// C4B output: |[y,x]|
+
 int __VERIFIER_nondet_int();
 unsigned int tick = 0;
 

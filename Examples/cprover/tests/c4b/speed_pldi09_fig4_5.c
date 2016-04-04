@@ -1,3 +1,6 @@
+// C4B output: Not Available
+// SPEED output: mx(n,n-m)
+
 unsigned int tick = 0;
 
 void start(int n, int m, int dir)
@@ -10,7 +13,7 @@ void start(int n, int m, int dir)
   i = m;
 
   while (0 < i && i < n) {
-	tick++;
+    tick++;
     if (dir == 1)
       i++;
     else

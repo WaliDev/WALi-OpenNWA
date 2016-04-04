@@ -1,3 +1,5 @@
+// C4B output: 50+|[-1,i]|+|[0,k]|
+
 unsigned int tick = 0;
 
 void start(int i, int k)

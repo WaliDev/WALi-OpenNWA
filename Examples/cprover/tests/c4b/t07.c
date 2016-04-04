@@ -1,3 +1,5 @@
+// C4B output: 1+3|[0,x]|+|[0,y]|
+
 unsigned int tick = 0;
 
 void fish() { return; }

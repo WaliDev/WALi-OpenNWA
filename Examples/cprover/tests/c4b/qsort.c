@@ -1,4 +1,5 @@
 /* Quicksort */
+// C4B output: 1+2|[0,len]|
 
 int __VERIFIER_nondet_int();
 unsigned int tick = 0;

@@ -1,3 +1,5 @@
+// C4B output: 1.33+0.67|[z,y]|
+
 unsigned int tick = 0; 
 
 void count_up(int, int);

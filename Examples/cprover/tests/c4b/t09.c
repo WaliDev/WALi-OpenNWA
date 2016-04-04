@@ -1,3 +1,5 @@
+// C4B output: Not Available
+
 unsigned int tick = 0;
 
 void start(int x) {

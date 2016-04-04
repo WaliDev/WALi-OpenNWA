@@ -1,3 +1,5 @@
+// C4B output: 0.01|[n,y]|+11|[n,0]|
+
 unsigned int tick = 0;
 
 void start(int n, int y)

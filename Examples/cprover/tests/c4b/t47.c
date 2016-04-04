@@ -1,3 +1,5 @@
+// C4B output: 1+|[0,n]|
+
 unsigned int tick = 0;
 
 void start(int n)
