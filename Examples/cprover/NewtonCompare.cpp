@@ -4681,7 +4681,7 @@ int main(int argc, char **argv)
         {"no_simplify_on_print",no_argument,    0,            'P' },
         {"help",	         no_argument,       0,            'H' },
         {"dump",             no_argument,       0,            'D' },
-        {"verbosity",        required_argument, 0,            'V' },
+//      {"verbosity",        required_argument, 0,            'V' },
         {0,                  0,                 0,             0  }
     };
 
@@ -4705,9 +4705,10 @@ int main(int argc, char **argv)
 				return 0;
 			// unrecognized option, currently we just pass it to duet
     		case '?':		    			
-				std::cout << "Passing command-line option " << 	argv[optind - 1] << " to duet." << std::endl;
-				unrecognizedArgs.push_back(argv[optind - 1]);
-				break;
+			std::cout << "Passing command-line option " << 	argv[optind - 1] << " to duet." << std::endl;
+			unrecognizedArgs.push_back(argv[optind - 1]);
+			break;
+		
 		}	
     }
     if (runningMode == 0) {
@@ -4721,7 +4722,7 @@ int main(int argc, char **argv)
 	
     else {
     	if (runningMode == 1) {
-			char **ocamlArgs = new char *[argc];
+			char **ocamlArgs = new char *[3 + unrecognizedArgs.size() + argc - optind];
 			ocamlArgs[0] = argv[0];
 			ocamlArgs[1] = "-cra_newton_basic";
 			ocamlArgs[2] = argv[optind];
