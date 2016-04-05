@@ -4422,6 +4422,7 @@ NEWROUND:
 std::vector<caml_rule> ruleHolder;
 std::vector<caml_call_rule> callRuleHolder;
 std::vector<caml_epsilon_rule> epsilonRuleHolder;
+std::vector<caml_error_rule> errorRuleHolder;
 wali::Key entry_key;
 wali::Key exit_key;
 duetrel_t compareWeight;

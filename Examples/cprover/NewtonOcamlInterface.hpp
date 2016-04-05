@@ -34,9 +34,11 @@ namespace goals {
 typedef std::pair<std::pair<wali::Key,wali::Key>, duetrel_t >  caml_rule;
 typedef std::pair<std::pair<wali::Key,std::pair<wali::Key,wali::Key> >, duetrel_t > caml_call_rule;
 typedef std::pair<wali::Key, duetrel_t > caml_epsilon_rule;
+typedef std::pair<wali::Key, duetrel_t > caml_error_rule;
 extern std::vector<caml_epsilon_rule> epsilonRuleHolder;
 extern std::vector<caml_rule> ruleHolder;
 extern std::vector<caml_call_rule> callRuleHolder;
+extern std::vector<caml_error_rule> errorRuleHolder;
 extern wali::Key entry_key;
 extern wali::Key exit_key;
 extern duetrel_t compareWeight;
