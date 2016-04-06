@@ -244,6 +244,19 @@ bool DuetRel::Equal( duetrel_t that) const
   CAMLreturnT(bool,Bool_val(ret_d));
 }
 
+
+bool DuetRel::IsSat() const
+{
+  CAMLparam0();
+  CAMLlocal2(ret_d, dval);
+
+  dval = this->getValue();
+  
+  value * is_sat_func = caml_named_value("is_sat_callback");
+  ret_d = caml_callback(*is_sat_func, dval);
+  CAMLreturnT(bool, Bool_val(ret_d));
+}
+
 duetrel_t DuetRel::Transpose() const
 {
   CAMLparam0();

@@ -4625,6 +4625,41 @@ int runBasicNewtonFromBelow(char **args)
         nval->print(std::cout);
         std::cout << std::endl << std::endl;
     }
+    
+    std::cout << "================================================" << std::endl;
+    std::cout << "Assertion Checkings at Error Points" << std::endl << std::endl;
+    
+    // Check the assertion at each error point
+    for (std::vector<caml_error_rule>::iterator it = errorRuleHolder.begin(); it != errorRuleHolder.end(); it++)
+    {
+        wali::wfa::TransSet error_transitions;
+        error_transitions = outfaNewton.match(st1(), it->first);
+        for(wali::wfa::TransSet::iterator tsit = error_transitions.begin(); tsit != error_transitions.end(); tsit++)
+        {
+            std::cout << "Checking assertion at vertex " << it->first <<  std::endl << std::endl;
+
+			// Check if is_sat_callback ( (it->second) extend(Compose) (*tsit)->weight() )
+
+			DuetRel *val = ((DuetRel*)(it->second.get_ptr()));
+            val->print(std::cout);
+            std::cout << std::endl << std::endl;
+            
+			DuetRel *val2 = ((DuetRel*)((*tsit)->weight().get_ptr()));
+			DuetRel *extval = val->Compose(val2).get_ptr();
+
+			if (extval->IsSat()) {
+				std::cout << "Is SAT! (Assertion Failed)" << std::endl ;	
+			
+				// This print statement causes seg fault (not sure why) -Ashkan		
+				//extval->print(std::cout);
+				//std::cout << std::endl;
+			}
+			else {
+				std::cout << "Is not SAT! (Assertion Passed)" << std::endl;
+			}
+			std::cout << "---------------------------------------------" << std::endl << std::endl;
+        }
+    }
 
     
   /*  if(dump){

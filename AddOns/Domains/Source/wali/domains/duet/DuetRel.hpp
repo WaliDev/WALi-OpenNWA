@@ -74,6 +74,7 @@ namespace wali
           duetrel_t Intersect( duetrel_t that ) const;
 	  duetrel_t Normalize() const;
           bool Equal(duetrel_t se) const;
+		  bool IsSat() const;
           duetrel_t Transpose() const;
           duetrel_t Kronecker( duetrel_t that) const;
 		  duetrel_t Merge(int c, int v) const;

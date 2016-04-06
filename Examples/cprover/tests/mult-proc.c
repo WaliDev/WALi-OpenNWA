@@ -14,8 +14,10 @@ void main() {
     m = m;
     n = n;
     while(i < n) {
-	mult();
+		mult();
     }
+	assert(i == 1);
+    assert(i != n);
     assert(i == n);
     assert(r == n * m);
 }
