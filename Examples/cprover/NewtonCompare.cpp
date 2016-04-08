@@ -3553,6 +3553,8 @@ NEWROUND:
 	double baseEvalTime = 0;
 	map<int, std::set<int> > varDependencies;
 	TdiffMap = TDiffHashMap();
+	
+	RTG::assignmentRefPtr aList;
 
 
     wali::set_verify_fwpds(false);
@@ -3695,7 +3697,6 @@ NEWROUND:
 
 		cout << "[Newton Compare] Creating Differentials" << std::endl;
 		//Created the differentials
-		RTG::assignmentRefPtr aList;
 		double t2 = 0;
 		if (diffMap.size() != 0)
 		{
@@ -3760,6 +3761,16 @@ NEWROUND:
 			*/
 			convertToTSLRegExpsT(rNew, regExpMap, tensoredRegExpMap, differentialMap, mapBack, mergeSrcMap);
 			aList = CIR::initializeAssignment();
+			
+			for (tslRegExpMap::iterator it = regExpMap.begin(); it != regExpMap.end(); ++it)
+			{
+				RTG::regExpRefPtr r = it->second;
+				EXTERN_TYPES::sem_elem_wrapperRefPtr newVal = evalNonRecAt0(r);
+
+				// Insert <it->first,newVal> into aList
+				aList = CIR::updateAssignment(aList, CBTI_INT32(it->first), newVal);
+			}
+
 
 			/* Step 6 - Perform Newton rounds until a fixed-point is reached */
 			cout << "[Newton Compare] Running Newton" << endl;
@@ -4638,7 +4649,7 @@ int runBasicNewtonFromBelow(char **args)
         {
             std::cout << "Checking assertion at vertex " << it->first <<  std::endl << std::endl;
 
-			// Check if is_sat_callback ( (it->second) extend(Compose) (*tsit)->weight() )
+			// Check if is_sat ( (it->second) extend (*tsit)->weight() )
 
 			DuetRel *val = ((DuetRel*)(it->second.get_ptr()));
             val->print(std::cout);
