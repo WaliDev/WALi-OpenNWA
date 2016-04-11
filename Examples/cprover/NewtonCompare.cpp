@@ -561,6 +561,11 @@ namespace goals {
   char * mainProc = NULL, * errLbl = NULL;
   string fname;
   prog * pg;
+
+
+  //this is used for the testing suite
+  bool testMode = false;
+  string testFileName;
   
 
   //Calls postar on the pds and wfa, also prints out .dot and .txt files with the initial wfa and final wfa.
@@ -3444,6 +3449,12 @@ NEWROUND:
 	}
 		
 	std::cout << std::endl << "NumRnds: " << rnd << std::endl;
+
+	if (testMode) {
+		std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
+		testFile << "__NUMRNDS " << rnd << std::endl;
+		testFile.close();
+	}
 	
 	/*else
 	{
@@ -3844,6 +3855,13 @@ NEWROUND:
 		double tTime = t->total_time() + t1 + t2 + baseEvalTime;
 		std::cout << "[Newton Compare] Time taken by: Newton: ";
 		cout << tTime << endl;
+		
+		if (testMode) {
+			std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
+			testFile << "__TIME " << tTime << std::endl;
+			testFile.close();
+		}
+		
 		return tTime;
 	}
 	else  //There is no error state
@@ -3854,6 +3872,13 @@ NEWROUND:
 		cout << tTime << endl;
 		std::cout << "NonRec";
 		std::cout << std::endl;
+		
+		if (testMode) {
+			std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
+			testFile << "__TIME " << tTime << std::endl;
+			testFile.close();
+		}
+		
 		return tTime;
 	}
   }
@@ -4656,9 +4681,10 @@ int runBasicNewtonFromBelow(char **args)
             std::cout << std::endl << std::endl;
             
 			DuetRel *val2 = ((DuetRel*)((*tsit)->weight().get_ptr()));
-			DuetRel *extval = val->Compose(val2).get_ptr();
+			DuetRel *extval = val2->Compose(val).get_ptr();
+			bool isSat;
 
-			if (extval->IsSat()) {
+			if (isSat = extval->IsSat()) {
 				std::cout << "Is SAT! (Assertion Failed)" << std::endl ;	
 			
 				// This print statement causes seg fault (not sure why) -Ashkan		
@@ -4668,6 +4694,13 @@ int runBasicNewtonFromBelow(char **args)
 			else {
 				std::cout << "Is not SAT! (Assertion Passed)" << std::endl;
 			}
+	
+			if (testMode) {
+				std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
+				testFile << "__ASSERTION " << (isSat ? "FAIL" : "PASS") << std::endl;
+				testFile.close();
+			}
+
 			std::cout << "---------------------------------------------" << std::endl << std::endl;
         }
     }
@@ -4728,12 +4761,13 @@ int main(int argc, char **argv)
         {"no_simplify_on_print",no_argument,    0,            'P' },
         {"help",	         no_argument,       0,            'H' },
         {"dump",             no_argument,       0,            'D' },
+        {"test",             required_argument, 0,            'T' },
 //      {"verbosity",        required_argument, 0,            'V' },
         {0,                  0,                 0,             0  }
     };
 
     int long_index = 0, opt = 0;	
-    while ((opt = getopt_long_only(argc, argv, "SPDH", 
+    while ((opt = getopt_long_only(argc, argv, "SPDT:H", 
                    long_options, &long_index )) != -1) {
     	switch (opt) {
 			case 0:
@@ -4750,12 +4784,15 @@ int main(int argc, char **argv)
 			case 'H':
 				printHelp();
 				return 0;
+			case 'T':
+				testMode = true;
+				testFileName = optarg;
+				break;
 			// unrecognized option, currently we just pass it to duet
-    		case '?':		    			
-			std::cout << "Passing command-line option " << 	argv[optind - 1] << " to duet." << std::endl;
-			unrecognizedArgs.push_back(argv[optind - 1]);
-			break;
-		
+			case '?':		    			
+				std::cout << "Passing command-line option " << 	argv[optind - 1] << " to duet." << std::endl;
+				unrecognizedArgs.push_back(argv[optind - 1]);
+				break;	
 		}	
     }
     if (runningMode == 0) {
@@ -4769,6 +4806,11 @@ int main(int argc, char **argv)
 	
     else {
     	if (runningMode == 1) {
+			if (testMode) {
+				std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
+				testFile << "__FILENAME " << argv[optind] << std::endl;
+				testFile.close();
+			}
 			char **ocamlArgs = new char *[3 + unrecognizedArgs.size() + argc - optind];
 			ocamlArgs[0] = argv[0];
 			ocamlArgs[1] = "-cra_newton_basic";
