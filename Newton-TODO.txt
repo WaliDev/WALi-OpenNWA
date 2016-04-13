@@ -1,0 +1,30 @@
+NewtonCompare.cpp, line 2126:
+  Missing call on EvalMap2.insert for a Project case
+
+NewtonCompare.cpp, line 1074:
+  Missing call on TdiffMap.insert for a Project case
+
+------------------------------------------------------------
+
+	// Perform Newton rounds until convergence, with a maximum of MAX_ROUNDS rounds
+	while (true){
+NEWROUND:
+          EvalMap.clear();   // Need to move here
+          EvalMap2.clear();   // Need to move here
+
+=== Cleanup ========================================================
+
+regExp.tsl
+  TDifferential
+       Project(a,b,v): should map ProjectT over each element of list
+  Differential
+       Project(a,b,v): should map Project over each element of list
+-----------------------------------------------------
+  MISSING: mkProject(a,b,v) and mkProjectT(a,b,v)
+
+  Okay?
+  We have places in NewtonCompare where we call Project() and/or
+  ProjectT explicitly.  However, we need to maintain the UNIQUEREP
+  invariant by checking the appropriate hash table.
+  Or does RTG::ProjectT::make(...,...); check the hash table?
+------------------------------------------------------------
