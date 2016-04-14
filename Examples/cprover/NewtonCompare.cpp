@@ -651,7 +651,7 @@ namespace goals {
 		//Prune outfa to be start at the error state and then call path_summary _tarjan_fwpds
 		outfa.setInitialState(fKey);
 		outfa.prune();
-		outfa.path_summary_tarjan_fwpds(true);
+		outfa.path_summary_tarjan_fwpds(true, false);
 		sem_elem_t wt2;
 		//If the weight from the path summary isn't null, then return that value, otherwise return the False/Zero weight
 		if (outfa.getState(outfa.getInitialState()) != NULL)
@@ -2813,13 +2813,13 @@ namespace goals {
                                // Look up the appropriate regexp for reID and evaluate at 0
 				  RTG::regExpRefPtr r = regExpMap[reID];
 				  EXTERN_TYPES::sem_elem_wrapperRefPtr newVal = evalNonRecAt0(r);
-                  std::cout << "***Output with evalNonRecAt0:" << std::endl;
-			      newVal.v->print(std::cout);
-                  std::cout << std::endl;
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr temp = CIR::evalRegExpAt0(r);
-                  std::cout << "***Output with evalRegExpAt0:" << std::endl;
-      			  temp.v->print(std::cout);
-                  std::cout << std::endl;
+                  //std::cout << "***Output with evalNonRecAt0:" << std::endl;
+			      //newVal.v->print(std::cout);
+                  //std::cout << std::endl;
+				  //EXTERN_TYPES::sem_elem_wrapperRefPtr temp = CIR::evalRegExpAt0(r);
+                  //std::cout << "***Output with evalRegExpAt0:" << std::endl;
+      			  //temp.v->print(std::cout);
+                  //std::cout << std::endl;
 				  d = CIR::mkTensorTranspose(RTG::One::make(), RTG::Weight::make(newVal));
 			  }
 		  }
@@ -3806,7 +3806,7 @@ NEWROUND:
 		}
 		t->stop();
 
-		//Map the evaluated weights back to the transitions the regexps came from
+        //Map the evaluated weights back to the transitions the regexps came from
 		for (stateIter = faStates.begin(); stateIter != faStates.end(); stateIter++)
 		{
 			TransSet & transSet = outfa.getState(*stateIter)->getTransSet();
@@ -3833,27 +3833,27 @@ NEWROUND:
 
 		//Perform the final path summary
 		t->start();
-		outfa.path_summary_tarjan_fwpds(true);
-		State * initS = outfa.getState(outfa.getInitialState());
-		if (initS == NULL)
-		{
-			cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
-		}
-		else
-		{
-			sem_elem_t fWt = outfa.getState(outfa.getInitialState())->weight();
-			if (fWt->equal(fWt->zero()))
-			{
-				cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
-			}
-			else{
-				cout << "[Newton Compare] FWPDS ==> error reachable" << endl;
-			}
-		}
+		outfa.path_summary_tarjan_fwpds(true, true);
+		//State * initS = outfa.getState(outfa.getInitialState());
+		//if (initS == NULL)
+		//{
+		//	cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
+		//}
+		//else
+		//{
+		//	sem_elem_t fWt = outfa.getState(outfa.getInitialState())->weight();
+		//	if (fWt->equal(fWt->zero()))
+		//	{
+		//		cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
+		//	}
+		//	else{
+		//		cout << "[Newton Compare] FWPDS ==> error reachable" << endl;
+		//	}
+		//}
 
 		t->stop();
 		double tTime = t->total_time() + t1 + t2 + baseEvalTime;
-		std::cout << "[Newton Compare] Time taken by: Newton: ";
+		std::cout << "[Newton Compare] Time taken by: Newton: " << std::endl;
 		cout << tTime << endl;
 		
 		if (testMode) {
@@ -4243,7 +4243,7 @@ NEWROUND:
 			  //on the new path summary automata
 			  WFA ansFA;
 
-			  outfa2.path_summary_tarjan_fwpds(true, ansFA);
+			  outfa2.path_summary_tarjan_fwpds(true, ansFA, false);
 
 			  //ansFA.print(std::cout) << std::endl;
 			  // outfa2.print(std::cout) << std::endl;
@@ -4331,7 +4331,7 @@ NEWROUND:
 				  //on the new path summary automata
 				  WFA ansFA;
 
-				  outfa3.path_summary_tarjan_fwpds(true, ansFA);
+				  outfa3.path_summary_tarjan_fwpds(true, ansFA, false);
 
 				  //outfa3.print(std::cout) << std::endl;
 
@@ -4411,22 +4411,23 @@ NEWROUND:
 		  }*/
 		  t->start();
 		  //sem_elem_t fWt = computePathSummary(fpds, outfa);
-		  outfa.path_summary_tarjan_fwpds(true);
-		  State * initS = outfa.getState(outfa.getInitialState());
+		  outfa.path_summary_tarjan_fwpds(true, false);
+
+          State * initS = outfa.getState(outfa.getInitialState());
 		  if (initS == NULL)
 		  {
-			  cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
+		      cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
 		  }
 		  else
 		  {
-			  sem_elem_t fWt = outfa.getState(outfa.getInitialState())->weight();
-			  if (fWt->equal(fWt->zero()))
-			  {
-				  cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
-			  }
-			  else{
-				  cout << "[Newton Compare] FWPDS ==> error reachable" << endl;
-			  }
+		      sem_elem_t fWt = outfa.getState(outfa.getInitialState())->weight();
+		      if (fWt->equal(fWt->zero()))
+		      {
+		    	  cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
+		      }
+		      else{
+		    	  cout << "[Newton Compare] FWPDS ==> error reachable" << endl;
+		      }
 		  }
 
 		  //cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
@@ -4832,6 +4833,10 @@ int main(int argc, char **argv)
     	    std::cout << "Not implemented yet." << std::endl;
     	}
     }   
+
+    //cout << "Printing stats" << std::endl;
+    //value * stats = caml_named_value("print_stats_callback");
+    //caml_callback(*stats, 0);
 }
 
 

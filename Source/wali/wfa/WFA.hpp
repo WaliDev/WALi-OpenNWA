@@ -76,6 +76,8 @@ namespace wali
       bool is_epsilon_transition(ITrans const * trans);
     
     bool is_any_transition(ITrans const * trans);
+    extern Key __current_initial_state;
+    bool is_not_transition_from_initial_state(ITrans const * trans);
       
 
     /** @class WFA
@@ -447,9 +449,9 @@ namespace wali
          * in the dual benefits of lazy witness evaluation and
          * transparent witness propagation.
          */
-        virtual void path_summary_tarjan_fwpds();
-        virtual void path_summary_tarjan_fwpds(bool top_down);
-		virtual void path_summary_tarjan_fwpds(bool top_down, WFA & ansFA);
+        virtual void path_summary_tarjan_fwpds(bool suppress_initial_state);
+        virtual void path_summary_tarjan_fwpds(bool top_down, bool suppress_initial_state);
+		virtual void path_summary_tarjan_fwpds(bool top_down, WFA & ansFA, bool suppress_initial_state);
 
         virtual void path_summary_crosscheck_all();
 
@@ -458,8 +460,8 @@ namespace wali
          *
          * This is mostly intended to be an internal structure.
          */
-        virtual void path_summary_via_wpds(wpds::WPDS & wpds);
-		virtual void path_summary_via_wpds(wpds::WPDS & wpds, WFA & ansFA);
+        virtual void path_summary_via_wpds(wpds::WPDS & wpds, bool suppress_initial_state=true);
+		virtual void path_summary_via_wpds(wpds::WPDS & wpds, WFA & ansFA, bool suppress_initial_state=true);
 
 	virtual std::map<wali::Key, sem_elem_t>
 	readOutCombineOverAllPathsValues(std::set<Key> alpha);
