@@ -32,6 +32,21 @@ dirName=os.getcwd()
 
 for line in fin:
 	words = line.split()
+	if (words[0] == "__DIRECTORY"):	
+		if not(firstAssertion):
+			firstAssertion = True
+			fout.write('</td>\n')
+		
+		if firstElem:
+			firstElem = False
+		else:
+			fout.write('</tr>\n')
+
+		fout.write('<tr align=\"center\">\n')
+		fout.write('<td colspan=\"5\"><font color=\"#00AAAA\">')
+		fout.write(words[1])
+		fout.write('</font></td>\n')
+
 	if (words[0] == "__FILENAME"):
 		if not(firstAssertion):
 			firstAssertion = True
@@ -45,7 +60,7 @@ for line in fin:
 		path=words[1]
 		fileName=os.path.basename(path)		
 		
-		fout.write('<tr align="center">\n')
+		fout.write('<tr align=\"center\">\n')
 		fout.write('<td>')
 		fout.write('<a href=\"' + path + '\">' + fileName + '</a>')
 		fout.write('</td>\n')
@@ -81,8 +96,9 @@ for line in fin:
 		
 		fout.write('<font color=\"#00AAAA\">TIMEOUT</font><br>')
 		
-	
-
+if not(firstAssertion):
+	fout.write('</td>\n')
+fout.write('</tr>\n')
 fout.write('</table>\n')
 
 fout.write('</body>\n')
