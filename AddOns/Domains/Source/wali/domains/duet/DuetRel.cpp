@@ -223,7 +223,7 @@ duetrel_t DuetRel::Intersect( duetrel_t that ) const
 bool DuetRel::Equal( duetrel_t that) const
 {
   CAMLparam0();
-  CAMLlocal5(ret_d, dval0, nval0, nval1, dval1);
+  CAMLlocal3(ret_d, dval0, dval1);
 
   dval0 = this->getValue();
   dval1 = that->getValue();
@@ -235,11 +235,8 @@ bool DuetRel::Equal( duetrel_t that) const
     return false;
   }
 #endif
-  value * norm_func = caml_named_value("normalize_callback");
-  nval0 = caml_callback(*norm_func, dval0);
-  nval1 = caml_callback(*norm_func, dval1);
   value * eq_func = caml_named_value("eq_callback");
-  ret_d = caml_callback2(*eq_func, nval0, nval1);
+  ret_d = caml_callback2(*eq_func, dval0, dval1);
 
   CAMLreturnT(bool,Bool_val(ret_d));
 }
