@@ -723,7 +723,7 @@ namespace goals {
 
   double duetTest(DuetRel* a, DuetRel * b)
 {
-  duetrel_t c = a->Compose(b);
+  duetrel_t c = a->Compose(b);    // FIXME: Compose badly named: Compose should be Extend
   c->print(std::cout);
   return 0;
 }
@@ -4682,7 +4682,7 @@ int runBasicNewtonFromBelow(char **args)
             std::cout << std::endl << std::endl;
             
 			DuetRel *val2 = ((DuetRel*)((*tsit)->weight().get_ptr()));
-			DuetRel *extval = val2->Compose(val).get_ptr();
+			DuetRel *extval = val2->Compose(val).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
 			bool isSat;
 
 			if (isSat = extval->IsSat()) {
