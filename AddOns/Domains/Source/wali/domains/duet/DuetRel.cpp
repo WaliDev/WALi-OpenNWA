@@ -75,7 +75,7 @@ namespace wali{
     namespace duetrel{
       duetrel_t operator*(duetrel_t a, duetrel_t b)
       {
-        return a->Compose(b);
+        return a->Compose(b);    // FIXME: Compose badly named: Compose should be Extend
       }
 
       duetrel_t operator|(duetrel_t a, duetrel_t b)
@@ -142,7 +142,7 @@ value DuetRel::getValue() const
   CAMLreturn(retVal);
 }
 
-duetrel_t DuetRel::Compose( duetrel_t that ) const
+duetrel_t DuetRel::Compose( duetrel_t that ) const    // FIXME: Compose badly named: Compose should be Extend
 {
   CAMLparam0();
   CAMLlocal3(dval0, dval1, retval);
@@ -151,7 +151,7 @@ duetrel_t DuetRel::Compose( duetrel_t that ) const
   duetrel_t d;
 
   if (!isTensored){  
-    value * com_func = caml_named_value("compose_callback");
+    value * com_func = caml_named_value("compose_callback");    // FIXME: Compose badly named: Compose should be Extend
     retval = caml_callback2(*com_func, dval0, dval1);
     
     if (simplify) {
@@ -163,7 +163,7 @@ duetrel_t DuetRel::Compose( duetrel_t that ) const
   }
   else
   {
-    value * com_func = caml_named_value("tensorCompose_callback");
+    value * com_func = caml_named_value("tensorCompose_callback");    // FIXME: Compose badly named: Compose should be Extend
     retval = caml_callback2(*com_func, dval0, dval1);
    
     if (simplify) {
@@ -463,10 +463,17 @@ wali::sem_elem_t DuetRel::combine(wali::SemElem* se)
   return Union(that);
 }
 
+//
+// extend
+//
+// Return the extend of x (this) and y.
+// Considering x and y as functions, x extend y = y o x,
+// where (g o f)(v) = g(f(v)).
+//
 wali::sem_elem_t DuetRel::extend(wali::SemElem* se) 
 {
   duetrel_t that( convert(se) );
-  return Compose(that);
+  return Compose(that);    // FIXME: Compose badly named: Compose should be Extend
 }
 
 bool DuetRel::equal(wali::SemElem* se) const 
