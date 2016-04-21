@@ -19,8 +19,10 @@ int main() {
   }
 
   // Check several independent assertions
-  assert(j != N || j == N);
   if (__VERIFIER_nondet_int() > 0) {
+    assert(j == N);
+  }
+  else if (__VERIFIER_nondet_int() > 0) {
     assert(t <= t0 + 10*N);
   }
   else {
