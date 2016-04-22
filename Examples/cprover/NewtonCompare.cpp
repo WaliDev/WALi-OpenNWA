@@ -1991,7 +1991,7 @@ namespace goals {
 					  //ret = EXTERNS::evalKleeneSemElem(evalRegExp___it->second);
 					  //EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
 					  //todo.pop();
-					  std::cout << "New code! (U)" << std::endl;
+					  //std::cout << "New code! (U)" << std::endl;
 					  duetrelpair_t ret;
 					  ret = ((evalRegExp___it->second.v))->alphaHatStar();
 					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret->second));
@@ -2154,7 +2154,7 @@ namespace goals {
 				  //ret = EXTERNS::evalKleeneSemElem(lch);
 				  //EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
 				  //todo.pop();
-				  std::cout << "New code! (U)" << std::endl;
+				  //std::cout << "New code! (U)" << std::endl;
 				  duetrelpair_t ret;
 				  ret = ((evalRegExp___it->second.v))->alphaHatStar();
 				  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret->second));
@@ -2398,7 +2398,7 @@ namespace goals {
 				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
 				  if (evalT___it != EvalMapT.end())
 				  {
-				  	  std::cout << "New code! (T1)" << std::endl;
+				  	  //std::cout << "New code! (T1)" << std::endl;
 					  duetrelpair_t ret;
 					  ret = ((evalT___it->second.v))->alphaHatStar();
 					  // std::cout << "  Body value is: " << std::endl;
@@ -2619,7 +2619,7 @@ namespace goals {
 			  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
 			  if (frame.op == 0) //Kleene
 			  {
-			  	  std::cout << "New code! (T2)" << std::endl;
+			  	  //std::cout << "New code! (T2)" << std::endl;
 				  duetrelpair_t ret;
 				  ret = ((evalT___it->second.v))->alphaHatStar();
 				  // std::cout << "  Body value is: " << std::endl;
@@ -3533,6 +3533,7 @@ NEWROUND:
 	nonRec = false;
 	pNonLin = false;
     
+    cout << "Step 1: =========================================================" << endl;
 	//Step 1 - Convert the program 'pg' into an fpds where the weights are nwaobdds.
 	FWPDS * fpds;
     if(originalPds != NULL)
@@ -3594,6 +3595,7 @@ NEWROUND:
 		outfile.close();
 	}
 
+    cout << "Step 2: =========================================================" << endl;
 	/* Step 2 - Perform poststar on the fpds get the regular expressions associated with
 	*			the outgoing nodes in the intra_graph associated with the fwpds
 	*/
@@ -3661,6 +3663,7 @@ NEWROUND:
 			outfile.close();
 		}
 
+        cout << "Step 3: =========================================================" << endl;
 		/*Step 3 - Convert these regexps into TSL regular expressions and get the partial differentials
 		*		   with respect their variables
 		*/
@@ -3690,7 +3693,7 @@ NEWROUND:
 				if (tmpReg != NULL)
 				{
 					diffMap[(*eit)] = regExpMap[(*eit)];
-                    tsl_regexp::regExpPrettyPrint(tmpReg, std::cout);
+                    //tsl_regexp::regExpPrettyPrint(tmpReg, std::cout);
 				}
 			//  std::cout << "RE: " << *eit;
 			//  std::cout << " ";
@@ -3706,7 +3709,7 @@ NEWROUND:
 		}
 		t->start();
 
-		cout << "[Newton Compare] Creating Differentials" << std::endl;
+		cout << std::endl << "[Newton Compare] Creating Differentials" << std::endl;
 		//Created the differentials
 		double t2 = 0;
 		if (diffMap.size() != 0)
@@ -3724,6 +3727,7 @@ NEWROUND:
 			}
 			tslDiffMap::iterator it3;
 
+            cout << "Step 4: =========================================================" << endl;
 			/* Step 4 - Create a new fwpds using these partial differentials - run poststar on the fwpds in
 			*	        order to get the full differentials representing the values of the program return points
 			*/
@@ -3767,6 +3771,7 @@ NEWROUND:
 				outfile.close();
 			}
 
+            cout << "Step 5: =========================================================" << endl;
 			/* Step 5 - Use the reg exps representing the differentials, the partial differentials, and the original
 			*			tsl regular expressions to get the tensored regular expressions we need to run the newton rounds
 			*/
@@ -3783,6 +3788,7 @@ NEWROUND:
 			}
 
 
+            cout << "Step 6: =========================================================" << endl;
 			/* Step 6 - Perform Newton rounds until a fixed-point is reached */
 			cout << "[Newton Compare] Running Newton" << endl;
 			runNewton(aList, differentialMap, varDependencies, tensoredRegExpMap,linear);
@@ -3806,6 +3812,7 @@ NEWROUND:
 		}
 		t->stop();
 
+        cout << "Step 7: =========================================================" << endl;
         //Map the evaluated weights back to the transitions the regexps came from
 		for (stateIter = faStates.begin(); stateIter != faStates.end(); stateIter++)
 		{
@@ -4495,17 +4502,17 @@ CAMLprim value compare_weights(Trans t) {
     std::cout << std::endl << "Duet Weight: " << std::endl;
     std::cout << String_val(sval) << std::endl;
 
-    bval = caml_callback2(*eq_func, nval, nCVal);
+    //bval = caml_callback2(*eq_func, nval, nCVal);
 
 
-    if(Bool_val(bval))
-    {
-	std::cout << "Correct!" << std::endl;
-    }
-    else 
-    {
-	std::cout << "Failure!" << std::endl;
-    }
+    //if(Bool_val(bval))
+    //{
+	//std::cout << "Correct!" << std::endl;
+    //}
+    //else 
+    //{
+	//std::cout << "Failure!" << std::endl;
+    //}
     CAMLreturn(Val_unit);
 }
 

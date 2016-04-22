@@ -409,17 +409,11 @@ duetrelpair_t DuetRel::alphaHatStar()
   d = DuetRelPair::MkDuetRelPair(d1, d2);
 
   std::cout << "alphaHatStar {" << std::endl;
-  std::cout << "  ** linearized formula: " << std::endl << "  ";
+  std::cout << "**** linearized formula: " << std::endl << "  ";
   std::cout << String_val(caml_callback(*print_formula_func, lin)) << std::endl;
-  std::cout << "  ** hull formula: ";
-  ////std::cout << String_val(caml_callback2(*print_transition_func, Val_int(2), hull)) << std::endl;
-  //std::cout << String_val(caml_callback(*print_formula_func, hull)) << std::endl;
+  std::cout << "**** hull formula: ";
   std::cout << String_val(caml_callback2(*print_hull_func, Val_int(2), hull)) << std::endl;
-  //std::cout << String_val(caml_callback2(*caml_named_value("print_hull_callback"), Val_int(2), hull)) << std::endl;
-  //std::cout << String_val(caml_callback(*caml_named_value("print_callback"), hull)) << std::endl;
-  //value TEST = caml_callback(*print_formula_func, hull);
-  //value TEST = caml_callback2(*print_transition_func, Val_int(2), hull);
-  std::cout << "  ** star transition: ";
+  std::cout << "**** star transition: ";
   std::cout << String_val(caml_callback2(*print_transition_func, Val_int(2), star_formula)) << std::endl;
   std::cout << "}" << std::endl;
 
