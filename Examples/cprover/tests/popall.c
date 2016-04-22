@@ -36,10 +36,10 @@ int main() {
     //assert(cost <= hwm); // and this,
     assert(hwm <= M);      // but not yet this.
 
-    while(s > 0) { // this loop performs popall()
-        s = s - 1;
-        tick(-1);
-    }
+    //while(s > 0) { // this loop performs popall()
+    //    s = s - 1;
+    //    tick(-1);
+    //}
     
     //assert(cost == 0); // We can prove this,
     //assert(hwm <= M);  // but not yet this.
