@@ -6,7 +6,10 @@ int cost; // current (memory) usage
 int hwm;  // high water mark: the largest amount of memory that we've
           //   needed at any point during this execution 
 
-#define tick(k)   cost = cost + (k); hwm = (hwm >= cost) ? hwm : cost
+#define init_tick(k) {cost = (k); hwm = (k);}
+// You could add a semicolon here, add a __VERIFIER_assume(hwm >= cost)
+
+#define tick(k) { __VERIFIER_assume(hwm >= cost); cost = cost + (k); hwm = (hwm >= cost) ? hwm : cost;}
 
 int main() {
     int N;
@@ -14,8 +17,7 @@ int main() {
     int i;
     int s; // the height of a stack variable
 
-    cost = 0;
-    hwm = 0;
+    init_tick(0);
 
     N = __VERIFIER_nondet_int();
     M = (N >= 0) ? N : 0;
@@ -32,17 +34,17 @@ int main() {
         //if (cost > hwm) { hwm = cost; }
     }
 
-    //assert(cost <= M);   // We can prove this,
-    //assert(cost <= hwm); // and this,
-    assert(hwm <= M);      // but not yet this.
+    assert(cost <= M);   
+    assert(cost <= hwm); 
+    assert(hwm <= M);    
 
-    //while(s > 0) { // this loop performs popall()
-    //    s = s - 1;
-    //    tick(-1);
-    //}
+    while(s > 0) { // this loop performs popall()
+        s = s - 1;
+        tick(-1);
+    }
     
-    //assert(cost == 0); // We can prove this,
-    //assert(hwm <= M);  // but not yet this.
+    assert(cost == 0); 
+    assert(hwm <= M); 
 
     return 0;
 }
