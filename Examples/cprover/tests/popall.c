@@ -1,13 +1,14 @@
-// Tarjan's popall example, which he uses to illustrate the potential method.
+// This is a simulation of the usage of memory in Tarjan's popall example, 
+// which he used to illustrate the potential method.  
 // We've modified the example to keep track of a cost and high water mark:
 
-int cost; // current (memory) usage
+int cost; // current memory usage
 
 int hwm;  // high water mark: the largest amount of memory that we've
           //   needed at any point during this execution 
 
 #define init_tick(k) {cost = (k); hwm = (k);}
-// You could add a semicolon here, add a __VERIFIER_assume(hwm >= cost)
+// You could add a semicolon here, and a __VERIFIER_assume(hwm >= cost)
 
 #define tick(k) { __VERIFIER_assume(hwm >= cost); cost = cost + (k); hwm = (hwm >= cost) ? hwm : cost;}
 
