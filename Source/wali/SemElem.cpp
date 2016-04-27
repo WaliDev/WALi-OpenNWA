@@ -64,6 +64,12 @@ namespace wali
   //
   // @return < this + se, this - se >
   //
+  // There are two correct ways of implementing this - se for distributive domains:
+  // (i) this + se = se? 0 : this + se
+  // (ii) this + se = se? 0 : this
+  //
+  // This default implementation for delta uses option (i) since that approach is sound
+  // even for non-distributive domains, ie, domains where x*y + x*z can be non-equal to x*(y+z)
   std::pair< sem_elem_t , sem_elem_t > SemElem::delta( SemElem * se )
   {
     std::pair< sem_elem_t , sem_elem_t > rp;
