@@ -73,7 +73,9 @@ namespace wali
   std::pair< sem_elem_t , sem_elem_t > SemElem::delta( SemElem * se )
   {
     std::pair< sem_elem_t , sem_elem_t > rp;
-    rp.first = combine(se);
+
+    // Use se as the first argument so that the old value se is the first argument to combine
+    rp.first = se->combine(this);
 
     // Because we do not actually have a difference operator,
     // we simply see if the combine is equal to the passed in parameter.
