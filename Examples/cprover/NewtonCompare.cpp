@@ -4684,15 +4684,17 @@ int runBasicNewtonFromBelow(char **args)
 
 			// Check if is_sat ( (it->second) extend (*tsit)->weight() )
 
-			DuetRel *val = ((DuetRel*)(it->second.get_ptr()));
+            DuetRel *val = ((DuetRel*)(it->second.get_ptr()));   // Negated assertion condition
             val->print(std::cout);
             std::cout << std::endl << std::endl;
             
-			DuetRel *val2 = ((DuetRel*)((*tsit)->weight().get_ptr()));
+            DuetRel *val2 = ((DuetRel*)((*tsit)->weight().get_ptr()));  // Weight from containing procedure's entry to assertion pt
+            // DuetRel *val3 = ???;   // Weight of calling context
 			DuetRel *extval = val2->Compose(val).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
-			bool isSat;
+                        // DuetRel *xxxval = val3->Compose(extval).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
+			bool isSat = extval->IsSat();      // FIXME: isSat = xxxval->IsSat(); 
 
-			if (isSat = extval->IsSat()) {
+			if (isSat) {
 				std::cout << "Is SAT! (Assertion Failed)" << std::endl ;	
 			
 				// This print statement causes seg fault (not sure why) -Ashkan		
