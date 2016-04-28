@@ -4826,14 +4826,17 @@ int main(int argc, char **argv)
 			}
 			char **ocamlArgs = new char *[3 + unrecognizedArgs.size() + argc - optind];
 			ocamlArgs[0] = argv[0];
-			ocamlArgs[1] = "-cra_newton_basic";
-			ocamlArgs[2] = argv[optind];
+			ocamlArgs[unrecognizedArgs.size() + 1] = "-cra_newton_basic";
+			ocamlArgs[unrecognizedArgs.size() + 2] = argv[optind];
+
 			for (int i = 0; i < unrecognizedArgs.size(); i++) {
-				ocamlArgs[3 + i] = unrecognizedArgs[i];
+				ocamlArgs[1 + i] = unrecognizedArgs[i];
+
 			}
 			for (int i = 0; i < argc - optind; i++) {
 				ocamlArgs[3 + unrecognizedArgs.size() + i] = argv[optind + i + 1];
 			}
+
 			runBasicNewtonFromBelow(ocamlArgs);
     	}
     	else if (runningMode == 2) {
