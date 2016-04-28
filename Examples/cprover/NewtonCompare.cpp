@@ -4664,7 +4664,8 @@ int runBasicNewtonFromBelow(char **args)
     for(wali::wfa::TransSet::iterator tsit = exit_transitions.begin(); tsit != exit_transitions.end(); tsit++)
     {
         std::cout << "Procedure summary for (some as yet unidentified -- FIXME) procedure" << std::endl;
-        DuetRel *nval = ((DuetRel*)((*tsit)->weight().get_ptr()));
+        duetrel_t nval = ((DuetRel*)((*tsit)->weight().get_ptr()));
+        //DuetRel *nval = ((DuetRel*)((*tsit)->weight().get_ptr()));
         //DuetRel *nval = ((DuetRel*)((*tsit)->weight().get_ptr()))->getValue();
         nval->print(std::cout);
         std::cout << std::endl << std::endl;
@@ -4684,15 +4685,17 @@ int runBasicNewtonFromBelow(char **args)
 
 			// Check if is_sat ( (it->second) extend (*tsit)->weight() )
 
-            DuetRel *val = ((DuetRel*)(it->second.get_ptr()));   // Negated assertion condition
-            val->print(std::cout);
+            duetrel_t negatedAssertionWeight = ((DuetRel*)(it->second.get_ptr()));   // Negated assertion condition
+            negatedAssertionWeight->print(std::cout);
             std::cout << std::endl << std::endl;
             
-            DuetRel *val2 = ((DuetRel*)((*tsit)->weight().get_ptr()));  // Weight from containing procedure's entry to assertion pt
-            // DuetRel *val3 = ???;   // Weight of calling context
-			DuetRel *extval = val2->Compose(val).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
-                        // DuetRel *xxxval = val3->Compose(extval).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
-			bool isSat = extval->IsSat();      // FIXME: isSat = xxxval->IsSat(); 
+            duetrel_t intraprocWeight = ((DuetRel*)((*tsit)->weight().get_ptr()));  // Weight from containing procedure's entry to assertion pt
+            duetrel_t contextWeight = ((DuetRel*)(outfaNewton.getState((*tsit)->to())->weight().get_ptr()));  // Weight of calling context
+
+            duetrel_t composedWeight = intraprocWeight->Compose(negatedAssertionWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
+            duetrel_t finalWeight = contextWeight->Compose(composedWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
+
+            bool isSat = finalWeight->IsSat();
 
 			if (isSat) {
 				std::cout << "Is SAT! (Assertion Failed)" << std::endl ;	
