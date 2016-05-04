@@ -4653,9 +4653,12 @@ int runBasicNewtonFromBelow(char **args)
     wali::Key acc = wali::getKeySpace()->getKey("accept");
 
     Trans t;
-    outfaNewton.find(st1(), exit_key, acc, t);
 
-    compare_weights(t);
+    bool exitTransitionFound = outfaNewton.find(st1(), exit_key, acc, t);
+
+    if (exitTransitionFound) {
+        compare_weights(t);
+    }
 
     // Set exit_transitions to the set of all transitions in outfaNewton
     // of the form (st1,WALI_EPSILON,<st1,e>), where e is an entry node
