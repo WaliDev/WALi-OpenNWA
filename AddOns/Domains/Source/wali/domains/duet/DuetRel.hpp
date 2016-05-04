@@ -22,8 +22,8 @@ extern "C" {
 #include "wali/SemElemTensor.hpp"
 #include "wali/Key.hpp"
 
-
-#define MAX_WEIGHT_COUNT 100000
+// FIXME Allow weights to be collected
+#define MAX_WEIGHT_COUNT 10000000
 
 namespace wali 
 {
