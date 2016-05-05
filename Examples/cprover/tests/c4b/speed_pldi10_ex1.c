@@ -25,6 +25,10 @@ void start(int n)
 
 int main() 
 {
-	start(20);
+	int n = __VERIFIER_nondet_int();
+	start(n);
+	
+	int bnd = n>0?n:0;
+	assert(tick <= bnd);
 	return 0;
 }

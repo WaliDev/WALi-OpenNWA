@@ -17,6 +17,13 @@ void start(int i, int k)
 
 int main() 
 {
-	start(200, 300);
+	int i = __VERIFIER_nondet_int();
+	int k = __VERIFIER_nondet_int();
+
+	start(i, k);
+	
+	int bnd = 50 + ((i>-1)?(i+1):0) + ((k>0)?k:0);
+	assert(tick <= bnd);
+	
 	return 0;
 }

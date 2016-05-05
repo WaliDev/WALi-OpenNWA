@@ -7,8 +7,8 @@ void start(int n, int m, int dir)
 {
   int i;
 
-  assert(0 < m);
-  assert(m < n);
+  // assert(0 < m);
+  // assert(m < n);
 
   i = m;
 
@@ -23,6 +23,15 @@ void start(int n, int m, int dir)
 
 int main() 
 {
-	start(20, 30, 1);
+	int dir = __VERIFIER_nondet_int();
+	int m = __VERIFIER_nondet_int();
+	__VERIFIER_assume(m > 0);
+	int n = __VERIFIER_nondet_int();
+	__VERIFIER_assume(n > m);
+	
+	start(n, m, dir);
+	
+	int bnd = (n>(n-m)) ? n : (n-m);
+	assert (tick <= bnd);
 	return 0;
 }

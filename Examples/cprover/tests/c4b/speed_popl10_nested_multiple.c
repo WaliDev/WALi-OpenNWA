@@ -18,6 +18,15 @@ void start(int x, int n, int y, int m)
 
 int main() 
 {
-	start(20, 100, 30, 500);
+	int x = __VERIFIER_nondet_int();
+	int y = __VERIFIER_nondet_int();
+	int n = __VERIFIER_nondet_int();
+	int m = __VERIFIER_nondet_int();
+
+	start(x, y, n, m);
+	
+	int bnd = ((n>x)?(n-x):0) + ((m>y)?(m-y):0);
+	assert(tick <= bnd);
+	
 	return 0;
 }

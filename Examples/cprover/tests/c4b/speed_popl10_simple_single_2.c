@@ -23,6 +23,13 @@ void start(int n, int m)
 
 int main() 
 {
-	start(20, 30);
+	int n = __VERIFIER_nondet_int();
+	int m = __VERIFIER_nondet_int();
+
+	start(n, m);
+	
+	int bnd = ((n>0)?n:0) + ((m>0)?m:0);
+	assert(tick <= bnd);
+	
 	return 0;
 }

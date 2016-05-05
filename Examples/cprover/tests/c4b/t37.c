@@ -28,6 +28,13 @@ void start(int x, int y) {
 
 int main() 
 {
-	start(20, 30);
+	int x = __VERIFIER_nondet_int();
+	int y = __VERIFIER_nondet_int();
+
+	start(x, y);
+	
+	int bnd = 3 + 2 * ((x>0)?x:0) + ((y>0)?y:0);
+	assert(tick <= bnd);
+	
 	return 0;
 }

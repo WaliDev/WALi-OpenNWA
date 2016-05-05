@@ -16,6 +16,13 @@ void start(int n, int y)
 
 int main() 
 {
-	start(-20, 30);
+	int n = __VERIFIER_nondet_int();
+	int y = __VERIFIER_nondet_int();
+
+	start(n, y);
+	
+	double bnd = 0.01 * ((y>n)?(y-n):0) + 11 * ((n<0)?-n:0);
+	assert(tick <= bnd);
+	
 	return 0;
 }

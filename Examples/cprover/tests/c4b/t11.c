@@ -15,6 +15,15 @@ void start(int x, int y, int n, int m)
 
 int main() 
 {
-	start(20, 30, 100, 500);
+	int x = __VERIFIER_nondet_int();
+	int y = __VERIFIER_nondet_int();
+	int n = __VERIFIER_nondet_int();
+	int m = __VERIFIER_nondet_int();
+	
+	start(x, y, n, m);
+	
+	int bnd = ((n>x)?(n-x):0) + ((m>y)?(m-y):0);
+	assert(tick <= bnd);
+	
 	return 0;
 }

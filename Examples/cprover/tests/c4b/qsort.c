@@ -12,8 +12,10 @@ void qsort(int *a, int lo, int hi) {
     return;
 
   n = __VERIFIER_nondet_int();   /* partition the array */
-  assert( n > 0 );
-  assert( lo + n <= hi );
+  //assert( n > 0 );
+  __VERIFIER_assume(n > 0);
+  //assert( lo + n <= hi );
+  __VERIFIER_assume(lo + n <= hi);
 
   m1 = n + lo;
   m2 = m1 - 1;
@@ -28,7 +30,15 @@ void start(int *a, int len) {
 
 int main() 
 {
-	int a[20];
-	start (a, 20);
+	int len = 20;		// legth of the array
+	int a[len];
+	int i;
+	for (i = 0; i < len; i++)
+		a[i] = __VERIFIER_nondet_int();
+
+	start (a, len);
+
+	int bnd = 1 + 2 * len;
+	assert(tick <= bnd);	
 	return 0;
 }
