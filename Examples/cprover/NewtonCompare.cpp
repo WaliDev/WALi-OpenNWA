@@ -3809,6 +3809,11 @@ NEWROUND:
 			aList = CIR::initializeAssignment();
 			//evalRegExps(aList);
 			t2 = 0;
+			if (testMode) {
+				std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
+				testFile << "__NUMRNDS 0" << std::endl;
+				testFile.close();
+			}	
 		}
 		t->stop();
 
