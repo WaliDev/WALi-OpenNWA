@@ -46,11 +46,12 @@ extern "C" {
 }
 
 extern "C" {
-  CAMLprim value add_wpds_error_rule(value weight, value key) {
-    CAMLparam2(weight, key);
+  CAMLprim value add_wpds_error_rule(value weight, value key, value lineno) {
+    CAMLparam3(weight, key, lineno);
     ref_ptr<DuetRel> w = DuetRel::MkDuetRel(weight);
     wali::Key k = stk(Int_val(key));
-    goals::errorRuleHolder.push_back(std::make_pair(k,w));
+    int line = Int_val(lineno);
+    goals::errorRuleHolder.push_back(std::make_pair(k,std::make_pair(w,line)));
     CAMLreturn(Val_unit);
   }
 }

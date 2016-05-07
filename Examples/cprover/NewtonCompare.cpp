@@ -4689,11 +4689,13 @@ int runBasicNewtonFromBelow(char **args)
         error_transitions = outfaNewton.match(st1(), it->first);
         for(wali::wfa::TransSet::iterator tsit = error_transitions.begin(); tsit != error_transitions.end(); tsit++)
         {
-            std::cout << "Checking assertion at vertex " << it->first <<  std::endl << std::endl;
+            std::cout << "Checking assertion at vertex " << it->first
+		      << ", line " << it->second.second << std::endl
+		      << std::endl;
 
 			// Check if is_sat ( (it->second) extend (*tsit)->weight() )
 
-            duetrel_t negatedAssertionWeight = ((DuetRel*)(it->second.get_ptr()));   // Negated assertion condition
+            duetrel_t negatedAssertionWeight = ((DuetRel*)(it->second.first.get_ptr()));   // Negated assertion condition
             negatedAssertionWeight->print(std::cout);
             std::cout << std::endl << std::endl;
             
