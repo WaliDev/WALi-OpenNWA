@@ -4785,7 +4785,10 @@ int main(int argc, char **argv)
         {"help",	         no_argument,       0,            'H' },
         {"dump",             no_argument,       0,            'D' },
         {"test",             required_argument, 0,            'T' },
-//      {"verbosity",        required_argument, 0,            'V' },
+        {"domain",           required_argument, 0,            'M' },
+        {"verbose",          required_argument, 0,            'V' },
+        {"verbosity",        required_argument, 0,            'I' },
+        {"qe",               required_argument, 0,            'Q' },
         {0,                  0,                 0,             0  }
     };
 
@@ -4811,6 +4814,15 @@ int main(int argc, char **argv)
 				testMode = true;
 				testFileName = optarg;
 				break;
+			// duet options with an argument
+			case 'M':
+			case 'V':
+			case 'I':
+			case 'Q':		    			
+				std::cout << "Passing command-line option " << 	argv[optind - 2] << " " << optarg << " to duet." << std::endl;
+				unrecognizedArgs.push_back(argv[optind - 2]);
+				unrecognizedArgs.push_back(optarg);
+				break;	
 			// unrecognized option, currently we just pass it to duet
 			case '?':		    			
 				std::cout << "Passing command-line option " << 	argv[optind - 1] << " to duet." << std::endl;
