@@ -4717,6 +4717,10 @@ int runBasicNewtonFromBelow(char **args)
 			else {
 				std::cout << "Is not SAT! (Assertion Passed)" << std::endl;
 			}
+
+            std::cout << std::endl << "contextWeight extend intraproceduralWeight = " << std::endl;
+		    composedWeight->print(std::cout);
+		    std::cout << std::endl << std::endl;
 	
 			if (testMode) {
 				std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
