@@ -4702,8 +4702,8 @@ int runBasicNewtonFromBelow(char **args)
             duetrel_t intraprocWeight = ((DuetRel*)((*tsit)->weight().get_ptr()));  // Weight from containing procedure's entry to assertion pt
             duetrel_t contextWeight = ((DuetRel*)(outfaNewton.getState((*tsit)->to())->weight().get_ptr()));  // Weight of calling context
 
-            duetrel_t composedWeight = intraprocWeight->Compose(negatedAssertionWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
-            duetrel_t finalWeight = contextWeight->Compose(composedWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
+            duetrel_t composedWeight = contextWeight->Compose(intraprocWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
+            duetrel_t finalWeight = composedWeight->Compose(negatedAssertionWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
 
             bool isSat = finalWeight->IsSat();
 
