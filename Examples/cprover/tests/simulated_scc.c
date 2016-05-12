@@ -14,7 +14,7 @@ int hwm;  // high water mark: the largest amount of memory that we've
 // You could add a semicolon here, and __VERIFIER_assume(hwm >= cost)
 
 #define tick(k) { \
-                 __VERIFIER_assume(k <= cost); \
+                 __VERIFIER_assume(cost + (k) >= 0); \
                  __VERIFIER_assume(hwm >= cost); \
                  __VERIFIER_assume(cost >= 0); \
                  __VERIFIER_assume(hwm >= 0); \
