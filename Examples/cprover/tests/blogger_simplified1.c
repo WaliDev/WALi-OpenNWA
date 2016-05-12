@@ -2,7 +2,7 @@
 
 int main(int argc, char ** argv) {
     int tuples;
-    int peek;
+    //int peek;
     int string_len;
     int URI_tree_nodes, URI_tree_nodes_remaining;
     int i;
@@ -19,28 +19,31 @@ int main(int argc, char ** argv) {
     __VERIFIER_assume(URI_tree_nodes >= 0);
     URI_tree_nodes_remaining = URI_tree_nodes;
     string_len = __VERIFIER_nondet_int();
-    __VERIFIER_assume(URI_tree_nodes >= 0);
+    __VERIFIER_assume(string_len >= 0);
 
     tuples = 0;
-    tuples ++;
-    while(tuples > 0 && ((peek = tuples) != 0)) {
+    tuples++;
+    while(tuples > 0) {
         tuples--;
-        if (peek == string_len) { 
+        if (__VERIFIER_nondet_bool()) { 
             break; // originally was "return true"
         }
-        if (string_len > peek) {
+        if (string_len > __VERIFIER_nondet_int()) {
             while(URI_tree_nodes_remaining > 0 && __VERIFIER_nondet_bool()) {
                 URI_tree_nodes_remaining--;
                 tuples++;
+                //tick(1);
             }
         }
         while(URI_tree_nodes_remaining > 0 && __VERIFIER_nondet_bool()) {
             URI_tree_nodes_remaining--;
             tuples++;
+            //tick(1);
         }
         tick(1);
     }
-    assert(__cost <= URI_tree_nodes);
+    assert(__cost <= URI_tree_nodes + 1);
+    //assert(__cost <= 2 * URI_tree_nodes + 1);
 
     return 0; // originally was "return false"
 }
