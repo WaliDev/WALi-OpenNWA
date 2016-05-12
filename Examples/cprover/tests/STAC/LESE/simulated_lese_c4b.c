@@ -59,6 +59,7 @@
 
 void simulated_parser(int N) {
   int i = 0;
+  int ver_len = 0;
 
   // Comment out next line to simulate (2) the construction of an overapproximating path formula 
   __VERIFIER_assume(N == 20);  // Simulates (1) exploration with a concrete state in which N is 20
@@ -66,7 +67,7 @@ void simulated_parser(int N) {
   while (i < N) {
     ver_len++; i++;
   }
-  assert(ver_len < 8);  // Should FAIL for exploration (1); should SUCCEED when path-formula (2) is used
+  assert(ver_len >= 8);  // Should SUCCEED for exploration (1); should FAIL when path-formula (2) is used
 }
 
 int main(){
