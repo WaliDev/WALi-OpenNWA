@@ -67,6 +67,7 @@ namespace wali
           static duetrel_t MkDuetRel(value w, bool is_tensored=false);
           static duetrel_t getBaseOne();
           static duetrel_t getBaseZero();
+          static duetrel_t getBaseTop();
           static duetrel_t getTensorOne();
 	  static duetrel_t getTensorZero();
           duetrel_t Compose( duetrel_t that ) const;

@@ -552,6 +552,20 @@ duetrel_t DuetRel::getBaseZero()
   	CAMLreturnT(duetrel_t,d);
 }
 
+duetrel_t DuetRel::getBaseTop()
+{
+  CAMLparam0();
+  CAMLlocal1(topV);
+  duetrel_t d;
+  
+  value * top_func = caml_named_value("top_callback");
+  topV = caml_callback(*top_func, Val_unit);
+
+  d = MkDuetRel(topV);
+
+  CAMLreturnT(duetrel_t,d);
+}
+
 duetrel_t DuetRel::getTensorZero()
 {
   CAMLparam0();
