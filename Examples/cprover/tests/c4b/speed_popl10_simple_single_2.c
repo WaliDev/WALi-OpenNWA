@@ -9,7 +9,7 @@ void start(int n, int m)
   int y=0;
 
   for (;;) {
-	tick++;
+    tick++;
     if (x<n) {
       x=x+1; y=y+1;
     }

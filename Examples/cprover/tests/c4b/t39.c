@@ -23,7 +23,6 @@ void count_up(int x, int y)
 }
 
 void start(int y, int z) {
-  tick++;
   count_down(y, z);
 }
 

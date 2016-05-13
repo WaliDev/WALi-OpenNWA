@@ -12,8 +12,8 @@ void start(int n)
   while (i<n) {
     j=i+1;
     while (j<n) {
-	  tick++;
-      if (__VERIFIER_nondet_int()) {
+	  if (__VERIFIER_nondet_int()) {
+        tick++;
         j=j-1;
         n=n-1;
       }

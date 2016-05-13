@@ -21,6 +21,6 @@ int main()
 	start(n);
 	
 	int bnd = n>0?n:0;
-	assert(tick < bnd);
+	assert(tick <= bnd);
 	return 0;
 }

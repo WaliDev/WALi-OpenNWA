@@ -6,7 +6,7 @@ int x, y;
 
 void produce() {
   while (x > 0) {
-    tick++;	
+    tick--;	
 	//tick(-1);
     x--; y++;
   }
@@ -26,12 +26,14 @@ void start(int y, int z) {
 
 int main() 
 {
-	int y = __VERIFIER_nondet_int();
+	x = __VERIFIER_nondet_int();
+	y = __VERIFIER_nondet_int();
 	int z = __VERIFIER_nondet_int();
 
+	int bnd = (y>0)?y:0;
+	
 	start(y, z);
 	
-	int bnd = (y>0)?y:0;
 	assert(tick <= bnd);
 	
 	return 0;
