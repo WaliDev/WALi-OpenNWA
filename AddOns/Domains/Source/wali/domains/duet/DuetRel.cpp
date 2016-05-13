@@ -363,56 +363,39 @@ wali::sem_elem_t DuetRel::star()
 duetrelpair_t DuetRel::alphaHatStar()
 {
   CAMLparam0();
-  CAMLlocal4(dval, temp, hull, star_formula);
-  CAMLlocal1(lin);
+  CAMLlocal3(dval, abstract, star_formula);
 
   dval = this->getValue();
   duetrel_t d1, d2;
   duetrelpair_t d;
 
-  value * print_formula_func;
   value * print_transition_func;
-  value * print_hull_func;
+  value * print_abstract_func;
+  value * alpha_hat_func;
+  value * abstract_star_func;
 
   if (isTensored) {
- 
-    value * star_func = caml_named_value("tensor_linearize_star_callback");
-    temp = caml_callback(*star_func, dval); 
-
-    // Decompose temp into hull and star_formula
-    value * ls_hull_func = caml_named_value("ls_hull_callback");
-    value * ls_lin_func = caml_named_value("ls_lin_callback");
-    print_formula_func = caml_named_value("tensor_print_formula_callback");
+    alpha_hat_func = caml_named_value("tensor_alpha_hat_callback");
+    abstract_star_func = caml_named_value("tensor_abstract_star_callback");
     print_transition_func = caml_named_value("tensor_print_robust_callback");
-    print_hull_func = caml_named_value("tensor_print_hull_callback");
-    hull = caml_callback(*ls_hull_func, temp);
-    lin = caml_callback(*ls_lin_func, temp);
+    print_abstract_func = caml_named_value("tensor_print_abstract_callback");
   } else {
-    value * star_func = caml_named_value("linearize_star_callback");
-    temp = caml_callback(*star_func, dval); 
-
-    // Decompose temp into hull and star_formula
-    value * ls_hull_func = caml_named_value("ls_hull_callback");
-    value * ls_lin_func = caml_named_value("ls_lin_callback");
-    print_formula_func = caml_named_value("print_formula_callback");
+    alpha_hat_func = caml_named_value("alpha_hat_callback");
+    abstract_star_func = caml_named_value("abstract_star_callback");
     print_transition_func = caml_named_value("print_robust_callback");
-    print_hull_func = caml_named_value("print_hull_callback");
-    hull = caml_callback(*ls_hull_func, temp);
-    lin = caml_callback(*ls_lin_func, temp);
+    print_abstract_func = caml_named_value("print_abstract_callback");
   }
-  
-  value * ls_star_func = caml_named_value("ls_star_callback");
-  star_formula = caml_callback(*ls_star_func, temp);
 
-  d1 = MkDuetRel(hull, isTensored);
+  abstract = caml_callback(*alpha_hat_func, dval);
+  star_formula = caml_callback(*abstract_star_func, abstract);
+
+  d1 = MkDuetRel(abstract, isTensored);
   d2 = MkDuetRel(star_formula, isTensored);
   d = DuetRelPair::MkDuetRelPair(d1, d2);
 
   std::cout << "alphaHatStar {" << std::endl;
-  std::cout << "**** linearized formula: " << std::endl << "  ";
-  std::cout << String_val(caml_callback(*print_formula_func, lin)) << std::endl;
-  std::cout << "**** hull formula: ";
-  std::cout << String_val(caml_callback2(*print_hull_func, Val_int(2), hull)) << std::endl;
+  std::cout << "**** alpha hat: ";
+  std::cout << String_val(caml_callback2(*print_abstract_func, Val_int(2), abstract)) << std::endl;
   std::cout << "**** star transition: ";
   std::cout << String_val(caml_callback2(*print_transition_func, Val_int(2), star_formula)) << std::endl;
   std::cout << "}" << std::endl;
@@ -434,10 +417,10 @@ bool DuetRel::Equivalent(duetrel_t that) const
   dval1 = that->getValue();
   
   if (isTensored) {
-    value * eq_func = caml_named_value("tensor_hull_equiv_callback");
+    value * eq_func = caml_named_value("tensor_abstract_equiv_callback");
     retVal = caml_callback2(*eq_func, dval0, dval1);
   } else {
-    value * eq_func = caml_named_value("hull_equiv_callback");
+    value * eq_func = caml_named_value("abstract_equiv_callback");
     retVal = caml_callback2(*eq_func, dval0, dval1);
   }
   // WARNING: The following print code causes segfaults.
