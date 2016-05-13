@@ -3522,6 +3522,43 @@ NEWROUND:
   *  Step 7 - Insert the new weights into the original outfa and perform the iterative path summary
   *           to determine if the error weight is reachable [Vestigial/optional]
   *
+  *  Notes on the handling of Project and ProjectT:
+  *  ---------------------------------------------
+  *  The implementation plays a bit fast and loose with Project and ProjectT:
+  *  o The original WALi regular expressions have no occurrences of Project
+  *  o In Step 3
+  *    - When the original WALi regular expressions are converted to TSL
+  *      regular expressions, occurrences of Project are inserted (search
+  *      for "Project::make")
+  *    - However, when the differentials of the TSL regular experssions are created,
+  *      all occurrences of Project are eliminated
+  *  o In Step 5, we have a new set of regular expressions over nameWeights.
+  *    A nameWeight corresponds to a right-hand-side constant in the Z equation system;
+  *    it represents a regular expression over nu^(i) variables, and thus is a
+  *    constant for a given round i, but varies from round to round. When these
+  *    regular expressions are converted into tensored TSL regular expressions
+  *    (convertToRegExpT), each regular expression r for a given nameWeight is
+  *    turned into ProjectT(r) (search for "ProjectT::make").
+  *
+  *  Step 5 is justified because Lemma 8.9(2) allows all right-hand-side
+  *  occurrences of ProjectT in the Z system of equations to be pushed down to the
+  *  "constants" (see Eqn. (74)). The lemma ensures that the value computed for
+  *  each Z_k is the same as it would have if ProjectT were applied to the
+  *  entire right-hand side of Z_k's defining equation. By Theorems 8.5 and 8.14
+  *  (also 8.13), the values correspond to the solution that we want.
+  *  
+  *  It may be worrisome that we have left out the occurrences of Project
+  *  at occurrences of nu^(i) -- that is, we use nu^(i) instead of Project(nu^(i)).
+  *  However, because the solution computed on each round for the Z equation system
+  *  is equivalent to one with Project_T applied to each right-hand side, after
+  *  we apply TDeTensor to obtain nu^(i+1), we have values equal to ones
+  *  on which Project has been applied. (The paper does not have the following lemma
+  *
+  *     for all a in S_T, Project(TDeTensor(a)) = TDeTensor(Project_T(a)),
+  *
+  *  however, there is a proof in TWR's notebook from 12/3/2015, orange notebook
+  *  p. 91.)
+  *
   *  Author:  Emma Turetsky
   */
   
