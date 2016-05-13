@@ -2803,7 +2803,7 @@ namespace goals {
 
 		  RTG::regExpTRefPtr d;
                 // The Z equation-system has an equation of the form
-                //    Z_reID = f_reId(0) combine ... combine_T (Z_var *_T RE_T[var,reID]) combine_T ...
+                //    Z_reID = f_reId(0) combine_T ... combine_T (Z_var *_T RE_T[var,reID]) combine_T ...
 		  if (var == -1){ // Create f_reId(0): NameWeight(dummy, reID) stands for f_reId(0)
                                 // in the FWPDS encoding of the Z equation-system's dependence graph
 			  if (reID == -1){  // Should never occur; return (1^t tensor 1)
