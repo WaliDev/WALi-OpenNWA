@@ -3530,7 +3530,7 @@ NEWROUND:
   *    - When the original WALi regular expressions are converted to TSL
   *      regular expressions, occurrences of Project are inserted (search
   *      for "Project::make")
-  *    - However, when the differentials of the TSL regular experssions are created,
+  *    - However, when the differentials of the TSL regular expressions are created,
   *      all occurrences of Project are eliminated
   *  o In Step 5, we have a new set of regular expressions over nameWeights.
   *    A nameWeight corresponds to a right-hand-side constant in the Z equation system;
@@ -3548,7 +3548,8 @@ NEWROUND:
   *  (also 8.13), the values correspond to the solution that we want.
   *  
   *  It may be worrisome that we have left out the occurrences of Project
-  *  at occurrences of nu^(i) -- that is, we use nu^(i) instead of Project(nu^(i)).
+  *  at occurrences of nu^(i) -- that is, because occurrences of Project
+  *  were filtered out in Step 3, we have occurrences of nu^(i) instead of Project(nu^(i)).
   *  However, because the solution computed on each round for the Z equation system
   *  is equivalent to one with Project_T applied to each right-hand side, after
   *  we apply TDeTensor to obtain nu^(i+1), we have values equal to ones
@@ -3556,8 +3557,8 @@ NEWROUND:
   *
   *     for all a in S_T, Project(TDeTensor(a)) = TDeTensor(Project_T(a)),
   *
-  *  however, there is a proof in TWR's notebook from 12/3/2015, orange notebook
-  *  p. 91.)
+  *  however, there is a proof of this lemma in TWR's notebook from 12/3/2015,
+  *  orange notebook, p. 91.)
   *
   *  Author:  Emma Turetsky
   */
