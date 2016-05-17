@@ -12,7 +12,7 @@ NEWTON_DIR="$(pwd)"
 DUET_DIR="$NEWTON_DIR/../duet"
 
 SUITE="$NEWTON_DIR/Examples/cprover/tests/regression"
-TESTDIRS=( $DUET_DIR/duet/regression/cra/code $NEWTON_DIR/Examples/cprover/tests/regression/c4b/assertion )
+TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b $DUET_DIR/duet/regression/cra/code $NEWTON_DIR/Examples/cprover/tests $NEWTON_DIR/Examples/cprover/tests/STAC/LESE $NEWTON_DIR/Examples/cprover/tests/STAC/LowerBound $NEWTON_DIR/Examples/cprover/tests/STAC/LZ )
 
 NEWTON="$NEWTON_DIR/_build64/Examples/cprover/NewtonOcaml"
 DUET="$DUET_DIR/duet.native"
