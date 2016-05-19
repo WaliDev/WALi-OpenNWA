@@ -32,6 +32,7 @@ fout.write('</tr>\n')
 
 firstElem = True
 firstAssertion = True
+flipResult = False
 dirName=os.getcwd()
 
 for line in fin:
@@ -62,7 +63,9 @@ for line in fin:
 			fout.write('</tr>\n')
 		
 		path=words[1]
-		fileName=os.path.basename(path)		
+		fileName=os.path.basename(path)
+		
+		flipResult = ('unsafe' in fileName)	
 		
 		fout.write('<tr align=\"center\">\n')
 		fout.write('<td>')
@@ -91,11 +94,16 @@ for line in fin:
 		if firstAssertion:
 			fout.write('<td>')
 			firstAssertion = False
-			
-		if (words[1] == "PASS"):
-			fout.write('<font color=\"#00AA00\">PASS</font><br>')
-		elif (words[1] == "FAIL"):
-			fout.write('<font color=\"#FF0000\">FAIL</font><br>')
+		if (flipResult):
+			if (words[1] == "FAIL"):
+				fout.write('<font color=\"#00AA00\">PASS</font><br>')
+			elif (words[1] == "PASS"):
+				fout.write('<font color=\"#FF0000\">FAIL</font><br>')
+		else:
+			if (words[1] == "PASS"):
+				fout.write('<font color=\"#00AA00\">PASS</font><br>')
+			elif (words[1] == "FAIL"):
+				fout.write('<font color=\"#FF0000\">FAIL</font><br>')
 			
 	elif (words[0] == "__DUET"):
 		if not(firstAssertion):
@@ -104,12 +112,20 @@ for line in fin:
 			
 		fout.write('<td>')
 		for i in range(len(words)-1):
-			if (words[i+1] == "PASS"):
-				fout.write('<font color=\"#00AA00\">PASS</font><br>')
-			elif (words[i+1] == "FAIL"):
-				fout.write('<font color=\"#FF0000\">FAIL</font><br>')
-			elif (words[i+1] == "TIMEOUT"):
-				fout.write('<font color=\"#00AAAA\">TIMEOUT</font><br>')
+			if (flipResult):
+				if (words[i+1] == "FAIL"):
+					fout.write('<font color=\"#00AA00\">PASS</font><br>')
+				elif (words[i+1] == "PASS"):
+					fout.write('<font color=\"#FF0000\">FAIL</font><br>')
+				elif (words[i+1] == "TIMEOUT"):
+					fout.write('<font color=\"#00AAAA\">TIMEOUT</font><br>')
+			else:
+				if (words[i+1] == "PASS"):
+					fout.write('<font color=\"#00AA00\">PASS</font><br>')
+				elif (words[i+1] == "FAIL"):
+					fout.write('<font color=\"#FF0000\">FAIL</font><br>')
+				elif (words[i+1] == "TIMEOUT"):
+					fout.write('<font color=\"#00AAAA\">TIMEOUT</font><br>')
 		fout.write('</td>')
 		
 	elif (words[0] == "__TIMEOUT"):
