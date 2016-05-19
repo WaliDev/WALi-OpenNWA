@@ -8,10 +8,5 @@ void main () {
 	tmp = tmp - a;
 	result = result - a;
     }
-    if (rand()) {
-	assert(x - y - result < a);  // succeed
-	assert(x - y - result >= 0); // succeed
-    } else {
 	assert(result == x - y);     // fail
-    }
 }
