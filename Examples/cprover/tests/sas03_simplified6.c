@@ -11,4 +11,5 @@ void p() {
 int main() {
   x = 5;
   p();
+  assert(x==0);
 }

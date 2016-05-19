@@ -10,4 +10,5 @@ int main() {
   while (x > 0) {
   	p();
   }
+  assert(x==0);
 }

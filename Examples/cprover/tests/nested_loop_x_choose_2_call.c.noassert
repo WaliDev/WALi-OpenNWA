@@ -1,7 +1,7 @@
 //#include <stdio.h>
 int y;
 
-void p(v) {
+void p(int v) {
   int j;
 
   // Perform y = y + v;
@@ -12,11 +12,14 @@ void p(v) {
 
 int main() {
   int x;
+  int n = __VERIFIER_nondet_int();
+  __VERIFIER_assume(n > 0);
 
   y = 0;
-  for(x = 0; x < 20; x++) {
+  for(x = 0; x < n; x++) {
     p(x);
   }
 
+  assert (2 * y == (n * n) - n);
   return 0;
 }

@@ -8,16 +8,13 @@ void mult() {
 }
 
 void main() { 
-    int n;//n = rand(), m = rand(), r;
+    int n = __VERIFIER_nondet_int();//n = rand(), m = rand(), r;
+	m = __VERIFIER_nondet_int();
+    __VERIFIER_assume(n > 0);
 
-    assume(n > 0);
-    m = m;
-    n = n;
     while(i < n) {
 		mult();
     }
-	assert(i == 1);
-    assert(i != n);
     assert(i == n);
     assert(r == n * m);
 }
