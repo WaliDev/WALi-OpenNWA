@@ -12,5 +12,5 @@ void main() {
     i = add(i, 1);
     //i = sub(i, 1);
     //i = sub(i, 0);
-    assert(i == 2); // succeed
+    assert(i == 1); // succeed
 }
