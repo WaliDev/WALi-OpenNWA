@@ -50,7 +50,7 @@ for directory in ${TESTDIRS[@]}; do
 		
 		echo -n "Running test $i of ${#TESTS[@]} ... "
 		cd $NEWTON_DIR
-		eval "timeout $TIMEOUT sh -c '{ $NEWTON -cra_newton_basic -cra-forward-inv --test=$RESULT $testf; } &> $outfile'"
+		eval "timeout $TIMEOUT sh -c '{ $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf; } > $outfile'"
 		success=$?
 		
 		if (($success==124)); then
@@ -63,7 +63,7 @@ for directory in ${TESTDIRS[@]}; do
 			echo -n "Duet ... "
 			echo -n "__DUET " >> $RESULT
 			cd $DUET_DIR
-			eval "timeout $TIMEOUT sh -c '{ $DUET -cra -cra-forward-inv $testf; } &> $duet_outfile'"
+			eval "timeout $TIMEOUT sh -c '{ $DUET -cra -cra-forward-inv -cra-split-loops $testf; } > $duet_outfile'"
 			if (($?==124)); then
 				echo "TIMEOUT" >> $RESULT
 				echo -e "\e[31mTimeout\e[0m"

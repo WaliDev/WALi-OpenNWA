@@ -4831,6 +4831,7 @@ int main(int argc, char **argv)
         {"verbose",          required_argument, 0,            'V' },
         {"verbosity",        required_argument, 0,            'I' },
         {"qe",               required_argument, 0,            'Q' },
+        {"cra-guard",        required_argument, 0,            'G' },
         {0,                  0,                 0,             0  }
     };
 
@@ -4860,7 +4861,8 @@ int main(int argc, char **argv)
 			case 'M':
 			case 'V':
 			case 'I':
-			case 'Q':		    			
+			case 'Q':
+	                case 'G':
 				std::cout << "Passing command-line option " << 	argv[optind - 2] << " " << optarg << " to duet." << std::endl;
 				unrecognizedArgs.push_back(argv[optind - 2]);
 				unrecognizedArgs.push_back(optarg);
