@@ -11,4 +11,5 @@ void loop() {
 
 void main() {
    loop();
+   assert(i==50);
 }

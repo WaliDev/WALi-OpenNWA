@@ -9,7 +9,6 @@ void start(int n, int m)
   int y=0;
 
   for (;;) {
-    tick++;
     if (x<n) {
       x=x+1; y=y+1;
     }
@@ -18,6 +17,7 @@ void start(int n, int m)
     }
     else
       break;
+    tick++;
   }
 }
 

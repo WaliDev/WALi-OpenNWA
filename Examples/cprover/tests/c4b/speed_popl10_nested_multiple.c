@@ -7,10 +7,10 @@ void start(int x, int n, int y, int m)
 {
   while (x<n) {
     while (y<m) {
-	  tick++;
       if (__VERIFIER_nondet_int())
         break;
       y=y+1;
+      tick++;
     }
     x=x+1;
   }
@@ -23,7 +23,7 @@ int main()
 	int n = __VERIFIER_nondet_int();
 	int m = __VERIFIER_nondet_int();
 
-	start(x, y, n, m);
+	start(x, n, y, m);
 	
 	int bnd = ((n>x)?(n-x):0) + ((m>y)?(m-y):0);
 	assert(tick <= bnd);

@@ -8,4 +8,5 @@ void p(int v) {
 int main() {
   x = 5;
   p(3);
+  assert(x==6);
 }

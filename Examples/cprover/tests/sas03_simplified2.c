@@ -9,4 +9,5 @@ int main() {
   x = 5;
   p(3);
   p(3);
+  assert (x == 7);
 }

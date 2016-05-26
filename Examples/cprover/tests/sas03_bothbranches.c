@@ -15,6 +15,14 @@ void p(int v) {
 }
 
 int main() {
-  x = 5;
-  p(9);
+  int v = __VERIFIER_nondet_int();
+  __VERIFIER_assume(v > 0);
+  int n = __VERIFIER_nondet_int();
+  __VERIFIER_assume(n > 0);
+  
+  
+  x = n;
+  p(v);
+  
+  assert(x==n);
 }

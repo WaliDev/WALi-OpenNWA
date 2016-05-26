@@ -2,9 +2,11 @@
 
 int main() {
   int x, y, i, j;
+  int n = __VERIFIER_nondet_int();
+  __VERIFIER_assume(n > 0);
 
   y = 0;
-  for(x = 0; x < 20; x++) {
+  for(x = 0; x < n; x++) {
     // Perform y = y + x*x;
     for (i = 0; i < x; i++) {
       for (j = 0; j < x; j++) {
@@ -12,6 +14,8 @@ int main() {
       }
     }
   }
+  
+  assert (6 * y = n * (n - 1) * (2 * n - 1));
 
   return 0;
 }
