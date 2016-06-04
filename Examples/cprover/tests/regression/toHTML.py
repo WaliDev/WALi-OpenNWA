@@ -65,7 +65,7 @@ for line in fin:
 		path=words[1]
 		fileName=os.path.basename(path)
 		
-		flipResult = ('unsafe' in fileName)	
+		flipResult = (('unsafe' in fileName) or ('false' in fileName))	
 		
 		fout.write('<tr align=\"center\">\n')
 		fout.write('<td>')
