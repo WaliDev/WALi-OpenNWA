@@ -1,5 +1,3 @@
-extern void __VERIFIER_error() __attribute__ ((__noreturn__));
-
 /* Licensed under the GPLv2 */
 
 int main(int argc, char **argv)

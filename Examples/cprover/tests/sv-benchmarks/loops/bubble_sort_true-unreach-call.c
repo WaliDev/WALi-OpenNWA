@@ -1,14 +1,3 @@
-extern void __VERIFIER_error() __attribute__ ((__noreturn__));
-
-void __VERIFIER_assert(int cond) {
-  if (!(cond)) {
-    ERROR: __VERIFIER_error();
-  }
-  return;
-}
-
-
-
 void bubblesort(int size, int item[])
 {
  int a, b, t;

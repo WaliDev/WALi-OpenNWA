@@ -9,7 +9,7 @@
 #define Q1_H_
 
 #include "bubblesort.h"
-extern int __VERIFIER_nondet_int();
+
 void q1(int argc, char* argv[])
 {
 	if(argc < 2)

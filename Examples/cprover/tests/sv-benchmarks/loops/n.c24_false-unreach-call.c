@@ -1,13 +1,4 @@
-extern void __VERIFIER_error() __attribute__ ((__noreturn__));
-
-void __VERIFIER_assert(int cond) {
-  if (!(cond)) {
-    ERROR: __VERIFIER_error();
-  }
-  return;
-}
 #include <string.h>
-extern int __VERIFIER_nondet_int(void);
 
 int bar(char *x)
 {

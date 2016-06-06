@@ -1,15 +1,3 @@
-extern void __VERIFIER_error() __attribute__ ((__noreturn__));
-extern void __VERIFIER_assume(int condition);
-
-void __VERIFIER_assert(int cond) {
-  if (!(cond)) {
-    ERROR: __VERIFIER_error();
-  }
-  return;
-}
-_Bool __VERIFIER_nondet_bool();
-int __VERIFIER_nondet_int();
-
 #define LARGE_INT 1000000
 
 void f(int d) {

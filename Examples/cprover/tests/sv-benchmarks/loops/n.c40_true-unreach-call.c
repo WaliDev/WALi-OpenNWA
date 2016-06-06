@@ -1,7 +1,3 @@
-extern void __VERIFIER_error() __attribute__ ((__noreturn__));
-
-int __VERIFIER_nondet_int();
-
   char x[100], y[100];
   int i,j,k;
 

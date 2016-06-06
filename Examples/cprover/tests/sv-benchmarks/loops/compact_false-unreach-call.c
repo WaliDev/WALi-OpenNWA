@@ -1,8 +1,4 @@
-extern void __VERIFIER_error() __attribute__ ((__noreturn__));
-
 /* Licensed under the GPLv2 */
-
-extern char __VERIFIER_nondet_char(void);
 
 int main(int argc, char **argv)
 {

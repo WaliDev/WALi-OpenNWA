@@ -1,14 +1,4 @@
-extern void __VERIFIER_error() __attribute__ ((__noreturn__));
-
-void __VERIFIER_assert(int cond) {
-  if (!(cond)) {
-    ERROR: __VERIFIER_error();
-  }
-  return;
-}
 #define MAX 10
-
-extern char __VERIFIER_nondet_char();
 
 int main(void)
 {

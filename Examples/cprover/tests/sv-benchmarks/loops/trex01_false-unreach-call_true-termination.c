@@ -1,14 +1,3 @@
-extern void __VERIFIER_error() __attribute__ ((__noreturn__));
-
-void __VERIFIER_assert(int cond) {
-  if (!(cond)) {
-    ERROR: __VERIFIER_error();
-  }
-  return;
-}
-_Bool __VERIFIER_nondet_bool();
-int __VERIFIER_nondet_int();
-
 void f(int d) {
   int x = __VERIFIER_nondet_int(), y = __VERIFIER_nondet_int(), k = __VERIFIER_nondet_int(), z = 1;
   L1:
