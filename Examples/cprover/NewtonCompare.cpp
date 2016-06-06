@@ -4908,7 +4908,7 @@ int main(int argc, char **argv)
     	if (runningMode == NEWTON_FROM_BELOW || runningMode == NEWTON_FROM_ABOVE) {
 			if (testMode) {
 				std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
-				testFile << "__FILENAME " << argv[optind] << std::endl;
+				testFile << "__FILENAME " << argv[optind] << " " << runningMode << std::endl;
 				testFile.close();
 			}
 			char **ocamlArgs = new char *[3 + unrecognizedArgs.size() + argc - optind];
