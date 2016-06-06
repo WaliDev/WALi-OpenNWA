@@ -1,27 +1,29 @@
 // C4B output: |[x,n]|+|[z,n]|
 
-unsigned int tick = 0;
+#include "tick.h"
 
 void start(int x, int z, int n)
 {
-  while (x<n) {
-	tick++;
-    if (z>x)
-      x=x+1;
-    else
-      z=z+1;
-  }
+	while (x < n) {
+		tick(1);
+		if (z > x)
+			x = x + 1;
+		else
+			z = z + 1;
+	}
 }
 
 int main() 
 {
+	init_tick(0);
+
 	int x = __VERIFIER_nondet_int();
 	int z = __VERIFIER_nondet_int();
 	int n = __VERIFIER_nondet_int();
 	
 	start(x, z, n);
 	
-	int bnd = ((n>x)?(n-x):0) + ((n>z)?(n-z):0);
-	assert(tick<=bnd);
+	int bnd = ((n > x) ? (n - x) : 0) + ((n > z) ? (n - z) : 0);
+	assert(__cost <= bnd);
 	return 0;
 }

@@ -1,20 +1,22 @@
 // C4B output: |[x,n]|+|[y,m]|
 
-unsigned int tick = 0;
+#include "tick.h"
 
 void start(int x, int y, int n, int m)
 {
-  while (n>x) {
-	tick++;
-    if (m>y) 
-      y = y+1;
-    else
-      x = x+1;
-  }
+	while (n > x) {
+		tick(1);
+		if (m > y) 
+			y = y + 1;
+		else
+			x = x + 1;
+	}
 }
 
 int main() 
 {
+	init_tick(0);
+
 	int x = __VERIFIER_nondet_int();
 	int y = __VERIFIER_nondet_int();
 	int n = __VERIFIER_nondet_int();
@@ -22,8 +24,8 @@ int main()
 	
 	start(x, y, n, m);
 	
-	int bnd = ((n>x)?(n-x):0) + ((m>y)?(m-y):0);
-	assert(tick <= bnd);
+	int bnd = ((n > x) ? (n - x) : 0) + ((m > y) ? (m - y) : 0);
+	assert(__cost <= bnd);
 	
 	return 0;
 }

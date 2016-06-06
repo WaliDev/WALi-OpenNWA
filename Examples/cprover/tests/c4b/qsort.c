@@ -1,35 +1,36 @@
 /* Quicksort */
 // C4B output: 1+2|[0,len]|
 
-int __VERIFIER_nondet_int();
-unsigned int tick = 0;
+#include "tick.h"
 
 void qsort(int *a, int lo, int hi) {
-  tick++;
-  int m1, m2, n;
+	tick(1);
+	int m1, m2, n;
 
-  if (hi - lo < 1)
-    return;
+	if (hi - lo < 1)
+		return;
 
-  n = __VERIFIER_nondet_int();   /* partition the array */
-  //assert( n > 0 );
-  __VERIFIER_assume(n > 0);
-  //assert( lo + n <= hi );
-  __VERIFIER_assume(lo + n <= hi);
+	n = __VERIFIER_nondet_int();	 /* partition the array */
+	//assert( n > 0 );
+	__VERIFIER_assume(n > 0);
+	//assert( lo + n <= hi );
+	__VERIFIER_assume(lo + n <= hi);
 
-  m1 = n + lo;
-  m2 = m1 - 1;
+	m1 = n + lo;
+	m2 = m1 - 1;
 
-  qsort(a, m1, hi);
-  qsort(a, lo, m2);
+	qsort(a, m1, hi);
+	qsort(a, lo, m2);
 }
 
 void start(int *a, int len) {
-  qsort(a, 0, len);
+	qsort(a, 0, len);
 }
 
 int main() 
 {
+	init_tick(0);
+	
 	int len = 20;		// legth of the array
 	int a[len];
 	int i;
@@ -39,6 +40,6 @@ int main()
 	start (a, len);
 
 	int bnd = 1 + 2 * len;
-	assert(tick <= bnd);	
+	assert(__cost <= bnd);	
 	return 0;
 }
