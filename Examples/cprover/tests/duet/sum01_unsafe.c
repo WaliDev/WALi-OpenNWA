@@ -1,11 +1,5 @@
-void __VERIFIER_assert(int cond) {
-  if (!(cond)) {
-    ERROR: goto ERROR;
-  }
-  return;
-}
 #define a (2)
-extern unsigned int __VERIFIER_nondet_uint();
+
 void main() { 
     int i, n=rand(), sn=0;
     assume(n >= 0);

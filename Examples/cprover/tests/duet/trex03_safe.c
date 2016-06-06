@@ -1,12 +1,3 @@
-void __VERIFIER_assert(int cond) {
-  if (!(cond)) {
-    ERROR: goto ERROR;
-  }
-  return;
-}
-unsigned int __VERIFIER_nondet_uint();
-_Bool __VERIFIER_nondet_bool();
-
 int main()
 {
     unsigned int x1=rand(), x2=rand(), x3=rand();

@@ -1,13 +1,3 @@
-extern void __VERIFIER_assume(int);
-void __VERIFIER_assert(int cond) {
-  if (!(cond)) {
-    ERROR: goto ERROR;
-  }
-  return;
-}
-int __VERIFIER_nondet_int();
-_Bool __VERIFIER_nondet_bool();
-
 void main()
 {
   int x=rand();

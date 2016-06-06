@@ -1,13 +1,4 @@
-void __VERIFIER_assert(int cond) {
-  if (!(cond)) {
-    ERROR: goto ERROR;
-  }
-  return;
-}
 #define bool int
-
-extern unsigned int __VERIFIER_nondet_uint();
-extern bool __VERIFIER_nondet_bool();
 
 int main()
 {

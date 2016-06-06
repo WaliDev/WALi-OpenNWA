@@ -1,12 +1,3 @@
-void __VERIFIER_assert(int cond) {
-  if (!(cond)) {
-    ERROR: goto ERROR;
-  }
-  return;
-}
-_Bool __VERIFIER_nondet_bool();
-int __VERIFIER_nondet_int();
-
 //x is an input variable
 int x;
 

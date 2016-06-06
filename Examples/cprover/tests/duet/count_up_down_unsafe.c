@@ -1,11 +1,3 @@
-void __VERIFIER_assert(int cond) {
-  if (!(cond)) {
-    ERROR: goto ERROR;
-  }
-  return;
-}
-unsigned int __VERIFIER_nondet_uint();
-
 void main()
 {
     unsigned int n = rand();

@@ -1,11 +1,4 @@
-void __VERIFIER_assert(int cond) {
-  if (!(cond)) {
-    ERROR: goto ERROR;
-  }
-  return;
-}
 #define a (2)
-unsigned int __VERIFIER_nondet_uint();
 
 int main() { 
   int sn=0;

@@ -1,11 +1,3 @@
-void __VERIFIER_assert(int cond) {
-  if (!(cond)) {
-    ERROR: goto ERROR;
-  }
-  return;
-}
-extern int __VERIFIER_nondet_int();
-
 void main() {
     int x=rand();
     int y=rand();
