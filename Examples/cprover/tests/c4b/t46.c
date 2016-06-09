@@ -1,40 +1,40 @@
 // C4B output: |[0,y]|
 
-unsigned int tick = 0;
+#include "tick.h"
 
 int x, y;
 
 void produce() {
-  while (x > 0) {
-    tick--;	
-	//tick(-1);
-    x--; y++;
-  }
+	while (x > 0) {
+		tick(-1);
+		x--; y++;
+	}
 }
 
 void consume() {
-  while (y > 0) {
-	tick++;
-    y--; x++; 
-	//tick(1);
-  }
+	while (y > 0) {
+		tick(1);
+		y--; x++; 
+	}
 }
 
 void start(int y, int z) {
-  consume(); produce(); consume();
+	consume(); produce(); consume();
 }
 
 int main() 
 {
+	init_tick(0);
+
 	x = __VERIFIER_nondet_int();
 	y = __VERIFIER_nondet_int();
 	int z = __VERIFIER_nondet_int();
 
-	int bnd = (y>0)?y:0;
+	int bnd = (y > 0) ? y : 0;
 	
 	start(y, z);
 	
-	assert(tick <= bnd);
+	assert(__cost <= bnd);
 	
 	return 0;
 }

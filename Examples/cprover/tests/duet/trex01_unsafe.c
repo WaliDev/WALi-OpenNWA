@@ -1,11 +1,3 @@
-void __VERIFIER_assert(int cond) {
-  if (!(cond)) {
-    ERROR: goto ERROR;
-  }
-  return;
-}
-_Bool __VERIFIER_nondet_bool();
-
 void f(int d) {
   int x, y, k, z = 1;
   L1:

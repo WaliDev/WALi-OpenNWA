@@ -1,0 +1,10 @@
+#define a (2)
+
+int main() { 
+  int i, n=__VERIFIER_nondet_uint(), sn=0;
+  for(i=1; i<=n; i++) {
+    sn = sn + a;
+    if (i==4) sn=-10;
+  }
+  __VERIFIER_assert(sn==n*a || sn == 0);
+}

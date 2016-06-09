@@ -1,33 +1,35 @@
 // C4B output: 101|[0,x]|
 
-unsigned int tick = 0;
+#include "tick.h"
 
 void start(int x, int y)
 {
-  int z;
+	int z;
 
-//  assert(y >= 0);
+	// assert(y >= 0);
 
-  while (x > y) {
-    x -= y+1;
-    z = 100 + 2*y;
-    while (z > 0) {
-	  tick++;
-      z--;
+	while (x > y) {
+		x -= y + 1;
+		z = 100 + 2 * y;
+		while (z > 0) {
+			tick(1);
+			z--;
+		}
 	}
-  }
 }
 
 int main() 
 {
+	init_tick(0);
+
 	int x = __VERIFIER_nondet_int();
 	int y = __VERIFIER_nondet_int();
 	__VERIFIER_assume(y >= 0);
 
 	start(x, y);
 	
-	int bnd = 101 * ((x>0)?x:0);
-	assert(tick <= bnd);
+	int bnd = 101 * ((x > 0) ? x : 0);
+	assert(__cost <= bnd);
 	
 	return 0;
 }

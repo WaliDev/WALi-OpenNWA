@@ -1,4 +1,3 @@
-
 int x, y, q, r, tmp;
 void subtract() {
     int tmp;

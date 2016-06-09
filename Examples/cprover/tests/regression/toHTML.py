@@ -34,6 +34,9 @@ firstElem = True
 firstAssertion = True
 flipResult = False
 dirName=os.getcwd()
+# these constants are declared in NewtonCompare.cpp
+NEWTON_BELOW = 1
+NEWTON_ABOVE = 3
 
 for line in fin:
 	words = line.split()
@@ -64,21 +67,28 @@ for line in fin:
 		
 		path=words[1]
 		fileName=os.path.basename(path)
-		
-		flipResult = ('unsafe' in fileName)	
+		if (int(words[2]) == NEWTON_ABOVE):
+			runMode = 'above'
+		else:
+			runMode = 'below'
+			
+		flipResult = (('unsafe' in fileName) or ('false' in fileName))	
 		
 		fout.write('<tr align=\"center\">\n')
-		fout.write('<td>')
-		fout.write('<a href=\"inputs/' + fileName + '\">' + fileName + '</a>')
-		fout.write('</td>\n')
+		
+		if (runMode == 'below'):
+			fout.write('<td rowspan="2">')
+			fout.write('<a href=\"inputs/' + fileName + '\">' + fileName + '</a>')
+			fout.write('</td>\n')
 		
 		fout.write('<td>')
-		fout.write('<a href=\"outputs/' + fileName + '.out\">output</a>')
+		fout.write('<a href=\"outputs/' + fileName + '.' + runMode + '.out\">' + runMode + '</a>')
 		fout.write('</td>\n')
 		
-		fout.write('<td>')
-		fout.write('<a href=\"outputs/' + fileName + '.duet.out\">duet</a>')
-		fout.write('</td>\n')
+		if (runMode == 'below'):
+			fout.write('<td rowspan="2">')
+			fout.write('<a href=\"outputs/' + fileName + '.duet.out\">duet</a>')
+			fout.write('</td>\n')
 		
 	elif (words[0] == "__NUMRNDS"):
 		fout.write('<td>')
@@ -110,7 +120,7 @@ for line in fin:
 			firstAssertion = True
 			fout.write('</td>\n')
 			
-		fout.write('<td>')
+		fout.write('<td rowspan="2">')
 		for i in range(len(words)-1):
 			if (flipResult):
 				if (words[i+1] == "FAIL"):

@@ -1,7 +1,7 @@
 /* Knuth-Morris-Pratt string searching */
 // C4B output: 1+2|[0,n]|
 
-unsigned int tick = 0;
+#include "tick.h"
 
 int srch(int t[],    // object string 
          int n,      // length of the object string
@@ -16,7 +16,7 @@ int srch(int t[],    // object string
         
         while (i < n) {
               while (j >= 0 && t[i] != p[j]) {  // check for a match failure
-                        tick++;
+                        tick(1);
                         // Adjust j according to the failure function
                         k = b[j];
                         __VERIFIER_assume(k > 0);
@@ -32,6 +32,8 @@ int srch(int t[],    // object string
 
 int main()
 {
+        init_tick(0);
+        
         int t[30];       // object string (i.e., the string being searched)
         int t_len = 10;  // length of object string
         int p[20];       // pattern string
@@ -58,6 +60,6 @@ int main()
 
         srch(t, t_len, p, p_len, b);
 
-        assert(tick <= t_len + p_len);
+        assert(__cost <= t_len + p_len);
         return 0;
 }
