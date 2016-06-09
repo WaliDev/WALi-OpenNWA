@@ -1,0 +1,185 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Helper routines to filter out unnecessary PDGs.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define (begins-with-dot pdg)
+ (let ((pdg-name (pdg-procedure-name pdg)))
+  (let ((und-pos (string-index "." pdg-name))) 
+   (if (not (equal? und-pos #f))
+    (if (= und-pos 0)
+     #t
+     #f
+    )
+    #f
+   )
+  )
+ ) 
+)
+
+(define (begins-with-framedummy pdg)
+ (let ((pdg-name (pdg-procedure-name pdg)))
+  (let ((und-pos (string-index "frame_dummy" pdg-name))) 
+   (if (not (equal? und-pos #f))
+    (if (= und-pos 0)
+     #t
+     #f
+    )
+    #f
+   )
+  )
+ ) 
+)
+
+(define (skip-pdg? pdg)
+ (if (equal? (pdg-kind pdg) 'user-defined)
+  ;; Do not process PDGs whose names begin with "."
+  (begins-with-dot pdg)
+  #t
+ )
+)
+
+(define (display-vertex pdgv file)
+  (begin
+     (display "Line " file)
+     (display (cdr (pdg-vertex-file-line pdgv)) file)
+     (display ": " file)
+     (display (ast-label (pdg-vertex-ast pdgv 'normalized)) file)
+     (display " [" file)
+     (display (pdg-vertex-id pdgv) file)
+     (display "]\n" file)
+  )
+)
+
+;; Is vertex an edge-kind element of edge-set?
+(define (pdg-edge-set-lookup-helper edge-set vertex edge-kind)
+  (pdg-edge-set-traverse
+    edge-set
+    (lambda (pdgv kind)
+      (if (and (equal? pdgv vertex) (equal? kind edge-kind))
+        #f
+        #t
+      )
+    )
+  )
+)
+
+(define (pdg-edge-set-lookup edge-set vertex edge-kind)
+  (if (null? edge-set)
+     #f
+     (not (pdg-edge-set-lookup-helper edge-set vertex edge-kind))
+  )
+)
+
+;; Is there a transitive control-dependence path from v1 to v2?
+(define (trans-control-dep-path v1 v2)
+  (let ((b-slice-criterion (pdg-vertex-set-create)))
+    (pdg-vertex-set-put! b-slice-criterion v2)
+    (let ((slice-set (s-slice b-slice-criterion 'control)))
+      (pdg-vertex-set-member? slice-set v1) 
+    )
+  )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; MAIN PROGRAM
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define (process-pdg pdg file)
+ (begin
+  ;; First print info about the current PDG
+  (display "Line " file)
+  (display (cdr (pdg-file-line pdg)) file)
+  (display ": " file)
+  (display (pdg-procedure-name pdg) file)
+  (display " [" file)
+  (display (pdg-procedure-id pdg) file)
+  (display "]\n" file)
+
+  ;; For each pair (cond1,cond2) of different conditional-branch nodes
+  (pdg-vertex-set-traverse
+   (pdg-vertices pdg)
+   (lambda (cond1)
+     (if (equal? (pdg-vertex-kind cond1) 'control-point)
+       (pdg-vertex-set-traverse
+        (pdg-vertices pdg)
+        (lambda (cond2)
+         (if (and
+              (equal? (pdg-vertex-kind cond2) 'control-point)
+              (not (equal? cond1 cond2))
+             )
+           ;; For each control-dependence successor of cond1
+           (pdg-edge-set-traverse
+             (pdg-vertex-intra-targets cond1)
+             (lambda (pdgv4 e4)
+               (if (equal? e4 'control)
+                 ;; For each transitive control-dependence successor of cond1
+                 (let ((f-slice-criterion (pdg-vertex-set-create)))
+                   (pdg-vertex-set-put! f-slice-criterion cond1) 
+                   (pdg-vertex-set-traverse
+                     (s-forward-slice f-slice-criterion 'control)
+                     (lambda (pdgv3)
+                       (if (and
+                             (not (equal? pdgv3 pdgv4))
+                             (not (equal? pdgv3 cond2)) ;; cond2 not in forward control slice w.r.t. cond1
+                           )
+                         (let ((targ3 (pdg-vertex-intra-targets pdgv3))
+                               (targ4 (pdg-vertex-intra-targets pdgv4)))
+                           (if (and
+                                 (pdg-edge-set-lookup targ3 cond2 'data)
+                                 (pdg-edge-set-lookup targ3 pdgv3 'data)
+                                 (pdg-edge-set-lookup targ4 pdgv4 'data)
+                                 (pdg-edge-set-lookup targ4 cond1 'data)
+                                 (not (pdg-edge-set-lookup targ3 pdgv4 'data))
+                                 (not (pdg-edge-set-lookup targ4 pdgv3 'data))
+                                 (not (trans-control-dep-path cond2 cond1))
+                               )
+                             (begin
+                               (display "\n-------------------------\n" file)
+                               (display-vertex cond1 file)
+                               (display-vertex pdgv4 file)
+                               (display-vertex pdgv3 file)
+                               (display-vertex cond2 file)
+                               (display "\n-------------------------\n" file)
+                             )
+                           )
+                         )
+                       )
+                       #t
+                     )
+                   )
+                 )
+               )
+               #t
+             )
+           )
+         )
+         #t
+        )
+       )
+     )
+     #t
+   )
+  )
+ )
+)
+
+(let ((lese-configurations (open-output-file "lese-configurations.txt")))
+ (for-each
+  (lambda (pdg)
+   (if (not (skip-pdg? pdg))
+    (begin  
+     (display "Line ")
+     (display (cdr (pdg-file-line pdg)))
+     (display ": ")
+     (display (pdg-procedure-name pdg))
+     (display " [")
+     (display (pdg-procedure-id pdg))
+     (display "]\n")
+     (process-pdg pdg lese-configurations)
+    )
+   ) 
+   #t
+  )
+  (sdg-pdgs)
+ )
+)

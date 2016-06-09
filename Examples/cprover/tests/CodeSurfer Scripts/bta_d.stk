@@ -1,0 +1,250 @@
+;; This is the stk script that finds Dynamic instructions in the BTA algorithm.
+;; Given the effective addresses of instructions that initialize dynamic inputs
+;; this script uses forward slicing to compute the set of dynamic 
+;; instructions in the binary. The output is a list of effective addresses of D
+;; instructions. The script writes its output in a file named 'D'. The scripts 
+;; that implement subsequent phases of the BTA algorithm and the specializer 
+;; will later read from the 'D' file. 
+;; NOTE: The codesurfer build of the binary on which this script is run must
+;; have the esp, ebp supressions turned on; i.e. the build must not have the
+;; '-sp_bp_deps yes' option set.
+;; To try out the script for an executable named 'test' in the tests directory
+;; csurf -preset-build-options high -compute-summaries no -x86 test vsa 
+;; (Notice that -sp_bp_deps is not turned on). Also, the forward slicing done 
+;; during BTA is not context-sensitive. This is because, if the body of a 
+;; function 'foo' is D, and, if a call C1 is S and another call C2 is D, C1 
+;; will require the (Static) return value of 'foo', which will not be available
+;; in the partial state since the entire body of 'foo' is D (and thus, the 
+;; return value of 'foo' will cannot be computed). 
+;; The user can provide extra dependence edges of the form 
+;; source1_EA
+;; dest1_EA
+;; source2_EA
+;; dest2_EA
+;; ...
+;; in a file called 'extra_deps'. These are used to convey dependes between 
+;; parameters and return values of library functions. (Csurf x86 uses csurf
+;; library models, which may be inaccurate for x86.) 
+;; csurf -nogui -l ../../../BTA/bta_d.stk test.prj -args $(cat test.sc) 
+;; To view output in the 'D' file in hex format, use:
+;; cat D | python ../../../scripts/dec_to_hex.py 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;BTA algorithm
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; This function prints the effective address of a pdg-vertex
+(define (print-pdg-vertex-ea pdgv port)
+(let ((ea (pdg-vertex-ea pdgv))) 
+ (if (not (equal? ea #f))
+  (begin 
+(Display (pdg-vertex-ea pdgv) port)
+(Display "\n" port)
+  )
+ )
+)
+)
+
+;; This function prints a pdg-vertex-set
+(define (print-vertices pdg-vertex-set port)
+(pdg-vertex-set-traverse 
+pdg-vertex-set
+(lambda (pdgv)
+(print-pdg-vertex-ea pdgv port)
+)
+)
+)
+
+;; Helper functions for computing slices using extra dependences
+(define (enhance-slicing-criteria slice deps new-slicing-criteria)
+    (if (equal? deps '())
+       new-slicing-criteria
+        (let ((dep (car deps)))
+            (let ((src-vertex (car dep)) (dest-vertex (cdr dep)))
+                (if (pdg-vertex-set-member? slice src-vertex)
+                    (pdg-vertex-set-put! new-slicing-criteria dest-vertex)
+                ) 
+            )
+            (enhance-slicing-criteria slice (cdr deps) new-slicing-criteria)
+        )
+    )   
+)
+(define (enhance-slicing-criteria-backward slice deps new-slicing-criteria)
+    (if (equal? deps '())
+       new-slicing-criteria
+        (let ((dep (car deps)))
+            (let ((src-vertex (car dep)) (dest-vertex (cdr dep)))
+                (if (pdg-vertex-set-member? slice dest-vertex)
+                    (pdg-vertex-set-put! new-slicing-criteria src-vertex)
+                ) 
+            )
+            (enhance-slicing-criteria slice (cdr deps) new-slicing-criteria)
+        )
+    )   
+)
+
+;; This function is used to compute a forward dependence while taking into
+;; account extra dependences
+(define (compute-forward-slice slicing-criteria deps)
+    (let ((slice (s-forward-slice slicing-criteria 'data-control)))
+        ;;(let ((new-slicing-criteria (pdg-vertex-set-copy slicing-criteria)))
+        ;;    (begin
+        ;;        (enhance-slicing-criteria slice deps new-slicing-criteria)
+        ;;        (let ((extra-vertices (pdg-vertex-set-subtract new-slicing-criteria slicing-criteria)))
+        ;;            (if (pdg-vertex-set-empty? extra-vertices) 
+        ;;                slice
+        ;;                (compute-forward-slice new-slicing-criteria deps)
+        ;;            )
+        ;;        )
+        ;;    )
+        ;;)
+        slice
+    )
+)
+
+;; This function is used to compute a backward dependence while taking into
+;; account extra dependences
+(define (compute-backward-slice slicing-criteria deps)
+    (let ((slice (s-slice slicing-criteria 'data-control)))
+        (let ((new-slicing-criteria (pdg-vertex-set-copy slicing-criteria)))
+            (begin
+                (enhance-slicing-criteria-backward slice deps new-slicing-criteria)
+                (let ((extra-vertices (pdg-vertex-set-subtract new-slicing-criteria slicing-criteria)))
+                    (if (pdg-vertex-set-empty? extra-vertices) 
+                        slice
+                        (compute-backward-slice new-slicing-criteria deps)
+                    )
+                )
+            )
+        )
+    )
+)
+
+;; This function is the main function
+;; Inputs:
+;; pdg: pdg of the main function
+;; ea-list: the list of effective addresses of instructions that form the
+;; slicing criteria
+;; Outputs: Prints the effective addresses of dynamic pdg vertices
+(define (process-main pdg ea-list deps)
+(let ((slicing-criteria (pdg-vertex-set-create)))
+;; First initialize the slicing criteria - the set of pdg vertices to slice from
+        (eas-to-pdgvs ea-list slicing-criteria)
+;; Now compute the d-vertices using the forward slice. This is the
+        ;; regular forward slice we do during BTA to find all nodes affected 
+        ;; by the D inputs.
+(let ((d-vertices (compute-forward-slice slicing-criteria deps)))
+            (let ((port (open-output-file "D")))
+        (print-vertices d-vertices port)
+                (close-output-port port)
+            )
+        )
+ )
+)
+
+;; This function is used to convert a list of EAs into the set of PDG
+;; vertices corresponding to the EAs.
+(define (eas-to-pdgvs ea-list slicing-criteria)
+    (if (equal? '() ea-list)
+        slicing-criteria
+        (let ((pdgv (x86fe-pdgv-for-ea (car ea-list))))
+            (if (equal? pdgv #f)
+                (eas-to-pdgvs (cdr ea-list) slicing-criteria)
+                (begin
+                    (pdg-vertex-set-put! slicing-criteria pdgv)
+                    (eas-to-pdgvs (cdr ea-list) slicing-criteria)
+                    #t
+                )
+            )
+        )
+    )
+)
+
+;; This function converts a list of strings into an equivalent list of numbers
+(define (process-ea-args str-ea-list number-ea-list)
+(if (equal? '() str-ea-list)
+number-ea-list
+        (let ((ea-str (car str-ea-list)))
+            (let ((ea-num (string->number ea-str)))
+                (process-ea-args (cdr str-ea-list) (cons ea-num number-ea-list))
+            )
+        )
+    )
+)
+
+;; Helper function for reading extra dependences
+(define (get-vertex ea)
+    (let ((vertex (x86fe-pdgv-for-ea ea)))
+        (if (equal? vertex #f)
+            (begin
+                (display "ERROR: Vertex for EA")
+                (display ea)
+                (display " is #f\n")
+                (exit)
+            )
+            vertex
+        )
+    )
+)
+
+;; This function is used to read library function dependences of the format
+;; (src_EA target_EA)* from a file called "extra_deps"
+(define (read-extra-dependences port deps)
+    (let ((src (read-line port)))
+        (if (or (eof-object? src) (string=? src ""))
+            deps
+            (let ((dest (read-line port)))
+                (if (eof-object? dest)
+                    (begin
+                        (display "ERROR - Incomplete dependence in file\n")
+                        (exit)
+                    )
+                    (let ((src-ea (string->number src)) (dest-ea (string->number dest)))
+                        (let ((src-vertex (get-vertex src-ea)) (dest-vertex (get-vertex dest-ea)))
+                            (read-extra-dependences port (cons (cons src-vertex dest-vertex) deps))
+                        )
+                    )
+                )
+            )
+        )
+    )
+)
+
+;; This function is used to print extra dependences to the console
+(define (print-extra-dependences deps)
+    (if (equal? deps '())
+        (display "\n")
+        (let ((dep (car deps)))
+            (let ((src (car dep)) (dest (cdr dep)))
+                (begin
+                    (display (pdg-vertex-ea src))
+                    (display " ")
+                    (display (pdg-vertex-ea dest))
+                    (display "\n")
+                    (print-extra-dependences (cdr deps))
+                )
+            )
+        )
+    )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; MAIN PROGRAM
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(for-each
+ (lambda (pdg)
+  (when (equal? (pdg-kind pdg) 'user-defined)
+  ;; Only process the PDG of main
+ (if (string=? (pdg-procedure-name pdg) "main")
+            (let ((port (open-input-file "extra_deps")))
+                (let ((deps (read-extra-dependences port '())))
+                    (print-extra-dependences deps)
+        (process-main pdg (process-ea-args *userargv* '()) deps)
+                )
+            )
+)
+  )
+ )
+ (sdg-pdgs)
+)
+

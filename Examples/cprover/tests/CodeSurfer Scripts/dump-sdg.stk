@@ -1,0 +1,550 @@
+;; This script is used to dump the CodeSurfer/x86 SDG into a file. This file
+;; will later be used by the micro-code slicer to rebuild the SDG.
+;; To use this script, build the csurf project with the following options:
+;; -preset-build-options highest (so that the slice is context-sensitive; 
+;; this also ensures that summary edges are computed)
+;; -sp_bp_deps yes (so that the slice includes sp and bp dependences)
+;; The script can be invoked as follows:
+;; csurf -nogui -l $(MICROCODE_SLICER_ROOT)/stk/dump-sdg.stk test.prj 
+;; This script creates 2 output files: 'nodes' and 'edges'. Each file 
+;; has the following format: ('nodes' file is shown below as an example;
+;; 'edges' file has a similar format.)
+;; PDG_1_ID
+;; node_1_ID node_1_info
+;; ...
+;; node_m_ID node_m_info
+;; #
+;; PDG_2_ID
+;; node_1_ID node_1_info
+;; ...
+;; node_n_ID node_m_info
+;; #
+;; ...
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Helper routines to deal with library-function calls.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define (populate-lib-fns-helper port lib-fns)
+ (let ((lib-fn (read-line port)))
+  (if (not (eof-object? lib-fn))
+   (populate-lib-fns-helper port (cons lib-fn lib-fns))
+   lib-fns
+  )
+ )
+)
+
+(define (populate-lib-fns)
+ (let ((port (open-input-file "Lib")))
+  (let ((lib-fns (populate-lib-fns-helper port '())))
+   (close-input-port port)
+   lib-fns
+  )
+ )
+)
+
+(define (lib-fn? proc-name lib-fns)
+ (if (not (equal? lib-fns '()))
+  (if (string=? proc-name (car lib-fns))
+   #t
+   (lib-fn? proc-name (cdr lib-fns))
+  )
+  #f
+ )
+)
+
+(define (lib-fn-actual-in-node? pdgv lib-fns)
+ ;; If this node is not an actual-in, return false
+ (let ((node-kind (pdg-vertex-kind pdgv)))
+  (if (not (or (equal? node-kind 'actual-in) 
+               (equal? node-kind 'global-actual-in)))
+   #f
+   ;; Node is an actual-in. Get the callsite associated with the 
+   ;; node, and get the name of the callee
+   (let ((call-site (pdg-vertex-call-site pdgv)))
+    (let ((callee-name (pdg-procedure-name (pdg-vertex-callee call-site))))
+     (lib-fn? callee-name lib-fns)
+    )
+   )
+  )
+ )
+)
+
+(define (lib-fn-node? pdgv lib-fns)
+ ;; If this node is not an actual-in, or actual-out return false
+ (let ((node-kind (pdg-vertex-kind pdgv)))
+  (if (not (or (equal? node-kind 'actual-in) 
+           (or (equal? node-kind 'global-actual-in)
+           (or (equal? node-kind 'actual-out)
+               (equal? node-kind 'global-actual-out)))))
+   #f
+   ;; Node is an actual-in or actual out. Get the callsite associated with the 
+   ;; node, and get the name of the callee
+   (let ((call-site (pdg-vertex-call-site pdgv)))
+    (let ((callee-name (pdg-procedure-name (pdg-vertex-callee call-site))))
+     (lib-fn? callee-name lib-fns)
+    )
+   )
+  )
+ )
+)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Helper routines to filter out unnecessary PDGs.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define (begins-with-underscore pdg)
+ (let ((pdg-name (pdg-procedure-name pdg)))
+  (let ((und-pos (string-index "_" pdg-name))) 
+   (if (not (equal? und-pos #f))
+    (if (= und-pos 0)
+     #t
+     #f
+    )
+    #f
+   )
+  )
+ ) 
+)
+
+(define (begins-with-dot pdg)
+ (let ((pdg-name (pdg-procedure-name pdg)))
+  (let ((und-pos (string-index "." pdg-name))) 
+   (if (not (equal? und-pos #f))
+    (if (= und-pos 0)
+     #t
+     #f
+    )
+    #f
+   )
+  )
+ ) 
+)
+
+(define (begins-with-framedummy pdg)
+ (let ((pdg-name (pdg-procedure-name pdg)))
+  (let ((und-pos (string-index "frame_dummy" pdg-name))) 
+   (if (not (equal? und-pos #f))
+    (if (= und-pos 0)
+     #t
+     #f
+    )
+    #f
+   )
+  )
+ ) 
+)
+
+
+(define (skip-pdg? pdg)
+ (if (equal? (pdg-kind pdg) 'user-defined)
+  ;; Do not process PDGs whose names begin with "_" or "."
+  (or (begins-with-underscore pdg) 
+      (or (begins-with-dot pdg) (begins-with-framedummy pdg)))
+  #t
+ )
+)
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Helper routines to print the use, kill, and cond kill sets of a node
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define (print-a-loc-set a-loc-set port)
+ (abs-loc-set-traverse 
+  a-loc-set
+  (lambda (a-loc)
+   (begin
+    (display (abs-loc-name a-loc) port)
+    (display "\n" port)
+    #t
+   )
+  )
+ )
+)
+
+(define (print-a-loc-list a-loc-list port)
+ (if (not (equal? a-loc-list '()))
+  (begin
+   (display (abs-loc-name (car a-loc-list)) port)
+   (display "\n" port)
+   (print-a-loc-list (cdr a-loc-list) port)
+  )
+ )
+)
+
+(define (print-usekill pdgv port-nodes)
+ (let ((used (pdg-vertex-ids-used pdgv)) (killed (pdg-vertex-ids-killed pdgv))
+ (cond-killed (pdg-vertex-ids-cond-killed pdgv)) (params (pdg-vertex-parameter-symbols pdgv)))
+  (print-a-loc-set used port-nodes)
+  (if (or (equal? (pdg-vertex-kind pdgv) 'global-actual-in) 
+          (equal? (pdg-vertex-kind pdgv) 'global-formal-out))
+   (print-a-loc-list params port-nodes)
+  )
+  (display "#\n" port-nodes) 
+  (print-a-loc-set killed port-nodes)
+  (if (or (equal? (pdg-vertex-kind pdgv) 'global-actual-out) 
+          (equal? (pdg-vertex-kind pdgv) 'global-formal-in))
+   (print-a-loc-list params port-nodes)
+  )
+  (display "#\n" port-nodes)
+  (print-a-loc-set cond-killed port-nodes)
+  (display "#\n" port-nodes)
+ )
+)
+
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Principal functions to dump information about nodes and edges.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define (summary-edge? node1 node2)
+ ;; If node1 is not an actual-in, nor node2 is an actual out, then return
+ ;; false. (Summary edges only exist between actual-ins and actual-outs.)
+ ;; If node1 and node2 are not part of the same call-site, again there 
+ ;; can't be a summary edge between the two.
+ ;; Compute the forward slice from node1. If node2 is in the forward
+ ;; slice, then there is a summary edge between node1 and node2.
+ (let ((node1-kind (pdg-vertex-kind node1)) (node2-kind (pdg-vertex-kind node2)))
+  (if (not (and (or (equal? node1-kind 'actual-in) 
+                    (equal? node1-kind 'global-actual-in)) 
+                (or (equal? node2-kind 'actual-out) 
+                    (equal? node2-kind 'global-actual-out))))
+   #f
+   (if (not (equal? (pdg-vertex-call-site node1) 
+                    (pdg-vertex-call-site node2)))
+    #f
+    (let ((sc (pdg-vertex-set-create)))
+     (pdg-vertex-set-put! sc node1)
+     (let ((fwd-slice (s-forward-slice sc 'data-control)))
+      (if (pdg-vertex-set-member? fwd-slice node2)
+       #t
+       #f
+      )
+     )
+    )
+   )
+  )
+ )
+)
+
+(define (is-associated-vertex? pdgv)
+ (or (equal? (pdg-vertex-kind pdgv) 'actual-in) 
+     (or (equal? (pdg-vertex-kind pdgv) 'actual-out) 
+         (or (equal? (pdg-vertex-kind pdgv) 'global-actual-in) 
+             (equal? (pdg-vertex-kind pdgv) 'global-actual-out))))
+)
+
+(define (get-solitary-cfg-succ pdgv)
+ (let ((succ (pdg-vertex-solitary-cfg-target pdgv)))
+  (if (not (equal? succ #f))
+   succ
+   #f
+  )
+ )
+)
+
+(define (get-succ-exp-node pdgv)
+ (if (or (equal? pdgv #f) (equal? (pdg-vertex-kind pdgv) 'expression))
+  pdgv
+  (get-succ-exp-node (get-solitary-cfg-succ pdgv))
+ )
+)
+
+(define (output-cfg-edges-call-site call-site port-edges)
+ (let ((succ (get-succ-exp-node call-site)))
+  (pdg-vertex-set-traverse
+   (pdg-vertex-actuals-in call-site)
+   (lambda (pdgv)
+    (begin
+     (display (pdg-vertex-id call-site) port-edges)
+     (display " " port-edges)
+     (display (pdg-vertex-id pdgv) port-edges)
+     (display "\n" port-edges)
+    )
+    #t
+   )
+  )
+  (pdg-vertex-set-traverse
+   (pdg-vertex-actuals-out call-site)
+   (lambda (pdgv)
+    (begin
+     ;; Sometimes, the CFG succ of a call site can be an 
+     ;; exit node. In such cases succ will be #f (see defn
+     ;; of get-solitary-cfg-succ). For such succs, don't
+     ;; print an edge
+     (if (not (equal? succ #f))
+      (begin
+       (display (pdg-vertex-id pdgv) port-edges)
+       (display " " port-edges)
+       (display (pdg-vertex-id succ) port-edges)
+       (display "\n" port-edges)
+      )
+     )
+     (display (pdg-vertex-id call-site) port-edges)
+     (display " " port-edges)
+     (display (pdg-vertex-id pdgv) port-edges)
+     (display "\n" port-edges)
+    )
+    #t
+   )
+  )
+ )
+)
+
+(define (ignore? pdgv)
+    (if (or (equal? (pdg-vertex-kind pdgv) 'declaration) (equal? (pdg-vertex-kind pdgv) 'auxiliary))
+        #t
+        #f
+    )
+)
+
+(define (process-edges pdg port-edges lib-fns)
+ (begin
+  ;; First print info about the current PDG
+  (display (pdg-procedure-id pdg) port-edges)
+  (display " " port-edges)
+  (display (pdg-procedure-name pdg) port-edges)
+  (display "\n" port-edges)
+  ;; Iterate through all nodes in the PDG
+  (pdg-vertex-set-traverse
+   (pdg-vertices pdg)
+   (lambda (pdgv)
+    (let ((node-id (pdg-vertex-id pdgv)))
+     ;; If the current node is a declaration node, no need to process it
+     (if (not (ignore? pdgv))
+      (begin
+       ;; For each node, iterate all outgoing intraprocedural dependence 
+       ;; edges and print them
+       (pdg-edge-set-traverse
+        (pdg-vertex-intra-targets pdgv)
+        (lambda (pdgv1 e)
+         ;; No need to display edges to declaration nodes
+         (if (not (ignore? pdgv1))
+          ;; Sometimes, summary edges might be included in 
+          ;; intra targets. Make sure we are not adding summary 
+          ;; edges to intraprocedural edges
+          (if (not (summary-edge? pdgv pdgv1))
+           (begin
+            (display node-id port-edges)
+            (display " " port-edges)
+            (display (pdg-procedure-id pdg) port-edges)
+            (display " " port-edges)
+            (display (pdg-vertex-id pdgv1) port-edges)
+            (display " INTRA " port-edges)
+            (if (equal? e 'data)
+             (display "D NON-SUMMARY\n" port-edges)
+             (display "C NON-SUMMARY\n" port-edges)
+            )
+           )
+          )
+         )
+         #t
+        ) 
+       )
+       ;; If the node is not an actual-in associated with a library-function 
+       ;; call, iterate all outgoing interprocedural dependence edges and
+       ;; print them
+       (if (not (lib-fn-actual-in-node? pdgv lib-fns))
+        (pdg-edge-set-traverse
+         (pdg-vertex-inter-targets pdgv)
+         (lambda (pdgv1 e)
+          ;; If the target node is in a PDG that needs to be skipped,
+          ;; skip the edge
+          (if (not (skip-pdg? (pdg-vertex-pdg pdgv1)))
+           ;; No need to display edges to declaration nodes
+           (if (not (ignore? pdgv1))
+            (begin
+             (display node-id port-edges)
+             (display " " port-edges)
+             (display (pdg-procedure-id (pdg-vertex-pdg pdgv1)) port-edges)
+             (display " " port-edges)
+             (display (pdg-vertex-id pdgv1) port-edges) 
+             (display " INTER " port-edges)
+             (if (equal? e 'data)
+              (display "D NON-SUMMARY\n" port-edges)
+              (display "C NON-SUMMARY\n" port-edges)
+             )
+            )
+           )
+          )
+          #t  
+         )
+        ) 
+       )
+       ;; Iterate though all nodes again, and find all nodes that have a summary 
+       ;; edge with pdgv
+       (pdg-vertex-set-traverse
+        (pdg-vertices pdg)
+        (lambda (pdgv1)
+         ;; No need to display summary edges to declaration nodes
+         (if (not (ignore? pdgv1))
+          (let ((node-id1 (pdg-vertex-id pdgv1)))
+           (if (not (equal? pdgv pdgv1))
+            (if (summary-edge? pdgv pdgv1)
+             (begin
+              (display node-id port-edges)
+              (display " " port-edges)
+              (display (pdg-procedure-id pdg) port-edges)
+              (display " " port-edges)
+              (display node-id1 port-edges)
+              (display " INTRA D SUMMARY\n" port-edges)
+             )
+            )
+           )
+          )
+         )
+         #t
+        )
+       )
+      )
+     )
+    )
+    #t
+   )
+  )
+  (display "#\n" port-edges)
+  (pdg-vertex-set-traverse
+   (pdg-vertices pdg)
+   (lambda (pdgv)
+    (let ((node-id (pdg-vertex-id pdgv)))
+     ;; If the current node is a declaration node, or an actual-in/out
+     ;; node, or a formal-in node, no need to process it
+     (if (not (or (ignore? pdgv) 
+                  (is-associated-vertex? pdgv)))
+      (if (equal? (pdg-vertex-kind pdgv) 'call-site)
+       (output-cfg-edges-call-site pdgv port-edges)
+       (if (or (equal? (pdg-vertex-kind pdgv) 'formal-in) 
+               (equal? (pdg-vertex-kind pdgv) 'global-formal-in))
+        (begin
+         (display node-id port-edges)
+         (display " " port-edges)
+         (display (pdg-vertex-id (pdg-entry-vertex pdg)) port-edges)
+         (display "\n" port-edges)
+        )
+        (if (or (equal? (pdg-vertex-kind pdgv) 'formal-out) 
+                (equal? (pdg-vertex-kind pdgv) 'global-formal-out))
+         (begin
+          (display (pdg-vertex-id (pdg-exit-vertex pdg)) port-edges)
+          (display " " port-edges)
+          (display node-id port-edges)
+          (display "\n" port-edges)
+         )
+         (begin
+          ;; For each node, iterate all outgoing intraprocedural CFG 
+          ;; edges and print them
+          (cfg-edge-set-traverse
+           (pdg-vertex-cfg-targets pdgv)
+           (lambda (pdgv1 e)
+            ;; Ensure that the CFG targets are not declaration nodes
+            (if (not (ignore? pdgv1))
+             (begin
+              (display node-id port-edges)
+              (display " " port-edges)
+              (display (pdg-vertex-id pdgv1) port-edges)
+              (display "\n" port-edges)
+             )
+             (begin
+              (display "ERROR: Target of CFG edge is a declaration\n")
+              (exit)
+             )
+            )
+            #t
+           ) 
+          )
+         )
+        )
+       )
+      )
+     )
+    )
+   )
+  )
+  (display "##\n" port-edges)
+ )
+)
+
+(define (truncate-label label)
+ (let ((colon-index (string-index ":" label)))
+  (if (equal? colon-index #f)
+   label
+   (substring label (+ colon-index 2) (string-length label))
+  )
+ )
+)
+
+(define (process-nodes pdg port-nodes lib-fns)
+ (begin
+  ;; First print info about the current PDG
+  (display (pdg-procedure-id pdg) port-nodes)
+  (display " " port-nodes)
+  (display (pdg-procedure-name pdg) port-nodes)
+  (display "\n" port-nodes)
+  ;; Display info about all nodes in the PDG
+  (pdg-vertex-set-traverse
+   (pdg-vertices pdg)
+   (lambda (pdgv)
+    ;; If the node is a declaration node, no need to print it
+    (if (not (ignore? pdgv))
+     (begin
+      (display (pdg-vertex-id pdgv) port-nodes)
+      (display " " port-nodes)
+      (display (pdg-vertex-kind pdgv) port-nodes)
+      (display " " port-nodes)
+      (display (pdg-vertex-ea pdgv) port-nodes)
+      (display " " port-nodes)
+      (if (lib-fn-node? pdgv lib-fns)
+       (display "LIB" port-nodes)
+       (display "NOLIB" port-nodes)
+      )
+      (display "\n" port-nodes)
+      (print-usekill pdgv port-nodes)
+     )
+    )
+    #t
+   )
+  )
+  (display "##\n" port-nodes)
+ )
+)
+
+(define (process-pdg pdg port-nodes port-edges)
+ (let ((lib-fns (populate-lib-fns)))
+  (process-nodes pdg port-nodes lib-fns)
+  (process-edges pdg port-edges lib-fns)
+ )
+)
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; MAIN PROGRAM
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(let ((port-nodes (open-output-file "nodes")) 
+      (port-edges (open-output-file "edges")))
+ (for-each
+  (lambda (pdg)
+   (if (not (skip-pdg? pdg))
+    (begin  
+     (display (pdg-procedure-id pdg))
+     (display " ")
+     (display (pdg-procedure-name pdg))
+     (display "\n")
+     (process-pdg pdg port-nodes port-edges)
+    )
+   ) 
+   #t
+  )
+  (sdg-pdgs)
+ )
+)
+

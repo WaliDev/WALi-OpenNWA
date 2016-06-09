@@ -1,0 +1,359 @@
+;; This is the stk script that finds the Lifted instructions in the BTA 
+;; algorithm. Given the effective addresses of D instructions, this script 
+;; computes the set of instructions in the binary that need to be 'Lifted'. 
+;; The output is a list of effective addresses of L instructions. The script 
+;; prints its output to a file called L. The specializer will later read from 
+;; the 'L' file. NOTE: The codesurfer build of the binary on which this script
+;; is run must have the esp, ebp supressions supressed; i.e. the build must 
+;; have the '-sp_bp_deps yes' option set.
+;; To try out the script for an executable named 'test' in the tests directory
+;; csurf -preset-build-options high -x86 test vsa -sp_bp_deps yes 
+;; csurf -nogui -l ../../../BTA/bta_l.stk test.prj
+;; To view output in the 'L' file in hex format, use:
+;; cat L | python ../../../scripts/dec_to_hex.py 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;BTA algorithm
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; This function prints the effective address of a pdg-vertex
+(define (print-pdg-vertex-ea pdgv port)
+(let ((ea (pdg-vertex-ea pdgv))) 
+ (if (not (equal? ea #f))
+  (begin 
+(Display (pdg-vertex-ea pdgv) port)
+(Display "\n" port)
+  )
+ )
+)
+)
+
+(define (display-pdg-vertex-ea pdgv)
+(let ((ea (pdg-vertex-ea pdgv))) 
+ (if (not (equal? ea #f))
+  (begin 
+(Display (pdg-vertex-ea pdgv))
+  )
+ )
+)
+)
+
+;; This function prints a pdg-vertex-set
+(define (print-vertices pdg-vertex-set port)
+(pdg-vertex-set-traverse 
+pdg-vertex-set
+(lambda (pdgv)
+            (begin
+    (print-pdg-vertex-ea pdgv port)
+                #t
+            )
+)
+)
+)
+
+;; This computes the set of PDG vertices that need to be lifted
+;; Inputs:
+;; d-vertices: the original set of d-vertices
+;; Output: 
+;; l-vertices: The set of vertices that need lifting
+(define (find-intra-predecessors pdgv preds)
+    (pdg-edge-set-traverse
+        (pdg-vertex-intra-sources pdgv)
+        (lambda (v e)
+            (begin
+                (if (equal? e 'data)
+                      (pdg-vertex-set-put! preds v)
+                )
+                #t
+            )
+        )
+    )
+)
+(define (find-inter-predecessors1 pdgv preds)
+    (pdg-edge-set-traverse
+        (pdg-vertex-intra-sources pdgv)
+        (lambda (v e)
+            (begin
+                (if (and (equal? e 'data) (equal? (pdg-vertex-kind v) 'global-formal-in))
+                    (pdg-edge-set-traverse
+                        (pdg-vertex-inter-sources v)
+                        (lambda (v1 e1)
+                            (begin
+                                (if (and (equal? e1 'data) (equal? (pdg-vertex-kind v1) 'global-actual-in))
+                                    (pdg-edge-set-traverse
+                                        (pdg-vertex-intra-sources v1)
+                                        (lambda (v2 e2)
+                                            (begin
+                                                (if (equal? e2 'data) 
+                                                    (pdg-vertex-set-put! preds v2)
+                                                )
+                                                #t
+                                            )
+                                        )
+                                    )
+                                )
+                                #t
+                            )
+                        )
+                    )
+                )
+                #t
+            )
+        )
+    )
+)
+(define (find-inter-predecessors2 pdgv preds)
+    (pdg-edge-set-traverse
+        (pdg-vertex-intra-sources pdgv)
+        (lambda (v e)
+            (begin
+                (if (and (equal? e 'data) (equal? (pdg-vertex-kind v) 'global-actual-out))
+                    (pdg-edge-set-traverse
+                        (pdg-vertex-inter-sources v)
+                        (lambda (v1 e1)
+                            (begin
+                                (if (and (equal? e1 'data) (equal? (pdg-vertex-kind v1) 'global-formal-out))
+                                    (pdg-edge-set-traverse
+                                        (pdg-vertex-intra-sources v1)
+                                        (lambda (v2 e2)
+                                            (begin
+                                                (if (equal? e2 'data) 
+                                                    (pdg-vertex-set-put! preds v2)
+                                                )
+                                                #t
+                                            )
+                                        )
+                                    )
+                                )
+                                #t
+                            )
+                        )
+                    )
+                )
+                #t
+            )
+        )
+    )
+)
+(define (find-inter-predecessors3 pdgv preds)
+    (pdg-edge-set-traverse
+        (pdg-vertex-intra-sources pdgv)
+        (lambda (v e)
+            (begin
+                (if (and (equal? e 'data) (equal? (pdg-vertex-kind v) 'formal-in))
+                    (pdg-edge-set-traverse
+                        (pdg-vertex-inter-sources v)
+                        (lambda (v1 e1)
+                            (begin
+                                (if (and (equal? e1 'data) (equal? (pdg-vertex-kind v1) 'actual-in))
+                                    (pdg-edge-set-traverse
+                                        (pdg-vertex-intra-sources v1)
+                                        (lambda (v2 e2)
+                                            (begin
+                                                (if (equal? e2 'data) 
+                                                    (pdg-vertex-set-put! preds v2)
+                                                )
+                                                #t
+                                            )
+                                        )
+                                    )
+                                )
+                                #t
+                            )
+                        )
+                    )
+                )
+                #t
+            )
+        )
+    )
+)
+(define (find-inter-predecessors4 pdgv preds)
+    (pdg-edge-set-traverse
+        (pdg-vertex-intra-sources pdgv)
+        (lambda (v e)
+            (begin
+                (if (and (equal? e 'data) (equal? (pdg-vertex-kind v) 'actual-out))
+                    (pdg-edge-set-traverse
+                        (pdg-vertex-inter-sources v)
+                        (lambda (v1 e1)
+                            (begin
+                                (if (and (equal? e1 'data) (equal? (pdg-vertex-kind v1) 'formal-out))
+                                    (pdg-edge-set-traverse
+                                        (pdg-vertex-intra-sources v1)
+                                        (lambda (v2 e2)
+                                            (begin
+                                                (if (equal? e2 'data) 
+                                                    (pdg-vertex-set-put! preds v2)
+                                                )
+                                                #t
+                                            )
+                                        )
+                                    )
+                                )
+                                #t
+                            )
+                        )
+                    )
+                )
+                #t
+            )
+        )
+    )
+)
+(define (find-inter-predecessors pdgv preds)
+    (begin
+        (find-inter-predecessors1 pdgv preds)
+        (find-inter-predecessors2 pdgv preds)
+        (find-inter-predecessors3 pdgv preds)
+        (find-inter-predecessors4 pdgv preds)
+    )
+)
+(define (find-extra-predecessors pdgv preds deps)
+    (if (not (equal? deps '()))
+        (let ((dep (car deps)))
+            (let ((src (car dep)) (dest (cdr dep)))
+                (begin
+                    (if (equal? dest pdgv)
+                        (pdg-vertex-set-put! preds src)
+                    )
+                    (find-extra-predecessors pdgv preds (cdr deps))
+                )
+            )
+        )
+    )
+)
+(define (find-predecessors pdgv deps)
+    (let ((preds (pdg-vertex-set-create)))
+        (begin
+            (find-intra-predecessors pdgv preds)
+            (find-inter-predecessors pdgv preds)
+            (find-extra-predecessors pdgv preds deps)
+            preds
+        )
+    )
+)
+(define (find-l-predecessors preds d-vertices)
+    (let ((l-preds (pdg-vertex-set-create)))
+        (begin
+         (pdg-vertex-set-traverse
+             preds
+             (lambda (v)
+                (begin
+                    (if (not (pdg-vertex-set-member? d-vertices v))
+                        (pdg-vertex-set-put! l-preds v)
+                    )
+                    #t
+                )
+             )
+         )
+         l-preds
+        )        
+    )
+)
+(define (compute-l-vertices d-vertices deps)
+    (let ((l-vertices (pdg-vertex-set-create)))
+        (begin
+            (pdg-vertex-set-traverse
+                d-vertices
+                (lambda (d-vertex)
+                    (begin
+                        (let ((preds (find-predecessors d-vertex deps)))
+                            (let ((l-preds (find-l-predecessors preds d-vertices)))
+                                (pdg-vertex-set-union! l-vertices l-preds)
+                            )
+                        )
+                        #t
+                    )
+                )
+            )
+            l-vertices
+        )
+    )
+)
+
+;; The following two functions read from the 'D' file and return a set of pdg
+;; vertices that correspond to the EAs in the 'D' file. 
+(define (populate-d-vertices-helper port d-vertices)
+    (let ((ea (read port)))
+        (if (eof-object? ea)
+            d-vertices
+            (begin 
+                (pdg-vertex-set-put! d-vertices (x86fe-pdgv-for-ea ea))
+                (populate-d-vertices-helper port d-vertices)
+            )
+        )
+    )
+)
+
+(define (populate-d-vertices)
+  (let ((port (open-input-file "D")) (d-vertices (pdg-vertex-set-create)))
+      (begin
+          (populate-d-vertices-helper port d-vertices)
+          (close-input-port port)
+          d-vertices
+      )
+  )
+)
+
+;; Helper function for reading extra dependences
+(define (get-vertex ea)
+    (let ((vertex (x86fe-pdgv-for-ea ea)))
+        (if (equal? vertex #f)
+            (begin
+                (display "ERROR: Vertex for EA")
+                (display ea)
+                (display " is #f\n")
+                (exit)
+            )
+            vertex
+        )
+    )
+)
+
+;; These two functions are used to read library function dependences of the format
+;; (src_EA target_EA)* from a file called "extra_deps"
+(define (populate-extra-deps-helper port deps)
+    (let ((src (read-line port)))
+        (if (or (eof-object? src) (string=? src ""))
+            deps
+            (let ((dest (read-line port)))
+                (if (eof-object? dest)
+                    (begin
+                        (display "ERROR - Incomplete dependence in file\n")
+                        (exit)
+                    )
+                    (let ((src-ea (string->number src)) (dest-ea (string->number dest)))
+                        (let ((src-vertex (get-vertex src-ea)) (dest-vertex (get-vertex dest-ea)))
+                            (populate-extra-deps-helper port (cons (cons src-vertex dest-vertex) deps))
+                        )
+                    )
+                )
+            )
+        )
+    )
+)
+(define (populate-extra-deps)
+  (let ((port (open-input-file "extra_deps")))
+      (let ((extra-deps (populate-extra-deps-helper port '())))
+          (close-input-port port)
+          extra-deps
+      )
+  )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; MAIN PROGRAM
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(let ((d-vertices (populate-d-vertices)) (deps (populate-extra-deps)))
+    (let ((l-vertices (compute-l-vertices d-vertices deps)))
+        (begin
+            ;; Print the effective addresses of the vertices
+            (let ((port (open-output-file "L")))
+                (print-vertices l-vertices port)
+                (close-output-port port)
+            )
+    )
+    )
+)
+
