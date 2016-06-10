@@ -3403,8 +3403,14 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 NEWROUND:
 		if (rnd >= maxRnds) {
 			std::cout << "Maximum number of rounds reached. ------------------------------------------" << std::endl;
+
+            if (runningMode == NEWTON_FROM_BELOW) {
+                assert(false && "In Newton-from-below mode, we must abort if we reach the maximum number of rounds.");
+            }
+
 			break;
 		}
+
 		std::cout << "-------------------------------------------------------------------------------" << std::endl;
 		std::cout << "Round " << rnd << ":" << std::endl;
 		rnd++;
