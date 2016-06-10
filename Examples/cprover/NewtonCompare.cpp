@@ -519,7 +519,10 @@ namespace goals {
 
 	StarMap newStarVal;
 	StarMapT newStarValT;
+	StarMap oldStarVal;
+	StarMapT oldStarValT;
 	
+    bool doWideningThisRound;
 	
 
 	// Stack frames needed by the non-recursive versions of convertToTSL and Eval and EvalT
@@ -1995,11 +1998,23 @@ namespace goals {
 					  //ret = EXTERNS::evalKleeneSemElem(evalRegExp___it->second);
 					  //EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
 					  //todo.pop();
-					  //std::cout << "New code! (U)" << std::endl;
+					  //std::cout << "New code! (U1)" << std::endl;
 					  duetrelpair_t ret;
-					  ret = ((evalRegExp___it->second.v))->alphaHatStar();
+
+				      MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(child);
+
+                      duetrel_t previousValue = 0;
+                      if (doWideningThisRound) {
+                          EvalRMap::const_iterator previousValueIterator = oldStarVal.find(lookupKeyForStar);
+                          if (previousValueIterator != oldStarVal.end()) {
+                              previousValue = previousValueIterator->second.v;
+                          }
+                      }
+
+					  ret = ((evalRegExp___it->second.v))->alphaHatStar(previousValue);
+
 					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret->second));
-				          MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(child);
+
 					  //std::cout << "  Hash key is: " << hash_value(lookupKeyForStar) << std::endl;
 					  newStarVal.insert(std::make_pair(lookupKeyForStar, ret->first));
 					  todo.pop();
@@ -2158,11 +2173,21 @@ namespace goals {
 				  //ret = EXTERNS::evalKleeneSemElem(lch);
 				  //EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
 				  //todo.pop();
-				  //std::cout << "New code! (U)" << std::endl;
+				  //std::cout << "New code! (U2)" << std::endl;
 				  duetrelpair_t ret;
-				  ret = ((evalRegExp___it->second.v))->alphaHatStar();
+				  
+                  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(frame.e);
+
+                  duetrel_t previousValue = 0;
+                  if (doWideningThisRound) {
+                      EvalRMap::const_iterator previousValueIterator = oldStarVal.find(lookupKeyForStar);
+                      if (previousValueIterator != oldStarVal.end()) {
+                          previousValue = previousValueIterator->second.v;
+                      }
+                  }
+
+				  ret = ((evalRegExp___it->second.v))->alphaHatStar(previousValue);
 				  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret->second));
-				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(frame.e);
 				  //std::cout << "  Hash key is: " << hash_value(lookupKeyForStar) << std::endl;
 				  newStarVal.insert(std::make_pair(lookupKeyForStar, ret->first));
                                   todo.pop();
@@ -2404,7 +2429,18 @@ namespace goals {
 				  {
 				  	  //std::cout << "New code! (T1)" << std::endl;
 					  duetrelpair_t ret;
-					  ret = ((evalT___it->second.v))->alphaHatStar();
+                      
+				  	  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(child);
+
+                      duetrel_t previousValue = 0;
+                      if (doWideningThisRound) {
+                          EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
+                          if (previousValueIterator != oldStarValT.end()) {
+                              previousValue = previousValueIterator->second.v;
+                          }
+                      }
+
+					  ret = ((evalT___it->second.v))->alphaHatStar(previousValue);
 					  // std::cout << "  Body value is: " << std::endl;
 					  // evalT___it->second.v->print(std::cout);
 					  // std::cout << std::endl;
@@ -2416,7 +2452,6 @@ namespace goals {
 					  // std::cout << std::endl;
 
 					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret->second));
-				  	  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(child);
 					  newStarValT.insert(std::make_pair(lookupKeyForStar, ret->first));
 					  todo.pop();
 					  continue;
@@ -2625,7 +2660,17 @@ namespace goals {
 			  {
 			  	  //std::cout << "New code! (T2)" << std::endl;
 				  duetrelpair_t ret;
-				  ret = ((evalT___it->second.v))->alphaHatStar();
+				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(frame.e); // FIXME this variable is now redundant with lookupKeyForevalTHash
+
+                  duetrel_t previousValue = 0;
+                  if (doWideningThisRound) {
+			          EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
+                      if (previousValueIterator != oldStarValT.end()) {
+                          previousValue = previousValueIterator->second.v;
+                      }
+                  }
+
+				  ret = ((evalT___it->second.v))->alphaHatStar(previousValue);
 				  // std::cout << "  Body value is: " << std::endl;
 				  // evalT___it->second.v->print(std::cout);
 				  // std::cout << std::endl;
@@ -2636,7 +2681,6 @@ namespace goals {
 				  // ret->second->print(std::cout);
 				  // std::cout << std::endl;
 				  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret->second));
-				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(frame.e); // FIXME this variable is now redundant with lookupKeyForevalTHash
 				  newStarValT.insert(std::make_pair(lookupKeyForStar, ret->first));
 				  //ret = EXTERNS::evalKleeneSemElemT(lch);
 				  //EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
@@ -3326,6 +3370,7 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
   *	break
   *  }
   */
+#define WIDENING_DELAY 6
 #define MAX_ROUNDS_FROM_BELOW 50
 #define MAX_ROUNDS_FROM_ABOVE 4
   void runNewton(RTG::assignmentRefPtr & newVal, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies, tslRegExpTMap & tensoredRegExpMap, bool linear, int runningMode)
@@ -3337,9 +3382,6 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
         tslDiffMap::iterator dIt;
 	int pV = 0;
 	tslRegExpTMap::iterator assignIt;
-	
-	StarMap oldStarVal;
-	StarMapT oldStarValT;
 	
 	newStarVal.clear();
 	newStarValT.clear();
@@ -3366,6 +3408,13 @@ NEWROUND:
 		oldStarValT = newStarValT;
 		newStarVal.clear();
 		newStarValT.clear();
+
+        if (rnd >= WIDENING_DELAY) {
+            std::cout << "Widening will be applied on this round." << std::endl;
+            doWideningThisRound = true;
+        } else {
+            doWideningThisRound = false;
+        }
 
 		// For each variable in the equation system, evaluate its regular expression
 		for (assignIt = tensoredRegExpMap.begin(); assignIt != tensoredRegExpMap.end(); assignIt++)
@@ -3457,6 +3506,7 @@ NEWROUND:
 				goto NEWROUND;
 			}
 			// std::cout << "  Equivalent." << std::endl;
+
 		}
 		// std::cout << "  All stars are equivalent: exiting loop." << std::endl;
 		break; // Exit the Newton loop because all abstracted Kleene star bodies have converged
@@ -4710,6 +4760,8 @@ int runBasicNewton(char **args, int runningMode)
     }
     
     pds->print(std::cout);
+    
+    doWideningThisRound = false;
 
     WFA outfaNewton;
     goals::run_newton(runningMode, outfaNewton, entry_key, pds, false);

@@ -360,11 +360,60 @@ wali::sem_elem_t DuetRel::star()
 }
 
 
-duetrelpair_t DuetRel::alphaHatStar()
+// duetrelpair_t DuetRel::alphaHatStar()
+// {
+//   CAMLparam0();
+//   CAMLlocal3(dval, abstract, star_formula);
+// 
+//   dval = this->getValue();
+//   duetrel_t d1, d2;
+//   duetrelpair_t d;
+// 
+//   value * print_transition_func;
+//   value * print_abstract_func;
+//   value * alpha_hat_func;
+//   value * abstract_star_func;
+// 
+//   if (isTensored) {
+//     alpha_hat_func = caml_named_value("tensor_alpha_hat_callback");
+//     abstract_star_func = caml_named_value("tensor_abstract_star_callback");
+//     print_transition_func = caml_named_value("tensor_print_robust_callback");
+//     print_abstract_func = caml_named_value("tensor_print_abstract_callback");
+//   } else {
+//     alpha_hat_func = caml_named_value("alpha_hat_callback");
+//     abstract_star_func = caml_named_value("abstract_star_callback");
+//     print_transition_func = caml_named_value("print_robust_callback");
+//     print_abstract_func = caml_named_value("print_abstract_callback");
+//   }
+// 
+//   abstract = caml_callback(*alpha_hat_func, dval);
+//   star_formula = caml_callback(*abstract_star_func, abstract);
+// 
+//   d1 = MkDuetRel(abstract, isTensored);
+//   d2 = MkDuetRel(star_formula, isTensored);
+//   d = DuetRelPair::MkDuetRelPair(d1, d2);
+// 
+//   std::cout << "alphaHatStar {" << std::endl;
+//   std::cout << "**** alpha hat: ";
+//   std::cout << String_val(caml_callback2(*print_abstract_func, Val_int(2), abstract)) << std::endl;
+//   std::cout << "**** star transition: ";
+//   std::cout << String_val(caml_callback2(*print_transition_func, Val_int(2), star_formula)) << std::endl;
+//   std::cout << "}" << std::endl;
+// 
+//   CAMLreturnT(duetrelpair_t,d);
+// }
+
+// Note: this function will perform widening with previousAbstractValue.
+//
+// If you don't want widening, call this with previousAbstractValue = 0, 
+//   which is the default parameter value.
+duetrelpair_t DuetRel::alphaHatStar(duetrel_t previousAbstractValue)
 {
   CAMLparam0();
-  CAMLlocal3(dval, abstract, star_formula);
-
+  CAMLlocal4(dval, abstract, star_formula, widened); 
+  // FIXME I'm not sure whether oldAbstractValue should appear in the previous
+  //   line or not, since it's a parameter, not a local variable. --JTB
+  
   dval = this->getValue();
   duetrel_t d1, d2;
   duetrelpair_t d;
@@ -373,21 +422,29 @@ duetrelpair_t DuetRel::alphaHatStar()
   value * print_abstract_func;
   value * alpha_hat_func;
   value * abstract_star_func;
+  value * widen_func;
 
   if (isTensored) {
     alpha_hat_func = caml_named_value("tensor_alpha_hat_callback");
     abstract_star_func = caml_named_value("tensor_abstract_star_callback");
     print_transition_func = caml_named_value("tensor_print_robust_callback");
     print_abstract_func = caml_named_value("tensor_print_abstract_callback");
+    widen_func = caml_named_value("tensor_abstract_widen_callback");
   } else {
     alpha_hat_func = caml_named_value("alpha_hat_callback");
     abstract_star_func = caml_named_value("abstract_star_callback");
     print_transition_func = caml_named_value("print_robust_callback");
     print_abstract_func = caml_named_value("print_abstract_callback");
+    widen_func = caml_named_value("abstract_widen_callback");
   }
 
   abstract = caml_callback(*alpha_hat_func, dval);
-  star_formula = caml_callback(*abstract_star_func, abstract);
+  if (previousAbstractValue != 0) {
+      widened = caml_callback2(*widen_func, previousAbstractValue->getValue(), abstract);
+      star_formula = caml_callback(*abstract_star_func, widened);
+  } else {
+      star_formula = caml_callback(*abstract_star_func, abstract);
+  }
 
   d1 = MkDuetRel(abstract, isTensored);
   d2 = MkDuetRel(star_formula, isTensored);
@@ -396,6 +453,10 @@ duetrelpair_t DuetRel::alphaHatStar()
   std::cout << "alphaHatStar {" << std::endl;
   std::cout << "**** alpha hat: ";
   std::cout << String_val(caml_callback2(*print_abstract_func, Val_int(2), abstract)) << std::endl;
+  if (previousAbstractValue != 0) {
+      std::cout << "**** result of widening: ";
+      std::cout << String_val(caml_callback2(*print_abstract_func, Val_int(2), widened)) << std::endl;
+  }
   std::cout << "**** star transition: ";
   std::cout << String_val(caml_callback2(*print_transition_func, Val_int(2), star_formula)) << std::endl;
   std::cout << "}" << std::endl;
