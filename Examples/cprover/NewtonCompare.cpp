@@ -4793,6 +4793,10 @@ int runBasicNewton(char **args, int runningMode)
     std::cout << "================================================" << std::endl;
     std::cout << "Assertion Checkings at Error Points" << std::endl << std::endl;
     
+    std::cout << std::endl << "outfaNewton" << std::endl;
+    outfaNewton.print(std::cout);
+    std::cout << std::endl << std::endl;
+
     // Check the assertion at each error point
     for (std::vector<caml_error_rule>::iterator it = errorRuleHolder.begin(); it != errorRuleHolder.end(); it++)
     {
@@ -4828,6 +4832,14 @@ int runBasicNewton(char **args, int runningMode)
 			else {
 				std::cout << "Is not SAT! (Assertion Passed)" << std::endl;
 			}
+
+            std::cout << std::endl << "contextWeight = " << std::endl;
+            contextWeight->print(std::cout);
+            std::cout << std::endl << std::endl;
+
+            std::cout << std::endl << "intraproceduralWeight = " << std::endl;
+            intraprocWeight->print(std::cout);
+            std::cout << std::endl << std::endl;
 
             std::cout << std::endl << "contextWeight extend intraproceduralWeight = " << std::endl;
 		    composedWeight->print(std::cout);
