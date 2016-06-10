@@ -571,6 +571,9 @@ namespace goals {
   bool testMode = false;
   string testFileName;
   
+  //maximum number of rounds
+  int maxRnds = -1;
+  
 
   //Calls postar on the pds and wfa, also prints out .dot and .txt files with the initial wfa and final wfa.
   //Author: Prathmesh Prahbu
@@ -3344,13 +3347,19 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 	newStarVal.clear();
 	newStarValT.clear();
 
+	if (maxRnds < 0) {		//maxRnds is not set yet
+		if (runningMode == NEWTON_FROM_BELOW)
+			maxRnds = MAX_ROUNDS_FROM_BELOW;
+		else if (runningMode == NEWTON_FROM_ABOVE)
+			maxRnds = MAX_ROUNDS_FROM_ABOVE;
+	}
 	
 	// In Newton-from-below mode, we perform Newton rounds until convergence
     //   or until MAX_ROUNDS_FROM_BELOW; in Newton-from-above mode, we always 
     //   go through MAX_ROUNDS_FROM_ABOVE rounds.
 	while (true){
 NEWROUND:
-		if (rnd >= MAX_ROUNDS_FROM_BELOW) {
+		if (rnd >= maxRnds) {
 			std::cout << "Maximum number of rounds reached. ------------------------------------------" << std::endl;
 			break;
 		}
@@ -3408,10 +3417,8 @@ NEWROUND:
 		EvalMap2.clear();
 		EvalMapT.clear();
 
-        if (runningMode == NEWTON_FROM_ABOVE) {
-            if (rnd < MAX_ROUNDS_FROM_ABOVE) goto NEWROUND;
-            break;
-        }
+        if (runningMode == NEWTON_FROM_ABOVE) 
+            goto NEWROUND;
 
 		// std::cout << "Beginning main-loop exit test:" << std::endl;
 		// std::cout << "Old untensored star keys are:" << std::endl;
@@ -4823,6 +4830,7 @@ void printUsageInstr() {
 	std::cout << "\t-H,\t--help" << std::endl;
 	std::cout << "\t-P,\t--no_simplify_on_print" << std::endl;
 	std::cout << "\t-S,\t--simplify" << std::endl;
+	std::cout << "\t-R,\t--rounds" << "\n\t\t\tMaximum number of rounds" << std::endl;
 }
 
 void printHelp() {
@@ -4847,6 +4855,7 @@ int main(int argc, char **argv)
         {"no_simplify_on_print",no_argument,    0,            'P' },
         {"help",	         no_argument,       0,            'H' },
         {"dump",             no_argument,       0,            'D' },
+        {"rounds",           required_argument, 0,            'R' },
         {"test",             required_argument, 0,            'T' },
         {"domain",           required_argument, 0,            'M' },
         {"verbose",          required_argument, 0,            'V' },
@@ -4857,7 +4866,7 @@ int main(int argc, char **argv)
     };
 
     int long_index = 0, opt = 0;	
-    while ((opt = getopt_long_only(argc, argv, "SPDT:H", 
+    while ((opt = getopt_long_only(argc, argv, "SPHDR:T:M:V:I:Q:G:", 
                    long_options, &long_index )) != -1) {
     	switch (opt) {
 			case 0:
@@ -4878,12 +4887,15 @@ int main(int argc, char **argv)
 				testMode = true;
 				testFileName = optarg;
 				break;
+			case 'R':
+				maxRnds = atoi(optarg);
+				break;
 			// duet options with an argument
 			case 'M':
 			case 'V':
 			case 'I':
 			case 'Q':
-	                case 'G':
+			case 'G':
 				std::cout << "Passing command-line option " << 	argv[optind - 2] << " " << optarg << " to duet." << std::endl;
 				unrecognizedArgs.push_back(argv[optind - 2]);
 				unrecognizedArgs.push_back(optarg);
