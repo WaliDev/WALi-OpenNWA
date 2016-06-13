@@ -519,7 +519,10 @@ namespace goals {
 
 	StarMap newStarVal;
 	StarMapT newStarValT;
+	StarMap oldStarVal;
+	StarMapT oldStarValT;
 	
+    bool doWideningThisRound;
 	
 
 	// Stack frames needed by the non-recursive versions of convertToTSL and Eval and EvalT
@@ -570,6 +573,9 @@ namespace goals {
   //this is used for the testing suite
   bool testMode = false;
   string testFileName;
+  
+  //maximum number of rounds
+  int maxRnds = -1;
   
 
   //Calls postar on the pds and wfa, also prints out .dot and .txt files with the initial wfa and final wfa.
@@ -1995,11 +2001,23 @@ namespace goals {
 					  //ret = EXTERNS::evalKleeneSemElem(evalRegExp___it->second);
 					  //EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
 					  //todo.pop();
-					  //std::cout << "New code! (U)" << std::endl;
+					  //std::cout << "New code! (U1)" << std::endl;
 					  duetrelpair_t ret;
-					  ret = ((evalRegExp___it->second.v))->alphaHatStar();
+
+				      MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(child);
+
+                      duetrel_t previousValue = 0;
+                      if (doWideningThisRound) {
+                          EvalRMap::const_iterator previousValueIterator = oldStarVal.find(lookupKeyForStar);
+                          if (previousValueIterator != oldStarVal.end()) {
+                              previousValue = previousValueIterator->second.v;
+                          }
+                      }
+
+					  ret = ((evalRegExp___it->second.v))->alphaHatStar(previousValue);
+
 					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret->second));
-				          MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(child);
+
 					  //std::cout << "  Hash key is: " << hash_value(lookupKeyForStar) << std::endl;
 					  newStarVal.insert(std::make_pair(lookupKeyForStar, ret->first));
 					  todo.pop();
@@ -2158,11 +2176,21 @@ namespace goals {
 				  //ret = EXTERNS::evalKleeneSemElem(lch);
 				  //EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
 				  //todo.pop();
-				  //std::cout << "New code! (U)" << std::endl;
+				  //std::cout << "New code! (U2)" << std::endl;
 				  duetrelpair_t ret;
-				  ret = ((evalRegExp___it->second.v))->alphaHatStar();
+				  
+                  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(frame.e);
+
+                  duetrel_t previousValue = 0;
+                  if (doWideningThisRound) {
+                      EvalRMap::const_iterator previousValueIterator = oldStarVal.find(lookupKeyForStar);
+                      if (previousValueIterator != oldStarVal.end()) {
+                          previousValue = previousValueIterator->second.v;
+                      }
+                  }
+
+				  ret = ((evalRegExp___it->second.v))->alphaHatStar(previousValue);
 				  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret->second));
-				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(frame.e);
 				  //std::cout << "  Hash key is: " << hash_value(lookupKeyForStar) << std::endl;
 				  newStarVal.insert(std::make_pair(lookupKeyForStar, ret->first));
                                   todo.pop();
@@ -2404,7 +2432,18 @@ namespace goals {
 				  {
 				  	  //std::cout << "New code! (T1)" << std::endl;
 					  duetrelpair_t ret;
-					  ret = ((evalT___it->second.v))->alphaHatStar();
+                      
+				  	  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(child);
+
+                      duetrel_t previousValue = 0;
+                      if (doWideningThisRound) {
+                          EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
+                          if (previousValueIterator != oldStarValT.end()) {
+                              previousValue = previousValueIterator->second.v;
+                          }
+                      }
+
+					  ret = ((evalT___it->second.v))->alphaHatStar(previousValue);
 					  // std::cout << "  Body value is: " << std::endl;
 					  // evalT___it->second.v->print(std::cout);
 					  // std::cout << std::endl;
@@ -2416,7 +2455,6 @@ namespace goals {
 					  // std::cout << std::endl;
 
 					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret->second));
-				  	  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(child);
 					  newStarValT.insert(std::make_pair(lookupKeyForStar, ret->first));
 					  todo.pop();
 					  continue;
@@ -2625,7 +2663,17 @@ namespace goals {
 			  {
 			  	  //std::cout << "New code! (T2)" << std::endl;
 				  duetrelpair_t ret;
-				  ret = ((evalT___it->second.v))->alphaHatStar();
+				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(frame.e); // FIXME this variable is now redundant with lookupKeyForevalTHash
+
+                  duetrel_t previousValue = 0;
+                  if (doWideningThisRound) {
+			          EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
+                      if (previousValueIterator != oldStarValT.end()) {
+                          previousValue = previousValueIterator->second.v;
+                      }
+                  }
+
+				  ret = ((evalT___it->second.v))->alphaHatStar(previousValue);
 				  // std::cout << "  Body value is: " << std::endl;
 				  // evalT___it->second.v->print(std::cout);
 				  // std::cout << std::endl;
@@ -2636,7 +2684,6 @@ namespace goals {
 				  // ret->second->print(std::cout);
 				  // std::cout << std::endl;
 				  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret->second));
-				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(frame.e); // FIXME this variable is now redundant with lookupKeyForevalTHash
 				  newStarValT.insert(std::make_pair(lookupKeyForStar, ret->first));
 				  //ret = EXTERNS::evalKleeneSemElemT(lch);
 				  //EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
@@ -3327,6 +3374,7 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
   *	break
   *  }
   */
+#define WIDENING_DELAY 6
 #define MAX_ROUNDS_FROM_BELOW 50
 #define MAX_ROUNDS_FROM_ABOVE 4
   void runNewton(RTG::assignmentRefPtr & newVal, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies, tslRegExpTMap & tensoredRegExpMap, bool linear, int runningMode)
@@ -3339,22 +3387,31 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 	int pV = 0;
 	tslRegExpTMap::iterator assignIt;
 	
-	StarMap oldStarVal;
-	StarMapT oldStarValT;
-	
 	newStarVal.clear();
 	newStarValT.clear();
 
+	if (maxRnds < 0) {		//maxRnds is not set yet
+		if (runningMode == NEWTON_FROM_BELOW)
+			maxRnds = MAX_ROUNDS_FROM_BELOW;
+		else if (runningMode == NEWTON_FROM_ABOVE)
+			maxRnds = MAX_ROUNDS_FROM_ABOVE;
+	}
 	
 	// In Newton-from-below mode, we perform Newton rounds until convergence
     //   or until MAX_ROUNDS_FROM_BELOW; in Newton-from-above mode, we always 
     //   go through MAX_ROUNDS_FROM_ABOVE rounds.
 	while (true){
 NEWROUND:
-		if (rnd >= MAX_ROUNDS_FROM_BELOW) {
+		if (rnd >= maxRnds) {
 			std::cout << "Maximum number of rounds reached. ------------------------------------------" << std::endl;
+
+            if (runningMode == NEWTON_FROM_BELOW) {
+                assert(false && "In Newton-from-below mode, we must abort if we reach the maximum number of rounds.");
+            }
+
 			break;
 		}
+
 		std::cout << "-------------------------------------------------------------------------------" << std::endl;
 		std::cout << "Round " << rnd << ":" << std::endl;
 		rnd++;
@@ -3367,6 +3424,13 @@ NEWROUND:
 		oldStarValT = newStarValT;
 		newStarVal.clear();
 		newStarValT.clear();
+
+        if (rnd >= WIDENING_DELAY) {
+            std::cout << "Widening will be applied on this round." << std::endl;
+            doWideningThisRound = true;
+        } else {
+            doWideningThisRound = false;
+        }
 
 		// For each variable in the equation system, evaluate its tensored regular expression
 		for (assignIt = tensoredRegExpMap.begin(); assignIt != tensoredRegExpMap.end(); assignIt++)
@@ -3409,10 +3473,8 @@ NEWROUND:
 		EvalMap2.clear();
 		EvalMapT.clear();
 
-        if (runningMode == NEWTON_FROM_ABOVE) {
-            if (rnd < MAX_ROUNDS_FROM_ABOVE) goto NEWROUND;
-            break;
-        }
+        if (runningMode == NEWTON_FROM_ABOVE) 
+            goto NEWROUND;
 
 		// std::cout << "Beginning main-loop exit test:" << std::endl;
 		// std::cout << "Old untensored star keys are:" << std::endl;
@@ -3458,6 +3520,7 @@ NEWROUND:
 				goto NEWROUND;
 			}
 			// std::cout << "  Equivalent." << std::endl;
+
 		}
 		// std::cout << "  All stars are equivalent: exiting loop." << std::endl;
 		break; // Exit the Newton loop because all abstracted Kleene star bodies have converged
@@ -4711,6 +4774,8 @@ int runBasicNewton(char **args, int runningMode)
     }
     
     pds->print(std::cout);
+    
+    doWideningThisRound = false;
 
     WFA outfaNewton;
     goals::run_newton(runningMode, outfaNewton, entry_key, pds, false);
@@ -4742,6 +4807,10 @@ int runBasicNewton(char **args, int runningMode)
     std::cout << "================================================" << std::endl;
     std::cout << "Assertion Checkings at Error Points" << std::endl << std::endl;
     
+    std::cout << std::endl << "outfaNewton" << std::endl;
+    outfaNewton.print(std::cout);
+    std::cout << std::endl << std::endl;
+
     // Check the assertion at each error point
     for (std::vector<caml_error_rule>::iterator it = errorRuleHolder.begin(); it != errorRuleHolder.end(); it++)
     {
@@ -4777,6 +4846,14 @@ int runBasicNewton(char **args, int runningMode)
 			else {
 				std::cout << "Is not SAT! (Assertion Passed)" << std::endl;
 			}
+
+            std::cout << std::endl << "contextWeight = " << std::endl;
+            contextWeight->print(std::cout);
+            std::cout << std::endl << std::endl;
+
+            std::cout << std::endl << "intraproceduralWeight = " << std::endl;
+            intraprocWeight->print(std::cout);
+            std::cout << std::endl << std::endl;
 
             std::cout << std::endl << "contextWeight extend intraproceduralWeight = " << std::endl;
 		    composedWeight->print(std::cout);
@@ -4824,6 +4901,7 @@ void printUsageInstr() {
 	std::cout << "\t-H,\t--help" << std::endl;
 	std::cout << "\t-P,\t--no_simplify_on_print" << std::endl;
 	std::cout << "\t-S,\t--simplify" << std::endl;
+	std::cout << "\t-R,\t--rounds" << "\n\t\t\tMaximum number of rounds" << std::endl;
 }
 
 void printHelp() {
@@ -4848,6 +4926,7 @@ int main(int argc, char **argv)
         {"no_simplify_on_print",no_argument,    0,            'P' },
         {"help",	         no_argument,       0,            'H' },
         {"dump",             no_argument,       0,            'D' },
+        {"rounds",           required_argument, 0,            'R' },
         {"test",             required_argument, 0,            'T' },
         {"domain",           required_argument, 0,            'M' },
         {"verbose",          required_argument, 0,            'V' },
@@ -4858,7 +4937,7 @@ int main(int argc, char **argv)
     };
 
     int long_index = 0, opt = 0;	
-    while ((opt = getopt_long_only(argc, argv, "SPDT:H", 
+    while ((opt = getopt_long_only(argc, argv, "SPHDR:T:M:V:I:Q:G:", 
                    long_options, &long_index )) != -1) {
     	switch (opt) {
 			case 0:
@@ -4879,12 +4958,15 @@ int main(int argc, char **argv)
 				testMode = true;
 				testFileName = optarg;
 				break;
+			case 'R':
+				maxRnds = atoi(optarg);
+				break;
 			// duet options with an argument
 			case 'M':
 			case 'V':
 			case 'I':
 			case 'Q':
-	                case 'G':
+			case 'G':
 				std::cout << "Passing command-line option " << 	argv[optind - 2] << " " << optarg << " to duet." << std::endl;
 				unrecognizedArgs.push_back(argv[optind - 2]);
 				unrecognizedArgs.push_back(optarg);
