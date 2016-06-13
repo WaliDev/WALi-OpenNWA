@@ -2697,14 +2697,15 @@ namespace goals {
 
   /*
   * Create the tensored differentials from the regular expressions of nodes
-  * with epsilon transitions and populate the map
+  * with epsilon transitions and populate the map differentialMap.
   *
-  * @params:  tslRegExpMap & diffMap - reference to map from varID to it's corresponding TSLRegExp
-  *			 tslDiffMap & differentialMap - reference to map from varID to it's list of TSL tensoredDifferentials
+  * @params:  tslRegExpMap &diffMap - (reference to) a map from varID to its corresponding TSLRegExp
+  *	       tslDiffMap &differentialMap - (reference to) a map from
+  *	                                     varID to its list of TSL tensoredDifferentials
   *
   * @author:  Emma Turetsky 
   */
-  bool createDifferentials(tslRegExpMap & diffMap, tslDiffMap & differentialMap){
+  bool createDifferentials(tslRegExpMap &diffMap, tslDiffMap &differentialMap){
 	  bool linear = true;
 	  for (tslRegExpMap::iterator it = diffMap.begin(); it != diffMap.end(); ++it)
 	  {
@@ -3367,7 +3368,7 @@ NEWROUND:
 		newStarVal.clear();
 		newStarValT.clear();
 
-		// For each variable in the equation system, evaluate its regular expression
+		// For each variable in the equation system, evaluate its tensored regular expression
 		for (assignIt = tensoredRegExpMap.begin(); assignIt != tensoredRegExpMap.end(); assignIt++)
 		{
 			int var = assignIt->first;
