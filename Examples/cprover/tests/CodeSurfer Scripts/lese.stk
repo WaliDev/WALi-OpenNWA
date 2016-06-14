@@ -106,12 +106,18 @@
          (if (and
               (equal? (pdg-vertex-kind cond2) 'control-point)
               (not (equal? cond1 cond2))
+              (not (trans-control-dep-path cond1 cond2))
+              (not (trans-control-dep-path cond2 cond1))
              )
            ;; For each control-dependence successor of cond1
            (pdg-edge-set-traverse
              (pdg-vertex-intra-targets cond1)
              (lambda (pdgv4 e4)
-               (if (equal? e4 'control)
+               (if (and
+                     (equal? e4 'control)
+                     (not (equal? pdgv4 cond1))
+                     (not (equal? pdgv4 cond2))
+                   )
                  ;; For each transitive control-dependence successor of cond1
                  (let ((f-slice-criterion (pdg-vertex-set-create)))
                    (pdg-vertex-set-put! f-slice-criterion cond1) 
@@ -119,8 +125,9 @@
                      (s-forward-slice f-slice-criterion 'control)
                      (lambda (pdgv3)
                        (if (and
+                             (not (equal? pdgv3 cond1))
+                             (not (equal? pdgv3 cond2))
                              (not (equal? pdgv3 pdgv4))
-                             (not (equal? pdgv3 cond2)) ;; cond2 not in forward control slice w.r.t. cond1
                            )
                          (let ((targ3 (pdg-vertex-intra-targets pdgv3))
                                (targ4 (pdg-vertex-intra-targets pdgv4)))
@@ -131,7 +138,6 @@
                                  (pdg-edge-set-lookup targ4 cond1 'data)
                                  (not (pdg-edge-set-lookup targ3 pdgv4 'data))
                                  (not (pdg-edge-set-lookup targ4 pdgv3 'data))
-                                 (not (trans-control-dep-path cond2 cond1))
                                )
                              (begin
                                (display "\n-------------------------\n" file)
