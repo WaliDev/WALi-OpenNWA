@@ -79,3 +79,13 @@ extern "C" {
   }
 }
 
+extern "C" {
+  CAMLprim value add_wpds_print_hull_rule(value vertex, value line, value var) {
+    CAMLparam3(vertex, line, var);
+    wali::Key key = stk(Int_val(vertex));
+    int lineno = Int_val(line);
+    int varno = Int_val(var);
+    goals::printHullRuleHolder.push_back(std::make_pair(key,std::make_pair(lineno,varno)));
+    CAMLreturn(Val_unit);
+  }
+}

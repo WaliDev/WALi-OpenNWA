@@ -29,6 +29,7 @@ std::vector<caml_rule> ruleHolder;
 std::vector<caml_call_rule> callRuleHolder;
 std::vector<caml_epsilon_rule> epsilonRuleHolder;
 std::vector<caml_error_rule> errorRuleHolder;
+std::vector<caml_print_hull_rule> printHullRuleHolder;
 wali::Key entry_key;
 wali::Key exit_key;
 ref_ptr<DuetRel> compareWeight;
