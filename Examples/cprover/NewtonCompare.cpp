@@ -5912,7 +5912,8 @@ int runBasicNewton(char **args, int runningMode)
             duetrel_t composedWeight = contextWeight->Compose(intraprocWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
             
             std::cout << "Variable Bounds at Line: " << line << std::endl;
-            composedWeight->printHull(std::cout, 0, variableID);
+            //composedWeight->printHull(std::cout, 0, variableID);
+            intraprocWeight->printHull(std::cout, 0, variableID);
             std::cout << std::endl;
         }
     }
