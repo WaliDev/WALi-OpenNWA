@@ -5889,6 +5889,33 @@ int runBasicNewton(char **args, int runningMode)
         nval->print(std::cout);
         std::cout << std::endl << std::endl;
     }
+    std::cout << "================================================" << std::endl;
+    std::cout << "Bounds on Variables" << std::endl << std::endl;
+    
+    // Check the assertion at each error point
+    for (std::vector<caml_print_hull_rule>::iterator it = printHullRuleHolder.begin(); 
+         it != printHullRuleHolder.end(); 
+         it++)
+    {
+        wali::Key key = it->first;
+        int line = it->second.first;
+        int variableID = it->second.second;
+        
+        wali::wfa::TransSet print_hull_transitions;
+        print_hull_transitions = outfaNewton.match(st1(), key);
+        for(wali::wfa::TransSet::iterator tsit = print_hull_transitions.begin(); 
+            tsit != print_hull_transitions.end(); 
+            tsit++)
+        {
+            duetrel_t intraprocWeight = ((DuetRel*)((*tsit)->weight().get_ptr()));  // Weight from containing procedure's entry to print-hull pt
+            duetrel_t contextWeight = ((DuetRel*)(outfaNewton.getState((*tsit)->to())->weight().get_ptr()));  // Weight of calling context
+            duetrel_t composedWeight = contextWeight->Compose(intraprocWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
+            
+            std::cout << "Variable Bounds at Line: " << line << std::endl;
+            composedWeight->printHull(std::cout, 0, variableID);
+            std::cout << std::endl;
+        }
+    }
     
     std::cout << "================================================" << std::endl;
     std::cout << "Assertion Checkings at Error Points" << std::endl << std::endl;
