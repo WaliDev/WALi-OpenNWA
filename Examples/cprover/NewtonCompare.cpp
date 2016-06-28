@@ -1,6 +1,6 @@
 #include "gtr/src/lang/gtr_config.h"
 #include "tsl/cir/regexp/conc.1level.cir.hpp"
-#include "tsl/analysis_components/src/reinterps/emul/conc_extern_types.hpp"
+#include "tsl/analysis_components/src/reinterps/emul/conc_extern_phyla.hpp"
 #include "tsl/analysis_components/src/reinterps/emul/conc_externs.hpp"
 ////// The following includes of CPP files were removed by Jason Breck
 //////
@@ -441,10 +441,10 @@ namespace goals {
 
 	typedef boost::unordered_map<
 		MemoCacheKey1<RTG::regExpRefPtr >,
-		ConcTSLInterface::regExpTListRefPtr,
+		RTG::regExpTListRefPtr,
 		boost::hash<MemoCacheKey1<RTG::regExpRefPtr > >,
 		std::equal_to<MemoCacheKey1<RTG::regExpRefPtr > >,
-		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, ConcTSLInterface::regExpTListRefPtr> > >
+		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, RTG::regExpTListRefPtr> > >
 		TDiffHashMap;
 
 	TDiffHashMap TdiffMap;
@@ -461,60 +461,60 @@ namespace goals {
 
 	typedef boost::unordered_map<
 		MemoCacheKey1<RTG::regExpRefPtr >,
-		EXTERN_TYPES::sem_elem_wrapperRefPtr,
+		CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
 		boost::hash<MemoCacheKey1<RTG::regExpRefPtr > >,
 		std::equal_to<MemoCacheKey1<RTG::regExpRefPtr > >,
-		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, EXTERN_TYPES::sem_elem_wrapperRefPtr> > >
+		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
 		EvalMap;
 
 	EvalMap EvalMap0;
 
 	// typedef boost::unordered_map<
 	// 	MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr >,
-	// 	EXTERN_TYPES::sem_elem_wrapperRefPtr,
+	// 	CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
 	// 	boost::hash<MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr > >,
 	// 	std::equal_to<MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr > >,
-	// 	std::allocator<std::pair<const MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr>, EXTERN_TYPES::sem_elem_wrapperRefPtr> > >
+	// 	std::allocator<std::pair<const MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr>, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
 	typedef boost::unordered_map<
 		MemoCacheKey1<RTG::regExpRefPtr >,
-		EXTERN_TYPES::sem_elem_wrapperRefPtr,
+		CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
 		boost::hash<MemoCacheKey1<RTG::regExpRefPtr > >,
 		std::equal_to<MemoCacheKey1<RTG::regExpRefPtr > >,
-		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, EXTERN_TYPES::sem_elem_wrapperRefPtr> > >
+		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
 		EvalRMap;
 
 	EvalRMap EvalMap2;
 
 	// typedef boost::unordered_map<
 	// 	MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr >,
-	// 	EXTERN_TYPES::sem_elem_wrapperRefPtr,
+	// 	CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
 	// 	boost::hash<MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr > >,
 	// 	std::equal_to<MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr > >,
-	// 	std::allocator<std::pair<const MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr >, EXTERN_TYPES::sem_elem_wrapperRefPtr> > >
+	// 	std::allocator<std::pair<const MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
 	typedef boost::unordered_map<
 		MemoCacheKey1<RTG::regExpTRefPtr >,
-		EXTERN_TYPES::sem_elem_wrapperRefPtr,
+		CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
 		boost::hash<MemoCacheKey1<RTG::regExpTRefPtr > >,
 		std::equal_to<MemoCacheKey1<RTG::regExpTRefPtr > >,
-		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpTRefPtr >, EXTERN_TYPES::sem_elem_wrapperRefPtr> > >
+		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpTRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
 		EvalTMap;
 	
 	EvalTMap EvalMapT;
 
 	typedef boost::unordered_map<
 		MemoCacheKey1<RTG::regExpRefPtr >,
-		EXTERN_TYPES::sem_elem_wrapperRefPtr,
+		CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
 		boost::hash<MemoCacheKey1<RTG::regExpRefPtr > >,
 		std::equal_to<MemoCacheKey1<RTG::regExpRefPtr > >,
-		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, EXTERN_TYPES::sem_elem_wrapperRefPtr> > >
+		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
 		StarMap;
 
 	typedef boost::unordered_map<
 		MemoCacheKey1<RTG::regExpTRefPtr >,
-		EXTERN_TYPES::sem_elem_wrapperRefPtr,
+		CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
 		boost::hash<MemoCacheKey1<RTG::regExpTRefPtr > >,
 		std::equal_to<MemoCacheKey1<RTG::regExpTRefPtr > >,
-		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpTRefPtr >, EXTERN_TYPES::sem_elem_wrapperRefPtr> > >
+		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpTRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
 		StarMapT;
 
 	StarMap newStarVal;
@@ -875,6 +875,8 @@ namespace goals {
   }
 
 
+// NONREC: Non-recursive functions:
+
   /*
   *  A non recursive version of the Differential function that uses a stack
   *  It takes in a TSL regular expression and returns a Tensored differential
@@ -887,7 +889,8 @@ namespace goals {
   *
   *  Author: Emma Turetsky
   */
- RTG::regExpTListRefPtr nonRecTDiff(RTG::regExpRefPtr exp)
+  RTG::regExpTListRefPtr nonRecTDiff(RTG::regExpRefPtr exp)
+  //RTG::regExpTListRefPtr TDifferential(RTG::regExpRefPtr exp)
   {
 	  //return CIR::TDifferential(exp);
 	  //This stack represents the worklist, as long as it's not empty, there are still
@@ -1044,34 +1047,34 @@ namespace goals {
 				  }
 			  }
 			  else { 
-				  ConcTSLInterface::regExpTListRefPtr T_a1;
+				  RTG::regExpTListRefPtr T_a1;
 				  switch (frame.e->GetClassId()) {
 				  case RTG::TSL_ID_Var: {
 					  RTG::VarRefPtr t_T_c1_scast__1 = static_cast<RTG::Var*>(frame.e.get_ptr());
 					  BASETYPE::INT32 e_Var_1 = t_T_c1_scast__1->Get_V();
 					  RTG::regExpTRefPtr T_c4 = RTG::OneT::make(); // TSL-spec: line 825 of "regExp.tsl"
-					  ConcTSLInterface::regExpTListRefPtr T_c5 = RTG::RegExpTListNull::make(); // TSL-spec: line 825 of "regExp.tsl"
-					  ConcTSLInterface::regExpTListRefPtr T_c1 = RTG::RegExpTListCons::make(e_Var_1, T_c4, T_c5); // TSL-spec: line 825 of "regExp.tsl"
+					  RTG::regExpTListRefPtr T_c5 = RTG::RegExpTListNull::make(); // TSL-spec: line 825 of "regExp.tsl"
+					  RTG::regExpTListRefPtr T_c1 = RTG::RegExpTListCons::make(e_Var_1, T_c4, T_c5); // TSL-spec: line 825 of "regExp.tsl"
 					  T_a1 = T_c1;
 					  TdiffMap.insert(std::make_pair(lookupKeyForTDifferentialHash, T_a1));
 				  }
 					  break;
 				  case RTG::TSL_ID_Zero: {
-					  ConcTSLInterface::regExpTListRefPtr T_c1 = RTG::RegExpTListNull::make(); // TSL-spec: line 826 of "regExp.tsl"
+					  RTG::regExpTListRefPtr T_c1 = RTG::RegExpTListNull::make(); // TSL-spec: line 826 of "regExp.tsl"
 					  T_a1 = T_c1;
 					  TdiffMap.insert(std::make_pair(lookupKeyForTDifferentialHash, T_a1));
 				  }
 					  break;
 				  case RTG::TSL_ID_One: {
-					  ConcTSLInterface::regExpTListRefPtr T_c1 = RTG::RegExpTListNull::make(); // TSL-spec: line 827 of "regExp.tsl"
+					  RTG::regExpTListRefPtr T_c1 = RTG::RegExpTListNull::make(); // TSL-spec: line 827 of "regExp.tsl"
 					  T_a1 = T_c1;
 					  TdiffMap.insert(std::make_pair(lookupKeyForTDifferentialHash, T_a1));
 				  }
 					  break;
 				  case RTG::TSL_ID_Weight: {
 					  RTG::WeightRefPtr t_T_c1_scast__1 = static_cast<RTG::Weight*>(frame.e.get_ptr());
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr e_Weight_1 = t_T_c1_scast__1->Get_weight();
-					  ConcTSLInterface::regExpTListRefPtr T_c1 = RTG::RegExpTListNull::make(); // TSL-spec: line 828 of "regExp.tsl"
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr e_Weight_1 = t_T_c1_scast__1->Get_weight();
+					  RTG::regExpTListRefPtr T_c1 = RTG::RegExpTListNull::make(); // TSL-spec: line 828 of "regExp.tsl"
 					  T_a1 = T_c1;
 					  TdiffMap.insert(std::make_pair(lookupKeyForTDifferentialHash, T_a1));
 				  }
@@ -1161,6 +1164,7 @@ namespace goals {
   *  Author: Emma Turetsky
   */
   RTG::regExpListRefPtr nonRecUntensoredDiff(RTG::regExpRefPtr exp)
+  //RTG::regExpListRefPtr Differential(RTG::regExpRefPtr exp)
   {
 	  //return CIR::Differential(exp);
 	  //std::cout << hits << std::endl;
@@ -1349,7 +1353,7 @@ namespace goals {
 					  break;
 				  case RTG::TSL_ID_Weight: {
 					  RTG::WeightRefPtr t_T_c1_scast__1 = static_cast<RTG::Weight*>(frame.e.get_ptr());
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr e_Weight_1 = t_T_c1_scast__1->Get_weight();
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr e_Weight_1 = t_T_c1_scast__1->Get_weight();
 					  RTG::regExpListRefPtr T_c1 = RTG::RegExpListNull::make(); // TSL-spec: line 1021 of "regExp.tsl"
 					  T_a1 = T_c1;
 					  diffHMap.insert(std::make_pair(lookupKeyForDifferentialHash, T_a1));
@@ -1431,16 +1435,17 @@ namespace goals {
   *  This is based on the recursive evalAt0 in regExp.tsl and uses that function's hastable
   *
   *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be evaluated
-  *  @return:  EXTERN_TYPES::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
+  *  @return:  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
   *
   *  Author: Emma Turetsky
   *
   */
-   EXTERN_TYPES::sem_elem_wrapperRefPtr evalNonRecAt0(RTG::regExpRefPtr exp)
+  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalNonRecAt0(RTG::regExpRefPtr exp)
+  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalRegExpAt0(RTG::regExpRefPtr exp)
   {
 	  //std::cout << hits << std::endl;
 	  std::stack<dFrame> todo;
-	  std::map<RTG::regExpRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr>::iterator it;
+	  std::map<RTG::regExpRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr>::iterator it;
 
 	  todo.push(dFrame(exp));  //Push the expression on the stack as our starter frame
 
@@ -1468,8 +1473,8 @@ namespace goals {
 				  {
 					  //If the child expression has been evaluated before, performe the Kleene Star operation and insert the resultant
 					  //value into the hash table and pop the stack frame
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-					  ret = EXTERNS::evalKleeneSemElem(evalRegExpAt0___it->second);
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+					  ret = CONC_EXTERNS::evalKleeneSemElem(evalRegExpAt0___it->second);
 					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
 					  todo.pop();
 					  continue;
@@ -1491,16 +1496,16 @@ namespace goals {
 				  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashL);
 				  if (evalRegExpAt0___it != EvalMap0.end())  //The left child has been evaluated before
 				  {
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExpAt0___it->second;
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExpAt0___it->second;
 					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashR(frame.right);
 					  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashR);
 					  //The right child has been evaluated before
 					  if (evalRegExpAt0___it != EvalMap0.end())
 					  {
 						  //Both children have been evaluated at 0 already, so evaluate the Dot expression and put the value into the hash table
-						  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalRegExpAt0___it->second;
-						  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-						  ret = EXTERNS::evalDotSemElem(lch, rch);
+						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExpAt0___it->second;
+						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+						  ret = CONC_EXTERNS::evalDotSemElem(lch, rch);
 						  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
 						  todo.pop();
 						  continue;
@@ -1535,15 +1540,15 @@ namespace goals {
 				  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashL);
 				  if (evalRegExpAt0___it != EvalMap0.end()) //The left child has been evaluated before
 				  {
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExpAt0___it->second;
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExpAt0___it->second;
 					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashR(frame.right);
 					  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashR);
 					  if (evalRegExpAt0___it != EvalMap0.end())  //The right child has been evaluated before
 					  {
 						  //Both children have been evaluated at 0 already, so evaluate the Plus expression and put the value into the hash table
-						  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalRegExpAt0___it->second;
-						  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-						  ret = EXTERNS::evalPlusSemElem(lch, rch);
+						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExpAt0___it->second;
+						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+						  ret = CONC_EXTERNS::evalPlusSemElem(lch, rch);
 						  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
 						  todo.pop();
 						  continue;
@@ -1573,23 +1578,23 @@ namespace goals {
 				  case RTG::TSL_ID_Var: {
 					  RTG::VarRefPtr t_T_c1_scast__1 = static_cast<RTG::Var*>(frame.e.get_ptr());
 					  BASETYPE::INT32 e_Var_1 = t_T_c1_scast__1->Get_V();
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr T_c1 = EXTERNS::getZeroWt(); // TSL-spec: line 680 of "regExp.tsl"
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getZeroWt(); // TSL-spec: line 680 of "regExp.tsl"
 					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, T_c1));
 				  }
 					  break;
 				  case RTG::TSL_ID_Zero: {
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr T_c1 = EXTERNS::getZeroWt(); // TSL-spec: line 681 of "regExp.tsl"
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getZeroWt(); // TSL-spec: line 681 of "regExp.tsl"
 					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, T_c1));
 				  }
 					  break;
 				  case RTG::TSL_ID_One: {
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr T_c1 = EXTERNS::getOneWt(); // TSL-spec: line 682 of "regExp.tsl"
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getOneWt(); // TSL-spec: line 682 of "regExp.tsl"
 					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, T_c1));
 				  }
 					  break;
 				  case RTG::TSL_ID_Weight: {
 					  RTG::WeightRefPtr t_e_Weight_1_scast__1 = static_cast<RTG::Weight*>(frame.e.get_ptr());
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr e_Weight_1 = t_e_Weight_1_scast__1->Get_weight();
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr e_Weight_1 = t_e_Weight_1_scast__1->Get_weight();
 					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, e_Weight_1));
 				  }
 					  break;
@@ -1617,12 +1622,12 @@ namespace goals {
 			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0Hash(frame.e);
 			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashL(frame.left);
 			  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashL);
-			  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExpAt0___it->second;
-			  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
+			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExpAt0___it->second;
+			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
 			  if (frame.op == 0) //Kleene
 			  {
 				  //Evaluate and insert into the hashmap
-				  ret = EXTERNS::evalKleeneSemElem(lch);
+				  ret = CONC_EXTERNS::evalKleeneSemElem(lch);
 				  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
 				  todo.pop();
 				  continue;
@@ -1640,12 +1645,12 @@ namespace goals {
 				  //frame.right->print(std::cout) << std::endl;
 				  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashR);
 
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalRegExpAt0___it->second;
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
+				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExpAt0___it->second;
+				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
 				  if (frame.op == 1) //Dot
 				  {
 					  //Evaluate and insert into the hashmap
-					  ret = EXTERNS::evalDotSemElem(lch, rch);
+					  ret = CONC_EXTERNS::evalDotSemElem(lch, rch);
 					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
 					  todo.pop();
 					  continue;
@@ -1653,7 +1658,7 @@ namespace goals {
 				  else //Plus
 				  {
 					  //Evaluate and insert into the hashmap
-					  ret = EXTERNS::evalPlusSemElem(lch, rch);
+					  ret = CONC_EXTERNS::evalPlusSemElem(lch, rch);
 					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
 					  todo.pop();
 					  continue;
@@ -1674,15 +1679,16 @@ namespace goals {
   *
   *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be evaluated
   *			  RTG::assignmentRefPtr a - The final values for the variables in the regExp
-  *  @return:  EXTERN_TYPES::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
+  *  @return:  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
   *
   *  Author: Emma Turetsky
   */
- EXTERN_TYPES::sem_elem_wrapperRefPtr evalRegExpFinNonRec(RTG::regExpRefPtr exp, RTG::assignmentRefPtr a)
+  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalRegExpFinNonRec(RTG::regExpRefPtr exp, RTG::assignmentRefPtr a)
+  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalRegExpFin(RTG::regExpRefPtr exp, RTG::assignmentRefPtr a)
   {
 	  //std::cout << hits << std::endl;
 	  std::stack<dFrame> todo;
-	  std::map<RTG::regExpRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr>::iterator it;
+	  std::map<RTG::regExpRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr>::iterator it;
 
 	  todo.push(dFrame(exp));
 	  while (!todo.empty())
@@ -1713,8 +1719,8 @@ namespace goals {
 				  {
 					  //If the child expression has been evaluated before, performe the Kleene Star operation and insert the resultant
 					  //value into the hash table and pop the stack frame
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-					  ret = EXTERNS::evalKleeneSemElem(evalRegExpFin___it->second);
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+					  ret = CONC_EXTERNS::evalKleeneSemElem(evalRegExpFin___it->second);
 					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
 					  todo.pop();
 					  continue;
@@ -1738,7 +1744,7 @@ namespace goals {
 				  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
 				  if (evalRegExpFin___it != EvalMap2.end()) //The left child has been evaluated before
 				  {
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExpFin___it->second;
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExpFin___it->second;
 					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
 					  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
 					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashR(frame.right);
@@ -1746,9 +1752,9 @@ namespace goals {
 					  if (evalRegExpFin___it != EvalMap2.end()) //The right child has been evaluated before
 					  {
 						  //Both children have been evaluated already, so evaluate the Dot expression and put the value into the hash table
-						  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalRegExpFin___it->second;
-						  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-						  ret = EXTERNS::evalDotSemElem(lch, rch);
+						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExpFin___it->second;
+						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+						  ret = CONC_EXTERNS::evalDotSemElem(lch, rch);
 						  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
 						  todo.pop();
 						  continue;
@@ -1786,7 +1792,7 @@ namespace goals {
 				  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
 				  if (evalRegExpFin___it != EvalMap2.end()) //The left child has been evaluated before
 				  {
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExpFin___it->second;
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExpFin___it->second;
 					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
 					  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
 					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashR(frame.right);
@@ -1794,9 +1800,9 @@ namespace goals {
 					  if (evalRegExpFin___it != EvalMap2.end()) //The right child has been evaluated before
 					  {
 						  //Both children have been evaluated already, so evaluate the Plus expression and put the value into the hash table
-						  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalRegExpFin___it->second;
-						  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-						  ret = EXTERNS::evalPlusSemElem(lch, rch);
+						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExpFin___it->second;
+						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+						  ret = CONC_EXTERNS::evalPlusSemElem(lch, rch);
 						  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
 						  todo.pop();
 						  continue;
@@ -1840,8 +1846,8 @@ namespace goals {
 				  if (evalRegExpFin___it != EvalMap2.end())
 				  {
 					  //Evaluate the projection and insert it into the hash table
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-					  ret = EXTERNS::evalProjectSemElem(e_Project_1, e_Project_2,evalRegExpFin___it->second);
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+					  ret = CONC_EXTERNS::evalProjectSemElem(e_Project_1, e_Project_2,evalRegExpFin___it->second);
 					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
 					  todo.pop();
 					  continue;
@@ -1860,23 +1866,23 @@ namespace goals {
 				  case RTG::TSL_ID_Var: {
 					  RTG::VarRefPtr t_T_c1_scast__1 = static_cast<RTG::Var*>(frame.e.get_ptr());
 					  BASETYPE::INT32 e_Var_1 = t_T_c1_scast__1->Get_V();
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr T_c1 = CIR::getAssignment(e_Var_1, a); // TSL-spec: line 701 of "regExp.tsl"
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CIR::getAssignment(e_Var_1, a); // TSL-spec: line 701 of "regExp.tsl"
 					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, T_c1));
 				  }
 					  break;
 				  case RTG::TSL_ID_Zero: {
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr T_c1 = EXTERNS::getZeroWt(); // TSL-spec: line 702 of "regExp.tsl"
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getZeroWt(); // TSL-spec: line 702 of "regExp.tsl"
 					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, T_c1));
 				  }
 					  break;
 				  case RTG::TSL_ID_One: {
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr T_c1 = EXTERNS::getOneWt(); // TSL-spec: line 703 of "regExp.tsl"
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getOneWt(); // TSL-spec: line 703 of "regExp.tsl"
 					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, T_c1));
 				  }
 					  break;
 				  case RTG::TSL_ID_Weight: {
 					  RTG::WeightRefPtr t_e_Weight_1_scast__1 = static_cast<RTG::Weight*>(frame.e.get_ptr());
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr e_Weight_1 = t_e_Weight_1_scast__1->Get_weight();
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr e_Weight_1 = t_e_Weight_1_scast__1->Get_weight();
 					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, e_Weight_1));
 				  }
 				  }
@@ -1895,11 +1901,11 @@ namespace goals {
 			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHash(frame.e);
 			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashL(frame.left);
 			  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
-			  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExpFin___it->second;
-			  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
+			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExpFin___it->second;
+			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
 			  if (frame.op == 0) //Kleene
 			  {
-				  ret = EXTERNS::evalKleeneSemElem(lch);
+				  ret = CONC_EXTERNS::evalKleeneSemElem(lch);
 				  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
 				  todo.pop();
 				  continue;
@@ -1909,7 +1915,7 @@ namespace goals {
 				  RTG::ProjectRefPtr t_T_c1_scast__1 = static_cast<RTG::Project*>(frame. e.get_ptr());
 				  BASETYPE::INT32 e_Project_1 = t_T_c1_scast__1->Get_MS();
 				  BASETYPE::INT32 e_Project_2 = t_T_c1_scast__1->Get_MT();
-				  ret = EXTERNS::evalProjectSemElem(e_Project_1, e_Project_2, lch);
+				  ret = CONC_EXTERNS::evalProjectSemElem(e_Project_1, e_Project_2, lch);
 				  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
 				  todo.pop();
 				  continue;
@@ -1923,18 +1929,18 @@ namespace goals {
 				  //frame.right->print(std::cout) << std::endl;
 				  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
 
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalRegExpFin___it->second;
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
+				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExpFin___it->second;
+				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
 				  if (frame.op == 1)  //Dot
 				  {
-					  ret = EXTERNS::evalDotSemElem(lch, rch);
+					  ret = CONC_EXTERNS::evalDotSemElem(lch, rch);
 					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
 					  todo.pop();
 					  continue;
 				  }
 				  else  //Plus
 				  {
-					  ret = EXTERNS::evalPlusSemElem(lch, rch);
+					  ret = CONC_EXTERNS::evalPlusSemElem(lch, rch);
 					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
 					  todo.pop();
 					  continue;
@@ -1957,15 +1963,16 @@ namespace goals {
   *
   *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be evaluated
   *           RTG::assignmentRefPtr a - The final values for the variables in the regExp
-  *  @return:  EXTERN_TYPES::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
+  *  @return:  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
   *
   *  Author: Emma Turetsky
   */
-  EXTERN_TYPES::sem_elem_wrapperRefPtr evalRegExpNonRec(RTG::regExpRefPtr exp, RTG::assignmentRefPtr a)
+  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalRegExpNonRec(RTG::regExpRefPtr exp, RTG::assignmentRefPtr a)
+  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalRegExp(RTG::regExpRefPtr exp, RTG::assignmentRefPtr a)
   {
 	  //std::cout << hits << std::endl;
 	  std::stack<dFrame> todo;
-	  std::map<RTG::regExpRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr>::iterator it;
+	  std::map<RTG::regExpRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr>::iterator it;
 
 	  todo.push(dFrame(exp));
 	  while (!todo.empty())
@@ -1997,8 +2004,8 @@ namespace goals {
 				  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
 				  if (evalRegExp___it != EvalMap2.end())
 				  {
-					  //EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-					  //ret = EXTERNS::evalKleeneSemElem(evalRegExp___it->second);
+					  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+					  //ret = CONC_EXTERNS::evalKleeneSemElem(evalRegExp___it->second);
 					  //EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
 					  //todo.pop();
 					  //std::cout << "New code! (U1)" << std::endl;
@@ -2040,16 +2047,16 @@ namespace goals {
 				  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
 				  if (evalRegExp___it != EvalMap2.end())
 				  {
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExp___it->second;
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExp___it->second;
 					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
 					  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
 					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashR(frame.right);
 					  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
 					  if (evalRegExp___it != EvalMap2.end())
 					  {
-						  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalRegExp___it->second;
-						  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-						  ret = EXTERNS::evalDotSemElem(lch, rch);
+						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExp___it->second;
+						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+						  ret = CONC_EXTERNS::evalDotSemElem(lch, rch);
 						  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
 						  todo.pop();
 						  continue;
@@ -2085,16 +2092,16 @@ namespace goals {
 				  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
 				  if (evalRegExp___it != EvalMap2.end())
 				  {
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExp___it->second;
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExp___it->second;
 					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
 					  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
 					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashR(frame.right);
 					  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
 					  if (evalRegExp___it != EvalMap2.end())
 					  {
-						  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalRegExp___it->second;
-						  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-						  ret = EXTERNS::evalPlusSemElem(lch, rch);
+						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExp___it->second;
+						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+						  ret = CONC_EXTERNS::evalPlusSemElem(lch, rch);
 						  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
 						  todo.pop();
 						  continue;
@@ -2124,23 +2131,23 @@ namespace goals {
 				  case RTG::TSL_ID_Var: {
 					  RTG::VarRefPtr t_T_c1_scast__1 = static_cast<RTG::Var*>(frame.e.get_ptr());
 					  BASETYPE::INT32 e_Var_1 = t_T_c1_scast__1->Get_V();
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr T_c1 = CIR::getAssignment(e_Var_1, a); // TSL-spec: line 724 of "regExp.tsl"
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CIR::getAssignment(e_Var_1, a); // TSL-spec: line 724 of "regExp.tsl"
 					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, T_c1));
 				  }
 					  break;
 				  case RTG::TSL_ID_Zero: {
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr T_c1 = EXTERNS::getZeroWt(); // TSL-spec: line 725 of "regExp.tsl"
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getZeroWt(); // TSL-spec: line 725 of "regExp.tsl"
 					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, T_c1));
 				  }
 					  break;
 				  case RTG::TSL_ID_One: {
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr T_c1 = EXTERNS::getOneWt(); // TSL-spec: line 726 of "regExp.tsl"
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getOneWt(); // TSL-spec: line 726 of "regExp.tsl"
 					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, T_c1));
 				  }
 					  break;
 				  case RTG::TSL_ID_Weight: {
 					  RTG::WeightRefPtr t_e_Weight_1_scast__1 = static_cast<RTG::Weight*>(frame.e.get_ptr());
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr e_Weight_1 = t_e_Weight_1_scast__1->Get_weight();
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr e_Weight_1 = t_e_Weight_1_scast__1->Get_weight();
 					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, e_Weight_1));
 				  }
 					  break;
@@ -2169,11 +2176,11 @@ namespace goals {
 			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHash(frame.e);
 			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashL(frame.left);
 			  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
-			  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalRegExp___it->second;
-			  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
+			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExp___it->second;
+			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
 			  if (frame.op == 0) //Kleene
 			  {
-				  //ret = EXTERNS::evalKleeneSemElem(lch);
+				  //ret = CONC_EXTERNS::evalKleeneSemElem(lch);
 				  //EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
 				  //todo.pop();
 				  //std::cout << "New code! (U2)" << std::endl;
@@ -2201,7 +2208,7 @@ namespace goals {
 				  RTG::ProjectRefPtr t_T_c1_scast__1 = static_cast<RTG::Project*>(frame.e.get_ptr());
 				  BASETYPE::INT32 e_Project_1 = t_T_c1_scast__1->Get_MS();
 				  BASETYPE::INT32 e_Project_2 = t_T_c1_scast__1->Get_MT();
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr T_c7 = EXTERNS::evalProjectSemElem(e_Project_1, e_Project_2, lch);
+				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c7 = CONC_EXTERNS::evalProjectSemElem(e_Project_1, e_Project_2, lch);
 				  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, T_c7));
 				  todo.pop();
 				  continue;
@@ -2215,18 +2222,18 @@ namespace goals {
 				  //frame.right->print(std::cout) << std::endl;
 				  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
 
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalRegExp___it->second;
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
+				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExp___it->second;
+				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
 				  if (frame.op == 1) //Dot
 				  {
-					  ret = EXTERNS::evalDotSemElem(lch, rch);
+					  ret = CONC_EXTERNS::evalDotSemElem(lch, rch);
 					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
 					  todo.pop();
 					  continue;
 				  }
 				  else //Plus
 				  {
-					  ret = EXTERNS::evalPlusSemElem(lch, rch);
+					  ret = CONC_EXTERNS::evalPlusSemElem(lch, rch);
 					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
 					  todo.pop();
 					  continue;
@@ -2242,12 +2249,365 @@ namespace goals {
 	  return EvalMap2[fin];
   }
 
+  /*
+  *  A non recursive version of evalT used to eval TSLRegExps representing tensored weights
+  *  given the assignment a.
+  *
+  *  This is based on the recursive evalT in regExp.tsl and uses that function's hashtable
+  *
+  *  @param:  RTG::regExpTRefPtr exp - The top level tensored regular expression to be evaluated
+  *           RTG::assignmentRefPtr a - The final values for the variables in the regExp
+  *  @return:  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr - A sem_elem wrapper around a tensored sem_elem wt
+  *
+  *  Author: Emma Turetsky
+  */
+  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalTNonRec(RTG::regExpTRefPtr exp, RTG::assignmentRefPtr a)
+  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalT(RTG::regExpTRefPtr exp, RTG::assignmentRefPtr a)
+  {
+	  //std::cout << hits << std::endl;
+	  std::stack<sFrame> todo;
+	  std::map<RTG::regExpTRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr>::iterator it;
+
+	  todo.push(sFrame(exp));
+	  while (!todo.empty())
+	  {
+		  sFrame & frame = todo.top();
+		  if (frame.is_new){  //Determine if this is the first time looking at this frame
+			  //Check frame.e see if it's been evaluated before.
+			  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHash(frame.e, a);
+			  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHash);
+			  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHash(frame.e);
+			  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHash);
+			  if (evalT___it != EvalMapT.end()) {
+				  todo.pop();
+				  continue;
+			  }
+			  frame.is_new = false;
+			  //frame.e has not been evaluated before - check to see if the children have been seen before
+			  //If so, evaluate frame.e as appropriate, otherwise push the children on to the stack
+			  if (CIR::isKleeneT(frame.e).get_data())
+			  {
+				  frame.op = 0;
+				  RTG::regExpTRefPtr child = CIR::getLChildT(frame.e);
+				  frame.left = child;
+				  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(child, a);
+				  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(child);
+				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+				  if (evalT___it != EvalMapT.end())
+				  {
+				  	  //std::cout << "New code! (T1)" << std::endl;
+					  duetrelpair_t ret;
+                      
+				  	  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(child);
+
+                      duetrel_t previousValue = 0;
+                      if (doWideningThisRound) {
+                          EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
+                          if (previousValueIterator != oldStarValT.end()) {
+                              previousValue = previousValueIterator->second.v;
+                          }
+                      }
+
+					  ret = ((evalT___it->second.v))->alphaHatStar(previousValue);
+					  // std::cout << "  Body value is: " << std::endl;
+					  // evalT___it->second.v->print(std::cout);
+					  // std::cout << std::endl;
+					  // std::cout << "  Linearized value is: " << std::endl;
+					  // ret->first->print(std::cout);
+					  // std::cout << std::endl;
+					  // std::cout << "  Star value is: " << std::endl;
+					  // ret->second->print(std::cout);
+					  // std::cout << std::endl;
+
+					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret->second));
+					  newStarValT.insert(std::make_pair(lookupKeyForStar, ret->first));
+					  todo.pop();
+					  continue;
+				  }
+				  else
+				  {
+					  todo.push(sFrame(child));
+					  continue;
+				  }
+			  }
+			  else if (CIR::isDotT(frame.e).get_data())
+			  {
+				  frame.op = 1;
+				  frame.left = CIR::getLChildT(frame.e);
+				  frame.right = CIR::getRChildT(frame.e);
+				  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
+				  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(frame.left);
+				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+				  if (evalT___it != EvalMapT.end())
+				  {
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalT___it->second;
+					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
+					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
+					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+					  if (evalT___it != EvalMapT.end())
+					  {
+						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalT___it->second;
+						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+						  ret = CONC_EXTERNS::evalDotSemElemT(lch, rch);
+						  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
+						  todo.pop();
+						  continue;
+					  }
+					  else
+					  {
+						  todo.push(sFrame(frame.right));
+						  continue;
+					  }
+				  }
+				  else
+				  {
+					  todo.push(sFrame(frame.left));
+					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
+					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
+					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+					  if (evalT___it == EvalMapT.end())
+					  {
+						  todo.push(sFrame(frame.right));
+						  continue;
+					  }
+				  }
+			  }
+			  else if (CIR::isPlusT(frame.e).get_data())
+			  {
+				  frame.op = 2;
+				  frame.left = CIR::getLChildT(frame.e);
+				  frame.right = CIR::getRChildT(frame.e);
+				  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
+				  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(frame.left);
+				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+				  if (evalT___it != EvalMapT.end())
+				  {
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalT___it->second;
+					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
+					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
+					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+					  if (evalT___it != EvalMapT.end())
+					  {
+						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalT___it->second;
+						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+						  ret = CONC_EXTERNS::evalPlusSemElemT(lch, rch);
+						  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
+						  todo.pop();
+						  continue;
+					  }
+					  else
+					  {
+						  todo.push(sFrame(frame.right));
+						  continue;
+					  }
+				  }
+				  else
+				  {
+					  todo.push(sFrame(frame.left));
+					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
+					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
+					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+					  if (evalT___it == EvalMapT.end())
+					  {
+						  todo.push(sFrame(frame.right));
+						  continue;
+					  }
+				  }
+			  }
+			  else if (CIR::isProjectT(frame.e).get_data()){
+					  frame.op = 3;
+					  RTG::ProjectTRefPtr t_T_b1_scast__1 = static_cast<RTG::ProjectT*>(frame.e.get_ptr());
+					  RTG::regExpTRefPtr e_ProjectT_3 = t_T_b1_scast__1->Get_child();
+					  BASETYPE::INT32 e_ProjectT_1 = t_T_b1_scast__1->Get_MS();
+					  BASETYPE::INT32 e_ProjectT_2 = t_T_b1_scast__1->Get_MT();
+					  frame.left = e_ProjectT_3;
+					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
+					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(frame.left);
+					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+					  if (evalT___it != EvalMapT.end())
+					  {
+						  // std::cout << "This value appears inside a ProjectT:" << std::endl;
+						  // evalT___it->second.print(std::cout);
+						  // std::cout << std::endl;
+						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret = CONC_EXTERNS::evalProjectSemElemT(e_ProjectT_1, e_ProjectT_2, evalT___it->second);
+						  // std::cout << "Evaluating ProjectT gave us:" << std::endl;
+						  // ret.print(std::cout);
+						  // std::cout << std::endl;
+						  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
+						  todo.pop();
+						  continue;
+					  }
+					  /*
+					 else if (CIR::isDotT(e_ProjectT_3).get_data())
+					  {
+						  RTG::regExpTRefPtr aDot = CIR::getLChildT(e_ProjectT_3);
+						  RTG::regExpTRefPtr bDot = CIR::getRChildT(e_ProjectT_3);
+						  if (CIR::isTensorTranspose(aDot).get_data())
+						  {
+							  if (CIR::isTensorTranspose(bDot).get_data())
+							  {
+								  RTG::TensorTransposeRefPtr t_T_c1_scast__1 = static_cast<RTG::TensorTranspose*>(aDot.get_ptr());
+								  RTG::regExpRefPtr w = t_T_c1_scast__1->Get_lChild();
+								  RTG::regExpRefPtr x = t_T_c1_scast__1->Get_rChild();
+								  RTG::TensorTransposeRefPtr t_T_c1_scast__2 = static_cast<RTG::TensorTranspose*>(bDot.get_ptr());
+								  RTG::regExpRefPtr y = t_T_c1_scast__2->Get_lChild();
+								  RTG::regExpRefPtr z = t_T_c1_scast__2->Get_rChild();
+								  RTG::regExpRefPtr lch = CIR::mkDot(y, w);
+								  RTG::regExpRefPtr rch = CIR::mkDot(x, z);
+								  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr mVal = evalRegExpNonRec(rch, a);
+								  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr fVal = evalRegExpNonRec(lch, a);
+								  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr mergedVal = CONC_EXTERNS::evalProjectSemElem(e_ProjectT_1, e_ProjectT_2, mVal);
+								  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr eVal = CONC_EXTERNS::evalDotSemElem(fVal, mergedVal);
+								  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret = CONC_EXTERNS::evalTensorTranspose(CONC_EXTERNS::getOneWt(), eVal);
+								  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
+								  todo.pop();
+								  continue;
+							  }
+						  }
+					  }
+					  */
+					  todo.push(frame.left);
+					  continue;
+				  }
+			  else if (CIR::isTensorTranspose(frame.e).get_data())
+				  {
+					  RTG::TensorTransposeRefPtr t_T_c1_scast__1 = static_cast<RTG::TensorTranspose*>(frame.e.get_ptr());
+					  RTG::regExpRefPtr lch = t_T_c1_scast__1->Get_lChild();
+					  RTG::regExpRefPtr rch = t_T_c1_scast__1->Get_rChild();
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lVal = evalRegExpNonRec(lch, a);
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rVal = evalRegExpNonRec(rch, a);
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret = CONC_EXTERNS::evalTensorTranspose(lVal, rVal);
+					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
+					  todo.pop();
+					  continue;
+				  }
+			  else  //Leaf tensored regexp, so call evalT as it's a base case
+			  {
+				  switch (frame.e->GetClassId()) {
+				  case RTG::TSL_ID_VarT: {
+					  RTG::VarTRefPtr t_T_c1_scast__1 = static_cast<RTG::VarT*>(frame.e.get_ptr());
+					  BASETYPE::INT32 e_VarT_1 = t_T_c1_scast__1->Get_VT();
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getZeroTWt(); // TSL-spec: line 751 of "regExp.tsl"
+					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, T_c1));
+				  }
+					  break;
+				  case RTG::TSL_ID_ZeroT: {
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getZeroTWt(); // TSL-spec: line 752 of "regExp.tsl"
+					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, T_c1));
+				  }
+					  break;
+				  case RTG::TSL_ID_OneT: {
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getOneTWt(); // TSL-spec: line 753 of "regExp.tsl"
+					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, T_c1));
+				  }
+				  }
+				  todo.pop();
+				  continue;
+
+			  }
+		  }
+		  else  //We've seen this stack frame before
+		  {
+			  //All the children of frame.e have been evaluated, so evaluate frame.e as appropriate
+			  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHash(frame.e, a);
+			  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
+			  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+			  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHash(frame.e);
+			  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(frame.left);
+			  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalT___it->second;
+			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+			  if (frame.op == 0) //Kleene
+			  {
+			  	  //std::cout << "New code! (T2)" << std::endl;
+				  duetrelpair_t ret;
+				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(frame.e); // FIXME this variable is now redundant with lookupKeyForevalTHash
+
+                  duetrel_t previousValue = 0;
+                  if (doWideningThisRound) {
+			          EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
+                      if (previousValueIterator != oldStarValT.end()) {
+                          previousValue = previousValueIterator->second.v;
+                      }
+                  }
+
+				  ret = ((evalT___it->second.v))->alphaHatStar(previousValue);
+				  // std::cout << "  Body value is: " << std::endl;
+				  // evalT___it->second.v->print(std::cout);
+				  // std::cout << std::endl;
+				  // std::cout << "  Linearized value is: " << std::endl;
+				  // ret->first->print(std::cout);
+				  // std::cout << std::endl;
+				  // std::cout << "  Star value is: " << std::endl;
+				  // ret->second->print(std::cout);
+				  // std::cout << std::endl;
+				  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret->second));
+				  newStarValT.insert(std::make_pair(lookupKeyForStar, ret->first));
+				  //ret = CONC_EXTERNS::evalKleeneSemElemT(lch);
+				  //EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
+				  todo.pop();
+				  continue;
+			  }
+			  else if (frame.op == 3) //Project
+			  {
+				  RTG::ProjectTRefPtr t_T_b1_scast__1 = static_cast<RTG::ProjectT*>(frame.e.get_ptr());
+				  BASETYPE::INT32 e_ProjectT_1 = t_T_b1_scast__1->Get_MS();
+				  BASETYPE::INT32 e_ProjectT_2 = t_T_b1_scast__1->Get_MT();
+				  // std::cout << "This value appears inside a ProjectT:" << std::endl;
+				  // lch.print(std::cout);
+				  // std::cout << std::endl;
+				  ret = CONC_EXTERNS::evalProjectSemElemT(e_ProjectT_1, e_ProjectT_2, lch);
+				  // std::cout << "Evaluating ProjectT gave us:" << std::endl;
+				  // ret.print(std::cout);
+				  // std::cout << std::endl;
+				  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
+				  todo.pop();
+				  continue;
+			  }
+			  else //Dot or Plust
+			  {
+				  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
+				  // //frame.right->print(std::cout) << std::endl;
+				  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
+				  //frame.right->print(std::cout) << std::endl;
+				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+
+				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalT___it->second;
+				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+				  if (frame.op == 1)  //Dot
+				  {
+					  ret = CONC_EXTERNS::evalDotSemElemT(lch, rch);
+					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
+					  todo.pop();
+					  continue;
+				  }
+				  else  //Plus
+				  {
+					  ret = CONC_EXTERNS::evalPlusSemElemT(lch, rch);
+					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
+					  todo.pop();
+					  continue;
+				  }
+			  }
+		  }
+	  }
+
+	  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > fin(exp, a);
+	  MemoCacheKey1<RTG::regExpTRefPtr > fin(exp);
+	  return EvalMapT[fin];  //Grabs exp evaluated at assignment a from the hash_map
+  }
 
 
-
-
-
-
+// NONREC End of non-recursive functions.
 
 
 
@@ -2588,11 +2948,11 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 
 
 ////  typedef boost::unordered_map<
-////    MemoCacheKey2<RTG::regExpRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr >,
-////    EXTERN_TYPES::sem_elem_wrapperRefPtr,
-////    boost::hash<MemoCacheKey2<RTG::regExpRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr > >,
-////    std::equal_to<MemoCacheKey2<RTG::regExpRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr > >,
-////    std::allocator<std::pair<const MemoCacheKey2<RTG::regExpRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr >, EXTERN_TYPES::sem_elem_wrapperRefPtr> > >
+////    MemoCacheKey2<RTG::regExpRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr >,
+////    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
+////    boost::hash<MemoCacheKey2<RTG::regExpRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr > >,
+////    std::equal_to<MemoCacheKey2<RTG::regExpRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr > >,
+////    std::allocator<std::pair<const MemoCacheKey2<RTG::regExpRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
 ////    EvalRMapRC;
 ////
 ////
@@ -2610,8 +2970,8 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////  struct dFrameRC
 ////  {
 ////      dFrameRC(RTG::regExpRefPtr & expr,
-////               EXTERN_TYPES::sem_elem_wrapperRefPtr rightContext,
-////               EXTERN_TYPES::sem_elem_wrapperRefPtr * returnValuePointer /* Beware: Pointer to RefPtr */ 
+////               CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rightContext,
+////               CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr * returnValuePointer /* Beware: Pointer to RefPtr */ 
 ////               ) : 
 ////               rightContext(rightContext), 
 ////               returnValuePointer(returnValuePointer),
@@ -2622,13 +2982,13 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////
 ////      RTG::regExpRefPtr expr;
 ////
-////      EXTERN_TYPES::sem_elem_wrapperRefPtr rightContext;
+////      CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rightContext;
 ////
-////      EXTERN_TYPES::sem_elem_wrapperRefPtr leftChildValue;
-////      EXTERN_TYPES::sem_elem_wrapperRefPtr rightChildValue;
+////      CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr leftChildValue;
+////      CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rightChildValue;
 ////
 ////      // Beware: This is an ugly hack because it's a pointer to a RefPtr !!
-////      EXTERN_TYPES::sem_elem_wrapperRefPtr * returnValuePointer;
+////      CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr * returnValuePointer;
 ////  };
 ////  
 //// 
@@ -2640,33 +3000,33 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////  *  This version takes into account the right context of every subexpression during evaluation.
 ////  *
 ////  *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be evaluated
-////  *           EXTERN_TYPES::sem_elem_wrapperRefPtr context - The right context in which to evalute exp
+////  *           CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr context - The right context in which to evalute exp
 ////  *           RTG::assignmentRefPtr a - The final values for the variables in the regExp
-////  *  @return:  EXTERN_TYPES::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
+////  *  @return:  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
 ////  *
 ////  *  Author: Jason Breck
 ////  */
-////  EXTERN_TYPES::sem_elem_wrapperRefPtr evalRegExpNonRecRC(RTG::regExpRefPtr exp, 
-////                                                          EXTERN_TYPES::sem_elem_wrapperRefPtr rightContext, 
+////  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalRegExpNonRecRC(RTG::regExpRefPtr exp, 
+////                                                          CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rightContext, 
 ////                                                          RTG::assignmentRefPtr a)
 ////  {
 ////      // First, check if this (expression, rightContext) pair is in the function cache:
-////      MemoCacheKey2<RTG::regExpRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr >
+////      MemoCacheKey2<RTG::regExpRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr >
 ////             lookupKeyForevalRegExpHash(exp, rightContext);
 ////      EvalRMapRC::const_iterator it0 = EvalMap2RC.find(lookupKeyForevalRegExpHash);
 ////      if (it0 != EvalMap2RC.end()) { return it0->second.v; }
 ////
-////      EXTERN_TYPES::sem_elem_wrapperRefPtr finalReturnValue;
+////      CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr finalReturnValue;
 ////      std::stack<dFrameRC> todo;
 ////      todo.push(dFrameRC(exp, rightContext, &finalReturnValue));
 ////
 ////      while (!todo.empty())
 ////      {
 ////          dFrameRC & frame = todo.top();
-////          EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
+////          CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
 ////          RTG::regExpRefPtr child;
-////          EXTERN_TYPES::sem_elem_wrapperRefPtr childContext;
-////          EXTERN_TYPES::sem_elem_wrapperRefPtr * childReturnValuePointer; // Beware: pointer to RefPtr
+////          CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr childContext;
+////          CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr * childReturnValuePointer; // Beware: pointer to RefPtr
 ////
 ////          if (frame.phase == 0) {
 ////
@@ -2683,11 +3043,11 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////                      goto FINISH_FRAME; }
 ////
 ////                  case RTG::TSL_ID_Zero: 
-////                      ret = EXTERNS::getZeroWt(); 
+////                      ret = CONC_EXTERNS::getZeroWt(); 
 ////                      goto FINISH_FRAME;
 ////
 ////                  case RTG::TSL_ID_One: 
-////                      ret = EXTERNS::getOneWt(); 
+////                      ret = CONC_EXTERNS::getOneWt(); 
 ////                      goto FINISH_FRAME;
 ////
 ////                  case RTG::TSL_ID_Weight: {
@@ -2698,7 +3058,7 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////                  // ************ Operators with one child: ***************
 ////                  case RTG::TSL_ID_Kleene: 
 ////                      child = CIR::getLChild(frame.expr); // Now process "left" (only) child
-////                      childContext = EXTERNS::getOneWt();
+////                      childContext = CONC_EXTERNS::getOneWt();
 ////                      childReturnValuePointer = &frame.leftChildValue;
 ////                      goto PROCESS_CHILD;
 ////
@@ -2728,7 +3088,7 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////
 ////                  // ************ Operators with one child: ***************
 ////                  case RTG::TSL_ID_Kleene: {
-////                      MemoCacheKey2<RTG::regExpRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr > 
+////                      MemoCacheKey2<RTG::regExpRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr > 
 ////                            lookupKeyForStar(frame.expr, frame.rightContext);
 ////
 ////                      // If we want to do widening, fetch the abstract value of this loop
@@ -2749,13 +3109,13 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////                      RTG::ProjectRefPtr t_T_b1_scast__1 = static_cast<RTG::Project*>(frame.expr.get_ptr());
 ////                      BASETYPE::INT32 e_Project_1 = t_T_b1_scast__1->Get_MS();
 ////                      BASETYPE::INT32 e_Project_2 = t_T_b1_scast__1->Get_MT();
-////                      ret = EXTERNS::evalProjectSemElem(e_Project_1, e_Project_2, frame.leftChildValue);
+////                      ret = CONC_EXTERNS::evalProjectSemElem(e_Project_1, e_Project_2, frame.leftChildValue);
 ////                      goto FINISH_FRAME; }
 ////
 ////                  // ************ Operators with two children: ***************
 ////                  case RTG::TSL_ID_Dot:
 ////                      child = CIR::getLChild(frame.expr); // Now process left child
-////                      childContext = EXTERNS::evalDotSemElem(frame.rightChildValue, frame.rightContext);
+////                      childContext = CONC_EXTERNS::evalDotSemElem(frame.rightChildValue, frame.rightContext);
 ////                      childReturnValuePointer = &frame.leftChildValue;
 ////                      goto PROCESS_CHILD;
 ////
@@ -2775,11 +3135,11 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////              switch (frame.expr->GetClassId()) {
 ////                  
 ////                  case RTG::TSL_ID_Dot:
-////                      ret = EXTERNS::evalDotSemElem(frame.leftChildValue, frame.rightChildValue);
+////                      ret = CONC_EXTERNS::evalDotSemElem(frame.leftChildValue, frame.rightChildValue);
 ////                      goto FINISH_FRAME;
 ////
 ////                  case RTG::TSL_ID_Plus:
-////                      ret = EXTERNS::evalPlusSemElem(frame.leftChildValue, frame.rightChildValue);
+////                      ret = CONC_EXTERNS::evalPlusSemElem(frame.leftChildValue, frame.rightChildValue);
 ////                      goto FINISH_FRAME;
 ////
 ////              } 
@@ -2796,7 +3156,7 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////
 ////PROCESS_CHILD: 
 ////          frame.phase++;
-////          MemoCacheKey2<RTG::regExpRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr >
+////          MemoCacheKey2<RTG::regExpRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr >
 ////                 lookupKeyForChild(child, childContext);
 ////          EvalRMapRC::const_iterator child_it = EvalMap2RC.find(lookupKeyForChild);
 ////          if (child_it != EvalMap2RC.end()) { // Child is in the function cache: 
@@ -2824,11 +3184,11 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////
 ////
 ////  typedef boost::unordered_map<
-////    MemoCacheKey2<EXTERN_TYPES::sem_elem_wrapperRefPtr, RTG::regExpRefPtr >,
-////    EXTERN_TYPES::sem_elem_wrapperRefPtr,
-////    boost::hash<MemoCacheKey2<EXTERN_TYPES::sem_elem_wrapperRefPtr, RTG::regExpRefPtr > >,
-////    std::equal_to<MemoCacheKey2<EXTERN_TYPES::sem_elem_wrapperRefPtr, RTG::regExpRefPtr > >,
-////    std::allocator<std::pair<const MemoCacheKey2<EXTERN_TYPES::sem_elem_wrapperRefPtr, RTG::regExpRefPtr >, EXTERN_TYPES::sem_elem_wrapperRefPtr> > >
+////    MemoCacheKey2<CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr, RTG::regExpRefPtr >,
+////    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
+////    boost::hash<MemoCacheKey2<CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr, RTG::regExpRefPtr > >,
+////    std::equal_to<MemoCacheKey2<CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr, RTG::regExpRefPtr > >,
+////    std::allocator<std::pair<const MemoCacheKey2<CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr, RTG::regExpRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
 ////    EvalRMapLC;
 ////
 ////
@@ -2843,9 +3203,9 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////  //   used for evalRegExpNonRecLC
 ////  struct dFrameLC
 ////  {
-////      dFrameLC(EXTERN_TYPES::sem_elem_wrapperRefPtr leftContext,
+////      dFrameLC(CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr leftContext,
 ////               RTG::regExpRefPtr & expr,
-////               EXTERN_TYPES::sem_elem_wrapperRefPtr * returnValuePointer /* Beware: Pointer to RefPtr */ 
+////               CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr * returnValuePointer /* Beware: Pointer to RefPtr */ 
 ////               ) : 
 ////               leftContext(leftContext), 
 ////               returnValuePointer(returnValuePointer),
@@ -2856,13 +3216,13 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////
 ////      RTG::regExpRefPtr expr;
 ////
-////      EXTERN_TYPES::sem_elem_wrapperRefPtr leftContext;
+////      CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr leftContext;
 ////
-////      EXTERN_TYPES::sem_elem_wrapperRefPtr leftChildValue;
-////      EXTERN_TYPES::sem_elem_wrapperRefPtr rightChildValue;
+////      CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr leftChildValue;
+////      CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rightChildValue;
 ////
 ////      // Beware: This is an ugly hack because it's a pointer to a RefPtr !!
-////      EXTERN_TYPES::sem_elem_wrapperRefPtr * returnValuePointer;
+////      CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr * returnValuePointer;
 ////  };
 ////  
 //// 
@@ -2873,34 +3233,34 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////  *
 ////  *  This version takes into account the left context of every subexpression during evaluation.
 ////  *
-////  *  @param:  EXTERN_TYPES::sem_elem_wrapperRefPtr context - The left context in which to evalute exp
+////  *  @param:  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr context - The left context in which to evalute exp
 ////  *           RTG::regExpRefPtr exp - The top level regular expression to be evaluated
 ////  *           RTG::assignmentRefPtr a - The final values for the variables in the regExp
-////  *  @return:  EXTERN_TYPES::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
+////  *  @return:  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
 ////  *
 ////  *  Author: Jason Breck
 ////  */
-////  EXTERN_TYPES::sem_elem_wrapperRefPtr evalRegExpNonRecLC(EXTERN_TYPES::sem_elem_wrapperRefPtr leftContext, 
+////  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalRegExpNonRecLC(CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr leftContext, 
 ////                                                          RTG::regExpRefPtr exp, 
 ////                                                          RTG::assignmentRefPtr a)
 ////  {
 ////      // First, check if this (expression, leftContext) pair is in the function cache:
-////      MemoCacheKey2<EXTERN_TYPES::sem_elem_wrapperRefPtr, RTG::regExpRefPtr >
+////      MemoCacheKey2<CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr, RTG::regExpRefPtr >
 ////             lookupKeyForevalRegExpHash(leftContext, exp);
 ////      EvalRMapLC::const_iterator it0 = EvalMap2LC.find(lookupKeyForevalRegExpHash);
 ////      if (it0 != EvalMap2LC.end()) { return it0->second.v; }
 ////
-////      EXTERN_TYPES::sem_elem_wrapperRefPtr finalReturnValue;
+////      CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr finalReturnValue;
 ////      std::stack<dFrameLC> todo;
 ////      todo.push(dFrameLC(leftContext, exp, &finalReturnValue));
 ////
 ////      while (!todo.empty())
 ////      {
 ////          dFrameLC & frame = todo.top();
-////          EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
+////          CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
 ////          RTG::regExpRefPtr child;
-////          EXTERN_TYPES::sem_elem_wrapperRefPtr childContext;
-////          EXTERN_TYPES::sem_elem_wrapperRefPtr * childReturnValuePointer; // Beware: pointer to RefPtr
+////          CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr childContext;
+////          CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr * childReturnValuePointer; // Beware: pointer to RefPtr
 ////
 ////          if (frame.phase == 0) {
 ////
@@ -2917,11 +3277,11 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////                      goto FINISH_FRAME; }
 ////
 ////                  case RTG::TSL_ID_Zero: 
-////                      ret = EXTERNS::getZeroWt(); 
+////                      ret = CONC_EXTERNS::getZeroWt(); 
 ////                      goto FINISH_FRAME;
 ////
 ////                  case RTG::TSL_ID_One: 
-////                      ret = EXTERNS::getOneWt(); 
+////                      ret = CONC_EXTERNS::getOneWt(); 
 ////                      goto FINISH_FRAME;
 ////
 ////                  case RTG::TSL_ID_Weight: {
@@ -2932,7 +3292,7 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////                  // ************ Operators with one child: ***************
 ////                  case RTG::TSL_ID_Kleene: 
 ////                      child = CIR::getLChild(frame.expr); // Now process "left" (only) child
-////                      childContext = EXTERNS::getOneWt();
+////                      childContext = CONC_EXTERNS::getOneWt();
 ////                      childReturnValuePointer = &frame.leftChildValue;
 ////                      goto PROCESS_CHILD;
 ////
@@ -2962,7 +3322,7 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////
 ////                  // ************ Operators with one child: ***************
 ////                  case RTG::TSL_ID_Kleene: {
-////                      MemoCacheKey2<EXTERN_TYPES::sem_elem_wrapperRefPtr, RTG::regExpRefPtr > 
+////                      MemoCacheKey2<CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr, RTG::regExpRefPtr > 
 ////                            lookupKeyForStar(frame.leftContext, frame.expr);
 ////
 ////                      // If we want to do widening, fetch the abstract value of this loop
@@ -2983,13 +3343,13 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////                      RTG::ProjectRefPtr t_T_b1_scast__1 = static_cast<RTG::Project*>(frame.expr.get_ptr());
 ////                      BASETYPE::INT32 e_Project_1 = t_T_b1_scast__1->Get_MS();
 ////                      BASETYPE::INT32 e_Project_2 = t_T_b1_scast__1->Get_MT();
-////                      ret = EXTERNS::evalProjectSemElem(e_Project_1, e_Project_2, frame.leftChildValue);
+////                      ret = CONC_EXTERNS::evalProjectSemElem(e_Project_1, e_Project_2, frame.leftChildValue);
 ////                      goto FINISH_FRAME; }
 ////
 ////                  // ************ Operators with two children: ***************
 ////                  case RTG::TSL_ID_Dot:
 ////                      child = CIR::getRChild(frame.expr); // Now process right child
-////                      childContext = EXTERNS::evalDotSemElem(frame.leftContext, frame.leftChildValue);
+////                      childContext = CONC_EXTERNS::evalDotSemElem(frame.leftContext, frame.leftChildValue);
 ////                      childReturnValuePointer = &frame.rightChildValue;
 ////                      goto PROCESS_CHILD;
 ////
@@ -3009,11 +3369,11 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////              switch (frame.expr->GetClassId()) {
 ////                  
 ////                  case RTG::TSL_ID_Dot:
-////                      ret = EXTERNS::evalDotSemElem(frame.leftChildValue, frame.rightChildValue);
+////                      ret = CONC_EXTERNS::evalDotSemElem(frame.leftChildValue, frame.rightChildValue);
 ////                      goto FINISH_FRAME;
 ////
 ////                  case RTG::TSL_ID_Plus:
-////                      ret = EXTERNS::evalPlusSemElem(frame.leftChildValue, frame.rightChildValue);
+////                      ret = CONC_EXTERNS::evalPlusSemElem(frame.leftChildValue, frame.rightChildValue);
 ////                      goto FINISH_FRAME;
 ////
 ////              } 
@@ -3030,7 +3390,7 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////
 ////PROCESS_CHILD: 
 ////          frame.phase++;
-////          MemoCacheKey2<EXTERN_TYPES::sem_elem_wrapperRefPtr, RTG::regExpRefPtr >
+////          MemoCacheKey2<CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr, RTG::regExpRefPtr >
 ////                 lookupKeyForChild(childContext, child);
 ////          EvalRMapLC::const_iterator child_it = EvalMap2LC.find(lookupKeyForChild);
 ////          if (child_it != EvalMap2LC.end()) { // Child is in the function cache: 
@@ -3062,11 +3422,11 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////
 ////
 ////  typedef boost::unordered_map<
-////    MemoCacheKey2<RTG::regExpTRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr >,
-////    EXTERN_TYPES::sem_elem_wrapperRefPtr,
-////    boost::hash<MemoCacheKey2<RTG::regExpTRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr > >,
-////    std::equal_to<MemoCacheKey2<RTG::regExpTRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr > >,
-////    std::allocator<std::pair<const MemoCacheKey2<RTG::regExpTRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr >, EXTERN_TYPES::sem_elem_wrapperRefPtr> > >
+////    MemoCacheKey2<RTG::regExpTRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr >,
+////    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
+////    boost::hash<MemoCacheKey2<RTG::regExpTRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr > >,
+////    std::equal_to<MemoCacheKey2<RTG::regExpTRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr > >,
+////    std::allocator<std::pair<const MemoCacheKey2<RTG::regExpTRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
 ////    EvalTMapRC;
 ////
 ////
@@ -3084,8 +3444,8 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////  struct sFrameRC
 ////  {
 ////      sFrameRC(RTG::regExpTRefPtr & expr,
-////               EXTERN_TYPES::sem_elem_wrapperRefPtr rightContext,
-////               EXTERN_TYPES::sem_elem_wrapperRefPtr * returnValuePointer /* Beware: Pointer to RefPtr */ 
+////               CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rightContext,
+////               CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr * returnValuePointer /* Beware: Pointer to RefPtr */ 
 ////               ) : 
 ////               rightContext(rightContext), 
 ////               returnValuePointer(returnValuePointer),
@@ -3096,13 +3456,13 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////
 ////      RTG::regExpTRefPtr expr;
 ////
-////      EXTERN_TYPES::sem_elem_wrapperRefPtr rightContext;
+////      CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rightContext;
 ////
-////      EXTERN_TYPES::sem_elem_wrapperRefPtr leftChildValue;
-////      EXTERN_TYPES::sem_elem_wrapperRefPtr rightChildValue;
+////      CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr leftChildValue;
+////      CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rightChildValue;
 ////
 ////      // Beware: This is an ugly hack because it's a pointer to a RefPtr !!
-////      EXTERN_TYPES::sem_elem_wrapperRefPtr * returnValuePointer;
+////      CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr * returnValuePointer;
 ////  };
 ////  
 ////  
@@ -3115,33 +3475,33 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////  *  This version takes into account the right context of every subexpression during evaluation.
 ////  *
 ////  *  @param:  RTG::regExpTRefPtr exp - The top level tensored regular expression to be evaluated
-////  *           EXTERN_TYPES::sem_elem_wrapperRefPtr context - The right context in which to evalute exp
+////  *           CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr context - The right context in which to evalute exp
 ////  *           RTG::assignmentRefPtr a - The final values for the variables in the regExp
-////  *  @return:  EXTERN_TYPES::sem_elem_wrapperRefPtr - A sem_elem wrapper around a tensored sem_elem wt
+////  *  @return:  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr - A sem_elem wrapper around a tensored sem_elem wt
 ////  *
 ////  *  Author: Jason Breck
 ////  */
-////  EXTERN_TYPES::sem_elem_wrapperRefPtr evalTNonRecRC(RTG::regExpTRefPtr exp, 
-////                                                     EXTERN_TYPES::sem_elem_wrapperRefPtr rightContext, 
+////  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalTNonRecRC(RTG::regExpTRefPtr exp, 
+////                                                     CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rightContext, 
 ////                                                     RTG::assignmentRefPtr a)
 ////  {
 ////      // First, check if this (expression, rightContext) pair is in the function cache:
-////      MemoCacheKey2<RTG::regExpTRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr >
+////      MemoCacheKey2<RTG::regExpTRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr >
 ////             lookupKeyForevalTHash(exp, rightContext);
 ////      EvalTMapRC::const_iterator it0 = EvalMapTRC.find(lookupKeyForevalTHash);
 ////      if (it0 != EvalMapTRC.end()) { return it0->second.v; }
 ////
-////      EXTERN_TYPES::sem_elem_wrapperRefPtr finalReturnValue;
+////      CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr finalReturnValue;
 ////      std::stack<sFrameRC> todo;
 ////      todo.push(sFrameRC(exp, rightContext, &finalReturnValue));
 ////
 ////      while (!todo.empty())
 ////      {
 ////          sFrameRC & frame = todo.top();
-////          EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
+////          CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
 ////          RTG::regExpTRefPtr child;
-////          EXTERN_TYPES::sem_elem_wrapperRefPtr childContext;
-////          EXTERN_TYPES::sem_elem_wrapperRefPtr * childReturnValuePointer; // Beware: pointer to RefPtr
+////          CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr childContext;
+////          CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr * childReturnValuePointer; // Beware: pointer to RefPtr
 ////
 ////          if (frame.phase == 0) {
 ////
@@ -3155,31 +3515,31 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////                                 static_cast<RTG::TensorTranspose*>(frame.expr.get_ptr());
 ////                      RTG::regExpRefPtr lch = t_T_c1_scast__1->Get_lChild();
 ////                      RTG::regExpRefPtr rch = t_T_c1_scast__1->Get_rChild();
-////                      EXTERN_TYPES::sem_elem_wrapperRefPtr lContext = frame.rightContext.getLeftContext();
-////                      EXTERN_TYPES::sem_elem_wrapperRefPtr rContext = frame.rightContext.getRightContext();
-////                      EXTERN_TYPES::sem_elem_wrapperRefPtr lVal = evalRegExpNonRecLC(lContext, lch, a);
-////                      EXTERN_TYPES::sem_elem_wrapperRefPtr rVal = evalRegExpNonRecRC(rch, rContext, a);
-////                      ret = EXTERNS::evalTensorTranspose(lVal, rVal);
+////                      CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lContext = frame.rightContext.getLeftContext();
+////                      CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rContext = frame.rightContext.getRightContext();
+////                      CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lVal = evalRegExpNonRecLC(lContext, lch, a);
+////                      CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rVal = evalRegExpNonRecRC(rch, rContext, a);
+////                      ret = CONC_EXTERNS::evalTensorTranspose(lVal, rVal);
 ////                      goto FINISH_FRAME; }
 ////                      
 ////                  // ************ Operators with zero children: ***************
 ////                  case RTG::TSL_ID_VarT: 
 ////                      assert(false && "Variable encountered in tensored regular expression.");
-////                      ret = EXTERNS::getZeroTWt(); 
+////                      ret = CONC_EXTERNS::getZeroTWt(); 
 ////                      goto FINISH_FRAME;
 ////                  
 ////                  case RTG::TSL_ID_ZeroT: 
-////                      ret = EXTERNS::getZeroTWt(); 
+////                      ret = CONC_EXTERNS::getZeroTWt(); 
 ////                      goto FINISH_FRAME;
 ////                  
 ////                  case RTG::TSL_ID_OneT: 
-////                      ret = EXTERNS::getOneTWt(); 
+////                      ret = CONC_EXTERNS::getOneTWt(); 
 ////                      goto FINISH_FRAME;
 ////
 ////                  // ************ Operators with one child: ***************
 ////                  case RTG::TSL_ID_KleeneT: 
 ////                      child = CIR::getLChildT(frame.expr); // Now process "left" (only) child
-////                      childContext = EXTERNS::getOneTWt();
+////                      childContext = CONC_EXTERNS::getOneTWt();
 ////                      childReturnValuePointer = &frame.leftChildValue;
 ////                      goto PROCESS_CHILD;
 ////
@@ -3209,7 +3569,7 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////
 ////                  // ************ Operators with one child: ***************
 ////                  case RTG::TSL_ID_KleeneT: {
-////                      MemoCacheKey2<RTG::regExpTRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr > 
+////                      MemoCacheKey2<RTG::regExpTRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr > 
 ////                            lookupKeyForStar(frame.expr, frame.rightContext);
 ////
 ////                      // If we want to do widening, fetch the abstract value of this loop
@@ -3230,13 +3590,13 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////                      RTG::ProjectTRefPtr t_T_b1_scast__1 = static_cast<RTG::ProjectT*>(frame.expr.get_ptr());
 ////                      BASETYPE::INT32 e_ProjectT_1 = t_T_b1_scast__1->Get_MS();
 ////                      BASETYPE::INT32 e_ProjectT_2 = t_T_b1_scast__1->Get_MT();
-////                      ret = EXTERNS::evalProjectSemElemT(e_ProjectT_1, e_ProjectT_2, frame.leftChildValue);
+////                      ret = CONC_EXTERNS::evalProjectSemElemT(e_ProjectT_1, e_ProjectT_2, frame.leftChildValue);
 ////                      goto FINISH_FRAME; }
 ////
 ////                  // ************ Operators with two children: ***************
 ////                  case RTG::TSL_ID_DotT:
 ////                      child = CIR::getLChildT(frame.expr); // Now process left child
-////                      childContext = EXTERNS::evalDotSemElemT(frame.rightChildValue, frame.rightContext);
+////                      childContext = CONC_EXTERNS::evalDotSemElemT(frame.rightChildValue, frame.rightContext);
 ////                      childReturnValuePointer = &frame.leftChildValue;
 ////                      goto PROCESS_CHILD;
 ////
@@ -3256,11 +3616,11 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////              switch (frame.expr->GetClassId()) {
 ////                  
 ////                  case RTG::TSL_ID_DotT:
-////                      ret = EXTERNS::evalDotSemElemT(frame.leftChildValue, frame.rightChildValue);
+////                      ret = CONC_EXTERNS::evalDotSemElemT(frame.leftChildValue, frame.rightChildValue);
 ////                      goto FINISH_FRAME;
 ////
 ////                  case RTG::TSL_ID_PlusT:
-////                      ret = EXTERNS::evalPlusSemElemT(frame.leftChildValue, frame.rightChildValue);
+////                      ret = CONC_EXTERNS::evalPlusSemElemT(frame.leftChildValue, frame.rightChildValue);
 ////                      goto FINISH_FRAME;
 ////
 ////              } // Note: TensorTranspose only needs a phase 0, since it's non-recursive.
@@ -3277,7 +3637,7 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////
 ////PROCESS_CHILD: 
 ////          frame.phase++;
-////          MemoCacheKey2<RTG::regExpTRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr >
+////          MemoCacheKey2<RTG::regExpTRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr >
 ////                 lookupKeyForChild(child, childContext);
 ////          EvalTMapRC::const_iterator child_it = EvalMapTRC.find(lookupKeyForChild);
 ////          if (child_it != EvalMapTRC.end()) { // Child is in the function cache: 
@@ -3447,361 +3807,6 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
   }
 
 
-  /*
-  *  A non recursive version of evalT used to eval TSLRegExps representing tensored weights
-  *  given the assignment a.
-  *
-  *  This is based on the recursive evalT in regExp.tsl and uses that function's hashtable
-  *
-  *  @param:  RTG::regExpTRefPtr exp - The top level tensored regular expression to be evaluated
-  *           RTG::assignmentRefPtr a - The final values for the variables in the regExp
-  *  @return:  EXTERN_TYPES::sem_elem_wrapperRefPtr - A sem_elem wrapper around a tensored sem_elem wt
-  *
-  *  Author: Emma Turetsky
-  */
-  EXTERN_TYPES::sem_elem_wrapperRefPtr evalTNonRec(RTG::regExpTRefPtr exp, RTG::assignmentRefPtr a)
-  {
-	  //std::cout << hits << std::endl;
-	  std::stack<sFrame> todo;
-	  std::map<RTG::regExpTRefPtr, EXTERN_TYPES::sem_elem_wrapperRefPtr>::iterator it;
-
-	  todo.push(sFrame(exp));
-	  while (!todo.empty())
-	  {
-		  sFrame & frame = todo.top();
-		  if (frame.is_new){  //Determine if this is the first time looking at this frame
-			  //Check frame.e see if it's been evaluated before.
-			  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHash(frame.e, a);
-			  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHash);
-			  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHash(frame.e);
-			  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHash);
-			  if (evalT___it != EvalMapT.end()) {
-				  todo.pop();
-				  continue;
-			  }
-			  frame.is_new = false;
-			  //frame.e has not been evaluated before - check to see if the children have been seen before
-			  //If so, evaluate frame.e as appropriate, otherwise push the children on to the stack
-			  if (CIR::isKleeneT(frame.e).get_data())
-			  {
-				  frame.op = 0;
-				  RTG::regExpTRefPtr child = CIR::getLChildT(frame.e);
-				  frame.left = child;
-				  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(child, a);
-				  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
-				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(child);
-				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
-				  if (evalT___it != EvalMapT.end())
-				  {
-				  	  //std::cout << "New code! (T1)" << std::endl;
-					  duetrelpair_t ret;
-                      
-				  	  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(child);
-
-                      duetrel_t previousValue = 0;
-                      if (doWideningThisRound) {
-                          EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
-                          if (previousValueIterator != oldStarValT.end()) {
-                              previousValue = previousValueIterator->second.v;
-                          }
-                      }
-
-					  ret = ((evalT___it->second.v))->alphaHatStar(previousValue);
-					  // std::cout << "  Body value is: " << std::endl;
-					  // evalT___it->second.v->print(std::cout);
-					  // std::cout << std::endl;
-					  // std::cout << "  Linearized value is: " << std::endl;
-					  // ret->first->print(std::cout);
-					  // std::cout << std::endl;
-					  // std::cout << "  Star value is: " << std::endl;
-					  // ret->second->print(std::cout);
-					  // std::cout << std::endl;
-
-					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret->second));
-					  newStarValT.insert(std::make_pair(lookupKeyForStar, ret->first));
-					  todo.pop();
-					  continue;
-				  }
-				  else
-				  {
-					  todo.push(sFrame(child));
-					  continue;
-				  }
-			  }
-			  else if (CIR::isDotT(frame.e).get_data())
-			  {
-				  frame.op = 1;
-				  frame.left = CIR::getLChildT(frame.e);
-				  frame.right = CIR::getRChildT(frame.e);
-				  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
-				  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
-				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(frame.left);
-				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
-				  if (evalT___it != EvalMapT.end())
-				  {
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalT___it->second;
-					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
-					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
-					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
-					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
-					  if (evalT___it != EvalMapT.end())
-					  {
-						  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalT___it->second;
-						  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-						  ret = EXTERNS::evalDotSemElemT(lch, rch);
-						  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
-						  todo.pop();
-						  continue;
-					  }
-					  else
-					  {
-						  todo.push(sFrame(frame.right));
-						  continue;
-					  }
-				  }
-				  else
-				  {
-					  todo.push(sFrame(frame.left));
-					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
-					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
-					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
-					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
-					  if (evalT___it == EvalMapT.end())
-					  {
-						  todo.push(sFrame(frame.right));
-						  continue;
-					  }
-				  }
-			  }
-			  else if (CIR::isPlusT(frame.e).get_data())
-			  {
-				  frame.op = 2;
-				  frame.left = CIR::getLChildT(frame.e);
-				  frame.right = CIR::getRChildT(frame.e);
-				  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
-				  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
-				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(frame.left);
-				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
-				  if (evalT___it != EvalMapT.end())
-				  {
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalT___it->second;
-					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
-					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
-					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
-					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
-					  if (evalT___it != EvalMapT.end())
-					  {
-						  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalT___it->second;
-						  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-						  ret = EXTERNS::evalPlusSemElemT(lch, rch);
-						  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
-						  todo.pop();
-						  continue;
-					  }
-					  else
-					  {
-						  todo.push(sFrame(frame.right));
-						  continue;
-					  }
-				  }
-				  else
-				  {
-					  todo.push(sFrame(frame.left));
-					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
-					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
-					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
-					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
-					  if (evalT___it == EvalMapT.end())
-					  {
-						  todo.push(sFrame(frame.right));
-						  continue;
-					  }
-				  }
-			  }
-			  else if (CIR::isProjectT(frame.e).get_data()){
-					  frame.op = 3;
-					  RTG::ProjectTRefPtr t_T_b1_scast__1 = static_cast<RTG::ProjectT*>(frame.e.get_ptr());
-					  RTG::regExpTRefPtr e_ProjectT_3 = t_T_b1_scast__1->Get_child();
-					  BASETYPE::INT32 e_ProjectT_1 = t_T_b1_scast__1->Get_MS();
-					  BASETYPE::INT32 e_ProjectT_2 = t_T_b1_scast__1->Get_MT();
-					  frame.left = e_ProjectT_3;
-					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
-					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
-					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(frame.left);
-					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
-					  if (evalT___it != EvalMapT.end())
-					  {
-						  // std::cout << "This value appears inside a ProjectT:" << std::endl;
-						  // evalT___it->second.print(std::cout);
-						  // std::cout << std::endl;
-						  EXTERN_TYPES::sem_elem_wrapperRefPtr ret = EXTERNS::evalProjectSemElemT(e_ProjectT_1, e_ProjectT_2, evalT___it->second);
-						  // std::cout << "Evaluating ProjectT gave us:" << std::endl;
-						  // ret.print(std::cout);
-						  // std::cout << std::endl;
-						  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
-						  todo.pop();
-						  continue;
-					  }
-					  /*
-					 else if (CIR::isDotT(e_ProjectT_3).get_data())
-					  {
-						  RTG::regExpTRefPtr aDot = CIR::getLChildT(e_ProjectT_3);
-						  RTG::regExpTRefPtr bDot = CIR::getRChildT(e_ProjectT_3);
-						  if (CIR::isTensorTranspose(aDot).get_data())
-						  {
-							  if (CIR::isTensorTranspose(bDot).get_data())
-							  {
-								  RTG::TensorTransposeRefPtr t_T_c1_scast__1 = static_cast<RTG::TensorTranspose*>(aDot.get_ptr());
-								  RTG::regExpRefPtr w = t_T_c1_scast__1->Get_lChild();
-								  RTG::regExpRefPtr x = t_T_c1_scast__1->Get_rChild();
-								  RTG::TensorTransposeRefPtr t_T_c1_scast__2 = static_cast<RTG::TensorTranspose*>(bDot.get_ptr());
-								  RTG::regExpRefPtr y = t_T_c1_scast__2->Get_lChild();
-								  RTG::regExpRefPtr z = t_T_c1_scast__2->Get_rChild();
-								  RTG::regExpRefPtr lch = CIR::mkDot(y, w);
-								  RTG::regExpRefPtr rch = CIR::mkDot(x, z);
-								  EXTERN_TYPES::sem_elem_wrapperRefPtr mVal = evalRegExpNonRec(rch, a);
-								  EXTERN_TYPES::sem_elem_wrapperRefPtr fVal = evalRegExpNonRec(lch, a);
-								  EXTERN_TYPES::sem_elem_wrapperRefPtr mergedVal = EXTERNS::evalProjectSemElem(e_ProjectT_1, e_ProjectT_2, mVal);
-								  EXTERN_TYPES::sem_elem_wrapperRefPtr eVal = EXTERNS::evalDotSemElem(fVal, mergedVal);
-								  EXTERN_TYPES::sem_elem_wrapperRefPtr ret = EXTERNS::evalTensorTranspose(EXTERNS::getOneWt(), eVal);
-								  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
-								  todo.pop();
-								  continue;
-							  }
-						  }
-					  }
-					  */
-					  todo.push(frame.left);
-					  continue;
-				  }
-			  else if (CIR::isTensorTranspose(frame.e).get_data())
-				  {
-					  RTG::TensorTransposeRefPtr t_T_c1_scast__1 = static_cast<RTG::TensorTranspose*>(frame.e.get_ptr());
-					  RTG::regExpRefPtr lch = t_T_c1_scast__1->Get_lChild();
-					  RTG::regExpRefPtr rch = t_T_c1_scast__1->Get_rChild();
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr lVal = evalRegExpNonRec(lch, a);
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr rVal = evalRegExpNonRec(rch, a);
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr ret = EXTERNS::evalTensorTranspose(lVal, rVal);
-					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
-					  todo.pop();
-					  continue;
-				  }
-			  else  //Leaf tensored regexp, so call evalT as it's a base case
-			  {
-				  switch (frame.e->GetClassId()) {
-				  case RTG::TSL_ID_VarT: {
-					  RTG::VarTRefPtr t_T_c1_scast__1 = static_cast<RTG::VarT*>(frame.e.get_ptr());
-					  BASETYPE::INT32 e_VarT_1 = t_T_c1_scast__1->Get_VT();
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr T_c1 = EXTERNS::getZeroTWt(); // TSL-spec: line 751 of "regExp.tsl"
-					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, T_c1));
-				  }
-					  break;
-				  case RTG::TSL_ID_ZeroT: {
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr T_c1 = EXTERNS::getZeroTWt(); // TSL-spec: line 752 of "regExp.tsl"
-					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, T_c1));
-				  }
-					  break;
-				  case RTG::TSL_ID_OneT: {
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr T_c1 = EXTERNS::getOneTWt(); // TSL-spec: line 753 of "regExp.tsl"
-					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, T_c1));
-				  }
-				  }
-				  todo.pop();
-				  continue;
-
-			  }
-		  }
-		  else  //We've seen this stack frame before
-		  {
-			  //All the children of frame.e have been evaluated, so evaluate frame.e as appropriate
-			  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHash(frame.e, a);
-			  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
-			  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
-			  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHash(frame.e);
-			  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(frame.left);
-			  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
-			  EXTERN_TYPES::sem_elem_wrapperRefPtr lch = evalT___it->second;
-			  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-			  if (frame.op == 0) //Kleene
-			  {
-			  	  //std::cout << "New code! (T2)" << std::endl;
-				  duetrelpair_t ret;
-				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(frame.e); // FIXME this variable is now redundant with lookupKeyForevalTHash
-
-                  duetrel_t previousValue = 0;
-                  if (doWideningThisRound) {
-			          EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
-                      if (previousValueIterator != oldStarValT.end()) {
-                          previousValue = previousValueIterator->second.v;
-                      }
-                  }
-
-				  ret = ((evalT___it->second.v))->alphaHatStar(previousValue);
-				  // std::cout << "  Body value is: " << std::endl;
-				  // evalT___it->second.v->print(std::cout);
-				  // std::cout << std::endl;
-				  // std::cout << "  Linearized value is: " << std::endl;
-				  // ret->first->print(std::cout);
-				  // std::cout << std::endl;
-				  // std::cout << "  Star value is: " << std::endl;
-				  // ret->second->print(std::cout);
-				  // std::cout << std::endl;
-				  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret->second));
-				  newStarValT.insert(std::make_pair(lookupKeyForStar, ret->first));
-				  //ret = EXTERNS::evalKleeneSemElemT(lch);
-				  //EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
-				  todo.pop();
-				  continue;
-			  }
-			  else if (frame.op == 3) //Project
-			  {
-				  RTG::ProjectTRefPtr t_T_b1_scast__1 = static_cast<RTG::ProjectT*>(frame.e.get_ptr());
-				  BASETYPE::INT32 e_ProjectT_1 = t_T_b1_scast__1->Get_MS();
-				  BASETYPE::INT32 e_ProjectT_2 = t_T_b1_scast__1->Get_MT();
-				  // std::cout << "This value appears inside a ProjectT:" << std::endl;
-				  // lch.print(std::cout);
-				  // std::cout << std::endl;
-				  ret = EXTERNS::evalProjectSemElemT(e_ProjectT_1, e_ProjectT_2, lch);
-				  // std::cout << "Evaluating ProjectT gave us:" << std::endl;
-				  // ret.print(std::cout);
-				  // std::cout << std::endl;
-				  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
-				  todo.pop();
-				  continue;
-			  }
-			  else //Dot or Plust
-			  {
-				  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
-				  // //frame.right->print(std::cout) << std::endl;
-				  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
-				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
-				  //frame.right->print(std::cout) << std::endl;
-				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
-
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr rch = evalT___it->second;
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
-				  if (frame.op == 1)  //Dot
-				  {
-					  ret = EXTERNS::evalDotSemElemT(lch, rch);
-					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
-					  todo.pop();
-					  continue;
-				  }
-				  else  //Plus
-				  {
-					  ret = EXTERNS::evalPlusSemElemT(lch, rch);
-					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
-					  todo.pop();
-					  continue;
-				  }
-			  }
-		  }
-	  }
-
-	  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > fin(exp, a);
-	  MemoCacheKey1<RTG::regExpTRefPtr > fin(exp);
-	  return EvalMapT[fin];  //Grabs exp evaluated at assignment a from the hash_map
-  }
 
 
 
@@ -3929,15 +3934,16 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 			  else { // From the regular expression r for reID, create (1^t tensor r(0))
                                // Look up the appropriate regexp for reID and evaluate at 0
 				  RTG::regExpRefPtr r = regExpMap[reID];
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr newVal = evalNonRecAt0(r);
+				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newVal = evalNonRecAt0(r);
                   //std::cout << "***Output with evalNonRecAt0:" << std::endl;
 			      //newVal.v->print(std::cout);
                   //std::cout << std::endl;
-				  //EXTERN_TYPES::sem_elem_wrapperRefPtr temp = CIR::evalRegExpAt0(r);
+				  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr temp = CIR::evalRegExpAt0(r);
                   //std::cout << "***Output with evalRegExpAt0:" << std::endl;
       			  //temp.v->print(std::cout);
                   //std::cout << std::endl;
-				  d = CIR::mkTensorTranspose(RTG::One::make(), RTG::Weight::make(newVal));
+				  //d = CIR::mkTensorTranspose(RTG::One::make(), RTG::Weight::make(newVal));
+				  d = CIR::mkTensorTranspose(RTG::One::make(), CIR::mkWeight(newVal));
 			  }
 		  }
 		  else { // Create the tensored regular expression RE_T[var,reID]
@@ -3954,13 +3960,15 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 		  int t2 = mapBack[var].first.second;
 		  //std::cout << "newMerge: " << t1 << "," << t2 << std::endl;
 		  std::pair<int, int> mergePair = mergeSrcMap[std::pair<int, int>(t1, t2)];
-		  return RTG::ProjectT::make(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), d);
+		  //return RTG::ProjectT::make(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), d);
+		  return CIR::mkProjectT(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), d);
 	  }
 	  else if (exp->isUpdatable()){  // This case is a placeholder; it will never occur due to
                                         // linear nature of the Z equation-system
                 assert(false && "A representation of a tensored variable occurred in a nameweight\n");
 		  int node_no = exp->updatableNumber();
-		  return RTG::VarT::make(CBTI::INT32(node_no));
+		  //return RTG::VarT::make(CBTI::INT32(node_no));
+		  return CIR::mkVarT(CBTI::INT32(node_no));
 	  }
 	  else if (exp->isStar()){ // Convert a Kleene node to a KleeneT node
 		  list<reg_exp_t> children = exp->getChildren(); // The list of children of a Star operation has a only a single element
@@ -4032,8 +4040,10 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 					  seen[frame.e] = RTG::Zero::make();
 				  else {  //If the expresssion isn't a simple constant, make an external TSL wrapper around the constant and create a TSL weight
 					  domain_t w = dynamic_cast<Relation*>(frame.e->get_weight().get_ptr());
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr wt = EXTERN_TYPES::sem_elem_wrapper(w);
-					  seen[frame.e] = RTG::Weight::make(wt);
+					  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr wt = w;
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr wt = CONC_EXTERN_PHYLA::sem_elem_wrapper(w);
+					  //seen[frame.e] = RTG::Weight::make(wt);
+					  seen[frame.e] = CIR::mkWeight(wt);
 				  }
 				  todo.pop();
 				  continue;
@@ -4055,9 +4065,12 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 					  vl.insert(mNum);
 				  }
 				  vDep.insert(mNum);  //This regExp is dependent on the regExp represented by mNum
+				  //seen[frame.e] = insertProjects
+				  //                    ? RTG::Project::make(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), RTG::Var::make(CBTI::INT32(mNum)))
+				  //                    : RTG::Var::make(CBTI::INT32(mNum));
 				  seen[frame.e] = insertProjects
-				                      ? RTG::Project::make(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), RTG::Var::make(CBTI::INT32(mNum)))
-				                      : RTG::Var::make(CBTI::INT32(mNum));
+				                      ? CIR::mkProject(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), CIR::mkVar(CBTI::INT32(mNum)))
+				                      : CIR::mkVar(CBTI::INT32(mNum));
 				  todo.pop();
 				  continue;
 			  }
@@ -4465,7 +4478,7 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
     for (assignIt = tensoredRegExpMap.begin(); assignIt != tensoredRegExpMap.end(); assignIt++)
     {
         std::cout << "Tensored regular expression for reID=" << assignIt->first << ": " << std::endl;
-        tsl_regexp::regExpTPrettyPrint(assignIt->second, std::cout);
+        tsl_regexp::regExpTPrettyPrint(assignIt->second, std::cout); // FIXME (problem here...?)
         std::cout << std::endl << std::endl;
     }
 
@@ -4525,20 +4538,20 @@ NEWROUND:
             //tsl_regexp::regExpTPrettyPrint(assignIt->second, std::cout);
 			//std::cout << std::endl;
 			
-			EXTERN_TYPES::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal);
+			CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal);
 			
 			std::cout << std::endl << "Tensored Value: ";
 			newValue.v->print(std::cout);
 			
-			EXTERN_TYPES::sem_elem_wrapperRefPtr rep = EXTERNS::detensorTranspose(newValue);
+			CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = CONC_EXTERNS::detensorTranspose(newValue);
 			
 			std::cout << std::endl << "Detensored Val: ";
 			rep.v->print(std::cout);
 			std::cout << std::endl;
 			
-			/*EXTERN_TYPES::sem_elem_wrapperRefPtr ret;
+			/*CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
 			
-			ret = EXTERNS::evalDotSemElem(rep, EXTERNS::getOneWt());
+			ret = CONC_EXTERNS::evalDotSemElem(rep, CONC_EXTERNS::getOneWt());
 			std::cout << std::endl << "After extend one: " << std::endl;
 			ret.v->print(std::cout);
 			std::cout << std::endl;*/
@@ -4631,11 +4644,11 @@ NEWROUND:
 				//std::cout << "Eval: " << assignIt->first << std::endl;
 				//assignIt->second.print(std::cout);
 				//std::cout << std::endl;
-				EXTERN_TYPES::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal);
+				CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal);
 				//DetensorTranspose the new value
 				//std::cout << std::endl << "Result: ";
 				//newVal.v->print(std::cout);
-				EXTERN_TYPES::sem_elem_wrapperRefPtr rep = EXTERNS::detensorTranspose(newVal);
+				CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = CONC_EXTERNS::detensorTranspose(newVal);
 				//std::cout << std::endl << "Detensored Val: ";
 				//rep.v->print(std::cout);
 				//Perform the computation needed for merge functions by computing rep = M(1,rep)
@@ -4984,13 +4997,13 @@ NEWROUND:
                 for (tslRegExpMap::iterator it = regExpMap.begin(); it != regExpMap.end(); ++it)
                 {
                     RTG::regExpRefPtr r = it->second;
-                    EXTERN_TYPES::sem_elem_wrapperRefPtr newVal = evalNonRecAt0(r);
+                    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newVal = evalNonRecAt0(r);
 
                     // Insert <it->first,newVal> into aList
                     aList = CIR::updateAssignment(aList, CBTI_INT32(it->first), newVal);
                 }
             } else if (runningMode == NEWTON_FROM_ABOVE) {
-                EXTERN_TYPES::sem_elem_wrapperRefPtr topVal = DuetRel::getBaseTop();
+                CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr topVal = DuetRel::getBaseTop();
                 aList = CIR::mkConstantAssignment(topVal);
             } else {
                 assert(false && "Unrecognized running mode.");
@@ -5039,7 +5052,7 @@ NEWROUND:
 				int tStack = tt->stack();
 				int transReg = transMap[std::make_pair(std::make_pair(tSrc, tTgt), tStack)];
 				t->start();
-				EXTERN_TYPES::sem_elem_wrapperRefPtr w = evalRegExpFinNonRec(regExpMap[transReg], aList);
+				CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr w = evalRegExpFinNonRec(regExpMap[transReg], aList);
 				t->stop();
 				//std::cout << "OutWeight: " << tSrc << "," << tTgt << "," << tStack << ":";
 				//w.v->print(std::cout) << endl;
@@ -5329,7 +5342,7 @@ NEWROUND:
 				  //std::cout << "KeyExit: " << keyStringExit.str() << " ----> " << KeyExit << endl;
 
 				  //Create a delta 1 fpds rule from e_entry to e_ext with reg_exp e at 0
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr w0 = evalNonRecAt0(regExpMap[wID]);
+				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr w0 = evalNonRecAt0(regExpMap[wID]);
 				  RTG::regExpRefPtr w = RTG::Weight::make(w0);
 				  tslFwpds->add_rule(st1(), stk(KeyEntry), st1(), stk(KeyExit), new TSLWeight(w));
 				  set<int> srcList = varDependencies[rePIt->first];
@@ -5410,7 +5423,7 @@ NEWROUND:
 				  Key toSt = ruleIt->to_state();
 				  Key fromStk = ruleIt->from_stack();
 				  TSLWeight * ruleWeight = static_cast<wali::domains::tsl_weight::TSLWeight*>(ruleIt->weight().get_ptr());
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr binWeight = evalRegExpNonRec(ruleWeight->getWeight(), aList);
+				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr binWeight = evalRegExpNonRec(ruleWeight->getWeight(), aList);
 				  domainFWPDS->add_rule(fromSt, fromStk, toSt, binWeight.v);
 			  }
 			  for (ruleIt = rules.stepRules.begin(); ruleIt != rules.stepRules.end(); ruleIt++)
@@ -5420,7 +5433,7 @@ NEWROUND:
 				  Key fromStk = ruleIt->from_stack();
 				  Key toStk = ruleIt->to_stack1();
 				  TSLWeight * ruleWeight = static_cast<wali::domains::tsl_weight::TSLWeight*>(ruleIt->weight().get_ptr());
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr binWeight = evalRegExpNonRec(ruleWeight->getWeight(), aList);
+				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr binWeight = evalRegExpNonRec(ruleWeight->getWeight(), aList);
 				  domainFWPDS->add_rule(fromSt, fromStk, toSt, toStk, binWeight.v);
 			  }
 			  for (ruleIt = rules.pushRules.begin(); ruleIt != rules.pushRules.end(); ruleIt++)
@@ -5436,7 +5449,7 @@ NEWROUND:
 				  //std::cout << "Key: (" << fStkSrc->getInt() << "," << tStkSrc->getInt() << "," << tStkSrc2->getInt() << ")" << std::endl;
 				  merge_fn_t mf = mfMap[make_pair(make_pair(fStkSrc->getInt(), tStkSrc->getInt()), tStkSrc2->getInt())];
 				  TSLWeight * ruleWeight = static_cast<wali::domains::tsl_weight::TSLWeight*>(ruleIt->weight().get_ptr());
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr binWeight = evalRegExpNonRec(ruleWeight->getWeight(), aList);
+				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr binWeight = evalRegExpNonRec(ruleWeight->getWeight(), aList);
 				  domainFWPDS->add_rule(fromSt, fromStk, toSt, toStk, toStk2, binWeight.v, mf);
 			  }
 
@@ -5482,7 +5495,7 @@ NEWROUND:
 					  wt = wt->combine((*transSIter)->weight());
 				  }
 				  //Compare with the new assignment
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr oldVal = CIR::getAssignment(CBTI_INT32(exitIt->first), aList);
+				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr oldVal = CIR::getAssignment(CBTI_INT32(exitIt->first), aList);
 				  //oldVal.v->print(std::cout) << std::endl;
 				  //wt->print(std::cout) << std::endl;
 				  if (wt != oldVal.v)
@@ -5491,7 +5504,8 @@ NEWROUND:
 					  changedVars.insert(rId);
 					  //std::cout << rId << std::endl;
 					  domain_t w = dynamic_cast<Relation*>(wt.get_ptr());
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr rep = EXTERN_TYPES::sem_elem_wrapper(w);
+					  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = w;
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = CONC_EXTERN_PHYLA::sem_elem_wrapper(w);
 					  aList = CIR::updateAssignment(aList, CBTI_INT32(rId), rep);
 				  }
 			  }
@@ -5531,7 +5545,7 @@ NEWROUND:
 					  //std::cout << "Key: (" << fStkSrc->getInt() << "," << tStkSrc->getInt() << ")" << std::endl;
 					  TSLWeight * ruleWeight = static_cast<wali::domains::tsl_weight::TSLWeight*>(ruleIt->weight().get_ptr());
 					  //ruleWeight->getWeight().print(std::cout) << endl;
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr binWeight = evalRegExpNonRec(ruleWeight->getWeight(), aPrime);
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr binWeight = evalRegExpNonRec(ruleWeight->getWeight(), aPrime);
 					  //binWeight.v->print(std::cout) << endl;
 					  domainFWPDS->replace_rule(fromSt, fromStk, toSt, toStk, binWeight.v);
 				  }
@@ -5568,7 +5582,7 @@ NEWROUND:
 						  wt = wt->combine((*transSIter)->weight());
 					  }
 					  //Compare with the new assignment
-					  EXTERN_TYPES::sem_elem_wrapperRefPtr oldVal = CIR::getAssignment(CBTI_INT32(exitIt->first), aPrime);
+					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr oldVal = CIR::getAssignment(CBTI_INT32(exitIt->first), aPrime);
 					  //std::cout << "NewWeight: ";
 					  //wt->print(std::cout) << std::endl;
 					  //std::cout << "OldWeight: ";
@@ -5580,7 +5594,8 @@ NEWROUND:
 						  int rId = exitIt->first;
 						  changedVars.insert(rId);
 						  //std::cout << rId << std::endl;
-						  EXTERN_TYPES::sem_elem_wrapperRefPtr rep = EXTERN_TYPES::sem_elem_wrapper(w);
+						  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = w;
+						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = CONC_EXTERN_PHYLA::sem_elem_wrapper(w);
 						  aList = CIR::updateAssignment(aList, CBTI_INT32(rId), rep);
 					  }
 				  }
@@ -5606,7 +5621,7 @@ NEWROUND:
 				  int tStack = tt->stack();
 				  int transReg = transMap[std::make_pair(std::make_pair(tSrc, tTgt), tStack)];
 				  t->start();
-				  EXTERN_TYPES::sem_elem_wrapperRefPtr w = evalRegExpFinNonRec(regExpMap[transReg], aList);
+				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr w = evalRegExpFinNonRec(regExpMap[transReg], aList);
 				  t->stop();
 				  //std::cout << "OutWeight: " << tSrc << "," << tTgt << "," << tStack << ":";
 				  //w.v->print(std::cout) << endl;

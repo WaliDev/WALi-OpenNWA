@@ -130,6 +130,7 @@ namespace wali
 
           virtual size_t hash() const {
             return static_cast<size_t>(getValue());
+            //return 0;
           }
 
 	  bool isWTensored()

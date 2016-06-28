@@ -517,7 +517,13 @@ wali::sem_elem_t DuetRel::extend(wali::SemElem* se)
 bool DuetRel::equal(wali::SemElem* se) const 
 {
   duetrel_t that( convert(se) );
-  return Equal(that);
+  //return Equal(that);
+  bool ans = Equal(that);
+  //assert(
+  //   ans
+  //   ? this->hash() == se->hash()
+  //   : true);
+  return ans;
 }
 
 bool DuetRel::containerLessThan(wali::SemElem const * se) const

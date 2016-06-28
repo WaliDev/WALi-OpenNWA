@@ -4,6 +4,9 @@
 #include "wali/ref_ptr.hpp"
 #include "wali/SemElemTensor.hpp"
 #include "tsl/analysis_components/src/reinterps/emul/conc_externs.hpp"
+// Added by Jason:
+#include "tsl/cir/regexp/conc.1level.cir.hpp"
+
 typedef tsl_regexp::Conc1LevelRTG RTG;
 
 namespace wali
