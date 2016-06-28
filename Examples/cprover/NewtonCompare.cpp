@@ -134,7 +134,6 @@ BddContext * con = NULL;
 BddContext * dCon = con;
 #endif
 
-
 namespace{
 
   class WFACompare : public wali::wfa::ConstTransFunctor
@@ -436,94 +435,116 @@ namespace{
 } 
 
 
+//namespace goals {
+
+
+typedef boost::unordered_map<
+	MemoCacheKey1<RTG::regExpRefPtr >,
+	RTG::regExpTListRefPtr,
+	boost::hash<MemoCacheKey1<RTG::regExpRefPtr > >,
+	std::equal_to<MemoCacheKey1<RTG::regExpRefPtr > >,
+	std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, RTG::regExpTListRefPtr> > >
+	TDiffHashMap;
+
+TDiffHashMap TdiffMap;
+
+typedef boost::unordered_map<
+	MemoCacheKey1<RTG::regExpRefPtr >,
+	RTG::regExpListRefPtr,
+	boost::hash<MemoCacheKey1<RTG::regExpRefPtr > >,
+	std::equal_to<MemoCacheKey1<RTG::regExpRefPtr > >,
+	std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, RTG::regExpListRefPtr> > >
+	DiffHashMap;
+
+DiffHashMap diffHMap;
+
+typedef boost::unordered_map<
+	MemoCacheKey1<RTG::regExpRefPtr >,
+	CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
+	boost::hash<MemoCacheKey1<RTG::regExpRefPtr > >,
+	std::equal_to<MemoCacheKey1<RTG::regExpRefPtr > >,
+	std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
+	EvalMap;
+
+EvalMap EvalMap0;
+
+// typedef boost::unordered_map<
+// 	MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr >,
+// 	CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
+// 	boost::hash<MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr > >,
+// 	std::equal_to<MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr > >,
+// 	std::allocator<std::pair<const MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr>, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
+typedef boost::unordered_map<
+	MemoCacheKey1<RTG::regExpRefPtr >,
+	CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
+	boost::hash<MemoCacheKey1<RTG::regExpRefPtr > >,
+	std::equal_to<MemoCacheKey1<RTG::regExpRefPtr > >,
+	std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
+	EvalRMap;
+
+EvalRMap EvalMap2;
+
+// typedef boost::unordered_map<
+// 	MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr >,
+// 	CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
+// 	boost::hash<MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr > >,
+// 	std::equal_to<MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr > >,
+// 	std::allocator<std::pair<const MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
+typedef boost::unordered_map<
+	MemoCacheKey1<RTG::regExpTRefPtr >,
+	CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
+	boost::hash<MemoCacheKey1<RTG::regExpTRefPtr > >,
+	std::equal_to<MemoCacheKey1<RTG::regExpTRefPtr > >,
+	std::allocator<std::pair<const MemoCacheKey1<RTG::regExpTRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
+	EvalTMap;
+
+EvalTMap EvalMapT;
+
+typedef boost::unordered_map<
+	MemoCacheKey1<RTG::regExpRefPtr >,
+	CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
+	boost::hash<MemoCacheKey1<RTG::regExpRefPtr > >,
+	std::equal_to<MemoCacheKey1<RTG::regExpRefPtr > >,
+	std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
+	StarMap;
+
+typedef boost::unordered_map<
+	MemoCacheKey1<RTG::regExpTRefPtr >,
+	CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
+	boost::hash<MemoCacheKey1<RTG::regExpTRefPtr > >,
+	std::equal_to<MemoCacheKey1<RTG::regExpTRefPtr > >,
+	std::allocator<std::pair<const MemoCacheKey1<RTG::regExpTRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
+	StarMapT;
+
+StarMap newStarVal;
+StarMapT newStarValT;
+StarMap oldStarVal;
+StarMapT oldStarValT;
+
+bool doWideningThisRound;
+	
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElemT(
+  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a)
+{
+  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+  duetrelpair_t ret;
+  ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar();
+  ans.v = ret->second.get_ptr();
+  return ans;
+}
+
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElem(
+  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a)
+{
+  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+  duetrelpair_t ret;
+  ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar();
+  ans.v = ret->second.get_ptr();
+  return ans;
+}
+
 namespace goals {
 
-
-	typedef boost::unordered_map<
-		MemoCacheKey1<RTG::regExpRefPtr >,
-		RTG::regExpTListRefPtr,
-		boost::hash<MemoCacheKey1<RTG::regExpRefPtr > >,
-		std::equal_to<MemoCacheKey1<RTG::regExpRefPtr > >,
-		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, RTG::regExpTListRefPtr> > >
-		TDiffHashMap;
-
-	TDiffHashMap TdiffMap;
-
-	typedef boost::unordered_map<
-		MemoCacheKey1<RTG::regExpRefPtr >,
-		RTG::regExpListRefPtr,
-		boost::hash<MemoCacheKey1<RTG::regExpRefPtr > >,
-		std::equal_to<MemoCacheKey1<RTG::regExpRefPtr > >,
-		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, RTG::regExpListRefPtr> > >
-		DiffHashMap;
-
-	DiffHashMap diffHMap;
-
-	typedef boost::unordered_map<
-		MemoCacheKey1<RTG::regExpRefPtr >,
-		CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
-		boost::hash<MemoCacheKey1<RTG::regExpRefPtr > >,
-		std::equal_to<MemoCacheKey1<RTG::regExpRefPtr > >,
-		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
-		EvalMap;
-
-	EvalMap EvalMap0;
-
-	// typedef boost::unordered_map<
-	// 	MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr >,
-	// 	CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
-	// 	boost::hash<MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr > >,
-	// 	std::equal_to<MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr > >,
-	// 	std::allocator<std::pair<const MemoCacheKey2<RTG::regExpRefPtr, ConcTSLInterface::assignmentRefPtr>, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
-	typedef boost::unordered_map<
-		MemoCacheKey1<RTG::regExpRefPtr >,
-		CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
-		boost::hash<MemoCacheKey1<RTG::regExpRefPtr > >,
-		std::equal_to<MemoCacheKey1<RTG::regExpRefPtr > >,
-		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
-		EvalRMap;
-
-	EvalRMap EvalMap2;
-
-	// typedef boost::unordered_map<
-	// 	MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr >,
-	// 	CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
-	// 	boost::hash<MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr > >,
-	// 	std::equal_to<MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr > >,
-	// 	std::allocator<std::pair<const MemoCacheKey2<RTG::regExpTRefPtr, ConcTSLInterface::assignmentRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
-	typedef boost::unordered_map<
-		MemoCacheKey1<RTG::regExpTRefPtr >,
-		CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
-		boost::hash<MemoCacheKey1<RTG::regExpTRefPtr > >,
-		std::equal_to<MemoCacheKey1<RTG::regExpTRefPtr > >,
-		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpTRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
-		EvalTMap;
-	
-	EvalTMap EvalMapT;
-
-	typedef boost::unordered_map<
-		MemoCacheKey1<RTG::regExpRefPtr >,
-		CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
-		boost::hash<MemoCacheKey1<RTG::regExpRefPtr > >,
-		std::equal_to<MemoCacheKey1<RTG::regExpRefPtr > >,
-		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
-		StarMap;
-
-	typedef boost::unordered_map<
-		MemoCacheKey1<RTG::regExpTRefPtr >,
-		CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr,
-		boost::hash<MemoCacheKey1<RTG::regExpTRefPtr > >,
-		std::equal_to<MemoCacheKey1<RTG::regExpTRefPtr > >,
-		std::allocator<std::pair<const MemoCacheKey1<RTG::regExpTRefPtr >, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr> > >
-		StarMapT;
-
-	StarMap newStarVal;
-	StarMapT newStarValT;
-	StarMap oldStarVal;
-	StarMapT oldStarValT;
-	
-    bool doWideningThisRound;
-	
 
 	// Stack frames needed by the non-recursive versions of convertToTSL and Eval and EvalT
 
@@ -873,6 +894,14 @@ namespace goals {
 
     delete pds;
   }
+
+
+
+
+
+
+
+
 
 
 // NONREC: Non-recursive functions:
