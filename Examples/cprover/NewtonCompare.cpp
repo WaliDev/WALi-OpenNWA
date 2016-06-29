@@ -1523,1186 +1523,1186 @@ namespace goals {
 
   // NONREC Non-recursive evaluation functions:  
 
-  /*
-  *  A non recursive version of evalAt0 used to eval TSLRegExp assuming variables are the zero sem_elem. (f(0)).
-  *
-  *  This is based on the recursive evalAt0 in regExp.tsl and uses that function's hastable
-  *
-  *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be evaluated
-  *  @return:  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
-  *
-  *  Author: Emma Turetsky
-  *
-  */
-  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalNonRecAt0(RTG::regExpRefPtr exp)
-  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalRegExpAt0(RTG::regExpRefPtr exp)
-  {
-	  //std::cout << hits << std::endl;
-	  std::stack<dFrame> todo;
-	  std::map<RTG::regExpRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr>::iterator it;
-
-	  todo.push(dFrame(exp));  //Push the expression on the stack as our starter frame
-
-	  while (!todo.empty())
-	  {
-		  dFrame & frame = todo.top();
-		  if (frame.is_new){  //See if we've seen this frame before
-			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0Hash(frame.e);  //See if we've evaluated this regexp already, if so, return evaluated value
-			  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0Hash);
-			  if (evalRegExpAt0___it != EvalMap0.end()) {
-				  todo.pop();
-				  continue;
-			  }
-			  frame.is_new = false;
-			  //If the regexp is of type Kleene star
-			  if (CIR::isKleene(frame.e).get_data())
-			  {
-				  frame.op = 0;
-				  //Determine if the child has been seen before
-				  RTG::regExpRefPtr child = CIR::getLChild(frame.e);
-				  frame.left = child;
-				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashL(child);
-				  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashL);
-				  if (evalRegExpAt0___it != EvalMap0.end())
-				  {
-					  //If the child expression has been evaluated before, performe the Kleene Star operation and insert the resultant
-					  //value into the hash table and pop the stack frame
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-					  //ret = CONC_EXTERNS::evalKleeneSemElem(evalRegExpAt0___it->second);
-					  ret = CONC_EXTERNS::evalKleeneSemElem(evalRegExpAt0___it->second, child);
-					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
-					  todo.pop();
-					  continue;
-				  }
-				  else
-				  {
-					  //Otherwise push the child onto the stack
-					  todo.push(dFrame(child));
-					  continue;
-				  }
-			  }
-			  else if (CIR::isDot(frame.e).get_data())  //If the regexp is of type Dot
-			  {
-				  frame.op = 1;
-				  //Determine if either child has been seen before
-				  frame.left = CIR::getLChild(frame.e);
-				  frame.right = CIR::getRChild(frame.e);
-				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashL(frame.left);
-				  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashL);
-				  if (evalRegExpAt0___it != EvalMap0.end())  //The left child has been evaluated before
-				  {
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExpAt0___it->second;
-					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashR(frame.right);
-					  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashR);
-					  //The right child has been evaluated before
-					  if (evalRegExpAt0___it != EvalMap0.end())
-					  {
-						  //Both children have been evaluated at 0 already, so evaluate the Dot expression and put the value into the hash table
-						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExpAt0___it->second;
-						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-						  ret = CONC_EXTERNS::evalDotSemElem(lch, rch);
-						  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
-						  todo.pop();
-						  continue;
-					  }
-					  else  //Push the unevaluated right expression onto the stack
-					  {
-						  todo.push(dFrame(frame.right));
-						  continue;
-					  }
-				  }
-				  else
-				  {
-					  todo.push(dFrame(frame.left)); //Push the unevaluated left expression onto the stack
-					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashR(frame.right);
-					  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashR);
-					  //If the right child has not been seen before
-					  if (evalRegExpAt0___it == EvalMap0.end())
-					  {
-						  //Push the unevaluated right expression onto the stack
-						  todo.push(dFrame(frame.right));
-						  continue;
-					  }
-				  }
-			  }
-			  else if (CIR::isPlus(frame.e).get_data())
-			  {
-				  frame.op = 2;
-				  //Determine if either child has been seen before
-				  frame.left = CIR::getLChild(frame.e);
-				  frame.right = CIR::getRChild(frame.e);
-				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashL(frame.left);
-				  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashL);
-				  if (evalRegExpAt0___it != EvalMap0.end()) //The left child has been evaluated before
-				  {
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExpAt0___it->second;
-					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashR(frame.right);
-					  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashR);
-					  if (evalRegExpAt0___it != EvalMap0.end())  //The right child has been evaluated before
-					  {
-						  //Both children have been evaluated at 0 already, so evaluate the Plus expression and put the value into the hash table
-						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExpAt0___it->second;
-						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-						  ret = CONC_EXTERNS::evalPlusSemElem(lch, rch);
-						  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
-						  todo.pop();
-						  continue;
-					  }
-					  else //Push the unevaluated right expression onto the stack
-					  {
-						  todo.push(dFrame(frame.right));
-						  continue;
-					  }
-				  }
-				  else
-				  {
-					  todo.push(dFrame(frame.left)); //Push the unevaluated left expression onto the stack
-					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashR(frame.right);
-					  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashR);
-					  //If the right child has not been seen before
-					  if (evalRegExpAt0___it == EvalMap0.end())
-					  {
-						  //Push the unevaluated right expression onto the stack
-						  todo.push(dFrame(frame.right));
-						  continue;
-					  }
-				  }
-			  }
-			  else {
-				  switch (frame.e->GetClassId()) {
-				  case RTG::TSL_ID_Var: {
-					  RTG::VarRefPtr t_T_c1_scast__1 = static_cast<RTG::Var*>(frame.e.get_ptr());
-					  BASETYPE::INT32 e_Var_1 = t_T_c1_scast__1->Get_V();
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getZeroWt(); // TSL-spec: line 680 of "regExp.tsl"
-					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, T_c1));
-				  }
-					  break;
-				  case RTG::TSL_ID_Zero: {
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getZeroWt(); // TSL-spec: line 681 of "regExp.tsl"
-					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, T_c1));
-				  }
-					  break;
-				  case RTG::TSL_ID_One: {
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getOneWt(); // TSL-spec: line 682 of "regExp.tsl"
-					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, T_c1));
-				  }
-					  break;
-				  case RTG::TSL_ID_Weight: {
-					  RTG::WeightRefPtr t_e_Weight_1_scast__1 = static_cast<RTG::Weight*>(frame.e.get_ptr());
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr e_Weight_1 = t_e_Weight_1_scast__1->Get_weight();
-					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, e_Weight_1));
-				  }
-					  break;
-				  case RTG::TSL_ID_Project: {
-					  RTG::ProjectRefPtr t_T_c1_scast__1 = static_cast<RTG::Project*>(frame.e.get_ptr());
-					  BASETYPE::INT32 e_Project_1 = t_T_c1_scast__1->Get_MS();
-					  BASETYPE::INT32 e_Project_2 = t_T_c1_scast__1->Get_MT();
-					  RTG::regExpRefPtr e_Project_3 = t_T_c1_scast__1->Get_child();
-					  frame.op = 3;
-					  frame.left = e_Project_3;
-					  todo.push(dFrame(frame.left));
-					  continue;
-				  }
-				  }
-				  //The value is a leaf, cheat and just call evalRegExpAt0.  This will add it to evalRegExpAt0Hash (the hash map) and leverages
-				  //the existing TSL spec.
-				  //Pop the stack frame when done.
-				  todo.pop();
-				  continue;
-			  }
-		  }
-		  else  //This is the second time we've popped this stack frame, so it's children must have been evaluated
-		  {
-			  //Look up the left child value (this is not a leaf regExp, so it must have a left child)
-			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0Hash(frame.e);
-			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashL(frame.left);
-			  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashL);
-			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExpAt0___it->second;
-			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-			  if (frame.op == 0) //Kleene
-			  {
-				  //Evaluate and insert into the hashmap
-				  //ret = CONC_EXTERNS::evalKleeneSemElem(lch);
-				  ret = CONC_EXTERNS::evalKleeneSemElem(lch, frame.left);
-				  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
-				  todo.pop();
-				  continue;
-			  }
-			  else if (frame.op == 3)
-			  {
-				  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, lch));
-				  todo.pop();
-				  continue;
-			  }
-			  else  //Dot or Plus
-			  {
-				  //Look up the value for the right child
-				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashR(frame.right);
-				  //frame.right->print(std::cout) << std::endl;
-				  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashR);
-
-				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExpAt0___it->second;
-				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-				  if (frame.op == 1) //Dot
-				  {
-					  //Evaluate and insert into the hashmap
-					  ret = CONC_EXTERNS::evalDotSemElem(lch, rch);
-					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
-					  todo.pop();
-					  continue;
-				  }
-				  else //Plus
-				  {
-					  //Evaluate and insert into the hashmap
-					  ret = CONC_EXTERNS::evalPlusSemElem(lch, rch);
-					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
-					  todo.pop();
-					  continue;
-				  }
-			  }
-		  }
-	  }
-
-	  //This will start with a lookup on the hash_map for exp, which has been evaluated in the loop above, so will not re-evaluate using evalRegExpAt0
-	  MemoCacheKey1<RTG::regExpRefPtr > fin(exp);
-	  return EvalMap0[fin];
-  }
-
-  /*
-  *  A non recursive version of evalRegExpFin used to eval TSLRegExps given the final assignment a.
-  *
-  *  This is based on the recursive evalRegExpFin in regExp.tsl and uses that function's hastable
-  *
-  *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be evaluated
-  *			  RTG::assignmentRefPtr a - The final values for the variables in the regExp
-  *  @return:  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
-  *
-  *  Author: Emma Turetsky
-  */
-  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalRegExpFinNonRec(RTG::regExpRefPtr exp, RTG::assignmentRefPtr a)
-  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalRegExpFin(RTG::regExpRefPtr exp, RTG::assignmentRefPtr a)
-  {
-	  //std::cout << hits << std::endl;
-	  std::stack<dFrame> todo;
-	  std::map<RTG::regExpRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr>::iterator it;
-
-	  todo.push(dFrame(exp));
-	  while (!todo.empty())
-	  {
-		  dFrame & frame = todo.top();
-		  if (frame.is_new){ //See if we've seen this frame before
-			  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHash(frame.e, a); //See if we've evaluated this regexp already, if so, return evaluated value
-			  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHash);
-			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHash(frame.e); //See if we've evaluated this regexp already, if so, return evaluated value
-			  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHash);
-			  if (evalRegExpFin___it != EvalMap2.end()) {
-				  todo.pop();
-				  continue;
-			  }
-			  frame.is_new = false;
-			  //If the regexp is of type Kleene star
-			  if (CIR::isKleene(frame.e).get_data())
-			  {
-				  frame.op = 0;
-				  //Determine if the child has been seen before
-				  RTG::regExpRefPtr child = CIR::getLChild(frame.e);
-				  frame.left = child;
-				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(child, a);
-				  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
-				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashL(child);
-				  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
-				  if (evalRegExpFin___it != EvalMap2.end())
-				  {
-					  //If the child expression has been evaluated before, performe the Kleene Star operation and insert the resultant
-					  //value into the hash table and pop the stack frame
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-					  //ret = CONC_EXTERNS::evalKleeneSemElem(evalRegExpFin___it->second);
-					  ret = CONC_EXTERNS::evalKleeneSemElem(evalRegExpFin___it->second, frame.left);
-					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
-					  todo.pop();
-					  continue;
-				  }
-				  else
-				  {
-					  //Otherwise push the child onto the stack
-					  todo.push(dFrame(child));
-					  continue;
-				  }
-			  }
-			  else if (CIR::isDot(frame.e).get_data())  //If the regexp is of type Dot
-			  {
-				  frame.op = 1;
-				  //Determine if either child has been seen before
-				  frame.left = CIR::getLChild(frame.e);
-				  frame.right = CIR::getRChild(frame.e);
-				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(frame.left, a);
-				  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
-				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashL(frame.left);
-				  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
-				  if (evalRegExpFin___it != EvalMap2.end()) //The left child has been evaluated before
-				  {
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExpFin___it->second;
-					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
-					  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
-					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashR(frame.right);
-					  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
-					  if (evalRegExpFin___it != EvalMap2.end()) //The right child has been evaluated before
-					  {
-						  //Both children have been evaluated already, so evaluate the Dot expression and put the value into the hash table
-						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExpFin___it->second;
-						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-						  ret = CONC_EXTERNS::evalDotSemElem(lch, rch);
-						  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
-						  todo.pop();
-						  continue;
-					  }
-					  else //Push the unevaluated right expression onto the stack
-					  {
-						  todo.push(dFrame(frame.right));
-						  continue;
-					  }
-				  }
-				  else
-				  {
-					  todo.push(dFrame(frame.left)); //Push the unevaluated left expression onto the stack
-					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
-					  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
-					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashR(frame.right);
-					  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
-					  if (evalRegExpFin___it == EvalMap2.end())
-					  {
-						  //Push the unevaluated right expression onto the stack
-						  todo.push(dFrame(frame.right));
-						  continue;
-					  }
-				  }
-			  }
-			  else if (CIR::isPlus(frame.e).get_data())
-			  {
-				  frame.op = 2;
-				  //Determine if either child has been seen before
-				  frame.left = CIR::getLChild(frame.e);
-				  frame.right = CIR::getRChild(frame.e);
-				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(frame.left, a);
-				  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
-				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashL(frame.left);
-				  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
-				  if (evalRegExpFin___it != EvalMap2.end()) //The left child has been evaluated before
-				  {
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExpFin___it->second;
-					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
-					  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
-					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashR(frame.right);
-					  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
-					  if (evalRegExpFin___it != EvalMap2.end()) //The right child has been evaluated before
-					  {
-						  //Both children have been evaluated already, so evaluate the Plus expression and put the value into the hash table
-						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExpFin___it->second;
-						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-						  ret = CONC_EXTERNS::evalPlusSemElem(lch, rch);
-						  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
-						  todo.pop();
-						  continue;
-					  }
-					  else
-					  {
-						  //Push the unevaluated right expression onto the stack
-						  todo.push(dFrame(frame.right));
-						  continue;
-					  }
-				  }
-				  else
-				  {
-					  todo.push(dFrame(frame.left)); //Push the unevaluated left expression onto the stack
-					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
-					  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
-					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashR(frame.right);
-					  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
-					  if (evalRegExpFin___it == EvalMap2.end())
-					  {
-						  //Push the unevaluated right expression onto the stack
-						  todo.push(dFrame(frame.right));
-						  continue;
-					  }
-				  }
-			  }
-			  else if (CIR::isProject(frame.e).get_data())
-			  {
-				  //Get the children for project (MT = merge Target, MS = merge Src)
-				  frame.op = 3;
-				  RTG::ProjectRefPtr t_T_c1_scast__1 = static_cast<RTG::Project*>(frame.e.get_ptr());
-				  BASETYPE::INT32 e_Project_1 = t_T_c1_scast__1->Get_MS();
-				  BASETYPE::INT32 e_Project_2 = t_T_c1_scast__1->Get_MT();
-				  RTG::regExpRefPtr e_Project_3 = t_T_c1_scast__1->Get_child();
-				  frame.left = e_Project_3;
-				  //if the child has been evaluated before
-				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(frame.left, a);
-				  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
-				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashL(frame.left);
-				  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
-				  if (evalRegExpFin___it != EvalMap2.end())
-				  {
-					  //Evaluate the projection and insert it into the hash table
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-					  ret = CONC_EXTERNS::evalProjectSemElem(e_Project_1, e_Project_2,evalRegExpFin___it->second);
-					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
-					  todo.pop();
-					  continue;
-				  }
-				  else
-				  {
-					  todo.push(dFrame(frame.left)); //Push the unevaluated child expression onto the stack
-					  continue;
-				  }
-			  }
-			  else {
-				  //The value is a leaf, cheat and just call evalRegExpFin.  This will add it to evalRegExpFinHash (the hash map) and leverages
-				  //the existing TSL spec.
-				  //Pop the stack frame when done.
-				  switch (frame.e->GetClassId()) {
-				  case RTG::TSL_ID_Var: {
-					  RTG::VarRefPtr t_T_c1_scast__1 = static_cast<RTG::Var*>(frame.e.get_ptr());
-					  BASETYPE::INT32 e_Var_1 = t_T_c1_scast__1->Get_V();
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CIR::getAssignment(e_Var_1, a); // TSL-spec: line 701 of "regExp.tsl"
-					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, T_c1));
-				  }
-					  break;
-				  case RTG::TSL_ID_Zero: {
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getZeroWt(); // TSL-spec: line 702 of "regExp.tsl"
-					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, T_c1));
-				  }
-					  break;
-				  case RTG::TSL_ID_One: {
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getOneWt(); // TSL-spec: line 703 of "regExp.tsl"
-					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, T_c1));
-				  }
-					  break;
-				  case RTG::TSL_ID_Weight: {
-					  RTG::WeightRefPtr t_e_Weight_1_scast__1 = static_cast<RTG::Weight*>(frame.e.get_ptr());
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr e_Weight_1 = t_e_Weight_1_scast__1->Get_weight();
-					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, e_Weight_1));
-				  }
-				  }
-				  todo.pop();
-				  continue;
-			  }
-		  }
-		  else  //This is the second time we've seen this value, so the children must have been evaluated at a, already
-		  {
-			  //Look up the children's evaluated values
-			  //Determine the op code
-			  //Call the appropriate evaluattion function depending on frame.op
-			  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHash(frame.e, a);
-			  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(frame.left, a);
-			  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
-			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHash(frame.e);
-			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashL(frame.left);
-			  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
-			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExpFin___it->second;
-			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-			  if (frame.op == 0) //Kleene
-			  {
-				  //ret = CONC_EXTERNS::evalKleeneSemElem(lch);
-				  ret = CONC_EXTERNS::evalKleeneSemElem(lch, frame.left);
-				  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
-				  todo.pop();
-				  continue;
-			  }
-			  else if (frame.op == 3)  //Project
-			  {
-				  RTG::ProjectRefPtr t_T_c1_scast__1 = static_cast<RTG::Project*>(frame. e.get_ptr());
-				  BASETYPE::INT32 e_Project_1 = t_T_c1_scast__1->Get_MS();
-				  BASETYPE::INT32 e_Project_2 = t_T_c1_scast__1->Get_MT();
-				  ret = CONC_EXTERNS::evalProjectSemElem(e_Project_1, e_Project_2, lch);
-				  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
-				  todo.pop();
-				  continue;
-			  }
-			  else //Dot or Plus
-			  {
-				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
-				  // //frame.right->print(std::cout) << std::endl;
-				  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
-				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashR(frame.right);
-				  //frame.right->print(std::cout) << std::endl;
-				  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
-
-				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExpFin___it->second;
-				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-				  if (frame.op == 1)  //Dot
-				  {
-					  ret = CONC_EXTERNS::evalDotSemElem(lch, rch);
-					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
-					  todo.pop();
-					  continue;
-				  }
-				  else  //Plus
-				  {
-					  ret = CONC_EXTERNS::evalPlusSemElem(lch, rch);
-					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
-					  todo.pop();
-					  continue;
-				  }
-			  }
-		  }
-	  }
-
-	  //This will start with a lookup on the hash_map for exp, which has been evaluated in the loop above, so will not re-evaluate using evalRegExpFin
-	  //MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > fin(exp, a);
-	  MemoCacheKey1<RTG::regExpRefPtr > fin(exp);
-	  
-	  return EvalMap2[fin];
-  }
-
-  /*
-  *  A non recursive version of evalRegExp used to eval TSLRegExps given the assignment a.
-  *
-  *  This is based on the recursive evalRegExp in regExp.tsl and uses that function's hashtable
-  *
-  *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be evaluated
-  *           RTG::assignmentRefPtr a - The final values for the variables in the regExp
-  *  @return:  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
-  *
-  *  Author: Emma Turetsky
-  */
-  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalRegExpNonRec(RTG::regExpRefPtr exp, RTG::assignmentRefPtr a)
-  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalRegExp(RTG::regExpRefPtr exp, RTG::assignmentRefPtr a)
-  {
-	  //std::cout << hits << std::endl;
-	  std::stack<dFrame> todo;
-	  std::map<RTG::regExpRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr>::iterator it;
-
-	  todo.push(dFrame(exp));
-	  while (!todo.empty())
-	  {
-		  dFrame & frame = todo.top();
-
-		  //Determine if this frame has been seen before
-		  if (frame.is_new){
-			  //The frame has not been seen before, but frame.e may be pointing to a regexp that's been previously evaluated.  If so, return that result
-			  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHash(frame.e, a);
-			  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHash);
-			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHash(frame.e);
-			  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHash);
-			  if (evalRegExp___it != EvalMap2.end()) {
-				  todo.pop();
-				  continue;
-			  }
-			  //frame.e has not been evaluated before, so lookup the children in the hash map.  If all the children of the frame.e have been evaluated, then evaluate frame.e, otherwise
-			  //push the unevaluated children onto the stack
-			  frame.is_new = false;
-			  if (CIR::isKleene(frame.e).get_data())
-			  {
-				  frame.op = 0;
-				  RTG::regExpRefPtr child = CIR::getLChild(frame.e);
-				  frame.left = child;
-				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashL(child, a);
-				  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
-				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashL(child);
-				  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
-				  if (evalRegExp___it != EvalMap2.end())
-				  {
-					  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-					  //ret = CONC_EXTERNS::evalKleeneSemElem(evalRegExp___it->second);
-					  //EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
-					  //todo.pop();
-					  //std::cout << "New code! (U1)" << std::endl;
-					  duetrelpair_t ret;
-
-				      MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(child);
-
-                      duetrel_t previousValue = 0;
-                      if (doWideningThisRound) {
-                          EvalRMap::const_iterator previousValueIterator = oldStarVal.find(lookupKeyForStar);
-                          if (previousValueIterator != oldStarVal.end()) {
-                              previousValue = previousValueIterator->second.v;
-                          }
-                      }
-
-					  ret = ((evalRegExp___it->second.v))->alphaHatStar(previousValue);
-
-					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret->second));
-
-					  //std::cout << "  Hash key is: " << hash_value(lookupKeyForStar) << std::endl;
-					  newStarVal.insert(std::make_pair(lookupKeyForStar, ret->first));
-					  todo.pop();
-					  continue;
-				  }
-				  else
-				  {
-					  todo.push(dFrame(child));
-					  continue;
-				  }
-			  }
-			  else if (CIR::isDot(frame.e).get_data())
-			  {
-				  frame.op = 1;
-				  frame.left = CIR::getLChild(frame.e);
-				  frame.right = CIR::getRChild(frame.e);
-				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashL(frame.left, a);
-				  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
-				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashL(frame.left);
-				  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
-				  if (evalRegExp___it != EvalMap2.end())
-				  {
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExp___it->second;
-					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
-					  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
-					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashR(frame.right);
-					  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
-					  if (evalRegExp___it != EvalMap2.end())
-					  {
-						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExp___it->second;
-						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-						  ret = CONC_EXTERNS::evalDotSemElem(lch, rch);
-						  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
-						  todo.pop();
-						  continue;
-					  }
-					  else
-					  {
-						  todo.push(dFrame(frame.right));
-						  continue;
-					  }
-				  }
-				  else
-				  {
-					  todo.push(dFrame(frame.left));
-					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
-					  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
-					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashR(frame.right);
-					  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
-					  if (evalRegExp___it == EvalMap2.end())
-					  {
-						  todo.push(dFrame(frame.right));
-						  continue;
-					  }
-				  }
-			  }
-			  else if (CIR::isPlus(frame.e).get_data())
-			  {
-				  frame.op = 2;
-				  frame.left = CIR::getLChild(frame.e);
-				  frame.right = CIR::getRChild(frame.e);
-				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashL(frame.left, a);
-				  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
-				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashL(frame.left);
-				  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
-				  if (evalRegExp___it != EvalMap2.end())
-				  {
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExp___it->second;
-					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
-					  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
-					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashR(frame.right);
-					  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
-					  if (evalRegExp___it != EvalMap2.end())
-					  {
-						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExp___it->second;
-						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-						  ret = CONC_EXTERNS::evalPlusSemElem(lch, rch);
-						  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
-						  todo.pop();
-						  continue;
-					  }
-					  else
-					  {
-						  todo.push(dFrame(frame.right));
-						  continue;
-					  }
-				  }
-				  else
-				  {
-					  todo.push(dFrame(frame.left));
-					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
-					  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
-					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashR(frame.right);
-					  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
-					  if (evalRegExp___it == EvalMap2.end())
-					  {
-						  todo.push(dFrame(frame.right));
-						  continue;
-					  }
-				  }
-			  }
-			  else {  //frame.e is a leaf, so just leverage the TSL function as it's a base case (non recursive)
-				  switch (frame.e->GetClassId()) {
-				  case RTG::TSL_ID_Var: {
-					  RTG::VarRefPtr t_T_c1_scast__1 = static_cast<RTG::Var*>(frame.e.get_ptr());
-					  BASETYPE::INT32 e_Var_1 = t_T_c1_scast__1->Get_V();
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CIR::getAssignment(e_Var_1, a); // TSL-spec: line 724 of "regExp.tsl"
-					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, T_c1));
-				  }
-					  break;
-				  case RTG::TSL_ID_Zero: {
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getZeroWt(); // TSL-spec: line 725 of "regExp.tsl"
-					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, T_c1));
-				  }
-					  break;
-				  case RTG::TSL_ID_One: {
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getOneWt(); // TSL-spec: line 726 of "regExp.tsl"
-					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, T_c1));
-				  }
-					  break;
-				  case RTG::TSL_ID_Weight: {
-					  RTG::WeightRefPtr t_e_Weight_1_scast__1 = static_cast<RTG::Weight*>(frame.e.get_ptr());
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr e_Weight_1 = t_e_Weight_1_scast__1->Get_weight();
-					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, e_Weight_1));
-				  }
-					  break;
-				  case RTG::TSL_ID_Project: {
-					  RTG::ProjectRefPtr t_T_c1_scast__1 = static_cast<RTG::Project*>(frame.e.get_ptr());
-					  BASETYPE::INT32 e_Project_1 = t_T_c1_scast__1->Get_MS();
-					  BASETYPE::INT32 e_Project_2 = t_T_c1_scast__1->Get_MT();
-					  RTG::regExpRefPtr e_Project_3 = t_T_c1_scast__1->Get_child();
-					  frame.op = 3;
-					  frame.left = e_Project_3;
-					  todo.push(dFrame(frame.left));
-					  continue;
-				  }
-				  }
-				  todo.pop();
-				  continue;
-			  }
-		  }
-		  else
-		  {
-			  //This frame has been seen before, so it's children have all previously been evaluated.  So lookup the children in the hashtable and evaluate
-			  //frame.e as appropriate based on what type of operation it is (determined in frame.op)
-			  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHash(frame.e, a);
-			  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashL(frame.left, a);
-			  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
-			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHash(frame.e);
-			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashL(frame.left);
-			  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
-			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExp___it->second;
-			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-			  if (frame.op == 0) //Kleene
-			  {
-				  //ret = CONC_EXTERNS::evalKleeneSemElem(lch);
-				  //EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
-				  //todo.pop();
-				  //std::cout << "New code! (U2)" << std::endl;
-				  duetrelpair_t ret;
-				  
-                  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(frame.e);
-
-                  duetrel_t previousValue = 0;
-                  if (doWideningThisRound) {
-                      EvalRMap::const_iterator previousValueIterator = oldStarVal.find(lookupKeyForStar);
-                      if (previousValueIterator != oldStarVal.end()) {
-                          previousValue = previousValueIterator->second.v;
-                      }
-                  }
-
-				  ret = ((evalRegExp___it->second.v))->alphaHatStar(previousValue);
-				  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret->second));
-				  //std::cout << "  Hash key is: " << hash_value(lookupKeyForStar) << std::endl;
-				  newStarVal.insert(std::make_pair(lookupKeyForStar, ret->first));
-                                  todo.pop();
-				  continue;
-			  }
-			  else if (frame.op == 3)
-			  {
-				  RTG::ProjectRefPtr t_T_c1_scast__1 = static_cast<RTG::Project*>(frame.e.get_ptr());
-				  BASETYPE::INT32 e_Project_1 = t_T_c1_scast__1->Get_MS();
-				  BASETYPE::INT32 e_Project_2 = t_T_c1_scast__1->Get_MT();
-				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c7 = CONC_EXTERNS::evalProjectSemElem(e_Project_1, e_Project_2, lch);
-				  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, T_c7));
-				  todo.pop();
-				  continue;
-			  }
-			  else
-			  {
-				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
-				  // //frame.right->print(std::cout) << std::endl;
-				  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
-				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashR(frame.right);
-				  //frame.right->print(std::cout) << std::endl;
-				  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
-
-				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExp___it->second;
-				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-				  if (frame.op == 1) //Dot
-				  {
-					  ret = CONC_EXTERNS::evalDotSemElem(lch, rch);
-					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
-					  todo.pop();
-					  continue;
-				  }
-				  else //Plus
-				  {
-					  ret = CONC_EXTERNS::evalPlusSemElem(lch, rch);
-					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
-					  todo.pop();
-					  continue;
-				  }
-			  }
-		  }
-	  }
-
-	  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > fin(exp, a);
-	  MemoCacheKey1<RTG::regExpRefPtr > fin(exp);
-
-	  //This will start with a lookup on the hash_map for exp, which has been evaluated in the loop above, so will not re-evaluate using evalRegExp
-	  return EvalMap2[fin];
-  }
-
-  /*
-  *  A non recursive version of evalT used to eval TSLRegExps representing tensored weights
-  *  given the assignment a.
-  *
-  *  This is based on the recursive evalT in regExp.tsl and uses that function's hashtable
-  *
-  *  @param:  RTG::regExpTRefPtr exp - The top level tensored regular expression to be evaluated
-  *           RTG::assignmentRefPtr a - The final values for the variables in the regExp
-  *  @return:  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr - A sem_elem wrapper around a tensored sem_elem wt
-  *
-  *  Author: Emma Turetsky
-  */
-  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalTNonRec(RTG::regExpTRefPtr exp, RTG::assignmentRefPtr a)
-  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalT(RTG::regExpTRefPtr exp, RTG::assignmentRefPtr a)
-  {
-	  //std::cout << hits << std::endl;
-	  std::stack<sFrame> todo;
-	  std::map<RTG::regExpTRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr>::iterator it;
-
-	  todo.push(sFrame(exp));
-	  while (!todo.empty())
-	  {
-		  sFrame & frame = todo.top();
-		  if (frame.is_new){  //Determine if this is the first time looking at this frame
-			  //Check frame.e see if it's been evaluated before.
-			  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHash(frame.e, a);
-			  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHash);
-			  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHash(frame.e);
-			  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHash);
-			  if (evalT___it != EvalMapT.end()) {
-				  todo.pop();
-				  continue;
-			  }
-			  frame.is_new = false;
-			  //frame.e has not been evaluated before - check to see if the children have been seen before
-			  //If so, evaluate frame.e as appropriate, otherwise push the children on to the stack
-			  if (CIR::isKleeneT(frame.e).get_data())
-			  {
-				  frame.op = 0;
-				  RTG::regExpTRefPtr child = CIR::getLChildT(frame.e);
-				  frame.left = child;
-				  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(child, a);
-				  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
-				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(child);
-				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
-				  if (evalT___it != EvalMapT.end())
-				  {
-				  	  //std::cout << "New code! (T1)" << std::endl;
-					  duetrelpair_t ret;
-                      
-				  	  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(child);
-
-                      duetrel_t previousValue = 0;
-                      if (doWideningThisRound) {
-                          EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
-                          if (previousValueIterator != oldStarValT.end()) {
-                              previousValue = previousValueIterator->second.v;
-                          }
-                      }
-
-					  ret = ((evalT___it->second.v))->alphaHatStar(previousValue);
-					  // std::cout << "  Body value is: " << std::endl;
-					  // evalT___it->second.v->print(std::cout);
-					  // std::cout << std::endl;
-					  // std::cout << "  Linearized value is: " << std::endl;
-					  // ret->first->print(std::cout);
-					  // std::cout << std::endl;
-					  // std::cout << "  Star value is: " << std::endl;
-					  // ret->second->print(std::cout);
-					  // std::cout << std::endl;
-
-					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret->second));
-					  newStarValT.insert(std::make_pair(lookupKeyForStar, ret->first));
-					  todo.pop();
-					  continue;
-				  }
-				  else
-				  {
-					  todo.push(sFrame(child));
-					  continue;
-				  }
-			  }
-			  else if (CIR::isDotT(frame.e).get_data())
-			  {
-				  frame.op = 1;
-				  frame.left = CIR::getLChildT(frame.e);
-				  frame.right = CIR::getRChildT(frame.e);
-				  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
-				  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
-				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(frame.left);
-				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
-				  if (evalT___it != EvalMapT.end())
-				  {
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalT___it->second;
-					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
-					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
-					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
-					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
-					  if (evalT___it != EvalMapT.end())
-					  {
-						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalT___it->second;
-						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-						  ret = CONC_EXTERNS::evalDotSemElemT(lch, rch);
-						  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
-						  todo.pop();
-						  continue;
-					  }
-					  else
-					  {
-						  todo.push(sFrame(frame.right));
-						  continue;
-					  }
-				  }
-				  else
-				  {
-					  todo.push(sFrame(frame.left));
-					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
-					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
-					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
-					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
-					  if (evalT___it == EvalMapT.end())
-					  {
-						  todo.push(sFrame(frame.right));
-						  continue;
-					  }
-				  }
-			  }
-			  else if (CIR::isPlusT(frame.e).get_data())
-			  {
-				  frame.op = 2;
-				  frame.left = CIR::getLChildT(frame.e);
-				  frame.right = CIR::getRChildT(frame.e);
-				  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
-				  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
-				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(frame.left);
-				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
-				  if (evalT___it != EvalMapT.end())
-				  {
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalT___it->second;
-					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
-					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
-					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
-					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
-					  if (evalT___it != EvalMapT.end())
-					  {
-						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalT___it->second;
-						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-						  ret = CONC_EXTERNS::evalPlusSemElemT(lch, rch);
-						  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
-						  todo.pop();
-						  continue;
-					  }
-					  else
-					  {
-						  todo.push(sFrame(frame.right));
-						  continue;
-					  }
-				  }
-				  else
-				  {
-					  todo.push(sFrame(frame.left));
-					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
-					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
-					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
-					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
-					  if (evalT___it == EvalMapT.end())
-					  {
-						  todo.push(sFrame(frame.right));
-						  continue;
-					  }
-				  }
-			  }
-			  else if (CIR::isProjectT(frame.e).get_data()){
-					  frame.op = 3;
-					  RTG::ProjectTRefPtr t_T_b1_scast__1 = static_cast<RTG::ProjectT*>(frame.e.get_ptr());
-					  RTG::regExpTRefPtr e_ProjectT_3 = t_T_b1_scast__1->Get_child();
-					  BASETYPE::INT32 e_ProjectT_1 = t_T_b1_scast__1->Get_MS();
-					  BASETYPE::INT32 e_ProjectT_2 = t_T_b1_scast__1->Get_MT();
-					  frame.left = e_ProjectT_3;
-					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
-					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
-					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(frame.left);
-					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
-					  if (evalT___it != EvalMapT.end())
-					  {
-						  // std::cout << "This value appears inside a ProjectT:" << std::endl;
-						  // evalT___it->second.print(std::cout);
-						  // std::cout << std::endl;
-						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret = CONC_EXTERNS::evalProjectSemElemT(e_ProjectT_1, e_ProjectT_2, evalT___it->second);
-						  // std::cout << "Evaluating ProjectT gave us:" << std::endl;
-						  // ret.print(std::cout);
-						  // std::cout << std::endl;
-						  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
-						  todo.pop();
-						  continue;
-					  }
-					  /*
-					 else if (CIR::isDotT(e_ProjectT_3).get_data())
-					  {
-						  RTG::regExpTRefPtr aDot = CIR::getLChildT(e_ProjectT_3);
-						  RTG::regExpTRefPtr bDot = CIR::getRChildT(e_ProjectT_3);
-						  if (CIR::isTensorTranspose(aDot).get_data())
-						  {
-							  if (CIR::isTensorTranspose(bDot).get_data())
-							  {
-								  RTG::TensorTransposeRefPtr t_T_c1_scast__1 = static_cast<RTG::TensorTranspose*>(aDot.get_ptr());
-								  RTG::regExpRefPtr w = t_T_c1_scast__1->Get_lChild();
-								  RTG::regExpRefPtr x = t_T_c1_scast__1->Get_rChild();
-								  RTG::TensorTransposeRefPtr t_T_c1_scast__2 = static_cast<RTG::TensorTranspose*>(bDot.get_ptr());
-								  RTG::regExpRefPtr y = t_T_c1_scast__2->Get_lChild();
-								  RTG::regExpRefPtr z = t_T_c1_scast__2->Get_rChild();
-								  RTG::regExpRefPtr lch = CIR::mkDot(y, w);
-								  RTG::regExpRefPtr rch = CIR::mkDot(x, z);
-								  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr mVal = evalRegExpNonRec(rch, a);
-								  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr fVal = evalRegExpNonRec(lch, a);
-								  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr mergedVal = CONC_EXTERNS::evalProjectSemElem(e_ProjectT_1, e_ProjectT_2, mVal);
-								  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr eVal = CONC_EXTERNS::evalDotSemElem(fVal, mergedVal);
-								  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret = CONC_EXTERNS::evalTensorTranspose(CONC_EXTERNS::getOneWt(), eVal);
-								  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
-								  todo.pop();
-								  continue;
-							  }
-						  }
-					  }
-					  */
-					  todo.push(frame.left);
-					  continue;
-				  }
-			  else if (CIR::isTensorTranspose(frame.e).get_data())
-				  {
-					  RTG::TensorTransposeRefPtr t_T_c1_scast__1 = static_cast<RTG::TensorTranspose*>(frame.e.get_ptr());
-					  RTG::regExpRefPtr lch = t_T_c1_scast__1->Get_lChild();
-					  RTG::regExpRefPtr rch = t_T_c1_scast__1->Get_rChild();
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lVal = evalRegExpNonRec(lch, a);
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rVal = evalRegExpNonRec(rch, a);
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret = CONC_EXTERNS::evalTensorTranspose(lVal, rVal);
-					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
-					  todo.pop();
-					  continue;
-				  }
-			  else  //Leaf tensored regexp, so call evalT as it's a base case
-			  {
-				  switch (frame.e->GetClassId()) {
-				  case RTG::TSL_ID_VarT: {
-					  RTG::VarTRefPtr t_T_c1_scast__1 = static_cast<RTG::VarT*>(frame.e.get_ptr());
-					  BASETYPE::INT32 e_VarT_1 = t_T_c1_scast__1->Get_VT();
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getZeroTWt(); // TSL-spec: line 751 of "regExp.tsl"
-					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, T_c1));
-				  }
-					  break;
-				  case RTG::TSL_ID_ZeroT: {
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getZeroTWt(); // TSL-spec: line 752 of "regExp.tsl"
-					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, T_c1));
-				  }
-					  break;
-				  case RTG::TSL_ID_OneT: {
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getOneTWt(); // TSL-spec: line 753 of "regExp.tsl"
-					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, T_c1));
-				  }
-				  }
-				  todo.pop();
-				  continue;
-
-			  }
-		  }
-		  else  //We've seen this stack frame before
-		  {
-			  //All the children of frame.e have been evaluated, so evaluate frame.e as appropriate
-			  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHash(frame.e, a);
-			  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
-			  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
-			  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHash(frame.e);
-			  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(frame.left);
-			  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
-			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalT___it->second;
-			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-			  if (frame.op == 0) //Kleene
-			  {
-			  	  //std::cout << "New code! (T2)" << std::endl;
-				  duetrelpair_t ret;
-				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(frame.e); // FIXME this variable is now redundant with lookupKeyForevalTHash
-
-                  duetrel_t previousValue = 0;
-                  if (doWideningThisRound) {
-			          EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
-                      if (previousValueIterator != oldStarValT.end()) {
-                          previousValue = previousValueIterator->second.v;
-                      }
-                  }
-
-				  ret = ((evalT___it->second.v))->alphaHatStar(previousValue);
-				  // std::cout << "  Body value is: " << std::endl;
-				  // evalT___it->second.v->print(std::cout);
-				  // std::cout << std::endl;
-				  // std::cout << "  Linearized value is: " << std::endl;
-				  // ret->first->print(std::cout);
-				  // std::cout << std::endl;
-				  // std::cout << "  Star value is: " << std::endl;
-				  // ret->second->print(std::cout);
-				  // std::cout << std::endl;
-				  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret->second));
-				  newStarValT.insert(std::make_pair(lookupKeyForStar, ret->first));
-				  //ret = CONC_EXTERNS::evalKleeneSemElemT(lch);
-				  //EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
-				  todo.pop();
-				  continue;
-			  }
-			  else if (frame.op == 3) //Project
-			  {
-				  RTG::ProjectTRefPtr t_T_b1_scast__1 = static_cast<RTG::ProjectT*>(frame.e.get_ptr());
-				  BASETYPE::INT32 e_ProjectT_1 = t_T_b1_scast__1->Get_MS();
-				  BASETYPE::INT32 e_ProjectT_2 = t_T_b1_scast__1->Get_MT();
-				  // std::cout << "This value appears inside a ProjectT:" << std::endl;
-				  // lch.print(std::cout);
-				  // std::cout << std::endl;
-				  ret = CONC_EXTERNS::evalProjectSemElemT(e_ProjectT_1, e_ProjectT_2, lch);
-				  // std::cout << "Evaluating ProjectT gave us:" << std::endl;
-				  // ret.print(std::cout);
-				  // std::cout << std::endl;
-				  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
-				  todo.pop();
-				  continue;
-			  }
-			  else //Dot or Plust
-			  {
-				  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
-				  // //frame.right->print(std::cout) << std::endl;
-				  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
-				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
-				  //frame.right->print(std::cout) << std::endl;
-				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
-
-				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalT___it->second;
-				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-				  if (frame.op == 1)  //Dot
-				  {
-					  ret = CONC_EXTERNS::evalDotSemElemT(lch, rch);
-					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
-					  todo.pop();
-					  continue;
-				  }
-				  else  //Plus
-				  {
-					  ret = CONC_EXTERNS::evalPlusSemElemT(lch, rch);
-					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
-					  todo.pop();
-					  continue;
-				  }
-			  }
-		  }
-	  }
-
-	  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > fin(exp, a);
-	  MemoCacheKey1<RTG::regExpTRefPtr > fin(exp);
-	  return EvalMapT[fin];  //Grabs exp evaluated at assignment a from the hash_map
-  }
+////////  /*
+////////  *  A non recursive version of evalAt0 used to eval TSLRegExp assuming variables are the zero sem_elem. (f(0)).
+////////  *
+////////  *  This is based on the recursive evalAt0 in regExp.tsl and uses that function's hastable
+////////  *
+////////  *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be evaluated
+////////  *  @return:  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
+////////  *
+////////  *  Author: Emma Turetsky
+////////  *
+////////  */
+////////  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalNonRecAt0(RTG::regExpRefPtr exp)
+////////  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalRegExpAt0(RTG::regExpRefPtr exp)
+////////  {
+////////	  //std::cout << hits << std::endl;
+////////	  std::stack<dFrame> todo;
+////////	  std::map<RTG::regExpRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr>::iterator it;
+////////
+////////	  todo.push(dFrame(exp));  //Push the expression on the stack as our starter frame
+////////
+////////	  while (!todo.empty())
+////////	  {
+////////		  dFrame & frame = todo.top();
+////////		  if (frame.is_new){  //See if we've seen this frame before
+////////			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0Hash(frame.e);  //See if we've evaluated this regexp already, if so, return evaluated value
+////////			  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0Hash);
+////////			  if (evalRegExpAt0___it != EvalMap0.end()) {
+////////				  todo.pop();
+////////				  continue;
+////////			  }
+////////			  frame.is_new = false;
+////////			  //If the regexp is of type Kleene star
+////////			  if (CIR::isKleene(frame.e).get_data())
+////////			  {
+////////				  frame.op = 0;
+////////				  //Determine if the child has been seen before
+////////				  RTG::regExpRefPtr child = CIR::getLChild(frame.e);
+////////				  frame.left = child;
+////////				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashL(child);
+////////				  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashL);
+////////				  if (evalRegExpAt0___it != EvalMap0.end())
+////////				  {
+////////					  //If the child expression has been evaluated before, performe the Kleene Star operation and insert the resultant
+////////					  //value into the hash table and pop the stack frame
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+////////					  //ret = CONC_EXTERNS::evalKleeneSemElem(evalRegExpAt0___it->second);
+////////					  ret = CONC_EXTERNS::evalKleeneSemElem(evalRegExpAt0___it->second, child);
+////////					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
+////////					  todo.pop();
+////////					  continue;
+////////				  }
+////////				  else
+////////				  {
+////////					  //Otherwise push the child onto the stack
+////////					  todo.push(dFrame(child));
+////////					  continue;
+////////				  }
+////////			  }
+////////			  else if (CIR::isDot(frame.e).get_data())  //If the regexp is of type Dot
+////////			  {
+////////				  frame.op = 1;
+////////				  //Determine if either child has been seen before
+////////				  frame.left = CIR::getLChild(frame.e);
+////////				  frame.right = CIR::getRChild(frame.e);
+////////				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashL(frame.left);
+////////				  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashL);
+////////				  if (evalRegExpAt0___it != EvalMap0.end())  //The left child has been evaluated before
+////////				  {
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExpAt0___it->second;
+////////					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashR(frame.right);
+////////					  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashR);
+////////					  //The right child has been evaluated before
+////////					  if (evalRegExpAt0___it != EvalMap0.end())
+////////					  {
+////////						  //Both children have been evaluated at 0 already, so evaluate the Dot expression and put the value into the hash table
+////////						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExpAt0___it->second;
+////////						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+////////						  ret = CONC_EXTERNS::evalDotSemElem(lch, rch);
+////////						  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
+////////						  todo.pop();
+////////						  continue;
+////////					  }
+////////					  else  //Push the unevaluated right expression onto the stack
+////////					  {
+////////						  todo.push(dFrame(frame.right));
+////////						  continue;
+////////					  }
+////////				  }
+////////				  else
+////////				  {
+////////					  todo.push(dFrame(frame.left)); //Push the unevaluated left expression onto the stack
+////////					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashR(frame.right);
+////////					  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashR);
+////////					  //If the right child has not been seen before
+////////					  if (evalRegExpAt0___it == EvalMap0.end())
+////////					  {
+////////						  //Push the unevaluated right expression onto the stack
+////////						  todo.push(dFrame(frame.right));
+////////						  continue;
+////////					  }
+////////				  }
+////////			  }
+////////			  else if (CIR::isPlus(frame.e).get_data())
+////////			  {
+////////				  frame.op = 2;
+////////				  //Determine if either child has been seen before
+////////				  frame.left = CIR::getLChild(frame.e);
+////////				  frame.right = CIR::getRChild(frame.e);
+////////				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashL(frame.left);
+////////				  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashL);
+////////				  if (evalRegExpAt0___it != EvalMap0.end()) //The left child has been evaluated before
+////////				  {
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExpAt0___it->second;
+////////					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashR(frame.right);
+////////					  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashR);
+////////					  if (evalRegExpAt0___it != EvalMap0.end())  //The right child has been evaluated before
+////////					  {
+////////						  //Both children have been evaluated at 0 already, so evaluate the Plus expression and put the value into the hash table
+////////						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExpAt0___it->second;
+////////						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+////////						  ret = CONC_EXTERNS::evalPlusSemElem(lch, rch);
+////////						  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
+////////						  todo.pop();
+////////						  continue;
+////////					  }
+////////					  else //Push the unevaluated right expression onto the stack
+////////					  {
+////////						  todo.push(dFrame(frame.right));
+////////						  continue;
+////////					  }
+////////				  }
+////////				  else
+////////				  {
+////////					  todo.push(dFrame(frame.left)); //Push the unevaluated left expression onto the stack
+////////					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashR(frame.right);
+////////					  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashR);
+////////					  //If the right child has not been seen before
+////////					  if (evalRegExpAt0___it == EvalMap0.end())
+////////					  {
+////////						  //Push the unevaluated right expression onto the stack
+////////						  todo.push(dFrame(frame.right));
+////////						  continue;
+////////					  }
+////////				  }
+////////			  }
+////////			  else {
+////////				  switch (frame.e->GetClassId()) {
+////////				  case RTG::TSL_ID_Var: {
+////////					  RTG::VarRefPtr t_T_c1_scast__1 = static_cast<RTG::Var*>(frame.e.get_ptr());
+////////					  BASETYPE::INT32 e_Var_1 = t_T_c1_scast__1->Get_V();
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getZeroWt(); // TSL-spec: line 680 of "regExp.tsl"
+////////					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, T_c1));
+////////				  }
+////////					  break;
+////////				  case RTG::TSL_ID_Zero: {
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getZeroWt(); // TSL-spec: line 681 of "regExp.tsl"
+////////					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, T_c1));
+////////				  }
+////////					  break;
+////////				  case RTG::TSL_ID_One: {
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getOneWt(); // TSL-spec: line 682 of "regExp.tsl"
+////////					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, T_c1));
+////////				  }
+////////					  break;
+////////				  case RTG::TSL_ID_Weight: {
+////////					  RTG::WeightRefPtr t_e_Weight_1_scast__1 = static_cast<RTG::Weight*>(frame.e.get_ptr());
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr e_Weight_1 = t_e_Weight_1_scast__1->Get_weight();
+////////					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, e_Weight_1));
+////////				  }
+////////					  break;
+////////				  case RTG::TSL_ID_Project: {
+////////					  RTG::ProjectRefPtr t_T_c1_scast__1 = static_cast<RTG::Project*>(frame.e.get_ptr());
+////////					  BASETYPE::INT32 e_Project_1 = t_T_c1_scast__1->Get_MS();
+////////					  BASETYPE::INT32 e_Project_2 = t_T_c1_scast__1->Get_MT();
+////////					  RTG::regExpRefPtr e_Project_3 = t_T_c1_scast__1->Get_child();
+////////					  frame.op = 3;
+////////					  frame.left = e_Project_3;
+////////					  todo.push(dFrame(frame.left));
+////////					  continue;
+////////				  }
+////////				  }
+////////				  //The value is a leaf, cheat and just call evalRegExpAt0.  This will add it to evalRegExpAt0Hash (the hash map) and leverages
+////////				  //the existing TSL spec.
+////////				  //Pop the stack frame when done.
+////////				  todo.pop();
+////////				  continue;
+////////			  }
+////////		  }
+////////		  else  //This is the second time we've popped this stack frame, so it's children must have been evaluated
+////////		  {
+////////			  //Look up the left child value (this is not a leaf regExp, so it must have a left child)
+////////			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0Hash(frame.e);
+////////			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashL(frame.left);
+////////			  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashL);
+////////			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExpAt0___it->second;
+////////			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+////////			  if (frame.op == 0) //Kleene
+////////			  {
+////////				  //Evaluate and insert into the hashmap
+////////				  //ret = CONC_EXTERNS::evalKleeneSemElem(lch);
+////////				  ret = CONC_EXTERNS::evalKleeneSemElem(lch, frame.left);
+////////				  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
+////////				  todo.pop();
+////////				  continue;
+////////			  }
+////////			  else if (frame.op == 3)
+////////			  {
+////////				  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, lch));
+////////				  todo.pop();
+////////				  continue;
+////////			  }
+////////			  else  //Dot or Plus
+////////			  {
+////////				  //Look up the value for the right child
+////////				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpAt0HashR(frame.right);
+////////				  //frame.right->print(std::cout) << std::endl;
+////////				  EvalMap::const_iterator evalRegExpAt0___it = EvalMap0.find(lookupKeyForevalRegExpAt0HashR);
+////////
+////////				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExpAt0___it->second;
+////////				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+////////				  if (frame.op == 1) //Dot
+////////				  {
+////////					  //Evaluate and insert into the hashmap
+////////					  ret = CONC_EXTERNS::evalDotSemElem(lch, rch);
+////////					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
+////////					  todo.pop();
+////////					  continue;
+////////				  }
+////////				  else //Plus
+////////				  {
+////////					  //Evaluate and insert into the hashmap
+////////					  ret = CONC_EXTERNS::evalPlusSemElem(lch, rch);
+////////					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
+////////					  todo.pop();
+////////					  continue;
+////////				  }
+////////			  }
+////////		  }
+////////	  }
+////////
+////////	  //This will start with a lookup on the hash_map for exp, which has been evaluated in the loop above, so will not re-evaluate using evalRegExpAt0
+////////	  MemoCacheKey1<RTG::regExpRefPtr > fin(exp);
+////////	  return EvalMap0[fin];
+////////  }
+////////
+////////  /*
+////////  *  A non recursive version of evalRegExpFin used to eval TSLRegExps given the final assignment a.
+////////  *
+////////  *  This is based on the recursive evalRegExpFin in regExp.tsl and uses that function's hastable
+////////  *
+////////  *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be evaluated
+////////  *			  RTG::assignmentRefPtr a - The final values for the variables in the regExp
+////////  *  @return:  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
+////////  *
+////////  *  Author: Emma Turetsky
+////////  */
+////////  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalRegExpFinNonRec(RTG::regExpRefPtr exp, RTG::assignmentRefPtr a)
+////////  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalRegExpFin(RTG::regExpRefPtr exp, RTG::assignmentRefPtr a)
+////////  {
+////////	  //std::cout << hits << std::endl;
+////////	  std::stack<dFrame> todo;
+////////	  std::map<RTG::regExpRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr>::iterator it;
+////////
+////////	  todo.push(dFrame(exp));
+////////	  while (!todo.empty())
+////////	  {
+////////		  dFrame & frame = todo.top();
+////////		  if (frame.is_new){ //See if we've seen this frame before
+////////			  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHash(frame.e, a); //See if we've evaluated this regexp already, if so, return evaluated value
+////////			  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHash);
+////////			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHash(frame.e); //See if we've evaluated this regexp already, if so, return evaluated value
+////////			  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHash);
+////////			  if (evalRegExpFin___it != EvalMap2.end()) {
+////////				  todo.pop();
+////////				  continue;
+////////			  }
+////////			  frame.is_new = false;
+////////			  //If the regexp is of type Kleene star
+////////			  if (CIR::isKleene(frame.e).get_data())
+////////			  {
+////////				  frame.op = 0;
+////////				  //Determine if the child has been seen before
+////////				  RTG::regExpRefPtr child = CIR::getLChild(frame.e);
+////////				  frame.left = child;
+////////				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(child, a);
+////////				  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
+////////				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashL(child);
+////////				  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
+////////				  if (evalRegExpFin___it != EvalMap2.end())
+////////				  {
+////////					  //If the child expression has been evaluated before, performe the Kleene Star operation and insert the resultant
+////////					  //value into the hash table and pop the stack frame
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+////////					  //ret = CONC_EXTERNS::evalKleeneSemElem(evalRegExpFin___it->second);
+////////					  ret = CONC_EXTERNS::evalKleeneSemElem(evalRegExpFin___it->second, frame.left);
+////////					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
+////////					  todo.pop();
+////////					  continue;
+////////				  }
+////////				  else
+////////				  {
+////////					  //Otherwise push the child onto the stack
+////////					  todo.push(dFrame(child));
+////////					  continue;
+////////				  }
+////////			  }
+////////			  else if (CIR::isDot(frame.e).get_data())  //If the regexp is of type Dot
+////////			  {
+////////				  frame.op = 1;
+////////				  //Determine if either child has been seen before
+////////				  frame.left = CIR::getLChild(frame.e);
+////////				  frame.right = CIR::getRChild(frame.e);
+////////				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(frame.left, a);
+////////				  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
+////////				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashL(frame.left);
+////////				  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
+////////				  if (evalRegExpFin___it != EvalMap2.end()) //The left child has been evaluated before
+////////				  {
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExpFin___it->second;
+////////					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
+////////					  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
+////////					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashR(frame.right);
+////////					  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
+////////					  if (evalRegExpFin___it != EvalMap2.end()) //The right child has been evaluated before
+////////					  {
+////////						  //Both children have been evaluated already, so evaluate the Dot expression and put the value into the hash table
+////////						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExpFin___it->second;
+////////						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+////////						  ret = CONC_EXTERNS::evalDotSemElem(lch, rch);
+////////						  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
+////////						  todo.pop();
+////////						  continue;
+////////					  }
+////////					  else //Push the unevaluated right expression onto the stack
+////////					  {
+////////						  todo.push(dFrame(frame.right));
+////////						  continue;
+////////					  }
+////////				  }
+////////				  else
+////////				  {
+////////					  todo.push(dFrame(frame.left)); //Push the unevaluated left expression onto the stack
+////////					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
+////////					  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
+////////					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashR(frame.right);
+////////					  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
+////////					  if (evalRegExpFin___it == EvalMap2.end())
+////////					  {
+////////						  //Push the unevaluated right expression onto the stack
+////////						  todo.push(dFrame(frame.right));
+////////						  continue;
+////////					  }
+////////				  }
+////////			  }
+////////			  else if (CIR::isPlus(frame.e).get_data())
+////////			  {
+////////				  frame.op = 2;
+////////				  //Determine if either child has been seen before
+////////				  frame.left = CIR::getLChild(frame.e);
+////////				  frame.right = CIR::getRChild(frame.e);
+////////				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(frame.left, a);
+////////				  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
+////////				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashL(frame.left);
+////////				  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
+////////				  if (evalRegExpFin___it != EvalMap2.end()) //The left child has been evaluated before
+////////				  {
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExpFin___it->second;
+////////					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
+////////					  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
+////////					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashR(frame.right);
+////////					  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
+////////					  if (evalRegExpFin___it != EvalMap2.end()) //The right child has been evaluated before
+////////					  {
+////////						  //Both children have been evaluated already, so evaluate the Plus expression and put the value into the hash table
+////////						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExpFin___it->second;
+////////						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+////////						  ret = CONC_EXTERNS::evalPlusSemElem(lch, rch);
+////////						  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
+////////						  todo.pop();
+////////						  continue;
+////////					  }
+////////					  else
+////////					  {
+////////						  //Push the unevaluated right expression onto the stack
+////////						  todo.push(dFrame(frame.right));
+////////						  continue;
+////////					  }
+////////				  }
+////////				  else
+////////				  {
+////////					  todo.push(dFrame(frame.left)); //Push the unevaluated left expression onto the stack
+////////					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
+////////					  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
+////////					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashR(frame.right);
+////////					  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
+////////					  if (evalRegExpFin___it == EvalMap2.end())
+////////					  {
+////////						  //Push the unevaluated right expression onto the stack
+////////						  todo.push(dFrame(frame.right));
+////////						  continue;
+////////					  }
+////////				  }
+////////			  }
+////////			  else if (CIR::isProject(frame.e).get_data())
+////////			  {
+////////				  //Get the children for project (MT = merge Target, MS = merge Src)
+////////				  frame.op = 3;
+////////				  RTG::ProjectRefPtr t_T_c1_scast__1 = static_cast<RTG::Project*>(frame.e.get_ptr());
+////////				  BASETYPE::INT32 e_Project_1 = t_T_c1_scast__1->Get_MS();
+////////				  BASETYPE::INT32 e_Project_2 = t_T_c1_scast__1->Get_MT();
+////////				  RTG::regExpRefPtr e_Project_3 = t_T_c1_scast__1->Get_child();
+////////				  frame.left = e_Project_3;
+////////				  //if the child has been evaluated before
+////////				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(frame.left, a);
+////////				  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
+////////				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashL(frame.left);
+////////				  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
+////////				  if (evalRegExpFin___it != EvalMap2.end())
+////////				  {
+////////					  //Evaluate the projection and insert it into the hash table
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+////////					  ret = CONC_EXTERNS::evalProjectSemElem(e_Project_1, e_Project_2,evalRegExpFin___it->second);
+////////					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
+////////					  todo.pop();
+////////					  continue;
+////////				  }
+////////				  else
+////////				  {
+////////					  todo.push(dFrame(frame.left)); //Push the unevaluated child expression onto the stack
+////////					  continue;
+////////				  }
+////////			  }
+////////			  else {
+////////				  //The value is a leaf, cheat and just call evalRegExpFin.  This will add it to evalRegExpFinHash (the hash map) and leverages
+////////				  //the existing TSL spec.
+////////				  //Pop the stack frame when done.
+////////				  switch (frame.e->GetClassId()) {
+////////				  case RTG::TSL_ID_Var: {
+////////					  RTG::VarRefPtr t_T_c1_scast__1 = static_cast<RTG::Var*>(frame.e.get_ptr());
+////////					  BASETYPE::INT32 e_Var_1 = t_T_c1_scast__1->Get_V();
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CIR::getAssignment(e_Var_1, a); // TSL-spec: line 701 of "regExp.tsl"
+////////					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, T_c1));
+////////				  }
+////////					  break;
+////////				  case RTG::TSL_ID_Zero: {
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getZeroWt(); // TSL-spec: line 702 of "regExp.tsl"
+////////					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, T_c1));
+////////				  }
+////////					  break;
+////////				  case RTG::TSL_ID_One: {
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getOneWt(); // TSL-spec: line 703 of "regExp.tsl"
+////////					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, T_c1));
+////////				  }
+////////					  break;
+////////				  case RTG::TSL_ID_Weight: {
+////////					  RTG::WeightRefPtr t_e_Weight_1_scast__1 = static_cast<RTG::Weight*>(frame.e.get_ptr());
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr e_Weight_1 = t_e_Weight_1_scast__1->Get_weight();
+////////					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, e_Weight_1));
+////////				  }
+////////				  }
+////////				  todo.pop();
+////////				  continue;
+////////			  }
+////////		  }
+////////		  else  //This is the second time we've seen this value, so the children must have been evaluated at a, already
+////////		  {
+////////			  //Look up the children's evaluated values
+////////			  //Determine the op code
+////////			  //Call the appropriate evaluattion function depending on frame.op
+////////			  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHash(frame.e, a);
+////////			  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashL(frame.left, a);
+////////			  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
+////////			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHash(frame.e);
+////////			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashL(frame.left);
+////////			  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashL);
+////////			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExpFin___it->second;
+////////			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+////////			  if (frame.op == 0) //Kleene
+////////			  {
+////////				  //ret = CONC_EXTERNS::evalKleeneSemElem(lch);
+////////				  ret = CONC_EXTERNS::evalKleeneSemElem(lch, frame.left);
+////////				  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
+////////				  todo.pop();
+////////				  continue;
+////////			  }
+////////			  else if (frame.op == 3)  //Project
+////////			  {
+////////				  RTG::ProjectRefPtr t_T_c1_scast__1 = static_cast<RTG::Project*>(frame. e.get_ptr());
+////////				  BASETYPE::INT32 e_Project_1 = t_T_c1_scast__1->Get_MS();
+////////				  BASETYPE::INT32 e_Project_2 = t_T_c1_scast__1->Get_MT();
+////////				  ret = CONC_EXTERNS::evalProjectSemElem(e_Project_1, e_Project_2, lch);
+////////				  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
+////////				  todo.pop();
+////////				  continue;
+////////			  }
+////////			  else //Dot or Plus
+////////			  {
+////////				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpFinHashR(frame.right, a);
+////////				  // //frame.right->print(std::cout) << std::endl;
+////////				  // EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
+////////				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpFinHashR(frame.right);
+////////				  //frame.right->print(std::cout) << std::endl;
+////////				  EvalRMap::const_iterator evalRegExpFin___it = EvalMap2.find(lookupKeyForevalRegExpFinHashR);
+////////
+////////				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExpFin___it->second;
+////////				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+////////				  if (frame.op == 1)  //Dot
+////////				  {
+////////					  ret = CONC_EXTERNS::evalDotSemElem(lch, rch);
+////////					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
+////////					  todo.pop();
+////////					  continue;
+////////				  }
+////////				  else  //Plus
+////////				  {
+////////					  ret = CONC_EXTERNS::evalPlusSemElem(lch, rch);
+////////					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
+////////					  todo.pop();
+////////					  continue;
+////////				  }
+////////			  }
+////////		  }
+////////	  }
+////////
+////////	  //This will start with a lookup on the hash_map for exp, which has been evaluated in the loop above, so will not re-evaluate using evalRegExpFin
+////////	  //MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > fin(exp, a);
+////////	  MemoCacheKey1<RTG::regExpRefPtr > fin(exp);
+////////	  
+////////	  return EvalMap2[fin];
+////////  }
+////////
+////////  /*
+////////  *  A non recursive version of evalRegExp used to eval TSLRegExps given the assignment a.
+////////  *
+////////  *  This is based on the recursive evalRegExp in regExp.tsl and uses that function's hashtable
+////////  *
+////////  *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be evaluated
+////////  *           RTG::assignmentRefPtr a - The final values for the variables in the regExp
+////////  *  @return:  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr - A sem_elem wrapper around a sem_elem wt
+////////  *
+////////  *  Author: Emma Turetsky
+////////  */
+////////  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalRegExpNonRec(RTG::regExpRefPtr exp, RTG::assignmentRefPtr a)
+////////  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalRegExp(RTG::regExpRefPtr exp, RTG::assignmentRefPtr a)
+////////  {
+////////	  //std::cout << hits << std::endl;
+////////	  std::stack<dFrame> todo;
+////////	  std::map<RTG::regExpRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr>::iterator it;
+////////
+////////	  todo.push(dFrame(exp));
+////////	  while (!todo.empty())
+////////	  {
+////////		  dFrame & frame = todo.top();
+////////
+////////		  //Determine if this frame has been seen before
+////////		  if (frame.is_new){
+////////			  //The frame has not been seen before, but frame.e may be pointing to a regexp that's been previously evaluated.  If so, return that result
+////////			  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHash(frame.e, a);
+////////			  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHash);
+////////			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHash(frame.e);
+////////			  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHash);
+////////			  if (evalRegExp___it != EvalMap2.end()) {
+////////				  todo.pop();
+////////				  continue;
+////////			  }
+////////			  //frame.e has not been evaluated before, so lookup the children in the hash map.  If all the children of the frame.e have been evaluated, then evaluate frame.e, otherwise
+////////			  //push the unevaluated children onto the stack
+////////			  frame.is_new = false;
+////////			  if (CIR::isKleene(frame.e).get_data())
+////////			  {
+////////				  frame.op = 0;
+////////				  RTG::regExpRefPtr child = CIR::getLChild(frame.e);
+////////				  frame.left = child;
+////////				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashL(child, a);
+////////				  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
+////////				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashL(child);
+////////				  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
+////////				  if (evalRegExp___it != EvalMap2.end())
+////////				  {
+////////					  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+////////					  //ret = CONC_EXTERNS::evalKleeneSemElem(evalRegExp___it->second);
+////////					  //EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
+////////					  //todo.pop();
+////////					  //std::cout << "New code! (U1)" << std::endl;
+////////					  duetrelpair_t ret;
+////////
+////////				      MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(child);
+////////
+////////                      duetrel_t previousValue = 0;
+////////                      if (doWideningThisRound) {
+////////                          EvalRMap::const_iterator previousValueIterator = oldStarVal.find(lookupKeyForStar);
+////////                          if (previousValueIterator != oldStarVal.end()) {
+////////                              previousValue = previousValueIterator->second.v;
+////////                          }
+////////                      }
+////////
+////////					  ret = ((evalRegExp___it->second.v))->alphaHatStar(previousValue);
+////////
+////////					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret->second));
+////////
+////////					  //std::cout << "  Hash key is: " << hash_value(lookupKeyForStar) << std::endl;
+////////					  newStarVal.insert(std::make_pair(lookupKeyForStar, ret->first));
+////////					  todo.pop();
+////////					  continue;
+////////				  }
+////////				  else
+////////				  {
+////////					  todo.push(dFrame(child));
+////////					  continue;
+////////				  }
+////////			  }
+////////			  else if (CIR::isDot(frame.e).get_data())
+////////			  {
+////////				  frame.op = 1;
+////////				  frame.left = CIR::getLChild(frame.e);
+////////				  frame.right = CIR::getRChild(frame.e);
+////////				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashL(frame.left, a);
+////////				  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
+////////				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashL(frame.left);
+////////				  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
+////////				  if (evalRegExp___it != EvalMap2.end())
+////////				  {
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExp___it->second;
+////////					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
+////////					  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
+////////					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashR(frame.right);
+////////					  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
+////////					  if (evalRegExp___it != EvalMap2.end())
+////////					  {
+////////						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExp___it->second;
+////////						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+////////						  ret = CONC_EXTERNS::evalDotSemElem(lch, rch);
+////////						  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
+////////						  todo.pop();
+////////						  continue;
+////////					  }
+////////					  else
+////////					  {
+////////						  todo.push(dFrame(frame.right));
+////////						  continue;
+////////					  }
+////////				  }
+////////				  else
+////////				  {
+////////					  todo.push(dFrame(frame.left));
+////////					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
+////////					  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
+////////					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashR(frame.right);
+////////					  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
+////////					  if (evalRegExp___it == EvalMap2.end())
+////////					  {
+////////						  todo.push(dFrame(frame.right));
+////////						  continue;
+////////					  }
+////////				  }
+////////			  }
+////////			  else if (CIR::isPlus(frame.e).get_data())
+////////			  {
+////////				  frame.op = 2;
+////////				  frame.left = CIR::getLChild(frame.e);
+////////				  frame.right = CIR::getRChild(frame.e);
+////////				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashL(frame.left, a);
+////////				  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
+////////				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashL(frame.left);
+////////				  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
+////////				  if (evalRegExp___it != EvalMap2.end())
+////////				  {
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExp___it->second;
+////////					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
+////////					  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
+////////					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashR(frame.right);
+////////					  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
+////////					  if (evalRegExp___it != EvalMap2.end())
+////////					  {
+////////						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExp___it->second;
+////////						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+////////						  ret = CONC_EXTERNS::evalPlusSemElem(lch, rch);
+////////						  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
+////////						  todo.pop();
+////////						  continue;
+////////					  }
+////////					  else
+////////					  {
+////////						  todo.push(dFrame(frame.right));
+////////						  continue;
+////////					  }
+////////				  }
+////////				  else
+////////				  {
+////////					  todo.push(dFrame(frame.left));
+////////					  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
+////////					  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
+////////					  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashR(frame.right);
+////////					  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
+////////					  if (evalRegExp___it == EvalMap2.end())
+////////					  {
+////////						  todo.push(dFrame(frame.right));
+////////						  continue;
+////////					  }
+////////				  }
+////////			  }
+////////			  else {  //frame.e is a leaf, so just leverage the TSL function as it's a base case (non recursive)
+////////				  switch (frame.e->GetClassId()) {
+////////				  case RTG::TSL_ID_Var: {
+////////					  RTG::VarRefPtr t_T_c1_scast__1 = static_cast<RTG::Var*>(frame.e.get_ptr());
+////////					  BASETYPE::INT32 e_Var_1 = t_T_c1_scast__1->Get_V();
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CIR::getAssignment(e_Var_1, a); // TSL-spec: line 724 of "regExp.tsl"
+////////					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, T_c1));
+////////				  }
+////////					  break;
+////////				  case RTG::TSL_ID_Zero: {
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getZeroWt(); // TSL-spec: line 725 of "regExp.tsl"
+////////					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, T_c1));
+////////				  }
+////////					  break;
+////////				  case RTG::TSL_ID_One: {
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getOneWt(); // TSL-spec: line 726 of "regExp.tsl"
+////////					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, T_c1));
+////////				  }
+////////					  break;
+////////				  case RTG::TSL_ID_Weight: {
+////////					  RTG::WeightRefPtr t_e_Weight_1_scast__1 = static_cast<RTG::Weight*>(frame.e.get_ptr());
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr e_Weight_1 = t_e_Weight_1_scast__1->Get_weight();
+////////					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, e_Weight_1));
+////////				  }
+////////					  break;
+////////				  case RTG::TSL_ID_Project: {
+////////					  RTG::ProjectRefPtr t_T_c1_scast__1 = static_cast<RTG::Project*>(frame.e.get_ptr());
+////////					  BASETYPE::INT32 e_Project_1 = t_T_c1_scast__1->Get_MS();
+////////					  BASETYPE::INT32 e_Project_2 = t_T_c1_scast__1->Get_MT();
+////////					  RTG::regExpRefPtr e_Project_3 = t_T_c1_scast__1->Get_child();
+////////					  frame.op = 3;
+////////					  frame.left = e_Project_3;
+////////					  todo.push(dFrame(frame.left));
+////////					  continue;
+////////				  }
+////////				  }
+////////				  todo.pop();
+////////				  continue;
+////////			  }
+////////		  }
+////////		  else
+////////		  {
+////////			  //This frame has been seen before, so it's children have all previously been evaluated.  So lookup the children in the hashtable and evaluate
+////////			  //frame.e as appropriate based on what type of operation it is (determined in frame.op)
+////////			  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHash(frame.e, a);
+////////			  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashL(frame.left, a);
+////////			  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
+////////			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHash(frame.e);
+////////			  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashL(frame.left);
+////////			  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashL);
+////////			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalRegExp___it->second;
+////////			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+////////			  if (frame.op == 0) //Kleene
+////////			  {
+////////				  //ret = CONC_EXTERNS::evalKleeneSemElem(lch);
+////////				  //EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
+////////				  //todo.pop();
+////////				  //std::cout << "New code! (U2)" << std::endl;
+////////				  duetrelpair_t ret;
+////////				  
+////////                  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(frame.e);
+////////
+////////                  duetrel_t previousValue = 0;
+////////                  if (doWideningThisRound) {
+////////                      EvalRMap::const_iterator previousValueIterator = oldStarVal.find(lookupKeyForStar);
+////////                      if (previousValueIterator != oldStarVal.end()) {
+////////                          previousValue = previousValueIterator->second.v;
+////////                      }
+////////                  }
+////////
+////////				  ret = ((evalRegExp___it->second.v))->alphaHatStar(previousValue);
+////////				  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret->second));
+////////				  //std::cout << "  Hash key is: " << hash_value(lookupKeyForStar) << std::endl;
+////////				  newStarVal.insert(std::make_pair(lookupKeyForStar, ret->first));
+////////                                  todo.pop();
+////////				  continue;
+////////			  }
+////////			  else if (frame.op == 3)
+////////			  {
+////////				  RTG::ProjectRefPtr t_T_c1_scast__1 = static_cast<RTG::Project*>(frame.e.get_ptr());
+////////				  BASETYPE::INT32 e_Project_1 = t_T_c1_scast__1->Get_MS();
+////////				  BASETYPE::INT32 e_Project_2 = t_T_c1_scast__1->Get_MT();
+////////				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c7 = CONC_EXTERNS::evalProjectSemElem(e_Project_1, e_Project_2, lch);
+////////				  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, T_c7));
+////////				  todo.pop();
+////////				  continue;
+////////			  }
+////////			  else
+////////			  {
+////////				  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > lookupKeyForevalRegExpHashR(frame.right, a);
+////////				  // //frame.right->print(std::cout) << std::endl;
+////////				  // EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
+////////				  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForevalRegExpHashR(frame.right);
+////////				  //frame.right->print(std::cout) << std::endl;
+////////				  EvalRMap::const_iterator evalRegExp___it = EvalMap2.find(lookupKeyForevalRegExpHashR);
+////////
+////////				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalRegExp___it->second;
+////////				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+////////				  if (frame.op == 1) //Dot
+////////				  {
+////////					  ret = CONC_EXTERNS::evalDotSemElem(lch, rch);
+////////					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
+////////					  todo.pop();
+////////					  continue;
+////////				  }
+////////				  else //Plus
+////////				  {
+////////					  ret = CONC_EXTERNS::evalPlusSemElem(lch, rch);
+////////					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpHash, ret));
+////////					  todo.pop();
+////////					  continue;
+////////				  }
+////////			  }
+////////		  }
+////////	  }
+////////
+////////	  // MemoCacheKey2<RTG::regExpRefPtr, RTG::assignmentRefPtr > fin(exp, a);
+////////	  MemoCacheKey1<RTG::regExpRefPtr > fin(exp);
+////////
+////////	  //This will start with a lookup on the hash_map for exp, which has been evaluated in the loop above, so will not re-evaluate using evalRegExp
+////////	  return EvalMap2[fin];
+////////  }
+////////
+////////  /*
+////////  *  A non recursive version of evalT used to eval TSLRegExps representing tensored weights
+////////  *  given the assignment a.
+////////  *
+////////  *  This is based on the recursive evalT in regExp.tsl and uses that function's hashtable
+////////  *
+////////  *  @param:  RTG::regExpTRefPtr exp - The top level tensored regular expression to be evaluated
+////////  *           RTG::assignmentRefPtr a - The final values for the variables in the regExp
+////////  *  @return:  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr - A sem_elem wrapper around a tensored sem_elem wt
+////////  *
+////////  *  Author: Emma Turetsky
+////////  */
+////////  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalTNonRec(RTG::regExpTRefPtr exp, RTG::assignmentRefPtr a)
+////////  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr evalT(RTG::regExpTRefPtr exp, RTG::assignmentRefPtr a)
+////////  {
+////////	  //std::cout << hits << std::endl;
+////////	  std::stack<sFrame> todo;
+////////	  std::map<RTG::regExpTRefPtr, CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr>::iterator it;
+////////
+////////	  todo.push(sFrame(exp));
+////////	  while (!todo.empty())
+////////	  {
+////////		  sFrame & frame = todo.top();
+////////		  if (frame.is_new){  //Determine if this is the first time looking at this frame
+////////			  //Check frame.e see if it's been evaluated before.
+////////			  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHash(frame.e, a);
+////////			  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHash);
+////////			  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHash(frame.e);
+////////			  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHash);
+////////			  if (evalT___it != EvalMapT.end()) {
+////////				  todo.pop();
+////////				  continue;
+////////			  }
+////////			  frame.is_new = false;
+////////			  //frame.e has not been evaluated before - check to see if the children have been seen before
+////////			  //If so, evaluate frame.e as appropriate, otherwise push the children on to the stack
+////////			  if (CIR::isKleeneT(frame.e).get_data())
+////////			  {
+////////				  frame.op = 0;
+////////				  RTG::regExpTRefPtr child = CIR::getLChildT(frame.e);
+////////				  frame.left = child;
+////////				  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(child, a);
+////////				  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+////////				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(child);
+////////				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+////////				  if (evalT___it != EvalMapT.end())
+////////				  {
+////////				  	  //std::cout << "New code! (T1)" << std::endl;
+////////					  duetrelpair_t ret;
+////////                      
+////////				  	  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(child);
+////////
+////////                      duetrel_t previousValue = 0;
+////////                      if (doWideningThisRound) {
+////////                          EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
+////////                          if (previousValueIterator != oldStarValT.end()) {
+////////                              previousValue = previousValueIterator->second.v;
+////////                          }
+////////                      }
+////////
+////////					  ret = ((evalT___it->second.v))->alphaHatStar(previousValue);
+////////					  // std::cout << "  Body value is: " << std::endl;
+////////					  // evalT___it->second.v->print(std::cout);
+////////					  // std::cout << std::endl;
+////////					  // std::cout << "  Linearized value is: " << std::endl;
+////////					  // ret->first->print(std::cout);
+////////					  // std::cout << std::endl;
+////////					  // std::cout << "  Star value is: " << std::endl;
+////////					  // ret->second->print(std::cout);
+////////					  // std::cout << std::endl;
+////////
+////////					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret->second));
+////////					  newStarValT.insert(std::make_pair(lookupKeyForStar, ret->first));
+////////					  todo.pop();
+////////					  continue;
+////////				  }
+////////				  else
+////////				  {
+////////					  todo.push(sFrame(child));
+////////					  continue;
+////////				  }
+////////			  }
+////////			  else if (CIR::isDotT(frame.e).get_data())
+////////			  {
+////////				  frame.op = 1;
+////////				  frame.left = CIR::getLChildT(frame.e);
+////////				  frame.right = CIR::getRChildT(frame.e);
+////////				  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
+////////				  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+////////				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(frame.left);
+////////				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+////////				  if (evalT___it != EvalMapT.end())
+////////				  {
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalT___it->second;
+////////					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
+////////					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+////////					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
+////////					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+////////					  if (evalT___it != EvalMapT.end())
+////////					  {
+////////						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalT___it->second;
+////////						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+////////						  ret = CONC_EXTERNS::evalDotSemElemT(lch, rch);
+////////						  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
+////////						  todo.pop();
+////////						  continue;
+////////					  }
+////////					  else
+////////					  {
+////////						  todo.push(sFrame(frame.right));
+////////						  continue;
+////////					  }
+////////				  }
+////////				  else
+////////				  {
+////////					  todo.push(sFrame(frame.left));
+////////					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
+////////					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+////////					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
+////////					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+////////					  if (evalT___it == EvalMapT.end())
+////////					  {
+////////						  todo.push(sFrame(frame.right));
+////////						  continue;
+////////					  }
+////////				  }
+////////			  }
+////////			  else if (CIR::isPlusT(frame.e).get_data())
+////////			  {
+////////				  frame.op = 2;
+////////				  frame.left = CIR::getLChildT(frame.e);
+////////				  frame.right = CIR::getRChildT(frame.e);
+////////				  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
+////////				  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+////////				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(frame.left);
+////////				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+////////				  if (evalT___it != EvalMapT.end())
+////////				  {
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalT___it->second;
+////////					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
+////////					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+////////					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
+////////					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+////////					  if (evalT___it != EvalMapT.end())
+////////					  {
+////////						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalT___it->second;
+////////						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+////////						  ret = CONC_EXTERNS::evalPlusSemElemT(lch, rch);
+////////						  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
+////////						  todo.pop();
+////////						  continue;
+////////					  }
+////////					  else
+////////					  {
+////////						  todo.push(sFrame(frame.right));
+////////						  continue;
+////////					  }
+////////				  }
+////////				  else
+////////				  {
+////////					  todo.push(sFrame(frame.left));
+////////					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
+////////					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+////////					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
+////////					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+////////					  if (evalT___it == EvalMapT.end())
+////////					  {
+////////						  todo.push(sFrame(frame.right));
+////////						  continue;
+////////					  }
+////////				  }
+////////			  }
+////////			  else if (CIR::isProjectT(frame.e).get_data()){
+////////					  frame.op = 3;
+////////					  RTG::ProjectTRefPtr t_T_b1_scast__1 = static_cast<RTG::ProjectT*>(frame.e.get_ptr());
+////////					  RTG::regExpTRefPtr e_ProjectT_3 = t_T_b1_scast__1->Get_child();
+////////					  BASETYPE::INT32 e_ProjectT_1 = t_T_b1_scast__1->Get_MS();
+////////					  BASETYPE::INT32 e_ProjectT_2 = t_T_b1_scast__1->Get_MT();
+////////					  frame.left = e_ProjectT_3;
+////////					  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
+////////					  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+////////					  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(frame.left);
+////////					  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+////////					  if (evalT___it != EvalMapT.end())
+////////					  {
+////////						  // std::cout << "This value appears inside a ProjectT:" << std::endl;
+////////						  // evalT___it->second.print(std::cout);
+////////						  // std::cout << std::endl;
+////////						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret = CONC_EXTERNS::evalProjectSemElemT(e_ProjectT_1, e_ProjectT_2, evalT___it->second);
+////////						  // std::cout << "Evaluating ProjectT gave us:" << std::endl;
+////////						  // ret.print(std::cout);
+////////						  // std::cout << std::endl;
+////////						  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
+////////						  todo.pop();
+////////						  continue;
+////////					  }
+////////					  /*
+////////					 else if (CIR::isDotT(e_ProjectT_3).get_data())
+////////					  {
+////////						  RTG::regExpTRefPtr aDot = CIR::getLChildT(e_ProjectT_3);
+////////						  RTG::regExpTRefPtr bDot = CIR::getRChildT(e_ProjectT_3);
+////////						  if (CIR::isTensorTranspose(aDot).get_data())
+////////						  {
+////////							  if (CIR::isTensorTranspose(bDot).get_data())
+////////							  {
+////////								  RTG::TensorTransposeRefPtr t_T_c1_scast__1 = static_cast<RTG::TensorTranspose*>(aDot.get_ptr());
+////////								  RTG::regExpRefPtr w = t_T_c1_scast__1->Get_lChild();
+////////								  RTG::regExpRefPtr x = t_T_c1_scast__1->Get_rChild();
+////////								  RTG::TensorTransposeRefPtr t_T_c1_scast__2 = static_cast<RTG::TensorTranspose*>(bDot.get_ptr());
+////////								  RTG::regExpRefPtr y = t_T_c1_scast__2->Get_lChild();
+////////								  RTG::regExpRefPtr z = t_T_c1_scast__2->Get_rChild();
+////////								  RTG::regExpRefPtr lch = CIR::mkDot(y, w);
+////////								  RTG::regExpRefPtr rch = CIR::mkDot(x, z);
+////////								  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr mVal = evalRegExpNonRec(rch, a);
+////////								  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr fVal = evalRegExpNonRec(lch, a);
+////////								  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr mergedVal = CONC_EXTERNS::evalProjectSemElem(e_ProjectT_1, e_ProjectT_2, mVal);
+////////								  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr eVal = CONC_EXTERNS::evalDotSemElem(fVal, mergedVal);
+////////								  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret = CONC_EXTERNS::evalTensorTranspose(CONC_EXTERNS::getOneWt(), eVal);
+////////								  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
+////////								  todo.pop();
+////////								  continue;
+////////							  }
+////////						  }
+////////					  }
+////////					  */
+////////					  todo.push(frame.left);
+////////					  continue;
+////////				  }
+////////			  else if (CIR::isTensorTranspose(frame.e).get_data())
+////////				  {
+////////					  RTG::TensorTransposeRefPtr t_T_c1_scast__1 = static_cast<RTG::TensorTranspose*>(frame.e.get_ptr());
+////////					  RTG::regExpRefPtr lch = t_T_c1_scast__1->Get_lChild();
+////////					  RTG::regExpRefPtr rch = t_T_c1_scast__1->Get_rChild();
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lVal = evalRegExpNonRec(lch, a);
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rVal = evalRegExpNonRec(rch, a);
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret = CONC_EXTERNS::evalTensorTranspose(lVal, rVal);
+////////					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
+////////					  todo.pop();
+////////					  continue;
+////////				  }
+////////			  else  //Leaf tensored regexp, so call evalT as it's a base case
+////////			  {
+////////				  switch (frame.e->GetClassId()) {
+////////				  case RTG::TSL_ID_VarT: {
+////////					  RTG::VarTRefPtr t_T_c1_scast__1 = static_cast<RTG::VarT*>(frame.e.get_ptr());
+////////					  BASETYPE::INT32 e_VarT_1 = t_T_c1_scast__1->Get_VT();
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getZeroTWt(); // TSL-spec: line 751 of "regExp.tsl"
+////////					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, T_c1));
+////////				  }
+////////					  break;
+////////				  case RTG::TSL_ID_ZeroT: {
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getZeroTWt(); // TSL-spec: line 752 of "regExp.tsl"
+////////					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, T_c1));
+////////				  }
+////////					  break;
+////////				  case RTG::TSL_ID_OneT: {
+////////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr T_c1 = CONC_EXTERNS::getOneTWt(); // TSL-spec: line 753 of "regExp.tsl"
+////////					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, T_c1));
+////////				  }
+////////				  }
+////////				  todo.pop();
+////////				  continue;
+////////
+////////			  }
+////////		  }
+////////		  else  //We've seen this stack frame before
+////////		  {
+////////			  //All the children of frame.e have been evaluated, so evaluate frame.e as appropriate
+////////			  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHash(frame.e, a);
+////////			  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashL(frame.left, a);
+////////			  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+////////			  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHash(frame.e);
+////////			  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashL(frame.left);
+////////			  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashL);
+////////			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr lch = evalT___it->second;
+////////			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+////////			  if (frame.op == 0) //Kleene
+////////			  {
+////////			  	  //std::cout << "New code! (T2)" << std::endl;
+////////				  duetrelpair_t ret;
+////////				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(frame.e); // FIXME this variable is now redundant with lookupKeyForevalTHash
+////////
+////////                  duetrel_t previousValue = 0;
+////////                  if (doWideningThisRound) {
+////////			          EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
+////////                      if (previousValueIterator != oldStarValT.end()) {
+////////                          previousValue = previousValueIterator->second.v;
+////////                      }
+////////                  }
+////////
+////////				  ret = ((evalT___it->second.v))->alphaHatStar(previousValue);
+////////				  // std::cout << "  Body value is: " << std::endl;
+////////				  // evalT___it->second.v->print(std::cout);
+////////				  // std::cout << std::endl;
+////////				  // std::cout << "  Linearized value is: " << std::endl;
+////////				  // ret->first->print(std::cout);
+////////				  // std::cout << std::endl;
+////////				  // std::cout << "  Star value is: " << std::endl;
+////////				  // ret->second->print(std::cout);
+////////				  // std::cout << std::endl;
+////////				  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret->second));
+////////				  newStarValT.insert(std::make_pair(lookupKeyForStar, ret->first));
+////////				  //ret = CONC_EXTERNS::evalKleeneSemElemT(lch);
+////////				  //EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
+////////				  todo.pop();
+////////				  continue;
+////////			  }
+////////			  else if (frame.op == 3) //Project
+////////			  {
+////////				  RTG::ProjectTRefPtr t_T_b1_scast__1 = static_cast<RTG::ProjectT*>(frame.e.get_ptr());
+////////				  BASETYPE::INT32 e_ProjectT_1 = t_T_b1_scast__1->Get_MS();
+////////				  BASETYPE::INT32 e_ProjectT_2 = t_T_b1_scast__1->Get_MT();
+////////				  // std::cout << "This value appears inside a ProjectT:" << std::endl;
+////////				  // lch.print(std::cout);
+////////				  // std::cout << std::endl;
+////////				  ret = CONC_EXTERNS::evalProjectSemElemT(e_ProjectT_1, e_ProjectT_2, lch);
+////////				  // std::cout << "Evaluating ProjectT gave us:" << std::endl;
+////////				  // ret.print(std::cout);
+////////				  // std::cout << std::endl;
+////////				  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
+////////				  todo.pop();
+////////				  continue;
+////////			  }
+////////			  else //Dot or Plust
+////////			  {
+////////				  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > lookupKeyForevalTHashR(frame.right, a);
+////////				  // //frame.right->print(std::cout) << std::endl;
+////////				  // EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+////////				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForevalTHashR(frame.right);
+////////				  //frame.right->print(std::cout) << std::endl;
+////////				  EvalTMap::const_iterator evalT___it = EvalMapT.find(lookupKeyForevalTHashR);
+////////
+////////				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rch = evalT___it->second;
+////////				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+////////				  if (frame.op == 1)  //Dot
+////////				  {
+////////					  ret = CONC_EXTERNS::evalDotSemElemT(lch, rch);
+////////					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
+////////					  todo.pop();
+////////					  continue;
+////////				  }
+////////				  else  //Plus
+////////				  {
+////////					  ret = CONC_EXTERNS::evalPlusSemElemT(lch, rch);
+////////					  EvalMapT.insert(std::make_pair(lookupKeyForevalTHash, ret));
+////////					  todo.pop();
+////////					  continue;
+////////				  }
+////////			  }
+////////		  }
+////////	  }
+////////
+////////	  // MemoCacheKey2<RTG::regExpTRefPtr, RTG::assignmentRefPtr > fin(exp, a);
+////////	  MemoCacheKey1<RTG::regExpTRefPtr > fin(exp);
+////////	  return EvalMapT[fin];  //Grabs exp evaluated at assignment a from the hash_map
+////////  }
 
 
 // NONREC End of non-recursive functions.
@@ -4032,7 +4032,8 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 			  else { // From the regular expression r for reID, create (1^t tensor r(0))
                                // Look up the appropriate regexp for reID and evaluate at 0
 				  RTG::regExpRefPtr r = regExpMap[reID];
-				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newVal = evalNonRecAt0(r);
+				  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newVal = evalNonRecAt0(r);
+				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newVal = CIR::evalRegExp(r);
                   //std::cout << "***Output with evalNonRecAt0:" << std::endl;
 			      //newVal.v->print(std::cout);
                   //std::cout << std::endl;
@@ -4556,13 +4557,16 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 	int rnd = 0;
         bool newton = true;
 	// A map of dependencies
-        RTG::assignmentRefPtr oldVal;
+        //RTG::assignmentRefPtr oldVal;
         tslDiffMap::iterator dIt;
 	int pV = 0;
 	tslRegExpTMap::iterator assignIt;
 	
 	newStarVal.clear();
 	newStarValT.clear();
+
+    RTG::_evalRegExpHash().clear();
+    RTG::_evalTHash().clear();
 
 	if (maxRnds < 0) {		//maxRnds is not set yet
 		if (runningMode == NEWTON_FROM_BELOW)
@@ -4606,7 +4610,8 @@ NEWROUND:
 		rnd++;
 			
 			
-		oldVal = newVal;
+		//oldVal = newVal;
+		globalAssignment = newVal;
 		newVal = CIR::initializeAssignment();
 			
 		oldStarVal = newStarVal;
@@ -4637,7 +4642,8 @@ NEWROUND:
             //tsl_regexp::regExpTPrettyPrint(assignIt->second, std::cout);
 			//std::cout << std::endl;
 			
-			CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal);
+			//CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal);
+			CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newValue = CIR::evalT(assignIt->second);
 			
 			std::cout << std::endl << "Tensored Value: ";
 			newValue.v->print(std::cout);
@@ -4660,8 +4666,10 @@ NEWROUND:
 
 		}
 		
-		EvalMap2.clear();
-		EvalMapT.clear();
+        //EvalMap2.clear();
+		//EvalMapT.clear();
+        RTG::_evalRegExpHash().clear();
+        RTG::_evalTHash().clear();
 
         if (runningMode == NEWTON_FROM_ABOVE) 
             goto NEWROUND;
@@ -4845,6 +4853,8 @@ NEWROUND:
     cout << "#################################################" << endl;
     //cout << "[Newton Compare] Goal VIII: end-to-end newton_merge_notensor_fwpds run" << endl;
 
+    globalAssignment = CIR::initializeAssignment(); // Create an assignment in which all variables are map to zero
+    
 	nonRec = false;
 	pNonLin = false;
     
@@ -5098,7 +5108,8 @@ NEWROUND:
                 for (tslRegExpMap::iterator it = regExpMap.begin(); it != regExpMap.end(); ++it)
                 {
                     RTG::regExpRefPtr r = it->second;
-                    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newVal = evalNonRecAt0(r);
+                    //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newVal = evalNonRecAt0(r);
+                    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newVal = CIR::evalRegExp(r);
 
                     // Insert <it->first,newVal> into aList
                     aList = CIR::updateAssignment(aList, CBTI_INT32(it->first), newVal);
@@ -5140,6 +5151,7 @@ NEWROUND:
 		t->stop();
 
         cout << "Step 7: =========================================================" << endl;
+        globalAssignment = aList;
         //Map the evaluated weights back to the transitions the regexps came from
 		for (stateIter = faStates.begin(); stateIter != faStates.end(); stateIter++)
 		{
@@ -5153,7 +5165,8 @@ NEWROUND:
 				int tStack = tt->stack();
 				int transReg = transMap[std::make_pair(std::make_pair(tSrc, tTgt), tStack)];
 				t->start();
-				CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr w = evalRegExpFinNonRec(regExpMap[transReg], aList);
+				//CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr w = evalRegExpFinNonRec(regExpMap[transReg], aList);
+				CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr w = CIR::evalRegExp(regExpMap[transReg]);
 				t->stop();
 				//std::cout << "OutWeight: " << tSrc << "," << tTgt << "," << tStack << ":";
 				//w.v->print(std::cout) << endl;
@@ -6220,6 +6233,9 @@ int main(int argc, char **argv)
     }
 	
     else {
+    	if (runningMode == NEWTON_FROM_ABOVE) {
+            assert(false && "Newton-from-above is not supported in this version of NewtonOcaml.");
+        }
     	if (runningMode == NEWTON_FROM_BELOW || runningMode == NEWTON_FROM_ABOVE) {
 			if (testMode) {
 				std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
