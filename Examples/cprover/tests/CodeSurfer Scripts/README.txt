@@ -1,5 +1,12 @@
+To build a CodeSurfer project:
+  Obtain VS2010 command window via Start>>Program
 
-csurf -nogui -l <path-to-script/script-name.stk $PROJ_NAME.prj
+  cl /nologo demo.c
+  csurf -preset-build-options highest gcc -o demo demo.c
+
+To run a script:
+
+  csurf -nogui -l <path-to-script/script-name.stk $PROJ_NAME.prj
 
 -------------------------------------------------------------------
 bta_l.stk, bta_d.stk, and dump-sdg.stk are just examples obtained
