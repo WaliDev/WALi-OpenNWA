@@ -535,7 +535,23 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElemT(
   const RTG::regExpTRefPtr & child)
 {
   if (inNewtonLoop) {
-    //
+    duetrelpair_t ret;
+    
+    MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(child);
+    
+    duetrel_t previousValue = 0;
+    if (doWideningThisRound) {
+        EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
+        if (previousValueIterator != oldStarValT.end()) {
+            previousValue = previousValueIterator->second.v;
+        }
+    }
+    
+    //ret = ((evalT___it->second.v))->alphaHatStar(previousValue);
+    ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar(previousValue);
+    
+    newStarValT.insert(std::make_pair(lookupKeyForStar, ret->first));
+    return ret->second;
   } else {
     CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
     duetrelpair_t ret;
@@ -550,7 +566,24 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElem(
   const RTG::regExpRefPtr & child)
 {
   if (inNewtonLoop) {
-    //
+    duetrelpair_t ret;
+    
+    MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(child);
+    
+    duetrel_t previousValue = 0;
+    if (doWideningThisRound) {
+        EvalRMap::const_iterator previousValueIterator = oldStarVal.find(lookupKeyForStar);
+        if (previousValueIterator != oldStarVal.end()) {
+            previousValue = previousValueIterator->second.v;
+        }
+    }
+    
+    //ret = ((evalRegExp___it->second.v))->alphaHatStar(previousValue);
+    ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar(previousValue);
+    
+    newStarVal.insert(std::make_pair(lookupKeyForStar, ret->first));
+
+    return ret->second;
   } else {
     CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
     duetrelpair_t ret;
@@ -558,6 +591,19 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElem(
     ans.v = ret->second.get_ptr();
     return ans;
   }
+}
+
+RTG::assignmentRefPtr globalAssignment;
+
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::evalVarSemElem(const CBTI_INT32 & v)
+{
+    return CIR::getAssignment(v, globalAssignment);
+}
+
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::evalVarSemElemT(const CBTI_INT32 & v)
+{
+    assert(false && "Attempted to evaluate a tensored variable.");
+    //return CIR::getAssignment(v, globalAssignment);
 }
 
 namespace goals {
@@ -1474,6 +1520,8 @@ namespace goals {
 	  return diffHMap[fin];
   }
 
+
+  // NONREC Non-recursive evaluation functions:  
 
   /*
   *  A non recursive version of evalAt0 used to eval TSLRegExp assuming variables are the zero sem_elem. (f(0)).
@@ -5171,577 +5219,577 @@ NEWROUND:
 
 
 
-  /*
-  *  This runs a fixed point error finding method using Newton rounds.
-  *
-  *	 Step 1 - Convert the program 'pg' into an fpds where the weights are nwaobdds.
-  *
-  *  Step 2 - Perform poststar on the fpds get the regular expressions associated with
-  *			  the outgoing nodes in the intra_graph associated with the fwpds
-  *
-  *	 Step 3 - Convert these regexps into TSL regular expressions and get the differentials
-  *			  with respect their variables
-  *
-  *  Step 4 -
-  */
-  double run_newton_noTensor(WFA& outfa, FWPDS * originalPds = NULL)
-  {
-	  cout << "#################################################" << endl;
-
-	  //Step 1 - Convert the program 'pg' into an fpds where the weights are nwaobdds.
-	  FWPDS * fpds;
-	  if (originalPds != NULL)
-		  fpds = new FWPDS(*originalPds);
-	  else{
-		  fpds = new FWPDS();
-#if USE_NWAOBDD
-		  con = pds_from_prog_with_newton_merge_nwa(fpds, pg, true);
-#else
-		  con = pds_from_prog_with_newton_merge(fpds, pg);
-#endif
-	  }
-
-	  //freopen("newtonOutTest.txt", "w", stdout);
-	  //fpds->print(std::cout) << endl;
-
-
-	  map<int, reg_exp_t> outNodeRegExpMap; // A map from a unique id of an outgoing node to the regular expression associated with it
-	  map<int, int> updateableMap;  //A map from an upadateable node number to the id of the node it depends on 
-	  map<int, int> oMap;
-	  map<int, pair< pair<int, int>, int> > mapBack;  //A map from the node index to the struct of the <<src,tgt>,stack> - used to insert weights back into wfa
-	  map<pair<pair<int, int>, int>, int> transMap;
-	  vector<int> differentiatedList; //A list of nodes with where the differential is to be taken
-	  tslRegExpMap regExpMap;  //The map of all tsl regular expression
-	  tslRegExpMap diffMap;  //The map of tsl regular expressions to be differentiated (the program return points)
-	  tslUntensoredDiffMap untensoredDifferentialMap;
-	  map<int, domain_t> finWeights;  //The map from node id to the final relational weights
-	  map<std::pair<int, int>, std::pair<int, int> > mergeSrcMap; //The map that keeps track of the src of calls on call instructions
-	  std::vector<int> wl;
-	  std::set<int> vl;
-	  double baseEvalTime = 0;
-	  map<int, std::set<int> > varDependencies;
-
-	  std::set<pair<std::pair<int, int>, int> > globalEpsilon;  //used for debugging Newton
-	  int dummy = -1;
-
-
-	  wali::set_verify_fwpds(false);
-
-	  fpds->useNewton(false);
-	  //fpds->add_rule(st1(),getKey(mainProc),st1(),fpds->get_theZero()->one());
-
-
-	  wali::util::GoodTimer * t = new wali::util::GoodTimer("temp");
-	  WFA fa;
-	  wali::Key acc = wali::getKeySpace()->getKey("accept");
-	  fa.addTrans(getPdsState(), getEntryStk(pg, mainProc), acc, fpds->get_theZero()->one());
-	  fa.setInitialState(getPdsState());
-	  fa.addFinalState(acc);
-
-
-	  if (dump){
-		  fstream outfile("init_fa.dot", fstream::out);
-		  fa.print_dot(outfile, true);
-		  outfile.close();
-	  }
-	  if (dump){
-		  fstream outfile("init_fa.txt", fstream::out);
-		  fa.print(outfile);
-		  outfile.close();
-	  }
-
-	  /* Step 2 - Perform poststar on the fpds get the regular expressions associated with
-	  *			the outgoing nodes in the intra_graph associated with the fwpds
-	  */
-	  //This function performs postar on the fa using the fpds and populations the maps as described above
-	  //The boolean means this is the first time the functions is called and will generate unique ids as needed
-	  double curTime = t->total_time();
-	  t->stop();
-	  double t1 = fpds->getOutRegExps(fa, outfa, outNodeRegExpMap, updateableMap, oMap, mapBack, transMap, differentiatedList, mergeSrcMap);
-	  t->start();
-
-	  //Get the key to the error state
-	  Key errKey = wali::getKeySpace()->getKey("error");
-	  Key iKey = wali::getKeySpace()->getKey("Unique State Name");
-	  Key pErrKey = wali::getKeySpace()->getKey(iKey, errKey);
-	  GenKeySource * esrc = new wali::wpds::GenKeySource(1, pErrKey);
-	  Key fKey = wali::getKeySpace()->getKey(esrc);
-	  bool prune = false;
-	  //Set the initial state to the error state, if the error state exists and prune the wfa
-	  if (outfa.getState(fKey) != NULL)
-	  {
-		  prune = true;
-	  }
-	  if (prune)
-	  {
-		  outfa.setInitialState(fKey);
-		  outfa.prune();
-		  t->stop();
-		  std::set<Key> faStates = outfa.getStates();
-		  std::set<Key>::iterator stateIter;
-		  int numTrans = 0;
-		  for (stateIter = faStates.begin(); stateIter != faStates.end(); stateIter++)
-		  {
-			  //Get the regular expressions on each remaining transition
-			  TransSet & transSet = outfa.getState(*stateIter)->getTransSet();
-			  TransSet::iterator transIt;
-			  for (transIt = transSet.begin(); transIt != transSet.end(); transIt++)
-			  {
-				  ITrans * tr = *transIt;
-				  int tSrc = tr->from();
-				  int tTgt = tr->to();
-				  int tStack = tr->stack();
-				  int transReg = transMap[std::make_pair(std::make_pair(tSrc, tTgt), tStack)];
-				  wl.push_back(transReg);
-				  vl.insert(transReg);
-				  numTrans++;
-			  }
-		  }
-		  if (dump){
-			  cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
-			  fstream outfile("inter_outfa.dot", fstream::out);
-			  outfa.print_dot(outfile, true);
-			  outfile.close();
-		  } if (dump){
-			  cout << "[Newton Compare] Dumping the output automaton to final_outfa.txt" << endl;
-			  fstream outfile("inter_outfa.txt", fstream::out);
-			  outfa.print(outfile);
-			  outfile.close();
-		  }
-
-		 /*Step 3 - Convert these regexps into TSL regular expressions and get the partial differentials
-		  *		   with respect their variables
-		  */
-		  cout << "[Newton Compare] converting to TSL" << endl;
-		  while (!wl.empty())
-		  {
-			  int wlSzie = wl.size();
-			  //convertToTSLRegExp
-			  //if in convertion an updatable node is hit
-			  //add that regexp to wl if not already in visitedList
-			  int rToConvert = wl.back();
-			  //std::cout << rToConvert << endl;
-			  wl.pop_back();
-			  baseEvalTime += convertToTSLRegExps(rToConvert, outNodeRegExpMap, regExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl);
-		  }
-
-
-		  int entry = 0;
-		  bool first = true;
-		  for (vector<int>::iterator eit = differentiatedList.begin(); eit != differentiatedList.end(); eit++)
-		  {
-			  //std::cout << "D: " << *eit << endl;
-			  RTG::regExpRefPtr tmpReg = regExpMap[(*eit)];
-			  if (tmpReg != NULL) //That updateable node may have been pruned away
-			  {
-				  if (first)
-				  {
-					  entry = (*eit);
-					  first = false;
-				  }
-				  diffMap[(*eit)] = regExpMap[(*eit)];
-			  }
-			  //std::cout << "RE: " << *eit;
-			  //std::cout << " ";
-			  //E[(*eit)].print(std::cout) << std::endl;
-			  //This is used  in debugging to compare the epsilon transitions with those generated by non-newton methods
-			  //and make sure they match
-#if defined(NEWTON_DEBUG)
-			  int src = mapBack[(*eit)].first.first;
-			  int tgt = mapBack[(*eit)].first.second;
-			  int stack = mapBack[(*eit)].second;
-			  globalEpsilon.insert(std::make_pair(std::make_pair(src, tgt), stack));
-#endif
-		  }
-		  t->start();
-		  RTG::assignmentRefPtr aList;
-		  if (diffMap.size() != 0)
-		  {
-			  std::cout << "[Newton Compare] Creating Differentials" << std::endl;
-			  //Created the differentials
-			  createUntensoredDifferentials(diffMap,untensoredDifferentialMap);
-
-			  //For each Differential
-			  //Create the rules for the TSLDifferentialPDS
-			  //We do this once
-
-			  std::map<int, Key> exitKeyMap;
-			  std::map<std::pair<std::pair<Key, Key>, Key>, merge_fn_t> mfMap;
-			  tslUntensoredDiffMap::iterator rePIt;
-			  //For each Differential e
-			  wali::KeySpace * ks = wali::getKeySpace();
-			  Key pKey = wali::getKeySpace()->getKey("Unique State Name");
-			  FWPDS * tslFwpds = new FWPDS;
-
-			  //Creat an main node this is the start of the fwpds - it has transitions to all the differential nodes
-			  ostringstream MEntry;
-			  MEntry << "Main_Entry_NODE";
-			  Key mEntryKey = ks->getKey(MEntry.str());
-			  for (rePIt = untensoredDifferentialMap.begin(); rePIt != untensoredDifferentialMap.end(); rePIt++)
-			  {
-				  //For the current RegExp
-				  int wID = rePIt->first;
-				  ostringstream keyStringEntry;
-				  ostringstream keyStringExit;
-				  //Get the key for the entry and exit pt for that regExp
-				  keyStringEntry << wID << "_entry";
-				  keyStringExit << wID << "_exit";
-				  Key KeyEntry = ks->getKey(keyStringEntry.str());
-				  Key KeyExit = ks->getKey(keyStringExit.str());
-				  exitKeyMap[wID] = KeyExit;
-				  //Add a rule from the main entry to this entry stack with weight one
-				  tslFwpds->add_rule(st1(), stk(mEntryKey), st1(), stk(KeyEntry), new TSLWeight(RTG::One::make()));
-				  //std::cout << "KeyEntry: " << keyStringEntry.str() << " ----> " << KeyEntry << endl;
-				  //std::cout << "KeyExit: " << keyStringExit.str() << " ----> " << KeyExit << endl;
-
-				  //Create a delta 1 fpds rule from e_entry to e_ext with reg_exp e at 0
-				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr w0 = evalNonRecAt0(regExpMap[wID]);
-				  RTG::regExpRefPtr w = RTG::Weight::make(w0);
-				  tslFwpds->add_rule(st1(), stk(KeyEntry), st1(), stk(KeyExit), new TSLWeight(w));
-				  set<int> srcList = varDependencies[rePIt->first];
-
-				  //Create the return rule for this pt
-				  tslFwpds->add_rule(st1(), stk(KeyExit), st1(), new TSLWeight(RTG::One::make()));
-				  //For each Var i in the differential
-				  for (set<int>::iterator srcit = srcList.begin(); srcit != srcList.end(); srcit++)
-				  {
-					  int y_i = *srcit;
-					  //Get the pairList associated with y_i
-					  RTG::rePairListRefPtr pList = CIR::getPFromRegList(rePIt->second, y_i);
-					  int numPairs = CIR::getNumPairs(pList).get_data();
-					  //For each Pair k in the var
-					  for (int pair_k = 0; pair_k < numPairs; pair_k++)
-					  {
-						  //Get the Left and Right sides of the pair
-						  RTG::regExpRefPtr L_k = CIR::getPairL(pList, 0);
-						  RTG::regExpRefPtr R_K = CIR::getPairR(pList, 0);
-						  pList = CIR::getNextPList(pList);
-						  ostringstream keyStringCallSite;
-						  ostringstream keyStringRetSite;
-						  //Create call and return keys
-						  keyStringCallSite << wID << "_" << y_i << "_" << pair_k << "Call";
-						  keyStringRetSite << wID << "_" << y_i << "_" << pair_k << "Ret";
-						  Key KeyCall = ks->getKey(keyStringCallSite.str());
-						  Key KeyRet = ks->getKey(keyStringRetSite.str());
-						  //std::cout << "KeyCall: " << keyStringCallSite.str() << " ----> " << KeyCall << endl;
-						  //std::cout << "KeyRet: " << keyStringRetSite.str() << " ----> " << KeyRet << endl;
-
-						  //Create a delta 1 fpds rule from e_entry to e_call_i_k with weight L_i_k
-						  //Create a delta 1 fpds rule from e_entry to e_return_i_k with weight L_r_k
-						  tslFwpds->add_rule(st1(), stk(KeyEntry), st1(), stk(KeyCall), new TSLWeight(L_k));
-						  tslFwpds->add_rule(st1(), stk(KeyRet), st1(), stk(KeyExit), new TSLWeight(R_K));
-						  ostringstream keyStringCalleeEntry;
-						  ostringstream keyStringCalleeExit;
-						  keyStringCalleeEntry << y_i << "_entry";
-						  keyStringCalleeExit << y_i << "_exit";
-						  Key KeyCalleeEntry = ks->getKey(keyStringCalleeEntry.str());
-						  //std::cout << "KeyCalleeEntry: " << keyStringCalleeEntry.str() << " ----> " << KeyCalleeEntry << endl;
-						  //std::cout << "KeyCaleeExit: " << keyStringCalleeExit.str() << " ----> " << KeyCalleeExit << endl;
-						  //Create a delta 2 fpds rule from e_call_i_k to e_entry_i_k e_return_i_k with a merge function on it
-						  //std::cout << "Looking Up: " << reID << "," << var << std::endl;
-						  int t1 = mapBack[wID].first.second;
-						  int t2 = mapBack[y_i].first.second;
-						  std::pair<int, int> mergePair = mergeSrcMap[std::pair<int, int>(t1, t2)];
-						  merge_fn_t merge = con->getLocalVars(mergePair).first;
-						  mfMap[make_pair(make_pair(KeyCall, KeyCalleeEntry), KeyRet)] = merge;
-						  tslFwpds->add_rule(st1(), stk(KeyCall), st1(), stk(KeyCalleeEntry), stk(KeyRet), new TSLWeight(RTG::One::make()), merge);
-					  }
-				  }
-			  }
-
-
-			  /*std::map<std::pair<std::pair<Key, Key>, Key>, merge_fn_t>::iterator mfmIt;
-			  for (mfmIt = mfMap.begin(); mfmIt != mfMap.end(); mfmIt++)
-			  {
-			  std::cout << "Key: (" << mfmIt->first.first.first << "," << mfmIt->first.first.second << "," << mfmIt->first.second << ")" << std::endl;
-			  mfmIt->second->print(std::cout);
-			  std::cout << std::endl;
-			  }*/
-
-			 std::cout << "Creating Domain FWPDS" << std::endl;
-			  //tslFwpds->print(std::cout);
-
-			  //Create an assignmentlist of 0
-			  aList = CIR::initializeAssignment();
-
-			  //THIS IS THE FIRST NEWTON ROUND
-			  FWPDS * domainFWPDS = new FWPDS();
-			  //For each pds rule - create a domain_t rule (evaluate the rule with respect to the assignment list and create a new pds
-			  WpdsRules rules;
-			  tslFwpds->for_each(rules);
-			  std::set< Rule >::iterator ruleIt;
-			  for (ruleIt = rules.popRules.begin(); ruleIt != rules.popRules.end(); ruleIt++)
-			  {
-				  Key fromSt = ruleIt->from_state();
-				  Key toSt = ruleIt->to_state();
-				  Key fromStk = ruleIt->from_stack();
-				  TSLWeight * ruleWeight = static_cast<wali::domains::tsl_weight::TSLWeight*>(ruleIt->weight().get_ptr());
-				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr binWeight = evalRegExpNonRec(ruleWeight->getWeight(), aList);
-				  domainFWPDS->add_rule(fromSt, fromStk, toSt, binWeight.v);
-			  }
-			  for (ruleIt = rules.stepRules.begin(); ruleIt != rules.stepRules.end(); ruleIt++)
-			  {
-				  Key fromSt = ruleIt->from_state();
-				  Key toSt = ruleIt->to_state();
-				  Key fromStk = ruleIt->from_stack();
-				  Key toStk = ruleIt->to_stack1();
-				  TSLWeight * ruleWeight = static_cast<wali::domains::tsl_weight::TSLWeight*>(ruleIt->weight().get_ptr());
-				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr binWeight = evalRegExpNonRec(ruleWeight->getWeight(), aList);
-				  domainFWPDS->add_rule(fromSt, fromStk, toSt, toStk, binWeight.v);
-			  }
-			  for (ruleIt = rules.pushRules.begin(); ruleIt != rules.pushRules.end(); ruleIt++)
-			  {
-				  Key fromSt = ruleIt->from_state();
-				  Key toSt = ruleIt->to_state();
-				  Key fromStk = ruleIt->from_stack();
-				  Key toStk = ruleIt->to_stack1();
-				  Key toStk2 = ruleIt->to_stack2();
-				  wali::IntSource * fStkSrc = static_cast<wali::IntSource*>(ks->getKeySource(fromStk).get_ptr());
-				  wali::IntSource * tStkSrc = static_cast<wali::IntSource*>(ks->getKeySource(toStk).get_ptr());
-				  wali::IntSource * tStkSrc2 = static_cast<wali::IntSource*>(ks->getKeySource(toStk2).get_ptr());
-				  //std::cout << "Key: (" << fStkSrc->getInt() << "," << tStkSrc->getInt() << "," << tStkSrc2->getInt() << ")" << std::endl;
-				  merge_fn_t mf = mfMap[make_pair(make_pair(fStkSrc->getInt(), tStkSrc->getInt()), tStkSrc2->getInt())];
-				  TSLWeight * ruleWeight = static_cast<wali::domains::tsl_weight::TSLWeight*>(ruleIt->weight().get_ptr());
-				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr binWeight = evalRegExpNonRec(ruleWeight->getWeight(), aList);
-				  domainFWPDS->add_rule(fromSt, fromStk, toSt, toStk, toStk2, binWeight.v, mf);
-			  }
-
-			  //std::cout << std::endl;
-			  //domainFWPDS->print(std::cout);
-
-			  //Create an automata and perform poststar on the domain_t pds
-			  ostringstream keyStringEntry;
-			  keyStringEntry << entry << "_entry";
-			  Key WFAEntry = ks->getKey(keyStringEntry.str());
-			  //std::cout << "WFA StackStart: " << WFAEntry << std::endl;
-
-			  WFA fa2;
-			  wali::Key acc2 = wali::getKeySpace()->getKey("accept2");
-			  fa2.addTrans(getPdsState(), stk(mEntryKey), acc2, domainFWPDS->get_theZero()->one());
-			  fa2.setInitialState(getPdsState());
-			  fa2.addFinalState(acc2);
-			  WFA outfa2;
-			  //fa2.print(std::cout);
-			  domainFWPDS->poststarIGR(fa2, outfa2);
-			  //outfa2.print(std::cout);
-
-			  // Call pathsummarytarjan on the automata and get the result(sum of weights on trans of exit stack symbol * w on state it points to
-			  //on the new path summary automata
-			  WFA ansFA;
-
-			  outfa2.path_summary_tarjan_fwpds(true, ansFA, false);
-
-			  //ansFA.print(std::cout) << std::endl;
-			  // outfa2.print(std::cout) << std::endl;
-
-			  std::set<int> changedVars; //The set of possible dirty regexps IDs
-			  for (std::map<int, Key>::iterator exitIt = exitKeyMap.begin(); exitIt != exitKeyMap.end(); exitIt++)
-			  {
-				  std::vector<ITrans const *>  trans;
-				  TransStackGetter stackGetter(exitIt->second, trans);
-				  outfa2.for_each(stackGetter);
-				  sem_elem_t wt = con->getBaseZero();
-				  for (std::vector<ITrans const *>::iterator transSIter = trans.begin(); transSIter != trans.end(); transSIter++)
-				  {
-					  //std::cout << "Key: " << exitIt->second << std::endl;
-					  //(*transSIter)->print(std::cout) << std::endl;
-					  wt = wt->combine((*transSIter)->weight());
-				  }
-				  //Compare with the new assignment
-				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr oldVal = CIR::getAssignment(CBTI_INT32(exitIt->first), aList);
-				  //oldVal.v->print(std::cout) << std::endl;
-				  //wt->print(std::cout) << std::endl;
-				  if (wt != oldVal.v)
-				  {
-					  int rId = exitIt->first;
-					  changedVars.insert(rId);
-					  //std::cout << rId << std::endl;
-					  domain_t w = dynamic_cast<Relation*>(wt.get_ptr());
-					  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = w;
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = CONC_EXTERN_PHYLA::sem_elem_wrapper(w);
-					  aList = CIR::updateAssignment(aList, CBTI_INT32(rId), rep);
-				  }
-			  }
-
-			  int rnd = 1;
-			  // A map of dependencies
-			  std::map<int, std::set<int> > dependenceMap;
-			  std::set<int> C;
-			  RTG::assignmentRefPtr aPrime = aList;
-			  std::cout << "Running Newton";
-			  //FOR EACH NEWTON ROUND
-			  // For each set of differentials, get the list of variables they depend on
-			  // Put those into dependeceMap
-			  // dependenceMap - Map from regular expression ID to the set variables that regexps differentials depend on
-			  while (changedVars.size() != 0)
-			  {
-				  EvalMap2.clear();
-				  rnd++;
-				  std::set<int>::iterator pIt;
-				  //For each of the variables whose dependencies changed, get their new assignement from aList
-				  for (pIt = changedVars.begin(); pIt != changedVars.end(); pIt++)
-				  {
-					  aPrime = CIR::updateAssignment(aPrime, CBTI_INT32(*pIt), CIR::getAssignment(CBTI_INT32(*pIt), aList));
-				  }
-				  C = changedVars;
-				  changedVars.clear();
-
-				  //Now rebuild the domain fwpds
-				  for (ruleIt = rules.stepRules.begin(); ruleIt != rules.stepRules.end(); ruleIt++)
-				  {
-					  Key fromSt = ruleIt->from_state();
-					  Key toSt = ruleIt->to_state();
-					  Key fromStk = ruleIt->from_stack();
-					  Key toStk = ruleIt->to_stack1();
-					  wali::IntSource * fStkSrc = static_cast<wali::IntSource*>(ks->getKeySource(fromStk).get_ptr());
-					  wali::IntSource * tStkSrc = static_cast<wali::IntSource*>(ks->getKeySource(toStk).get_ptr());
-					  //std::cout << "Key: (" << fStkSrc->getInt() << "," << tStkSrc->getInt() << ")" << std::endl;
-					  TSLWeight * ruleWeight = static_cast<wali::domains::tsl_weight::TSLWeight*>(ruleIt->weight().get_ptr());
-					  //ruleWeight->getWeight().print(std::cout) << endl;
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr binWeight = evalRegExpNonRec(ruleWeight->getWeight(), aPrime);
-					  //binWeight.v->print(std::cout) << endl;
-					  domainFWPDS->replace_rule(fromSt, fromStk, toSt, toStk, binWeight.v);
-				  }
-
-				  //domainFWPDS->print(std::cout);
-				  WFA fa3;
-				  wali::Key acc2 = wali::getKeySpace()->getKey("accept2");
-				  fa3.addTrans(getPdsState(), stk(mEntryKey), acc2, domainFWPDS->get_theZero()->one());
-				  fa3.setInitialState(getPdsState());
-				  fa3.addFinalState(acc2);
-				  WFA outfa3;
-				  //fa3.print(std::cout);
-				  domainFWPDS->poststarIGR(fa3, outfa3);
-				  //outfa3.print(std::cout);
-
-				  // Call pathsummarytarjan on the automata and get the result(sum of weights on trans of exit stack symbol * w on state it points to
-				  //on the new path summary automata
-				  WFA ansFA;
-
-				  outfa3.path_summary_tarjan_fwpds(true, ansFA, false);
-
-				  //outfa3.print(std::cout) << std::endl;
-
-				  for (std::map<int, Key>::iterator exitIt = exitKeyMap.begin(); exitIt != exitKeyMap.end(); exitIt++)
-				  {
-					  std::vector<ITrans const *>  trans;
-					  TransStackGetter stackGetter(exitIt->second, trans);
-					  outfa3.for_each(stackGetter);
-					  sem_elem_t wt = con->getBaseZero();
-					  for (std::vector<ITrans const *>::iterator transSIter = trans.begin(); transSIter != trans.end(); transSIter++)
-					  {
-						  //std::cout << "Key: " << exitIt->second << std::endl;
-						  //(*transSIter)->print(std::cout) << std::endl;
-						  wt = wt->combine((*transSIter)->weight());
-					  }
-					  //Compare with the new assignment
-					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr oldVal = CIR::getAssignment(CBTI_INT32(exitIt->first), aPrime);
-					  //std::cout << "NewWeight: ";
-					  //wt->print(std::cout) << std::endl;
-					  //std::cout << "OldWeight: ";
-					  //oldVal.v->print(std::cout) << std::endl;
-					  domain_t w = dynamic_cast<Relation*>(wt.get_ptr());
-					  domain_t oldV = oldVal.v;
-					  if (!(w.get_ptr()->equal(oldV.get_ptr())))
-					  {
-						  int rId = exitIt->first;
-						  changedVars.insert(rId);
-						  //std::cout << rId << std::endl;
-						  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = w;
-						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = CONC_EXTERN_PHYLA::sem_elem_wrapper(w);
-						  aList = CIR::updateAssignment(aList, CBTI_INT32(rId), rep);
-					  }
-				  }
-			  }
-			  std::cout << std::endl << "NumRnds: " << rnd << std::endl;
-		  }
-		  else
-		  {
-			  aList = CIR::initializeAssignment();
-			  std::cout << std::endl << "NumRnds: " << 0 << std::endl;
-		  }
-		  //evalRegExps(aList);
-		  t->stop();
-		  for (stateIter = faStates.begin(); stateIter != faStates.end(); stateIter++)
-		  {
-			  TransSet & transSet = outfa.getState(*stateIter)->getTransSet();
-			  TransSet::iterator transIt;
-			  for (transIt = transSet.begin(); transIt != transSet.end(); transIt++)
-			  {
-				  ITrans * tt = *transIt;
-				  int tSrc = tt->from();
-				  int tTgt = tt->to();
-				  int tStack = tt->stack();
-				  int transReg = transMap[std::make_pair(std::make_pair(tSrc, tTgt), tStack)];
-				  t->start();
-				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr w = evalRegExpFinNonRec(regExpMap[transReg], aList);
-				  t->stop();
-				  //std::cout << "OutWeight: " << tSrc << "," << tTgt << "," << tStack << ":";
-				  //w.v->print(std::cout) << endl;
-				  tt->setWeight(w.v);
-			  }
-		  }
-		  /*for(map<int,pair<pair<int,int>,int> >::iterator mbit = mapBack.begin(); mbit != mapBack.end(); mbit++)
-		  {
-		  int src = mbit->second.first.first;
-		  int tgt = mbit->second.first.second;
-		  int stck = mbit->second.second;
-		  //  cout << endl << endl;
-		  //cout << "Src: " << key2str(src) << " Target: " << key2str(tgt) << " Stack: " << key2str(stck) << "\n";
-		  wali::wfa::ITrans * tt = outfa.find2(src,stck,tgt);
-		  sem_elem_t w = finWeights[mbit->first];
-		  if (w != NULL && tt != NULL)
-		  {
-		  //  cout << endl;
-		  // w->print(std::cout);
-		  tt->setWeight(w);
-		  }
-		  }*/
-		  t->start();
-		  //sem_elem_t fWt = computePathSummary(fpds, outfa);
-		  outfa.path_summary_tarjan_fwpds(true, false);
-
-          State * initS = outfa.getState(outfa.getInitialState());
-		  if (initS == NULL)
-		  {
-		      cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
-		  }
-		  else
-		  {
-		      sem_elem_t fWt = outfa.getState(outfa.getInitialState())->weight();
-		      if (fWt->equal(fWt->zero()))
-		      {
-		    	  cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
-		      }
-		      else{
-		    	  cout << "[Newton Compare] FWPDS ==> error reachable" << endl;
-		      }
-		  }
-
-		  //cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
-		  //fstream outfile("nnt_outfa.dot", fstream::out);
-		  //outfa.print_dot(outfile, true);
-		  //outfile.close();
-		  t->stop();
-		  double tTime = t->total_time() + t1 + baseEvalTime;
-		  std::cout << "[Newton Compare] Time taken by: Newton: ";
-		  cout << tTime << endl;
-		  return tTime;
-	  }
-	  else
-	  {
-		  cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
-		  double tTime = t->total_time() + t1;
-		  std::cout << "[Newton Compare] Time taken by: Newton: ";
-		  cout << tTime << endl;
-		  return tTime;
-	  }
-	  //While the set of changed variables != empty, continue iterating through NewtonRounds
-	  //This is the actual workhorse of the Newton Rounds
-
-	  //FOR EACH Zi that depends on the changed variables
-	  //RE-EVALUATE THE tslFPDS RULE and create a new weight of the domain_t pds rule*/
-  }
+////  /*
+////  *  This runs a fixed point error finding method using Newton rounds.
+////  *
+////  *	 Step 1 - Convert the program 'pg' into an fpds where the weights are nwaobdds.
+////  *
+////  *  Step 2 - Perform poststar on the fpds get the regular expressions associated with
+////  *			  the outgoing nodes in the intra_graph associated with the fwpds
+////  *
+////  *	 Step 3 - Convert these regexps into TSL regular expressions and get the differentials
+////  *			  with respect their variables
+////  *
+////  *  Step 4 -
+////  */
+////  double run_newton_noTensor(WFA& outfa, FWPDS * originalPds = NULL)
+////  {
+////	  cout << "#################################################" << endl;
+////
+////	  //Step 1 - Convert the program 'pg' into an fpds where the weights are nwaobdds.
+////	  FWPDS * fpds;
+////	  if (originalPds != NULL)
+////		  fpds = new FWPDS(*originalPds);
+////	  else{
+////		  fpds = new FWPDS();
+////#if USE_NWAOBDD
+////		  con = pds_from_prog_with_newton_merge_nwa(fpds, pg, true);
+////#else
+////		  con = pds_from_prog_with_newton_merge(fpds, pg);
+////#endif
+////	  }
+////
+////	  //freopen("newtonOutTest.txt", "w", stdout);
+////	  //fpds->print(std::cout) << endl;
+////
+////
+////	  map<int, reg_exp_t> outNodeRegExpMap; // A map from a unique id of an outgoing node to the regular expression associated with it
+////	  map<int, int> updateableMap;  //A map from an upadateable node number to the id of the node it depends on 
+////	  map<int, int> oMap;
+////	  map<int, pair< pair<int, int>, int> > mapBack;  //A map from the node index to the struct of the <<src,tgt>,stack> - used to insert weights back into wfa
+////	  map<pair<pair<int, int>, int>, int> transMap;
+////	  vector<int> differentiatedList; //A list of nodes with where the differential is to be taken
+////	  tslRegExpMap regExpMap;  //The map of all tsl regular expression
+////	  tslRegExpMap diffMap;  //The map of tsl regular expressions to be differentiated (the program return points)
+////	  tslUntensoredDiffMap untensoredDifferentialMap;
+////	  map<int, domain_t> finWeights;  //The map from node id to the final relational weights
+////	  map<std::pair<int, int>, std::pair<int, int> > mergeSrcMap; //The map that keeps track of the src of calls on call instructions
+////	  std::vector<int> wl;
+////	  std::set<int> vl;
+////	  double baseEvalTime = 0;
+////	  map<int, std::set<int> > varDependencies;
+////
+////	  std::set<pair<std::pair<int, int>, int> > globalEpsilon;  //used for debugging Newton
+////	  int dummy = -1;
+////
+////
+////	  wali::set_verify_fwpds(false);
+////
+////	  fpds->useNewton(false);
+////	  //fpds->add_rule(st1(),getKey(mainProc),st1(),fpds->get_theZero()->one());
+////
+////
+////	  wali::util::GoodTimer * t = new wali::util::GoodTimer("temp");
+////	  WFA fa;
+////	  wali::Key acc = wali::getKeySpace()->getKey("accept");
+////	  fa.addTrans(getPdsState(), getEntryStk(pg, mainProc), acc, fpds->get_theZero()->one());
+////	  fa.setInitialState(getPdsState());
+////	  fa.addFinalState(acc);
+////
+////
+////	  if (dump){
+////		  fstream outfile("init_fa.dot", fstream::out);
+////		  fa.print_dot(outfile, true);
+////		  outfile.close();
+////	  }
+////	  if (dump){
+////		  fstream outfile("init_fa.txt", fstream::out);
+////		  fa.print(outfile);
+////		  outfile.close();
+////	  }
+////
+////	  /* Step 2 - Perform poststar on the fpds get the regular expressions associated with
+////	  *			the outgoing nodes in the intra_graph associated with the fwpds
+////	  */
+////	  //This function performs postar on the fa using the fpds and populations the maps as described above
+////	  //The boolean means this is the first time the functions is called and will generate unique ids as needed
+////	  double curTime = t->total_time();
+////	  t->stop();
+////	  double t1 = fpds->getOutRegExps(fa, outfa, outNodeRegExpMap, updateableMap, oMap, mapBack, transMap, differentiatedList, mergeSrcMap);
+////	  t->start();
+////
+////	  //Get the key to the error state
+////	  Key errKey = wali::getKeySpace()->getKey("error");
+////	  Key iKey = wali::getKeySpace()->getKey("Unique State Name");
+////	  Key pErrKey = wali::getKeySpace()->getKey(iKey, errKey);
+////	  GenKeySource * esrc = new wali::wpds::GenKeySource(1, pErrKey);
+////	  Key fKey = wali::getKeySpace()->getKey(esrc);
+////	  bool prune = false;
+////	  //Set the initial state to the error state, if the error state exists and prune the wfa
+////	  if (outfa.getState(fKey) != NULL)
+////	  {
+////		  prune = true;
+////	  }
+////	  if (prune)
+////	  {
+////		  outfa.setInitialState(fKey);
+////		  outfa.prune();
+////		  t->stop();
+////		  std::set<Key> faStates = outfa.getStates();
+////		  std::set<Key>::iterator stateIter;
+////		  int numTrans = 0;
+////		  for (stateIter = faStates.begin(); stateIter != faStates.end(); stateIter++)
+////		  {
+////			  //Get the regular expressions on each remaining transition
+////			  TransSet & transSet = outfa.getState(*stateIter)->getTransSet();
+////			  TransSet::iterator transIt;
+////			  for (transIt = transSet.begin(); transIt != transSet.end(); transIt++)
+////			  {
+////				  ITrans * tr = *transIt;
+////				  int tSrc = tr->from();
+////				  int tTgt = tr->to();
+////				  int tStack = tr->stack();
+////				  int transReg = transMap[std::make_pair(std::make_pair(tSrc, tTgt), tStack)];
+////				  wl.push_back(transReg);
+////				  vl.insert(transReg);
+////				  numTrans++;
+////			  }
+////		  }
+////		  if (dump){
+////			  cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
+////			  fstream outfile("inter_outfa.dot", fstream::out);
+////			  outfa.print_dot(outfile, true);
+////			  outfile.close();
+////		  } if (dump){
+////			  cout << "[Newton Compare] Dumping the output automaton to final_outfa.txt" << endl;
+////			  fstream outfile("inter_outfa.txt", fstream::out);
+////			  outfa.print(outfile);
+////			  outfile.close();
+////		  }
+////
+////		 /*Step 3 - Convert these regexps into TSL regular expressions and get the partial differentials
+////		  *		   with respect their variables
+////		  */
+////		  cout << "[Newton Compare] converting to TSL" << endl;
+////		  while (!wl.empty())
+////		  {
+////			  int wlSzie = wl.size();
+////			  //convertToTSLRegExp
+////			  //if in convertion an updatable node is hit
+////			  //add that regexp to wl if not already in visitedList
+////			  int rToConvert = wl.back();
+////			  //std::cout << rToConvert << endl;
+////			  wl.pop_back();
+////			  baseEvalTime += convertToTSLRegExps(rToConvert, outNodeRegExpMap, regExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl);
+////		  }
+////
+////
+////		  int entry = 0;
+////		  bool first = true;
+////		  for (vector<int>::iterator eit = differentiatedList.begin(); eit != differentiatedList.end(); eit++)
+////		  {
+////			  //std::cout << "D: " << *eit << endl;
+////			  RTG::regExpRefPtr tmpReg = regExpMap[(*eit)];
+////			  if (tmpReg != NULL) //That updateable node may have been pruned away
+////			  {
+////				  if (first)
+////				  {
+////					  entry = (*eit);
+////					  first = false;
+////				  }
+////				  diffMap[(*eit)] = regExpMap[(*eit)];
+////			  }
+////			  //std::cout << "RE: " << *eit;
+////			  //std::cout << " ";
+////			  //E[(*eit)].print(std::cout) << std::endl;
+////			  //This is used  in debugging to compare the epsilon transitions with those generated by non-newton methods
+////			  //and make sure they match
+////#if defined(NEWTON_DEBUG)
+////			  int src = mapBack[(*eit)].first.first;
+////			  int tgt = mapBack[(*eit)].first.second;
+////			  int stack = mapBack[(*eit)].second;
+////			  globalEpsilon.insert(std::make_pair(std::make_pair(src, tgt), stack));
+////#endif
+////		  }
+////		  t->start();
+////		  RTG::assignmentRefPtr aList;
+////		  if (diffMap.size() != 0)
+////		  {
+////			  std::cout << "[Newton Compare] Creating Differentials" << std::endl;
+////			  //Created the differentials
+////			  createUntensoredDifferentials(diffMap,untensoredDifferentialMap);
+////
+////			  //For each Differential
+////			  //Create the rules for the TSLDifferentialPDS
+////			  //We do this once
+////
+////			  std::map<int, Key> exitKeyMap;
+////			  std::map<std::pair<std::pair<Key, Key>, Key>, merge_fn_t> mfMap;
+////			  tslUntensoredDiffMap::iterator rePIt;
+////			  //For each Differential e
+////			  wali::KeySpace * ks = wali::getKeySpace();
+////			  Key pKey = wali::getKeySpace()->getKey("Unique State Name");
+////			  FWPDS * tslFwpds = new FWPDS;
+////
+////			  //Creat an main node this is the start of the fwpds - it has transitions to all the differential nodes
+////			  ostringstream MEntry;
+////			  MEntry << "Main_Entry_NODE";
+////			  Key mEntryKey = ks->getKey(MEntry.str());
+////			  for (rePIt = untensoredDifferentialMap.begin(); rePIt != untensoredDifferentialMap.end(); rePIt++)
+////			  {
+////				  //For the current RegExp
+////				  int wID = rePIt->first;
+////				  ostringstream keyStringEntry;
+////				  ostringstream keyStringExit;
+////				  //Get the key for the entry and exit pt for that regExp
+////				  keyStringEntry << wID << "_entry";
+////				  keyStringExit << wID << "_exit";
+////				  Key KeyEntry = ks->getKey(keyStringEntry.str());
+////				  Key KeyExit = ks->getKey(keyStringExit.str());
+////				  exitKeyMap[wID] = KeyExit;
+////				  //Add a rule from the main entry to this entry stack with weight one
+////				  tslFwpds->add_rule(st1(), stk(mEntryKey), st1(), stk(KeyEntry), new TSLWeight(RTG::One::make()));
+////				  //std::cout << "KeyEntry: " << keyStringEntry.str() << " ----> " << KeyEntry << endl;
+////				  //std::cout << "KeyExit: " << keyStringExit.str() << " ----> " << KeyExit << endl;
+////
+////				  //Create a delta 1 fpds rule from e_entry to e_ext with reg_exp e at 0
+////				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr w0 = evalNonRecAt0(regExpMap[wID]);
+////				  RTG::regExpRefPtr w = RTG::Weight::make(w0);
+////				  tslFwpds->add_rule(st1(), stk(KeyEntry), st1(), stk(KeyExit), new TSLWeight(w));
+////				  set<int> srcList = varDependencies[rePIt->first];
+////
+////				  //Create the return rule for this pt
+////				  tslFwpds->add_rule(st1(), stk(KeyExit), st1(), new TSLWeight(RTG::One::make()));
+////				  //For each Var i in the differential
+////				  for (set<int>::iterator srcit = srcList.begin(); srcit != srcList.end(); srcit++)
+////				  {
+////					  int y_i = *srcit;
+////					  //Get the pairList associated with y_i
+////					  RTG::rePairListRefPtr pList = CIR::getPFromRegList(rePIt->second, y_i);
+////					  int numPairs = CIR::getNumPairs(pList).get_data();
+////					  //For each Pair k in the var
+////					  for (int pair_k = 0; pair_k < numPairs; pair_k++)
+////					  {
+////						  //Get the Left and Right sides of the pair
+////						  RTG::regExpRefPtr L_k = CIR::getPairL(pList, 0);
+////						  RTG::regExpRefPtr R_K = CIR::getPairR(pList, 0);
+////						  pList = CIR::getNextPList(pList);
+////						  ostringstream keyStringCallSite;
+////						  ostringstream keyStringRetSite;
+////						  //Create call and return keys
+////						  keyStringCallSite << wID << "_" << y_i << "_" << pair_k << "Call";
+////						  keyStringRetSite << wID << "_" << y_i << "_" << pair_k << "Ret";
+////						  Key KeyCall = ks->getKey(keyStringCallSite.str());
+////						  Key KeyRet = ks->getKey(keyStringRetSite.str());
+////						  //std::cout << "KeyCall: " << keyStringCallSite.str() << " ----> " << KeyCall << endl;
+////						  //std::cout << "KeyRet: " << keyStringRetSite.str() << " ----> " << KeyRet << endl;
+////
+////						  //Create a delta 1 fpds rule from e_entry to e_call_i_k with weight L_i_k
+////						  //Create a delta 1 fpds rule from e_entry to e_return_i_k with weight L_r_k
+////						  tslFwpds->add_rule(st1(), stk(KeyEntry), st1(), stk(KeyCall), new TSLWeight(L_k));
+////						  tslFwpds->add_rule(st1(), stk(KeyRet), st1(), stk(KeyExit), new TSLWeight(R_K));
+////						  ostringstream keyStringCalleeEntry;
+////						  ostringstream keyStringCalleeExit;
+////						  keyStringCalleeEntry << y_i << "_entry";
+////						  keyStringCalleeExit << y_i << "_exit";
+////						  Key KeyCalleeEntry = ks->getKey(keyStringCalleeEntry.str());
+////						  //std::cout << "KeyCalleeEntry: " << keyStringCalleeEntry.str() << " ----> " << KeyCalleeEntry << endl;
+////						  //std::cout << "KeyCaleeExit: " << keyStringCalleeExit.str() << " ----> " << KeyCalleeExit << endl;
+////						  //Create a delta 2 fpds rule from e_call_i_k to e_entry_i_k e_return_i_k with a merge function on it
+////						  //std::cout << "Looking Up: " << reID << "," << var << std::endl;
+////						  int t1 = mapBack[wID].first.second;
+////						  int t2 = mapBack[y_i].first.second;
+////						  std::pair<int, int> mergePair = mergeSrcMap[std::pair<int, int>(t1, t2)];
+////						  merge_fn_t merge = con->getLocalVars(mergePair).first;
+////						  mfMap[make_pair(make_pair(KeyCall, KeyCalleeEntry), KeyRet)] = merge;
+////						  tslFwpds->add_rule(st1(), stk(KeyCall), st1(), stk(KeyCalleeEntry), stk(KeyRet), new TSLWeight(RTG::One::make()), merge);
+////					  }
+////				  }
+////			  }
+////
+////
+////			  /*std::map<std::pair<std::pair<Key, Key>, Key>, merge_fn_t>::iterator mfmIt;
+////			  for (mfmIt = mfMap.begin(); mfmIt != mfMap.end(); mfmIt++)
+////			  {
+////			  std::cout << "Key: (" << mfmIt->first.first.first << "," << mfmIt->first.first.second << "," << mfmIt->first.second << ")" << std::endl;
+////			  mfmIt->second->print(std::cout);
+////			  std::cout << std::endl;
+////			  }*/
+////
+////			 std::cout << "Creating Domain FWPDS" << std::endl;
+////			  //tslFwpds->print(std::cout);
+////
+////			  //Create an assignmentlist of 0
+////			  aList = CIR::initializeAssignment();
+////
+////			  //THIS IS THE FIRST NEWTON ROUND
+////			  FWPDS * domainFWPDS = new FWPDS();
+////			  //For each pds rule - create a domain_t rule (evaluate the rule with respect to the assignment list and create a new pds
+////			  WpdsRules rules;
+////			  tslFwpds->for_each(rules);
+////			  std::set< Rule >::iterator ruleIt;
+////			  for (ruleIt = rules.popRules.begin(); ruleIt != rules.popRules.end(); ruleIt++)
+////			  {
+////				  Key fromSt = ruleIt->from_state();
+////				  Key toSt = ruleIt->to_state();
+////				  Key fromStk = ruleIt->from_stack();
+////				  TSLWeight * ruleWeight = static_cast<wali::domains::tsl_weight::TSLWeight*>(ruleIt->weight().get_ptr());
+////				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr binWeight = evalRegExpNonRec(ruleWeight->getWeight(), aList);
+////				  domainFWPDS->add_rule(fromSt, fromStk, toSt, binWeight.v);
+////			  }
+////			  for (ruleIt = rules.stepRules.begin(); ruleIt != rules.stepRules.end(); ruleIt++)
+////			  {
+////				  Key fromSt = ruleIt->from_state();
+////				  Key toSt = ruleIt->to_state();
+////				  Key fromStk = ruleIt->from_stack();
+////				  Key toStk = ruleIt->to_stack1();
+////				  TSLWeight * ruleWeight = static_cast<wali::domains::tsl_weight::TSLWeight*>(ruleIt->weight().get_ptr());
+////				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr binWeight = evalRegExpNonRec(ruleWeight->getWeight(), aList);
+////				  domainFWPDS->add_rule(fromSt, fromStk, toSt, toStk, binWeight.v);
+////			  }
+////			  for (ruleIt = rules.pushRules.begin(); ruleIt != rules.pushRules.end(); ruleIt++)
+////			  {
+////				  Key fromSt = ruleIt->from_state();
+////				  Key toSt = ruleIt->to_state();
+////				  Key fromStk = ruleIt->from_stack();
+////				  Key toStk = ruleIt->to_stack1();
+////				  Key toStk2 = ruleIt->to_stack2();
+////				  wali::IntSource * fStkSrc = static_cast<wali::IntSource*>(ks->getKeySource(fromStk).get_ptr());
+////				  wali::IntSource * tStkSrc = static_cast<wali::IntSource*>(ks->getKeySource(toStk).get_ptr());
+////				  wali::IntSource * tStkSrc2 = static_cast<wali::IntSource*>(ks->getKeySource(toStk2).get_ptr());
+////				  //std::cout << "Key: (" << fStkSrc->getInt() << "," << tStkSrc->getInt() << "," << tStkSrc2->getInt() << ")" << std::endl;
+////				  merge_fn_t mf = mfMap[make_pair(make_pair(fStkSrc->getInt(), tStkSrc->getInt()), tStkSrc2->getInt())];
+////				  TSLWeight * ruleWeight = static_cast<wali::domains::tsl_weight::TSLWeight*>(ruleIt->weight().get_ptr());
+////				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr binWeight = evalRegExpNonRec(ruleWeight->getWeight(), aList);
+////				  domainFWPDS->add_rule(fromSt, fromStk, toSt, toStk, toStk2, binWeight.v, mf);
+////			  }
+////
+////			  //std::cout << std::endl;
+////			  //domainFWPDS->print(std::cout);
+////
+////			  //Create an automata and perform poststar on the domain_t pds
+////			  ostringstream keyStringEntry;
+////			  keyStringEntry << entry << "_entry";
+////			  Key WFAEntry = ks->getKey(keyStringEntry.str());
+////			  //std::cout << "WFA StackStart: " << WFAEntry << std::endl;
+////
+////			  WFA fa2;
+////			  wali::Key acc2 = wali::getKeySpace()->getKey("accept2");
+////			  fa2.addTrans(getPdsState(), stk(mEntryKey), acc2, domainFWPDS->get_theZero()->one());
+////			  fa2.setInitialState(getPdsState());
+////			  fa2.addFinalState(acc2);
+////			  WFA outfa2;
+////			  //fa2.print(std::cout);
+////			  domainFWPDS->poststarIGR(fa2, outfa2);
+////			  //outfa2.print(std::cout);
+////
+////			  // Call pathsummarytarjan on the automata and get the result(sum of weights on trans of exit stack symbol * w on state it points to
+////			  //on the new path summary automata
+////			  WFA ansFA;
+////
+////			  outfa2.path_summary_tarjan_fwpds(true, ansFA, false);
+////
+////			  //ansFA.print(std::cout) << std::endl;
+////			  // outfa2.print(std::cout) << std::endl;
+////
+////			  std::set<int> changedVars; //The set of possible dirty regexps IDs
+////			  for (std::map<int, Key>::iterator exitIt = exitKeyMap.begin(); exitIt != exitKeyMap.end(); exitIt++)
+////			  {
+////				  std::vector<ITrans const *>  trans;
+////				  TransStackGetter stackGetter(exitIt->second, trans);
+////				  outfa2.for_each(stackGetter);
+////				  sem_elem_t wt = con->getBaseZero();
+////				  for (std::vector<ITrans const *>::iterator transSIter = trans.begin(); transSIter != trans.end(); transSIter++)
+////				  {
+////					  //std::cout << "Key: " << exitIt->second << std::endl;
+////					  //(*transSIter)->print(std::cout) << std::endl;
+////					  wt = wt->combine((*transSIter)->weight());
+////				  }
+////				  //Compare with the new assignment
+////				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr oldVal = CIR::getAssignment(CBTI_INT32(exitIt->first), aList);
+////				  //oldVal.v->print(std::cout) << std::endl;
+////				  //wt->print(std::cout) << std::endl;
+////				  if (wt != oldVal.v)
+////				  {
+////					  int rId = exitIt->first;
+////					  changedVars.insert(rId);
+////					  //std::cout << rId << std::endl;
+////					  domain_t w = dynamic_cast<Relation*>(wt.get_ptr());
+////					  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = w;
+////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = CONC_EXTERN_PHYLA::sem_elem_wrapper(w);
+////					  aList = CIR::updateAssignment(aList, CBTI_INT32(rId), rep);
+////				  }
+////			  }
+////
+////			  int rnd = 1;
+////			  // A map of dependencies
+////			  std::map<int, std::set<int> > dependenceMap;
+////			  std::set<int> C;
+////			  RTG::assignmentRefPtr aPrime = aList;
+////			  std::cout << "Running Newton";
+////			  //FOR EACH NEWTON ROUND
+////			  // For each set of differentials, get the list of variables they depend on
+////			  // Put those into dependeceMap
+////			  // dependenceMap - Map from regular expression ID to the set variables that regexps differentials depend on
+////			  while (changedVars.size() != 0)
+////			  {
+////				  EvalMap2.clear();
+////				  rnd++;
+////				  std::set<int>::iterator pIt;
+////				  //For each of the variables whose dependencies changed, get their new assignement from aList
+////				  for (pIt = changedVars.begin(); pIt != changedVars.end(); pIt++)
+////				  {
+////					  aPrime = CIR::updateAssignment(aPrime, CBTI_INT32(*pIt), CIR::getAssignment(CBTI_INT32(*pIt), aList));
+////				  }
+////				  C = changedVars;
+////				  changedVars.clear();
+////
+////				  //Now rebuild the domain fwpds
+////				  for (ruleIt = rules.stepRules.begin(); ruleIt != rules.stepRules.end(); ruleIt++)
+////				  {
+////					  Key fromSt = ruleIt->from_state();
+////					  Key toSt = ruleIt->to_state();
+////					  Key fromStk = ruleIt->from_stack();
+////					  Key toStk = ruleIt->to_stack1();
+////					  wali::IntSource * fStkSrc = static_cast<wali::IntSource*>(ks->getKeySource(fromStk).get_ptr());
+////					  wali::IntSource * tStkSrc = static_cast<wali::IntSource*>(ks->getKeySource(toStk).get_ptr());
+////					  //std::cout << "Key: (" << fStkSrc->getInt() << "," << tStkSrc->getInt() << ")" << std::endl;
+////					  TSLWeight * ruleWeight = static_cast<wali::domains::tsl_weight::TSLWeight*>(ruleIt->weight().get_ptr());
+////					  //ruleWeight->getWeight().print(std::cout) << endl;
+////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr binWeight = evalRegExpNonRec(ruleWeight->getWeight(), aPrime);
+////					  //binWeight.v->print(std::cout) << endl;
+////					  domainFWPDS->replace_rule(fromSt, fromStk, toSt, toStk, binWeight.v);
+////				  }
+////
+////				  //domainFWPDS->print(std::cout);
+////				  WFA fa3;
+////				  wali::Key acc2 = wali::getKeySpace()->getKey("accept2");
+////				  fa3.addTrans(getPdsState(), stk(mEntryKey), acc2, domainFWPDS->get_theZero()->one());
+////				  fa3.setInitialState(getPdsState());
+////				  fa3.addFinalState(acc2);
+////				  WFA outfa3;
+////				  //fa3.print(std::cout);
+////				  domainFWPDS->poststarIGR(fa3, outfa3);
+////				  //outfa3.print(std::cout);
+////
+////				  // Call pathsummarytarjan on the automata and get the result(sum of weights on trans of exit stack symbol * w on state it points to
+////				  //on the new path summary automata
+////				  WFA ansFA;
+////
+////				  outfa3.path_summary_tarjan_fwpds(true, ansFA, false);
+////
+////				  //outfa3.print(std::cout) << std::endl;
+////
+////				  for (std::map<int, Key>::iterator exitIt = exitKeyMap.begin(); exitIt != exitKeyMap.end(); exitIt++)
+////				  {
+////					  std::vector<ITrans const *>  trans;
+////					  TransStackGetter stackGetter(exitIt->second, trans);
+////					  outfa3.for_each(stackGetter);
+////					  sem_elem_t wt = con->getBaseZero();
+////					  for (std::vector<ITrans const *>::iterator transSIter = trans.begin(); transSIter != trans.end(); transSIter++)
+////					  {
+////						  //std::cout << "Key: " << exitIt->second << std::endl;
+////						  //(*transSIter)->print(std::cout) << std::endl;
+////						  wt = wt->combine((*transSIter)->weight());
+////					  }
+////					  //Compare with the new assignment
+////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr oldVal = CIR::getAssignment(CBTI_INT32(exitIt->first), aPrime);
+////					  //std::cout << "NewWeight: ";
+////					  //wt->print(std::cout) << std::endl;
+////					  //std::cout << "OldWeight: ";
+////					  //oldVal.v->print(std::cout) << std::endl;
+////					  domain_t w = dynamic_cast<Relation*>(wt.get_ptr());
+////					  domain_t oldV = oldVal.v;
+////					  if (!(w.get_ptr()->equal(oldV.get_ptr())))
+////					  {
+////						  int rId = exitIt->first;
+////						  changedVars.insert(rId);
+////						  //std::cout << rId << std::endl;
+////						  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = w;
+////						  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = CONC_EXTERN_PHYLA::sem_elem_wrapper(w);
+////						  aList = CIR::updateAssignment(aList, CBTI_INT32(rId), rep);
+////					  }
+////				  }
+////			  }
+////			  std::cout << std::endl << "NumRnds: " << rnd << std::endl;
+////		  }
+////		  else
+////		  {
+////			  aList = CIR::initializeAssignment();
+////			  std::cout << std::endl << "NumRnds: " << 0 << std::endl;
+////		  }
+////		  //evalRegExps(aList);
+////		  t->stop();
+////		  for (stateIter = faStates.begin(); stateIter != faStates.end(); stateIter++)
+////		  {
+////			  TransSet & transSet = outfa.getState(*stateIter)->getTransSet();
+////			  TransSet::iterator transIt;
+////			  for (transIt = transSet.begin(); transIt != transSet.end(); transIt++)
+////			  {
+////				  ITrans * tt = *transIt;
+////				  int tSrc = tt->from();
+////				  int tTgt = tt->to();
+////				  int tStack = tt->stack();
+////				  int transReg = transMap[std::make_pair(std::make_pair(tSrc, tTgt), tStack)];
+////				  t->start();
+////				  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr w = evalRegExpFinNonRec(regExpMap[transReg], aList);
+////				  t->stop();
+////				  //std::cout << "OutWeight: " << tSrc << "," << tTgt << "," << tStack << ":";
+////				  //w.v->print(std::cout) << endl;
+////				  tt->setWeight(w.v);
+////			  }
+////		  }
+////		  /*for(map<int,pair<pair<int,int>,int> >::iterator mbit = mapBack.begin(); mbit != mapBack.end(); mbit++)
+////		  {
+////		  int src = mbit->second.first.first;
+////		  int tgt = mbit->second.first.second;
+////		  int stck = mbit->second.second;
+////		  //  cout << endl << endl;
+////		  //cout << "Src: " << key2str(src) << " Target: " << key2str(tgt) << " Stack: " << key2str(stck) << "\n";
+////		  wali::wfa::ITrans * tt = outfa.find2(src,stck,tgt);
+////		  sem_elem_t w = finWeights[mbit->first];
+////		  if (w != NULL && tt != NULL)
+////		  {
+////		  //  cout << endl;
+////		  // w->print(std::cout);
+////		  tt->setWeight(w);
+////		  }
+////		  }*/
+////		  t->start();
+////		  //sem_elem_t fWt = computePathSummary(fpds, outfa);
+////		  outfa.path_summary_tarjan_fwpds(true, false);
+////
+////          State * initS = outfa.getState(outfa.getInitialState());
+////		  if (initS == NULL)
+////		  {
+////		      cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
+////		  }
+////		  else
+////		  {
+////		      sem_elem_t fWt = outfa.getState(outfa.getInitialState())->weight();
+////		      if (fWt->equal(fWt->zero()))
+////		      {
+////		    	  cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
+////		      }
+////		      else{
+////		    	  cout << "[Newton Compare] FWPDS ==> error reachable" << endl;
+////		      }
+////		  }
+////
+////		  //cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
+////		  //fstream outfile("nnt_outfa.dot", fstream::out);
+////		  //outfa.print_dot(outfile, true);
+////		  //outfile.close();
+////		  t->stop();
+////		  double tTime = t->total_time() + t1 + baseEvalTime;
+////		  std::cout << "[Newton Compare] Time taken by: Newton: ";
+////		  cout << tTime << endl;
+////		  return tTime;
+////	  }
+////	  else
+////	  {
+////		  cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
+////		  double tTime = t->total_time() + t1;
+////		  std::cout << "[Newton Compare] Time taken by: Newton: ";
+////		  cout << tTime << endl;
+////		  return tTime;
+////	  }
+////	  //While the set of changed variables != empty, continue iterating through NewtonRounds
+////	  //This is the actual workhorse of the Newton Rounds
+////
+////	  //FOR EACH Zi that depends on the changed variables
+////	  //RE-EVALUATE THE tslFPDS RULE and create a new weight of the domain_t pds rule*/
+////  }
 
 #ifdef USE_DUET
 std::vector<caml_rule> ruleHolder;
@@ -5896,7 +5944,8 @@ void * work(void *)
       run_newton(NEWTON_FROM_BELOW, outfa, getEntryStk(pg, mainProc));
       break;
     case 7:
-	run_newton_noTensor(outfa);
+	//run_newton_noTensor(outfa);
+      assert(false && "run_newton_noTensor is no longer available.");
 	break;
     default:
       assert(0 && "I don't understand that goal!!!");
