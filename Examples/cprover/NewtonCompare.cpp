@@ -522,25 +522,42 @@ StarMap oldStarVal;
 StarMapT oldStarValT;
 
 bool doWideningThisRound;
-	
+bool inNewtonLoop;
+
+// FIXME: In the following functions, consider whether or not:
+//    (1) we need a separate case for the final evaluation that occurs outside
+//       of the Newton loop
+//  and
+//    (2) we need a separate case for evalAt0.
+
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElemT(
-  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a)
+  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a, 
+  const RTG::regExpTRefPtr & child)
 {
-  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-  duetrelpair_t ret;
-  ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar();
-  ans.v = ret->second.get_ptr();
-  return ans;
+  if (inNewtonLoop) {
+    //
+  } else {
+    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+    duetrelpair_t ret;
+    ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar();
+    ans.v = ret->second.get_ptr();
+    return ans;
+  }
 }
 
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElem(
-  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a)
+  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
+  const RTG::regExpRefPtr & child)
 {
-  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-  duetrelpair_t ret;
-  ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar();
-  ans.v = ret->second.get_ptr();
-  return ans;
+  if (inNewtonLoop) {
+    //
+  } else {
+    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+    duetrelpair_t ret;
+    ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar();
+    ans.v = ret->second.get_ptr();
+    return ans;
+  }
 }
 
 namespace goals {
@@ -1503,7 +1520,8 @@ namespace goals {
 					  //If the child expression has been evaluated before, performe the Kleene Star operation and insert the resultant
 					  //value into the hash table and pop the stack frame
 					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-					  ret = CONC_EXTERNS::evalKleeneSemElem(evalRegExpAt0___it->second);
+					  //ret = CONC_EXTERNS::evalKleeneSemElem(evalRegExpAt0___it->second);
+					  ret = CONC_EXTERNS::evalKleeneSemElem(evalRegExpAt0___it->second, child);
 					  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
 					  todo.pop();
 					  continue;
@@ -1656,7 +1674,8 @@ namespace goals {
 			  if (frame.op == 0) //Kleene
 			  {
 				  //Evaluate and insert into the hashmap
-				  ret = CONC_EXTERNS::evalKleeneSemElem(lch);
+				  //ret = CONC_EXTERNS::evalKleeneSemElem(lch);
+				  ret = CONC_EXTERNS::evalKleeneSemElem(lch, frame.left);
 				  EvalMap0.insert(std::make_pair(lookupKeyForevalRegExpAt0Hash, ret));
 				  todo.pop();
 				  continue;
@@ -1749,7 +1768,8 @@ namespace goals {
 					  //If the child expression has been evaluated before, performe the Kleene Star operation and insert the resultant
 					  //value into the hash table and pop the stack frame
 					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
-					  ret = CONC_EXTERNS::evalKleeneSemElem(evalRegExpFin___it->second);
+					  //ret = CONC_EXTERNS::evalKleeneSemElem(evalRegExpFin___it->second);
+					  ret = CONC_EXTERNS::evalKleeneSemElem(evalRegExpFin___it->second, frame.left);
 					  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
 					  todo.pop();
 					  continue;
@@ -1934,7 +1954,8 @@ namespace goals {
 			  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
 			  if (frame.op == 0) //Kleene
 			  {
-				  ret = CONC_EXTERNS::evalKleeneSemElem(lch);
+				  //ret = CONC_EXTERNS::evalKleeneSemElem(lch);
+				  ret = CONC_EXTERNS::evalKleeneSemElem(lch, frame.left);
 				  EvalMap2.insert(std::make_pair(lookupKeyForevalRegExpFinHash, ret));
 				  todo.pop();
 				  continue;
@@ -4545,6 +4566,7 @@ NEWROUND:
 		newStarVal.clear();
 		newStarValT.clear();
 
+        inNewtonLoop = true;
         if (rnd >= WIDENING_DELAY) {
             std::cout << "Widening will be applied on this round." << std::endl;
             doWideningThisRound = true;
@@ -4692,6 +4714,8 @@ NEWROUND:
 		EvalMapT.clear();
 	std::cout << std::endl << "NumRnds: " << rnd << std::endl;
 	}*/
+
+    inNewtonLoop = false;
   }
 
  /*
@@ -5906,6 +5930,7 @@ int runBasicNewton(char **args, int runningMode)
     pds->print(std::cout);
     
     doWideningThisRound = false;
+    inNewtonLoop = false;
 
     WFA outfaNewton;
     goals::run_newton(runningMode, outfaNewton, entry_key, pds, false);
