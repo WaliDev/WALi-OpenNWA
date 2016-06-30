@@ -4549,7 +4549,7 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
   *	break
   *  }
   */
-#define WIDENING_DELAY 6
+#define WIDENING_DELAY 6 
 #define MAX_ROUNDS_FROM_BELOW 50
 #define MAX_ROUNDS_FROM_ABOVE 4
   void runNewton(RTG::assignmentRefPtr & newVal, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies, tslRegExpTMap & tensoredRegExpMap, bool linear, int runningMode)
@@ -4663,6 +4663,227 @@ NEWROUND:
 
 			// Insert <var,rep> into newVal
 			newVal = CIR::updateAssignment(newVal, CBTI_INT32(var), rep);
+
+		}
+		
+        //EvalMap2.clear();
+		//EvalMapT.clear();
+        RTG::_evalRegExpHash().clear();
+        RTG::_evalTHash().clear();
+
+        if (runningMode == NEWTON_FROM_ABOVE) 
+            goto NEWROUND;
+
+		// std::cout << "Beginning main-loop exit test:" << std::endl;
+		// std::cout << "Old untensored star keys are:" << std::endl;
+                // for(StarMap::const_iterator oldStar_it = oldStarVal.begin(); oldStar_it != oldStarVal.end(); ++oldStar_it)
+		// {
+		// 	std::cout << "  Hash Key: " << hash_value((*oldStar_it).first) << std::endl;
+		// 	//std::cout << (*oldStar_it).second << std::endl; // segfault!
+		// }
+		// std::cout << "New untensored star keys are:" << std::endl;
+                // for(StarMap::const_iterator newStar_it = newStarVal.begin(); newStar_it != newStarVal.end(); ++newStar_it)
+		// {
+		// 	std::cout << "  Hash Key: " << hash_value((*newStar_it).first) << std::endl;
+		// 	//std::cout << (*oldStar_it).second << std::endl; // segfault!
+		// }
+		// std::cout << "End of untensored map keys." << std::endl;
+		// Test to see whether all abstracted Kleene star bodies have converged
+		for(StarMap::const_iterator newStar_it = newStarVal.begin(); newStar_it != newStarVal.end(); ++newStar_it) 
+		{
+			// std::cout << "  Checking an untensored Kleene star." << std::endl;
+			StarMap::const_iterator oldStarValue = oldStarVal.find(newStar_it->first);
+			if (oldStarValue == oldStarVal.end()) {
+				// On the first round, we have no previous value to compare against
+				// std::cout << "    Nothing to compare against: continuing loop." << std::endl;
+				propagationRounds = 0;
+                goto NEWROUND;
+			}
+			if (!newStar_it->second.v->Equivalent(oldStarValue->second.v)) {
+				// std::cout << "    Inequivalent: continuing loop." << std::endl;
+				propagationRounds = 0;
+				goto NEWROUND;
+			}
+			// std::cout << "  Equivalent." << std::endl;
+		}
+		for(StarMapT::const_iterator newStar_it = newStarValT.begin(); newStar_it != newStarValT.end(); ++newStar_it) 
+		{
+			// std::cout << "  Checking a tensored Kleene star." << std::endl;
+			StarMapT::const_iterator oldStarValue = oldStarValT.find(newStar_it->first);
+			if (oldStarValue == oldStarValT.end()) {
+				// On the first round, we have no previous value to compare against
+				// std::cout << "    Nothing to compare against: continuing loop." << std::endl;
+				propagationRounds = 0;
+				goto NEWROUND;
+			}
+			if (!newStar_it->second.v->Equivalent(oldStarValue->second.v)) {
+				// std::cout << "    Inequivalent: continuing loop." << std::endl;
+				propagationRounds = 0;
+				goto NEWROUND;
+			}
+			// std::cout << "  Equivalent." << std::endl;
+		}
+        if (propagationRounds >= stratificationHeight) {
+            // std::cout << "  All stars are equivalent: exiting loop." << std::endl;
+  		    break; // Exit the Newton loop because all abstracted Kleene star bodies have converged
+        } else {
+            propagationRounds++;
+        }
+	}
+		
+	std::cout << std::endl << "NumRnds: " << rnd << std::endl;
+
+	if (testMode) {
+		std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
+		testFile << "__NUMRNDS " << rnd << std::endl;
+		testFile.close();
+	}
+	
+	/*else
+	{
+		rnd++;
+		for (assignIt = tensoredRegExpMap.begin(); assignIt != tensoredRegExpMap.end(); assignIt++)
+		{
+			    int var = assignIt->first;
+				//v = Tdetensor(evalT(Mmap[p],oldVal))
+				//The variable representing the regexp is potentially dirty, so reevaluate it using the
+				//new assignment in oldVal
+				//std::cout << "Eval: " << assignIt->first << std::endl;
+				//assignIt->second.print(std::cout);
+				//std::cout << std::endl;
+				CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal);
+				//DetensorTranspose the new value
+				//std::cout << std::endl << "Result: ";
+				//newVal.v->print(std::cout);
+				CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = CONC_EXTERNS::detensorTranspose(newVal);
+				//std::cout << std::endl << "Detensored Val: ";
+				//rep.v->print(std::cout);
+				//Perform the computation needed for merge functions by computing rep = M(1,rep)
+				//FIXME - what is applied here has to be a global merge function that applies at all procedure exits
+				//		- we don't have the information to perform exit-specific merge functions
+				//Check to see if the new value is the same as the previous one
+				//if A'[p] != v`
+				//Add v' to the changedVar set and updated the assignmentList
+				newVal = CIR::updateAssignment(newVal, CBTI_INT32(var), rep);
+		}
+		EvalMap2.clear();
+		EvalMapT.clear();
+	std::cout << std::endl << "NumRnds: " << rnd << std::endl;
+	}*/
+
+    inNewtonLoop = false;
+  }
+
+  void runNewton_GaussianElimination(RTG::assignmentRefPtr & newVal, tslRegExpMap & regExpsAfterIsolation, int runningMode)
+  {
+	int rnd = 0;
+	tslRegExpMap::iterator assignIt;
+	
+	newStarVal.clear();
+	newStarValT.clear();
+
+    RTG::_evalRegExpHash().clear();
+    RTG::_evalTHash().clear();
+
+	if (maxRnds < 0) {		//maxRnds is not set yet
+		if (runningMode == NEWTON_FROM_BELOW)
+			maxRnds = MAX_ROUNDS_FROM_BELOW;
+		else if (runningMode == NEWTON_FROM_ABOVE)
+			maxRnds = MAX_ROUNDS_FROM_ABOVE;
+	}
+    
+    // For debugging purposes, print all regular expressions before the first Newton round 
+    std::cout << std::endl;
+    for (assignIt = regExpsAfterIsolation.begin(); assignIt != regExpsAfterIsolation.end(); assignIt++)
+    {
+        std::cout << "Tensored regular expression for reID=" << assignIt->first << ": " << std::endl;
+        tsl_regexp::regExpPrettyPrint(assignIt->second, std::cout); 
+        std::cout << std::endl << std::endl;
+    }
+
+    int stratificationHeight = 1;
+    int propagationRounds = 0;
+    //if (runningMode == NEWTON_FROM_BELOW) {
+    //    stratificationHeight = computeStratificationHeight(tensoredRegExpMap);
+    //}
+
+	// In Newton-from-below mode, we perform Newton rounds until convergence
+    //   or until MAX_ROUNDS_FROM_BELOW; in Newton-from-above mode, we always 
+    //   go through MAX_ROUNDS_FROM_ABOVE rounds.
+	while (true){
+NEWROUND:
+		if (rnd >= maxRnds) {
+			std::cout << "Maximum number of rounds reached. ------------------------------------------" << std::endl;
+
+            if (runningMode == NEWTON_FROM_BELOW) {
+                assert(false && "In Newton-from-below mode, we must abort if we reach the maximum number of rounds.");
+            }
+
+			break;
+		}
+
+		std::cout << "-------------------------------------------------------------------------------" << std::endl;
+		std::cout << "Round " << rnd << ":" << std::endl;
+		rnd++;
+			
+			
+		//oldVal = newVal;
+		globalAssignment = newVal;
+		newVal = CIR::initializeAssignment();
+			
+		oldStarVal = newStarVal;
+		oldStarValT = newStarValT;
+		newStarVal.clear();
+		newStarValT.clear();
+
+        inNewtonLoop = true;
+        if (rnd >= WIDENING_DELAY) {
+            std::cout << "Widening will be applied on this round." << std::endl;
+            doWideningThisRound = true;
+        } else {
+            doWideningThisRound = false;
+        }
+
+		// For each variable in the equation system, evaluate its tensored regular expression
+        for (assignIt = regExpsAfterIsolation.begin(); assignIt != regExpsAfterIsolation.end(); assignIt++)
+		{
+			int var = assignIt->first;
+			
+			// Reevaluate the regular expression associated with variable var,
+			//    using oldVal for the quantity \vec{nu} of Algorithm NPA-TP, and
+			//    apply detensorTranspose
+			//v = Tdetensor(evalT(Mmap[p],oldVal))
+			
+			std::cout << "Eval: " << assignIt->first << std::endl;
+			//assignIt->second.print(std::cout);
+            std::cout << "  Regular expression is: " << std::endl;
+            tsl_regexp::regExpPrettyPrint(assignIt->second, std::cout);
+			std::cout << std::endl;
+			
+			//CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal);
+			//CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newValue = CIR::evalT(assignIt->second);
+			CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newValue = CIR::evalRegExp(assignIt->second);
+			
+			////////std::cout << std::endl << "Tensored Value: ";
+			////////newValue.v->print(std::cout);
+			////////
+			////////CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = CONC_EXTERNS::detensorTranspose(newValue);
+			////////
+			////////std::cout << std::endl << "Detensored Val: ";
+			std::cout << std::endl << "Value: ";
+			newValue.v->print(std::cout);
+			std::cout << std::endl;
+			
+			/*CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
+			
+			ret = CONC_EXTERNS::evalDotSemElem(rep, CONC_EXTERNS::getOneWt());
+			std::cout << std::endl << "After extend one: " << std::endl;
+			ret.v->print(std::cout);
+			std::cout << std::endl;*/
+
+			// Insert <var,newValue> into newVal
+			newVal = CIR::updateAssignment(newVal, CBTI_INT32(var), newValue);
+			//newVal = CIR::updateAssignment(newVal, CBTI_INT32(var), rep);
 
 		}
 		
@@ -5200,6 +5421,497 @@ NEWROUND:
 
 		t->stop();
 		double tTime = t->total_time() + t1 + t2 + baseEvalTime;
+		std::cout << "[Newton Compare] Time taken by: Newton: " << std::endl;
+		cout << tTime << endl;
+		
+		if (testMode) {
+			std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
+			testFile << "__TIME " << tTime << std::endl;
+			testFile.close();
+		}
+		
+		return tTime;
+	}
+	else  //There is no error state
+	{
+		cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
+		double tTime = t->total_time() + t1;;
+		std::cout << "[Newton Compare] Time taken by: Newton: ";
+		cout << tTime << endl;
+		std::cout << "NonRec";
+		std::cout << std::endl;
+		
+		if (testMode) {
+			std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
+			testFile << "__TIME " << tTime << std::endl;
+			testFile.close();
+		}
+		
+		return tTime;
+	}
+  }
+
+
+
+
+  double run_newton_GaussianElimination(int runningMode, WFA& outfa, wali::Key entry_key, FWPDS * originalPds = NULL, bool canPrune = true)
+  { 
+    cout << "#################################################" << endl;
+
+    globalAssignment = CIR::initializeAssignment(); // Create an assignment in which all variables are map to zero
+    
+	nonRec = false;
+	pNonLin = false;
+    
+    cout << "Step 1: =========================================================" << endl;
+	//Step 1 - Convert the program 'pg' into an fpds where the weights are nwaobdds.
+	FWPDS * fpds;
+    if(originalPds != NULL)
+      fpds = new FWPDS(*originalPds);
+    else{
+      fpds = new FWPDS();
+	  con = pds_from_prog_with_newton_merge(fpds, pg);// ncon = pds_from_prog_nwa(fpds, pg);
+    }
+
+    //freopen("newtonMinTest.txt", "w", stdout);
+	//fpds->print(std::cout) << endl;
+
+	int dummy = -1;
+	map<int, reg_exp_t> outNodeRegExpMap; // A map from a unique id of an outgoing node to the regular expression associated with it
+	map<int, reg_exp_t> rNew; // A map from the node ids to the regexps representing the full differentials associated with that node id
+	map<int, int> updateableMap;  //A map from an updateable node number to the id of the node it depends on 
+	map<int, int> oMap;
+	map<int, pair< pair<int, int>, int> > mapBack;  //A map from the node index to the struct of the <<src,tgt>,stack> - used to insert weights back into wfa
+	map<pair<pair<int, int>, int>, int> transMap;
+	vector<int> variableIDs; //A list of nodes with where the differential is to be taken
+	tslRegExpMap regExpMap;  //The map of all tsl regular expression
+	tslRegExpMap diffMap;  //The map of tsl regular expressions to be differentiated (the program return points)
+	tslDiffMap differentialMap;  //This is a map from regexp ids to the partial differentials assoicated with them
+	tslRegExpTMap tensoredRegExpMap;  //A map from the regexpId to the tsl tensored differential representing it
+	map<int, domain_t> finWeights;  //The map from node id to the final relational weights
+	map<std::pair<int, int>, std::pair<int, int> > mergeSrcMap; //The map that keeps track of the src of calls on call instructions
+	std::vector<int> wl;
+	std::set<int> vl;
+	double baseEvalTime = 0;
+	map<int, std::set<int> > varDependencies;
+	TdiffMap = TDiffHashMap();
+	
+	RTG::assignmentRefPtr aList;
+
+
+    wali::set_verify_fwpds(false);
+    
+    fpds->useNewton(false);
+    //fpds->add_rule(st1(),getKey(mainProc),st1(),fpds->get_theZero()->one());
+
+
+    wali::util::GoodTimer * t = new wali::util::GoodTimer("temp");
+    WFA fa;
+    wali::Key acc = wali::getKeySpace()->getKey("accept");
+    sem_elem_t temp = fpds->get_theZero()->one();
+    fa.addTrans(getPdsState(),entry_key, acc, fpds->get_theZero()->one());
+    fa.setInitialState(getPdsState());
+    fa.addFinalState(acc);
+
+
+	if (dump){
+		fstream outfile("init_fa.dot", fstream::out);
+		fa.print_dot(outfile, true);
+		outfile.close();
+	}
+	if (dump){
+		fstream outfile("init_fa.txt", fstream::out);
+		fa.print(outfile);
+		outfile.close();
+	}
+
+    cout << "Step 2: =========================================================" << endl;
+	/* Step 2 - Perform poststar on the fpds get the regular expressions associated with
+	*			the outgoing nodes in the intra_graph associated with the fwpds
+	*/
+	// This function performs poststar on fpds w.r.t. fa, and populates the maps as described above
+	// The Boolean indicates whether this is the first time the function is called and will generate unique ids as needed
+	double curTime = t->total_time();
+	t->stop();
+	double t1 = fpds->getOutRegExps(fa, outfa, outNodeRegExpMap, updateableMap, oMap, mapBack, transMap, variableIDs, mergeSrcMap);
+	t->start();
+	int testSize = mapBack.size();
+	int testSize2 = transMap.size();
+
+	// Find the key to the error state
+	Key errKey = wali::getKeySpace()->getKey("error");
+	Key iKey = wali::getKeySpace()->getKey("Unique State Name");
+	Key pErrKey = wali::getKeySpace()->getKey(iKey, errKey);
+	GenKeySource * esrc = new wali::wpds::GenKeySource(1, pErrKey);
+	Key fKey = wali::getKeySpace()->getKey(esrc);
+	bool prune = false;
+
+	// If the error state is in the wfa, then prune, otherwise the error is not reachable  -- ETTODO (prune check is redundant)
+	if (outfa.getState(fKey) != NULL)
+	{
+		prune = true;
+	}
+	if (prune || (!canPrune))
+	{
+                if(prune)
+                {
+		//Set the initial state to be the error state in the wfa and then prune
+		outfa.setInitialState(fKey);
+		outfa.prune();
+		}
+		t->stop();
+		std::set<Key> faStates = outfa.getStates();
+		std::set<Key>::iterator stateIter;
+		int numTrans = 0;
+
+		//Get the set of transitions on the remaining states and put that into the worklist
+		for (stateIter = faStates.begin(); stateIter != faStates.end(); stateIter++)
+		{
+			TransSet & transSet = outfa.getState(*stateIter)->getTransSet();
+			TransSet::iterator transIt;
+			for (transIt = transSet.begin(); transIt != transSet.end(); transIt++)
+			{
+				ITrans * tr = *transIt;
+				int tSrc = tr->from();
+				int tTgt = tr->to();
+				int tStack = tr->stack();
+				int transReg = transMap[std::make_pair(std::make_pair(tSrc, tTgt), tStack)];
+				wl.push_back(transReg);
+				vl.insert(transReg);
+				numTrans++;
+			}
+		}
+		//if (dump){
+		//	cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
+		//	fstream outfile("inter_outfa.dot", fstream::out);
+		//	outfa.print_dot(outfile, true);
+		//	outfile.close();
+		//} if (dump){
+		//	cout << "[Newton Compare] Dumping the output automaton to final_outfa.txt" << endl;
+		//	fstream outfile("inter_outfa.txt", fstream::out);
+		//	outfa.print(outfile);
+		//	outfile.close();
+		//}
+
+        cout << "Step 3: =========================================================" << endl;
+		/*Step 3 - Convert these regexps into TSL regular expressions and get the partial differentials
+		*		   with respect their variables
+		*/
+
+		cout << "[Newton Compare] converting to TSL" << endl;
+		while (!wl.empty())
+		{
+			int wlSzie = wl.size();
+			//convertToTSLRegExp
+			//if in conversion an updatable node is hit
+			//add that regexp to wl if not already in visitedList
+			int rToConvert = wl.back();
+			//std::cout << rToConvert << endl;
+			wl.pop_back();
+
+            // This converted regular expression goes into regExpMap
+			//bool insertProjects = true;
+			bool insertProjects = false;
+            baseEvalTime += convertToTSLRegExps(rToConvert, outNodeRegExpMap, regExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl, insertProjects);
+		}
+		//std::cout << "ESIZE: " << E.size() << std::endl;
+		//std::cout << "DSIZE: " << variableIDs.size() << std::endl;
+
+//		// Create a map from unique IDs to tsl regular expressions with variables
+//		// Currently doing this by iterating through the regular expressions and copying
+//		// the tsl regular expression whose ids match the nodes in the differentiatedMap
+//		for (vector<int>::iterator eit = variableIDs.begin(); eit != variableIDs.end(); eit++)
+//		{
+//			// std::cout << "D: " << *eit << endl;
+//				RTG::regExpRefPtr tmpReg = regExpMap[(*eit)];
+//				if (tmpReg != NULL)
+//				{
+//					diffMap[(*eit)] = regExpMap[(*eit)];
+//                    //tsl_regexp::regExpPrettyPrint(tmpReg, std::cout);
+//				}
+//			//  std::cout << "RE: " << *eit;
+//			//  std::cout << " ";
+//			//  E[(*eit)].print(std::cout) << std::endl;
+//			// This is used in debugging to compare the epsilon transitions with those generated by non-newton methods
+//			// to make sure they match
+//#if defined(NEWTON_DEBUG)
+//			int src = mapBack[(*eit)].first.first;
+//			int tgt = mapBack[(*eit)].first.second;
+//			int stack = mapBack[(*eit)].second;
+//			globalEpsilon.insert(std::make_pair(std::make_pair(src,tgt),stack));
+//#endif
+//		}
+//		t->start();
+
+		//cout << std::endl << "[Newton Compare] Creating Differentials" << std::endl;
+		////Created the differentials
+		//double t2 = 0;
+		//if (diffMap.size() != 0)
+		//{
+		//	bool linear = createDifferentials(diffMap, differentialMap);
+		//	if (linear)
+		//	{
+		//		std::cout << "linear";
+		//		std::cout << std::endl;
+		//	}
+		//	else
+		//	{
+		//		std::cout << "NonLin";
+		//		std::cout << std::endl;
+		//	}
+		//	tslDiffMap::iterator it3;
+
+        //    cout << "Step 4: =========================================================" << endl;
+		//	/* Step 4 - Create a new fwpds using these partial differentials - run poststar on the fwpds in
+		//	*	        order to get the full differentials representing the values of the program return points
+		//	*/
+		//	//Now we create new fwpds using these differentials, this fwpds has the weight type of NameWeight
+		//	FWPDS * fnew = new FWPDS();
+		//	fwpdsFromDifferential(fnew, differentialMap, varDependencies);
+
+		//	//Now create another finite automaton
+		//	WFA fa2;
+		//	wali::Key acc2 = wali::getKeySpace()->getKey("accept2");
+		//	fa2.addTrans(getPdsState(), stk(dummy), acc2, fnew->get_theZero()->one());
+		//	fa2.setInitialState(getPdsState());
+		//	fa2.addFinalState(acc2);
+		//	WFA outfa2;
+
+		//	//Get the regexps generated by running poststar on the new fwpds, these are the ones we will use in the Newton Round
+		//	t->stop();
+		//	t2 = fnew->getOutRegExpsSimple(fa2, outfa2, rNew);
+			t->start();
+		//	if (dump){
+		//		cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
+		//		fstream outfile("inter_outfa2.dot", fstream::out);
+		//		outfa2.print_dot(outfile, true);
+		//		outfile.close();
+		//	} if (dump){
+		//		cout << "[Newton Compare] Dumping the output automaton to final_outfa.txt" << endl;
+		//		fstream outfile("inter_outfa2.txt", fstream::out);
+		//		outfa2.print(outfile);
+		//		outfile.close();
+		//	}
+
+		//	if (dump){
+		//		cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
+		//		fstream outfile("fa2.dot", fstream::out);
+		//		fa2.print_dot(outfile, true);
+		//		outfile.close();
+		//	} if (dump){
+		//		cout << "[Newton Compare] Dumping the output automaton to final_outfa.txt" << endl;
+		//		fstream outfile("fa2.txt", fstream::out);
+		//		fa2.print(outfile);
+		//		outfile.close();
+		//	}
+
+            cout << "Step 4: =========================================================" << endl;
+            // Perform Gaussian elimination
+
+            std::cout << "Contents of variableIDs: " << std::endl;
+            for (vector<int>::iterator eit = variableIDs.begin(); eit != variableIDs.end(); eit++)
+            {
+                std::cout << *eit << "  "; 
+            }
+            std::cout << std::endl;
+            std::cout << "Keys of regExpMap: " << std::endl;
+            for (tslRegExpMap::iterator it = regExpMap.begin(); it != regExpMap.end(); ++it)
+            {
+                std::cout << it->first << "  "; 
+            }
+            std::cout << std::endl << std::endl;
+            for (vector<int>::iterator eit = variableIDs.begin(); eit != variableIDs.end(); eit++)
+            {
+                std::cout << "Regular expression in regExpMap for reID=" << *eit << ": " << std::endl;
+                tsl_regexp::regExpPrettyPrint(regExpMap[*eit], std::cout); 
+                std::cout << std::endl << std::endl;
+            }
+
+            std::sort(variableIDs.begin(), variableIDs.end());
+
+	        // FIXME: I don't really need two different maps here...
+            //   But, for debugging, I think it will be useful.
+            tslRegExpMap regExpsBeforeIsolation;
+	        tslRegExpMap regExpsAfterIsolation;
+
+            std::cout << std::endl << "Performing Gaussian Elimination." << std::endl << std::endl;
+
+            for (vector<int>::iterator varIt = variableIDs.begin(); varIt != variableIDs.end(); varIt++)
+            {
+                int i = *varIt;
+                //regExpsBeforeIsolation[i] = regExpMap[i];
+                regExpsBeforeIsolation[i] = CIR::mkProject(0,0,regExpMap[i]); // FIXME: numbers are dummy values, but we don't use them anyway
+            }
+
+            for (vector<int>::iterator varIt = variableIDs.begin(); varIt != variableIDs.end(); varIt++)
+            {
+                int i = *varIt;
+
+                //std::cout << std::endl << "  ------------------------------ " << std::endl;
+                //std::cout << "Working on variable " << i << std::endl;
+                //std::cout << "  The regexp for " << i << " just before isolating it:" << std::endl << std::endl;
+                //tsl_regexp::regExpPrettyPrint(regExpsBeforeIsolation[i], std::cout); 
+
+                RTG::regExpRefPtr iRHS = CIR::isolate(i, regExpsBeforeIsolation[i]);
+
+                //std::cout << std::endl << std::endl << "  The regexp for " << i << " just after isolating it:" << std::endl << std::endl;
+                //tsl_regexp::regExpPrettyPrint(iRHS, std::cout); 
+                //std::cout << std::endl;
+                //std::cout << std::endl << "  ------------------------------ " << std::endl;
+
+                regExpsAfterIsolation[i] = iRHS;
+
+                for (vector<int>::iterator varIt2 = variableIDs.begin(); varIt2 != variableIDs.end(); varIt2++)
+                {
+                    int j = *varIt2;
+
+                    if (j < i) {
+                        //std::cout << std::endl << "  ''''''''''''''''''''''''''''''''''(A) " << std::endl;
+                        //std::cout << " Substituting in for " << i << " in the RHS for variable " << j << std::endl;
+                        //std::cout << "  The regexp for " << j << " just before substituting in for " << i << ":" << std::endl;
+                        //tsl_regexp::regExpPrettyPrint(regExpsAfterIsolation[j], std::cout); 
+
+                        regExpsAfterIsolation[j] = CIR::substFree(iRHS, i, regExpsAfterIsolation[j]);
+
+                        //std::cout << std::endl << "  The regexp for " << j << " just after substituting in for " << i << ":" << std::endl;
+                        //tsl_regexp::regExpPrettyPrint(regExpsAfterIsolation[j], std::cout); 
+                        //std::cout << std::endl << "  '''''''''''''''''''''''''''''''''' " << std::endl;
+                    } else if (j > i) {
+                        //std::cout << std::endl << "  ''''''''''''''''''''''''''''''''''(B) " << std::endl;
+                        //std::cout << " Substituting in for " << i << " in the RHS for variable " << j << std::endl;
+                        //std::cout << "  The regexp for " << j << " just before substituting in for " << i << ":" << std::endl;
+                        //tsl_regexp::regExpPrettyPrint(regExpsBeforeIsolation[j], std::cout); 
+
+                        regExpsBeforeIsolation[j] = CIR::substFree(iRHS, i, regExpsBeforeIsolation[j]);
+
+                        //std::cout << std::endl << "  The regexp for " << j << " just after substituting in for " << i << ":" << std::endl;
+                        //tsl_regexp::regExpPrettyPrint(regExpsBeforeIsolation[j], std::cout); 
+                        //std::cout << std::endl;
+                        //std::cout << std::endl << "  '''''''''''''''''''''''''''''''''' " << std::endl;
+                    }
+
+                }
+
+            }
+            std::cout << std::endl << " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  " << std::endl << std::endl;
+
+            std::cout << std::endl << "Finished Gaussian Elimination." << std::endl << std::endl;
+
+            for (vector<int>::iterator eit = variableIDs.begin(); eit != variableIDs.end(); eit++)
+            {
+                std::cout << "Regular expression in regExpsAfterIsolation for reID=" << *eit << ": " << std::endl;
+                tsl_regexp::regExpPrettyPrint(regExpsAfterIsolation[*eit], std::cout); 
+                std::cout << std::endl << std::endl;
+            }
+
+            
+
+            //cout << "Step 5: =========================================================" << endl;
+
+			//convertToTSLRegExpsT(rNew, regExpMap, tensoredRegExpMap, differentialMap, mapBack, mergeSrcMap);
+			
+            if (runningMode == NEWTON_FROM_BELOW) {
+                aList = CIR::initializeAssignment(); 
+                //for (tslRegExpMap::iterator it = regExpMap.begin(); it != regExpMap.end(); ++it)
+                //{
+                //    RTG::regExpRefPtr r = it->second;
+                //    //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newVal = evalNonRecAt0(r);
+                //    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newVal = CIR::evalRegExp(r);
+
+                //    // Insert <it->first,newVal> into aList
+                //    aList = CIR::updateAssignment(aList, CBTI_INT32(it->first), newVal);
+                //}
+            } else if (runningMode == NEWTON_FROM_ABOVE) {
+                assert(false && "We should not use runningMode NEWTON_FROM_ABOVE in runNewton_GaussianElimination");
+                CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr topVal = DuetRel::getBaseTop();
+                aList = CIR::mkConstantAssignment(topVal);
+            } 
+            // else {
+            //    assert(false && "Unrecognized running mode.");
+            //}
+
+            cout << "Step 5: =========================================================" << endl;
+			/* Step 6 - Perform Newton rounds until a fixed-point is reached */
+			cout << "[Newton Compare] Running Newton" << endl;
+			runNewton_GaussianElimination(aList, regExpsAfterIsolation, runningMode);
+
+            //assert(false && "The rest of this function is not yet implemented!"); 
+
+			//Using the final weights from Newton, evaluate the tslRegExps to get the final weights
+			//evalRegExps(aList);
+
+
+			/* Step 7 - Insert the new weights into the original outfa and perform the iterative path summary in order to
+			*			determine if the error weight is reachable
+			*/
+		//}
+		//else  //There are no variables to be differentiated
+		//{
+		//	nonRec = true;
+		//	std::cout << "NonRec";
+		//	std::cout << std::endl;
+		//	aList = CIR::initializeAssignment();
+		//	//evalRegExps(aList);
+		//	//t2 = 0;
+		//	if (testMode) {
+		//		std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
+		//		testFile << "__NUMRNDS 0" << std::endl;
+		//		testFile.close();
+		//	}	
+		//}
+		t->stop();
+
+        cout << "Step 6: =========================================================" << endl;
+        globalAssignment = aList;
+        //Map the evaluated weights back to the transitions the regexps came from
+		for (stateIter = faStates.begin(); stateIter != faStates.end(); stateIter++)
+		{
+			TransSet & transSet = outfa.getState(*stateIter)->getTransSet();
+			TransSet::iterator transIt;
+			for (transIt = transSet.begin(); transIt != transSet.end(); transIt++)
+			{
+				ITrans * tt = *transIt;
+				int tSrc = tt->from();
+				int tTgt = tt->to();
+				int tStack = tt->stack();
+				int transReg = transMap[std::make_pair(std::make_pair(tSrc, tTgt), tStack)];
+				t->start();
+				//CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr w = evalRegExpFinNonRec(regExpMap[transReg], aList);
+				CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr w = CIR::evalRegExp(regExpMap[transReg]);
+				t->stop();
+				//std::cout << "OutWeight: " << tSrc << "," << tTgt << "," << tStack << ":";
+				//w.v->print(std::cout) << endl;
+				tt->setWeight(w.v);
+			}
+		}
+		/*cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
+		fstream outfile("newton_outfa.dot", fstream::out);
+		outfa.print_dot(outfile, true);
+		outfile.close();*/
+
+		//Perform the final path summary
+		t->start();
+		outfa.path_summary_tarjan_fwpds(true, true);
+		//State * initS = outfa.getState(outfa.getInitialState());
+		//if (initS == NULL)
+		//{
+		//	cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
+		//}
+		//else
+		//{
+		//	sem_elem_t fWt = outfa.getState(outfa.getInitialState())->weight();
+		//	if (fWt->equal(fWt->zero()))
+		//	{
+		//		cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
+		//	}
+		//	else{
+		//		cout << "[Newton Compare] FWPDS ==> error reachable" << endl;
+		//	}
+		//}
+
+		t->stop();
+		double tTime = t->total_time() + t1 + baseEvalTime;
+		//double tTime = t->total_time() + t1 + t2 + baseEvalTime;
 		std::cout << "[Newton Compare] Time taken by: Newton: " << std::endl;
 		cout << tTime << endl;
 		
@@ -5861,68 +6573,68 @@ CAMLprim value compare_weights(Trans t) {
 
 #endif
 
-void runFwpds(FWPDS * pds)
-{
-  #if ET_DBG == 1
-    pds->print(std::cout);
-#endif
-    //reachPds->print(std::cout);
-    WFA outfa;
-    WFA outfa2;
-    WFA fa;
-    wali::Key acc = wali::getKeySpace()->getKey("accept");
-    sem_elem_t x = pds->get_theZero();
-    fa.addTrans(st1(),entry_key, acc, pds->get_theZero()->one());
-    fa.setInitialState(st1());
-    fa.addFinalState(acc);
-
-#if ET_DBG == 1
-	map<int, reg_exp_t> outNodeRegExpMap; // A map from a unique id of an outgoing node to the regular expression associated with it
-	map<int, int> updateableMap;  //A map from an upadateable node number to the id of the node it depends on 
-	map<int, int> oMap;
-	map<int, pair< pair<int, int>, int> > mapBack;  //A map from the node index to the struct of the <<src,tgt>,stack> - used to insert weights back into wfa
-	map<pair<pair<int, int>, int>, int> transMap;
-	vector<int> differentiatedList; //A list of nodes with where the differential is to be taken
-	map<std::pair<int, int>, std::pair<int, int> > mergeSrcMap; //The map that keeps track of the src of calls on call instructions
-#endif
-	
-    //Calls the poststar functions
-    cout << "[Newton Compare] Computing poststar..." << endl;
-#if ET_DBG == 1
-      pds->getOutRegExps(fa, outfa, outNodeRegExpMap, updateableMap, oMap, mapBack, transMap, differentiatedList, mergeSrcMap);
-#endif
-      pds->poststarIGR(fa,outfa);
-    //static value * start_anal = NULL;
-    //start_anal = caml_named_value("init_analysis");
-    //caml_callback(*start_anal, Val_unit);
-
-#if ET_DBG == 1
-    cout << "Print Regular Expressions: " << endl;
-    map<int, reg_exp_t>::iterator regExpIt = outNodeRegExpMap.begin();
-    for (regExpIt; regExpIt != outNodeRegExpMap.end(); regExpIt++)
-    {
- 	regExpIt->second->print(std::cout);
-	std::cout << std::endl << std::endl;
-    }
-
-#endif
-
-    cout << "Finishing poststar: " << endl;
-    outfa.path_summary_iterative_original(outfa.getSomeWeight()->one());
-
-    fstream outfile("outfa.txt", fstream::out);
-		  outfa.print(outfile);
-		  outfile.close();
-
-    Trans t;
-    outfa.find(st1(), exit_key, acc, t);
-
-    compare_weights(t);
-
-
-    #undef flush
-    std::cout << "Finished Printing" << std::endl << std::flush;
-}
+//void runFwpds(FWPDS * pds)
+//{
+//  #if ET_DBG == 1
+//    pds->print(std::cout);
+//#endif
+//    //reachPds->print(std::cout);
+//    WFA outfa;
+//    WFA outfa2;
+//    WFA fa;
+//    wali::Key acc = wali::getKeySpace()->getKey("accept");
+//    sem_elem_t x = pds->get_theZero();
+//    fa.addTrans(st1(),entry_key, acc, pds->get_theZero()->one());
+//    fa.setInitialState(st1());
+//    fa.addFinalState(acc);
+//
+//#if ET_DBG == 1
+//	map<int, reg_exp_t> outNodeRegExpMap; // A map from a unique id of an outgoing node to the regular expression associated with it
+//	map<int, int> updateableMap;  //A map from an upadateable node number to the id of the node it depends on 
+//	map<int, int> oMap;
+//	map<int, pair< pair<int, int>, int> > mapBack;  //A map from the node index to the struct of the <<src,tgt>,stack> - used to insert weights back into wfa
+//	map<pair<pair<int, int>, int>, int> transMap;
+//	vector<int> differentiatedList; //A list of nodes with where the differential is to be taken
+//	map<std::pair<int, int>, std::pair<int, int> > mergeSrcMap; //The map that keeps track of the src of calls on call instructions
+//#endif
+//	
+//    //Calls the poststar functions
+//    cout << "[Newton Compare] Computing poststar..." << endl;
+//#if ET_DBG == 1
+//      pds->getOutRegExps(fa, outfa, outNodeRegExpMap, updateableMap, oMap, mapBack, transMap, differentiatedList, mergeSrcMap);
+//#endif
+//      pds->poststarIGR(fa,outfa);
+//    //static value * start_anal = NULL;
+//    //start_anal = caml_named_value("init_analysis");
+//    //caml_callback(*start_anal, Val_unit);
+//
+//#if ET_DBG == 1
+//    cout << "Print Regular Expressions: " << endl;
+//    map<int, reg_exp_t>::iterator regExpIt = outNodeRegExpMap.begin();
+//    for (regExpIt; regExpIt != outNodeRegExpMap.end(); regExpIt++)
+//    {
+// 	regExpIt->second->print(std::cout);
+//	std::cout << std::endl << std::endl;
+//    }
+//
+//#endif
+//
+//    cout << "Finishing poststar: " << endl;
+//    outfa.path_summary_iterative_original(outfa.getSomeWeight()->one());
+//
+//    fstream outfile("outfa.txt", fstream::out);
+//		  outfa.print(outfile);
+//		  outfile.close();
+//
+//    Trans t;
+//    outfa.find(st1(), exit_key, acc, t);
+//
+//    compare_weights(t);
+//
+//
+//    #undef flush
+//    std::cout << "Finished Printing" << std::endl << std::flush;
+//}
 // Jason is commenting out what he believes to be a dangling
 //   preprocessor directive here:
 //#endif
@@ -5995,7 +6707,11 @@ int runBasicNewton(char **args, int runningMode)
     inNewtonLoop = false;
 
     WFA outfaNewton;
-    goals::run_newton(runningMode, outfaNewton, entry_key, pds, false);
+    if (runningMode == NEWTON_FROM_ABOVE) {
+        goals::run_newton(runningMode, outfaNewton, entry_key, pds, false);
+    } else if (runningMode == NEWTON_FROM_BELOW) {
+        goals::run_newton_GaussianElimination(runningMode, outfaNewton, entry_key, pds, false);
+    }
 
     wali::Key acc = wali::getKeySpace()->getKey("accept");
 
@@ -6003,9 +6719,9 @@ int runBasicNewton(char **args, int runningMode)
 
     bool exitTransitionFound = outfaNewton.find(st1(), exit_key, acc, t);
 
-    if (exitTransitionFound) {
-        compare_weights(t);
-    }
+    //if (exitTransitionFound) {
+    //    compare_weights(t);
+    //}
 
     // Set exit_transitions to the set of all transitions in outfaNewton
     // of the form (st1,WALI_EPSILON,<st1,e>), where e is an entry node
@@ -6052,9 +6768,9 @@ int runBasicNewton(char **args, int runningMode)
     std::cout << "================================================" << std::endl;
     std::cout << "Assertion Checkings at Error Points" << std::endl << std::endl;
     
-    std::cout << std::endl << "outfaNewton" << std::endl;
-    outfaNewton.print(std::cout);
-    std::cout << std::endl << std::endl;
+    //std::cout << std::endl << "outfaNewton" << std::endl;
+    //outfaNewton.print(std::cout);
+    //std::cout << std::endl << std::endl;
 
     // Check the assertion at each error point
     for (std::vector<caml_error_rule>::iterator it = errorRuleHolder.begin(); it != errorRuleHolder.end(); it++)
@@ -6233,9 +6949,9 @@ int main(int argc, char **argv)
     }
 	
     else {
-    	if (runningMode == NEWTON_FROM_ABOVE) {
-            assert(false && "Newton-from-above is not supported in this version of NewtonOcaml.");
-        }
+    	//if (runningMode == NEWTON_FROM_ABOVE) {
+        //    assert(false && "Newton-from-above is not supported in this version of NewtonOcaml.");
+        //}
     	if (runningMode == NEWTON_FROM_BELOW || runningMode == NEWTON_FROM_ABOVE) {
 			if (testMode) {
 				std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
