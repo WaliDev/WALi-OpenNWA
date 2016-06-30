@@ -2,6 +2,20 @@
 ;; Helper routines to filter out unnecessary PDGs.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; This function prints a pdg-vertex-set
+(define (print-vertices pdg-vertex-set)
+  (pdg-vertex-set-traverse 
+    pdg-vertex-set
+    (lambda (pdgv)
+      (begin
+        (display (ast-label (pdg-vertex-ast pdgv 'normalized)))
+        (display "\n")
+        #t
+      )
+    )
+  )
+)
+
 (define (begins-with-dot pdg)
  (let ((pdg-name (pdg-procedure-name pdg)))
   (let ((und-pos (string-index "." pdg-name))) 
@@ -80,112 +94,259 @@
   )
 )
 
+(define (formal-ins-of-pdg pdg answer)
+  (pdg-vertex-set-traverse
+    (pdg-vertices pdg)
+    (lambda (cond0)
+      (if (equal? (pdg-vertex-kind cond0) 'formal-in)
+        (begin
+          (pdg-vertex-set-put! answer cond0)
+          #t
+        )
+      )
+      #t
+    )
+  )
+)
+
+(define (pdg-vertex-intra-targets-kind pdgv kind)
+  (begin
+    (let ((answer (pdg-vertex-set-create)))
+      (pdg-edge-set-traverse
+        (pdg-vertex-intra-targets pdgv)
+        (lambda (w k)
+          (if (equal? k kind)
+            (pdg-vertex-set-put! answer w)
+            #t
+          )
+          #t
+        )
+      )
+      ;; (print-vertices answer)
+      answer
+    )
+  )
+)
+
+;; Return intraprocedural target vertices of kind 'vertex-kind' following only 'edge-kind' edges
+(define (pdg-vertex-intra-targets-filtered pdgv edge-kind vertex-kind)
+  (begin
+    (let ((answer (pdg-vertex-set-create)))
+      (pdg-edge-set-traverse
+        (pdg-vertex-intra-targets pdgv)
+        (lambda (w k)
+          (begin
+            (if (and
+                  (equal? k edge-kind)
+                  (equal? (pdg-vertex-kind w) vertex-kind)
+                )
+              (pdg-vertex-set-put! answer w)
+              #t
+            )
+            ;;(display (ast-label (pdg-vertex-ast w 'normalized)))
+            #t
+          )
+        )
+      )
+      ;; (print-vertices answer)
+      answer
+    )
+  )
+)
+
+;; Return all data successors of elements in set that are control-points
+(define (control-point-data-successors set)
+  (let ((answer-set (pdg-vertex-set-create)))
+    (begin
+      (pdg-vertex-set-traverse
+        set
+        (lambda (v)
+          (begin
+            ;; (print-vertices (pdg-vertex-intra-targets-filtered v 'data 'control-point))
+            (pdg-vertex-set-union! answer-set (pdg-vertex-intra-targets-filtered v 'data 'control-point))
+            ;; (print-vertices answer-set)
+          )
+        )
+      )
+      ;; (print-vertices answer-set)
+      answer-set
+    )
+  )
+)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; MAIN PROGRAM
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define (process-pdg pdg file)
- (begin
-  ;; First print info about the current PDG
-  (display "Line " file)
-  (display (cdr (pdg-file-line pdg)) file)
-  (display ": " file)
-  (display (pdg-procedure-name pdg) file)
-  (display " [" file)
-  (display (pdg-procedure-id pdg) file)
-  (display "]\n" file)
 
-  ;; For each pair (cond1,cond2) of different conditional-branch nodes
-  (pdg-vertex-set-traverse
-   (pdg-vertices pdg)
-   (lambda (cond1)
-     (if (equal? (pdg-vertex-kind cond1) 'control-point)
-       (pdg-vertex-set-traverse
-        (pdg-vertices pdg)
-        (lambda (cond2)
-         (if (and
-              (equal? (pdg-vertex-kind cond2) 'control-point)
-              (not (equal? cond1 cond2))
-              (not (trans-control-dep-path cond1 cond2))
-              (not (trans-control-dep-path cond2 cond1))
+(define (process-pdg n pdg w file next-frontier)
+  (begin
+    ;; For each pair (cond1,cond2) of different conditional-branch nodes
+    ;; such that cond1 ->* w
+    (pdg-vertex-set-traverse
+     (pdg-vertices pdg)
+     (lambda (cond1)
+       (if (and
+             (equal? (pdg-vertex-kind cond1) 'control-point)
+             (let ((targ1 (pdg-vertex-intra-targets cond1)))
+               (pdg-edge-set-lookup targ1 cond1 'control)       ;; control-dependence self-loop
              )
-           ;; For each control-dependence successor of cond1
-           (pdg-edge-set-traverse
-             (pdg-vertex-intra-targets cond1)
-             (lambda (pdgv4 e4)
-               (if (and
-                     (equal? e4 'control)
-                     (not (equal? pdgv4 cond1))
-                     (not (equal? pdgv4 cond2))
-                   )
-                 ;; For each transitive control-dependence successor of cond1
-                 (let ((f-slice-criterion (pdg-vertex-set-create)))
-                   (pdg-vertex-set-put! f-slice-criterion cond1) 
-                   (pdg-vertex-set-traverse
-                     (s-forward-slice f-slice-criterion 'control)
-                     (lambda (pdgv3)
-                       (if (and
-                             (not (equal? pdgv3 cond1))
-                             (not (equal? pdgv3 cond2))
-                             (not (equal? pdgv3 pdgv4))
-                           )
-                         (let ((targ3 (pdg-vertex-intra-targets pdgv3))
-                               (targ4 (pdg-vertex-intra-targets pdgv4)))
-                           (if (and
-                                 (pdg-edge-set-lookup targ3 cond2 'data)
-                                 (pdg-edge-set-lookup targ3 pdgv3 'data)
-                                 (pdg-edge-set-lookup targ4 pdgv4 'data)
-                                 (pdg-edge-set-lookup targ4 cond1 'data)
-                                 (not (pdg-edge-set-lookup targ3 pdgv4 'data))
-                                 (not (pdg-edge-set-lookup targ4 pdgv3 'data))
+             (trans-control-dep-path cond1 w)
+           )
+         (pdg-vertex-set-traverse
+          (pdg-vertices pdg)
+          (lambda (cond2)
+           (if (and
+                (equal? (pdg-vertex-kind cond2) 'control-point)
+                (not (equal? cond1 cond2))
+                (not (trans-control-dep-path cond1 cond2))
+                (not (trans-control-dep-path cond2 cond1))
+               )
+             ;; For each control-dependence successor of cond1
+             (pdg-edge-set-traverse
+               (pdg-vertex-intra-targets cond1)
+               (lambda (pdgv4 e4)
+                 (if (and
+                       (equal? e4 'control)
+                       (not (equal? pdgv4 cond1))
+                       (not (equal? pdgv4 cond2))
+                     )
+                   ;; For each transitive control-dependence successor of w
+                   (let ((f-slice-criterion (pdg-vertex-set-create)))
+                     (pdg-vertex-set-put! f-slice-criterion cond1) 
+                     (pdg-vertex-set-traverse
+                       (s-forward-slice f-slice-criterion 'control)
+                       (lambda (pdgv3)
+                         (if (and
+                               (not (equal? pdgv3 w))
+                               (not (equal? pdgv3 cond1))
+                               (not (equal? pdgv3 cond2))
+                               (not (equal? pdgv3 pdgv4))
+                             )
+                           (let ((targ3 (pdg-vertex-intra-targets pdgv3))
+                                 (targ4 (pdg-vertex-intra-targets pdgv4)))
+                             (if (and
+                                   (pdg-edge-set-lookup targ3 cond2 'data)
+                                   (pdg-edge-set-lookup targ3 pdgv3 'data)
+                                   (pdg-edge-set-lookup targ4 pdgv4 'data)
+                                   (pdg-edge-set-lookup targ4 cond1 'data)
+                                   (not (pdg-edge-set-lookup targ3 pdgv4 'data))
+                                   (not (pdg-edge-set-lookup targ4 pdgv3 'data))
+                                 )
+                               (begin
+                                 (display "-------------------------\n" file)
+                                 (display-vertex cond1 file)
+                                 (display-vertex w file)
+                                 (display-vertex pdgv4 file)
+                                 (display-vertex pdgv3 file)
+                                 (display-vertex cond2 file)
+                                 (display "-------------------------\n" file)
+                                 (pdg-vertex-set-put! next-frontier cond2)
                                )
-                             (begin
-                               (display "\n-------------------------\n" file)
-                               (display-vertex cond1 file)
-                               (display-vertex pdgv4 file)
-                               (display-vertex pdgv3 file)
-                               (display-vertex cond2 file)
-                               (display "\n-------------------------\n" file)
                              )
                            )
                          )
+                         #t
                        )
-                       #t
                      )
                    )
                  )
+                 #t
                )
-               #t
              )
            )
+           #t
+          )
          )
-         #t
-        )
        )
+       #t
      )
-     #t
-   )
+    )
   )
- )
+)
+
+(define (visit-pdg-helper n pdg file visited to-visit next-frontier)
+  (begin
+    (pdg-vertex-set-traverse
+      to-visit
+      (lambda (w)
+        (if (not (pdg-vertex-set-member? visited w))
+          (process-pdg n pdg w file next-frontier)
+        )
+        #t
+      )
+    )
+  )
+)
+
+;; Worklist algorithm to visit pdg as many rounds as needed
+;;   visited keeps track of what vertices have already been visited
+;;   to-visit is the worklist
+;;   next-frontier is filled during one round
+;;      with the next group of vertices to visit
+(define (visit-pdg n pdg file visited to-visit)
+  (let ((next-frontier (pdg-vertex-set-create)))
+    ;; (display "visit-pdg (")
+    ;; (display n)
+    ;; (display ") <<<\n")
+    ;; (print-vertices to-visit)
+    ;; (display ">>>\n")
+
+    (display "Round " file)
+    (display n file)
+    (display ":\n" file)
+ 
+    (visit-pdg-helper n pdg file visited to-visit next-frontier)
+
+    ;; (display "[[[\n")
+    ;; (print-vertices next-frontier)
+    ;; (display "]]]\n")
+    ;; (display "\n")
+
+
+    (pdg-vertex-set-union! visited to-visit)
+    (if (not (pdg-vertex-set-empty? next-frontier))
+      (visit-pdg (+ n 1) pdg file visited next-frontier)
+    )
+  )
 )
 
 (let ((lese-configurations (open-output-file "lese-configurations.txt")))
- (for-each
-  (lambda (pdg)
-   (if (not (skip-pdg? pdg))
-    (begin  
-     (display "Line ")
-     (display (cdr (pdg-file-line pdg)))
-     (display ": ")
-     (display (pdg-procedure-name pdg))
-     (display " [")
-     (display (pdg-procedure-id pdg))
-     (display "]\n")
-     (process-pdg pdg lese-configurations)
+  (for-each
+    (lambda (pdg)
+      (if (not (skip-pdg? pdg))
+        (begin  
+          (let ((initial-frontier (pdg-vertex-set-create))
+                (visited (pdg-vertex-set-create))
+                (formal-ins (pdg-vertex-set-create))
+               )
+            (display "Line ")
+            (display (cdr (pdg-file-line pdg)))
+            (display ": ")
+            (display (pdg-procedure-name pdg))
+            (display " [")
+            (display (pdg-procedure-id pdg))
+            (display "]\n")
+
+            (display "\n============================\n" lese-configurations)
+            (display "Line " lese-configurations)
+            (display (cdr (pdg-file-line pdg)) lese-configurations)
+            (display ": " lese-configurations)
+            (display (pdg-procedure-name pdg) lese-configurations)
+            (display " [" lese-configurations)
+            (display (pdg-procedure-id pdg) lese-configurations)
+            (display "]\n============================\n" lese-configurations)
+
+            ;; Compute the initial set of vertices to visit in pdg
+              (formal-ins-of-pdg pdg formal-ins) ;; compute the formal-ins of pdg
+              (pdg-vertex-set-union! initial-frontier (control-point-data-successors formal-ins))
+
+            (visit-pdg 1 pdg lese-configurations visited initial-frontier)
+          )
+        ) 
+        #t
+      )
     )
-   ) 
-   #t
+    (sdg-pdgs)
   )
-  (sdg-pdgs)
- )
 )
