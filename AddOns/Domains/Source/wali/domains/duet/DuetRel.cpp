@@ -439,6 +439,20 @@ duetrelpair_t DuetRel::alphaHatStar(duetrel_t previousAbstractValue)
   }
 
   abstract = caml_callback(*alpha_hat_func, dval);
+
+  if (previousAbstractValue == 0) {
+      std::cout << "(Not performing widening.)" << std::endl;
+  } else {
+      std::cout << "(Performing widening.)" << std::endl;
+  }
+
+  std::cout << "alphaHatStar {" << std::endl;
+  std::cout << "**** body value: ";
+  print(std::cout);
+  
+  std::cout << std::endl << "**** alpha hat: ";
+  std::cout << String_val(caml_callback2(*print_abstract_func, Val_int(2), abstract)) << std::endl;
+
   if (previousAbstractValue != 0) {
       widened = caml_callback2(*widen_func, previousAbstractValue->getValue(), abstract);
       star_formula = caml_callback(*abstract_star_func, widened);
@@ -450,9 +464,6 @@ duetrelpair_t DuetRel::alphaHatStar(duetrel_t previousAbstractValue)
   d2 = MkDuetRel(star_formula, isTensored);
   d = DuetRelPair::MkDuetRelPair(d1, d2);
 
-  std::cout << "alphaHatStar {" << std::endl;
-  std::cout << "**** alpha hat: ";
-  std::cout << String_val(caml_callback2(*print_abstract_func, Val_int(2), abstract)) << std::endl;
   if (previousAbstractValue != 0) {
       std::cout << "**** result of widening: ";
       std::cout << String_val(caml_callback2(*print_abstract_func, Val_int(2), widened)) << std::endl;

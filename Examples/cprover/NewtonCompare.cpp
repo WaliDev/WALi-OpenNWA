@@ -4609,7 +4609,6 @@ NEWROUND:
 		std::cout << "Round " << rnd << ":" << std::endl;
 		rnd++;
 			
-			
 		//oldVal = newVal;
 		globalAssignment = newVal;
 		newVal = CIR::initializeAssignment();
@@ -4843,6 +4842,16 @@ NEWROUND:
         } else {
             doWideningThisRound = false;
         }
+
+        std::cout << std::endl << "Here is the current assignment of values to variables:" << std::endl;
+        for (assignIt = regExpsAfterIsolation.begin(); assignIt != regExpsAfterIsolation.end(); assignIt++)
+		{
+			int var = assignIt->first;
+			std::cout << "Value of variable " << assignIt->first << " is: " << std::endl;
+            CIR::getAssignment(var, globalAssignment).print(std::cout);
+			std::cout << std::endl << std::endl;
+        }
+        std::cout << std::endl;
 
 		// For each variable in the equation system, evaluate its tensored regular expression
         for (assignIt = regExpsAfterIsolation.begin(); assignIt != regExpsAfterIsolation.end(); assignIt++)
@@ -5803,11 +5812,7 @@ NEWROUND:
                 tsl_regexp::regExpPrettyPrint(regExpsAfterIsolation[*eit], std::cout); 
                 std::cout << std::endl << std::endl;
             }
-
             
-
-            //cout << "Step 5: =========================================================" << endl;
-
 			//convertToTSLRegExpsT(rNew, regExpMap, tensoredRegExpMap, differentialMap, mapBack, mergeSrcMap);
 			
             if (runningMode == NEWTON_FROM_BELOW) {
