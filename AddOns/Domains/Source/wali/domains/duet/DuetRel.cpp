@@ -673,6 +673,31 @@ duetrel_t DuetRel::getTensorOne()
   CAMLreturnT(duetrel_t,d);
 }
 
+// Print a value from the abstract domain of recurrences.
+// FIXME: obviously these abstract values should either be made into a separate
+//   class, or else there should be a flag in a DuetRel indicating whether it 
+//   is one of these, instead of a usual DuetRel.  But, I'm in a hurry.
+std::ostream& DuetRel::printAbstract( std::ostream& o ) const 
+{
+  
+  CAMLparam0();
+  CAMLlocal1(dval); 
+  
+  dval = this->getValue();
+
+  value * print_abstract_func;
+
+  if (isTensored) {
+    print_abstract_func = caml_named_value("tensor_print_abstract_callback");
+  } else {
+    print_abstract_func = caml_named_value("print_abstract_callback");
+  }
+
+  o << String_val(caml_callback2(*print_abstract_func, Val_int(2), dval)) << std::endl;
+
+  CAMLreturnT(std::ostream&, o);
+}
+
 std::ostream& DuetRel::print( std::ostream& o ) const 
 {
   return printIndented(o, 0);

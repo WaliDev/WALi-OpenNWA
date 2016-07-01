@@ -4549,7 +4549,7 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
   *	break
   *  }
   */
-#define WIDENING_DELAY 6 
+#define WIDENING_DELAY 6
 #define MAX_ROUNDS_FROM_BELOW 50
 #define MAX_ROUNDS_FROM_ABOVE 4
   void runNewton(RTG::assignmentRefPtr & newVal, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies, tslRegExpTMap & tensoredRegExpMap, bool linear, int runningMode)
@@ -4580,7 +4580,7 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
     for (assignIt = tensoredRegExpMap.begin(); assignIt != tensoredRegExpMap.end(); assignIt++)
     {
         std::cout << "Tensored regular expression for reID=" << assignIt->first << ": " << std::endl;
-        tsl_regexp::regExpTPrettyPrint(assignIt->second, std::cout); // FIXME (problem here...?)
+        tsl_regexp::regExpTPrettyPrint(assignIt->second, std::cout); 
         std::cout << std::endl << std::endl;
     }
 
@@ -4800,7 +4800,7 @@ NEWROUND:
         std::cout << std::endl << std::endl;
     }
 
-    int stratificationHeight = 1;
+    int stratificationHeight = 0;
     int propagationRounds = 0;
     //if (runningMode == NEWTON_FROM_BELOW) {
     //    stratificationHeight = computeStratificationHeight(tensoredRegExpMap);
@@ -4865,9 +4865,10 @@ NEWROUND:
 			
 			std::cout << "Eval: " << assignIt->first << std::endl;
 			//assignIt->second.print(std::cout);
-            std::cout << "  Regular expression is: " << std::endl;
-            tsl_regexp::regExpPrettyPrint(assignIt->second, std::cout);
-			std::cout << std::endl;
+            
+            //std::cout << "\n  The regular expression for " << assignIt->first << " is: \n" << std::endl;
+            //tsl_regexp::regExpPrettyPrint(assignIt->second, std::cout);
+			//std::cout << std::endl;
 			
 			//CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal);
 			//CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newValue = CIR::evalT(assignIt->second);
@@ -4879,9 +4880,9 @@ NEWROUND:
 			////////CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = CONC_EXTERNS::detensorTranspose(newValue);
 			////////
 			////////std::cout << std::endl << "Detensored Val: ";
-			std::cout << std::endl << "Value: ";
+			std::cout << "\n  The value on this round is: \n\n";
 			newValue.v->print(std::cout);
-			std::cout << std::endl;
+			std::cout << std::endl << std::endl;
 			
 			/*CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
 			
@@ -4938,7 +4939,10 @@ NEWROUND:
 		}
 		for(StarMapT::const_iterator newStar_it = newStarValT.begin(); newStar_it != newStarValT.end(); ++newStar_it) 
 		{
-			// std::cout << "  Checking a tensored Kleene star." << std::endl;
+			std::cout << "  Checking a tensored Kleene star." << std::endl;
+            std::cout << "  Its new value is: " << std::endl;
+            newStar_it->second.v->printAbstract(std::cout);
+
 			StarMapT::const_iterator oldStarValue = oldStarValT.find(newStar_it->first);
 			if (oldStarValue == oldStarValT.end()) {
 				// On the first round, we have no previous value to compare against
@@ -4946,15 +4950,17 @@ NEWROUND:
 				propagationRounds = 0;
 				goto NEWROUND;
 			}
+            std::cout << "\n  Its old value was: " << std::endl;
+            oldStarValue->second.v->printAbstract(std::cout);
 			if (!newStar_it->second.v->Equivalent(oldStarValue->second.v)) {
-				// std::cout << "    Inequivalent: continuing loop." << std::endl;
+				std::cout << "\n    Inequivalent: continuing loop." << std::endl;
 				propagationRounds = 0;
 				goto NEWROUND;
 			}
-			// std::cout << "  Equivalent." << std::endl;
+			std::cout << "\n  Equivalent." << std::endl;
 		}
         if (propagationRounds >= stratificationHeight) {
-            // std::cout << "  All stars are equivalent: exiting loop." << std::endl;
+            std::cout << "\n  All stars are equivalent: exiting loop." << std::endl;
   		    break; // Exit the Newton loop because all abstracted Kleene star bodies have converged
         } else {
             propagationRounds++;
@@ -5430,7 +5436,7 @@ NEWROUND:
 
 		t->stop();
 		double tTime = t->total_time() + t1 + t2 + baseEvalTime;
-		std::cout << "[Newton Compare] Time taken by: Newton: " << std::endl;
+		std::cout << std::endl << "[Newton Compare] Time taken by: Newton: " << std::endl << std::endl;
 		cout << tTime << endl;
 		
 		if (testMode) {
@@ -5749,24 +5755,24 @@ NEWROUND:
             {
                 int i = *varIt;
                 //regExpsBeforeIsolation[i] = regExpMap[i];
-                regExpsBeforeIsolation[i] = CIR::mkProject(0,0,regExpMap[i]); // FIXME: numbers are dummy values, but we don't use them anyway
+                regExpsBeforeIsolation[i] = CIR::mkProject(0,0,regExpMap[i]); // FIXME: 0,0 are dummy values, but we don't use them anyway
             }
 
             for (vector<int>::iterator varIt = variableIDs.begin(); varIt != variableIDs.end(); varIt++)
             {
                 int i = *varIt;
 
-                //std::cout << std::endl << "  ------------------------------ " << std::endl;
-                //std::cout << "Working on variable " << i << std::endl;
-                //std::cout << "  The regexp for " << i << " just before isolating it:" << std::endl << std::endl;
-                //tsl_regexp::regExpPrettyPrint(regExpsBeforeIsolation[i], std::cout); 
+                std::cout << std::endl << "  ------------------------------ " << std::endl;
+                std::cout << "Working on variable " << i << std::endl;
+                std::cout << "  The regexp for " << i << " just before isolating it:" << std::endl << std::endl;
+                tsl_regexp::regExpPrettyPrint(regExpsBeforeIsolation[i], std::cout); 
 
                 RTG::regExpRefPtr iRHS = CIR::isolate(i, regExpsBeforeIsolation[i]);
 
-                //std::cout << std::endl << std::endl << "  The regexp for " << i << " just after isolating it:" << std::endl << std::endl;
-                //tsl_regexp::regExpPrettyPrint(iRHS, std::cout); 
-                //std::cout << std::endl;
-                //std::cout << std::endl << "  ------------------------------ " << std::endl;
+                std::cout << std::endl << std::endl << "  The regexp for " << i << " just after isolating it:" << std::endl << std::endl;
+                tsl_regexp::regExpPrettyPrint(iRHS, std::cout); 
+                std::cout << std::endl;
+                std::cout << std::endl << "  ------------------------------ " << std::endl;
 
                 regExpsAfterIsolation[i] = iRHS;
 
@@ -5775,28 +5781,28 @@ NEWROUND:
                     int j = *varIt2;
 
                     if (j < i) {
-                        //std::cout << std::endl << "  ''''''''''''''''''''''''''''''''''(A) " << std::endl;
-                        //std::cout << " Substituting in for " << i << " in the RHS for variable " << j << std::endl;
-                        //std::cout << "  The regexp for " << j << " just before substituting in for " << i << ":" << std::endl;
-                        //tsl_regexp::regExpPrettyPrint(regExpsAfterIsolation[j], std::cout); 
+                        std::cout << std::endl << "  ''''''''''''''''''''''''''''''''''(A) " << std::endl;
+                        std::cout << " Substituting in for " << i << " in the RHS for variable " << j << std::endl;
+                        std::cout << "  The regexp for " << j << " just before substituting in for " << i << ":\n" << std::endl;
+                        tsl_regexp::regExpPrettyPrint(regExpsAfterIsolation[j], std::cout); 
 
                         regExpsAfterIsolation[j] = CIR::substFree(iRHS, i, regExpsAfterIsolation[j]);
 
-                        //std::cout << std::endl << "  The regexp for " << j << " just after substituting in for " << i << ":" << std::endl;
-                        //tsl_regexp::regExpPrettyPrint(regExpsAfterIsolation[j], std::cout); 
-                        //std::cout << std::endl << "  '''''''''''''''''''''''''''''''''' " << std::endl;
+                        std::cout << std::endl << "  The regexp for " << j << " just after substituting in for " << i << ":\n" << std::endl;
+                        tsl_regexp::regExpPrettyPrint(regExpsAfterIsolation[j], std::cout); 
+                        std::cout << std::endl << "  '''''''''''''''''''''''''''''''''' " << std::endl;
                     } else if (j > i) {
-                        //std::cout << std::endl << "  ''''''''''''''''''''''''''''''''''(B) " << std::endl;
-                        //std::cout << " Substituting in for " << i << " in the RHS for variable " << j << std::endl;
-                        //std::cout << "  The regexp for " << j << " just before substituting in for " << i << ":" << std::endl;
-                        //tsl_regexp::regExpPrettyPrint(regExpsBeforeIsolation[j], std::cout); 
+                        std::cout << std::endl << "  ''''''''''''''''''''''''''''''''''(B) " << std::endl;
+                        std::cout << " Substituting in for " << i << " in the RHS for variable " << j << std::endl;
+                        std::cout << "  The regexp for " << j << " just before substituting in for " << i << ":\n" << std::endl;
+                        tsl_regexp::regExpPrettyPrint(regExpsBeforeIsolation[j], std::cout); 
 
                         regExpsBeforeIsolation[j] = CIR::substFree(iRHS, i, regExpsBeforeIsolation[j]);
 
-                        //std::cout << std::endl << "  The regexp for " << j << " just after substituting in for " << i << ":" << std::endl;
-                        //tsl_regexp::regExpPrettyPrint(regExpsBeforeIsolation[j], std::cout); 
-                        //std::cout << std::endl;
-                        //std::cout << std::endl << "  '''''''''''''''''''''''''''''''''' " << std::endl;
+                        std::cout << std::endl << "  The regexp for " << j << " just after substituting in for " << i << ":\n" << std::endl;
+                        tsl_regexp::regExpPrettyPrint(regExpsBeforeIsolation[j], std::cout); 
+                        std::cout << std::endl;
+                        std::cout << std::endl << "  '''''''''''''''''''''''''''''''''' " << std::endl;
                     }
 
                 }
@@ -5866,7 +5872,7 @@ NEWROUND:
 		//}
 		t->stop();
 
-        cout << "Step 6: =========================================================" << endl;
+        cout << "\nStep 6: =========================================================" << endl;
         globalAssignment = aList;
         //Map the evaluated weights back to the transitions the regexps came from
 		for (stateIter = faStates.begin(); stateIter != faStates.end(); stateIter++)
@@ -5917,8 +5923,8 @@ NEWROUND:
 		t->stop();
 		double tTime = t->total_time() + t1 + baseEvalTime;
 		//double tTime = t->total_time() + t1 + t2 + baseEvalTime;
-		std::cout << "[Newton Compare] Time taken by: Newton: " << std::endl;
-		cout << tTime << endl;
+		std::cout << "\n[Newton Compare] Time taken by: Newton: " << std::endl;
+		cout << tTime << "\n" << endl;
 		
 		if (testMode) {
 			std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
@@ -5932,7 +5938,7 @@ NEWROUND:
 	{
 		cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
 		double tTime = t->total_time() + t1;;
-		std::cout << "[Newton Compare] Time taken by: Newton: ";
+		std::cout << "\n[Newton Compare] Time taken by: Newton: \n";
 		cout << tTime << endl;
 		std::cout << "NonRec";
 		std::cout << std::endl;
@@ -6764,7 +6770,7 @@ int runBasicNewton(char **args, int runningMode)
             duetrel_t composedWeight = contextWeight->Compose(intraprocWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
             
             std::cout << "Variable Bounds at Line: " << line << std::endl;
-            //composedWeight->printHull(std::cout, 0, variableID);
+            //composedWeight->printHull(std::cout, 0, variableID); //FIXME XXX FIXME XXX UNDO THIS
             intraprocWeight->printHull(std::cout, 0, variableID);
             std::cout << std::endl;
         }
@@ -6803,14 +6809,14 @@ int runBasicNewton(char **args, int runningMode)
             bool isSat = finalWeight->IsSat();
 
 			if (isSat) {
-				std::cout << "Is SAT! (Assertion Failed)" << std::endl ;	
+				std::cout << "Is SAT! (Assertion on line " << it->second.second << " FAILED)" << std::endl ;	
 			
 				// This print statement causes seg fault (not sure why) -Ashkan		
 				//extval->print(std::cout);
 				//std::cout << std::endl;
 			}
 			else {
-				std::cout << "Is not SAT! (Assertion Passed)" << std::endl;
+				std::cout << "Is not SAT! (Assertion on line " << it->second.second << " PASSED)" << std::endl;
 			}
 
             std::cout << std::endl << "contextWeight = " << std::endl;
