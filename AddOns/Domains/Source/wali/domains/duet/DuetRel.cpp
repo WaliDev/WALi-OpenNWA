@@ -457,10 +457,14 @@ duetrelpair_t DuetRel::alphaHatStar(duetrel_t previousAbstractValue)
       widened = caml_callback2(*widen_func, previousAbstractValue->getValue(), abstract);
       star_formula = caml_callback(*abstract_star_func, widened);
   } else {
+      widened = abstract; // FIXME is this right?
       star_formula = caml_callback(*abstract_star_func, abstract);
   }
 
-  d1 = MkDuetRel(abstract, isTensored);
+  // If we perform widening, we should return the widened value instead of the un-widened alpha-hat;
+  //   if we are not widening, then we can return the un-widened alpha-hat.
+  d1 = MkDuetRel(widened, isTensored); 
+  //d1 = MkDuetRel(abstract, isTensored);
   d2 = MkDuetRel(star_formula, isTensored);
   d = DuetRelPair::MkDuetRelPair(d1, d2);
 
