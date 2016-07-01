@@ -38,13 +38,15 @@ dirName=os.getcwd()
 NEWTON_BELOW = 1
 NEWTON_ABOVE = 3
 
+bgColor = 0
+
 for line in fin:
 	words = line.split()
 	if (words[0] == "__DIRECTORY"):	
 		if not(firstAssertion):
 			firstAssertion = True
 			fout.write('</td>\n')
-		
+ 		
 		if firstElem:
 			firstElem = False
 		else:
@@ -71,10 +73,12 @@ for line in fin:
 			runMode = 'above'
 		else:
 			runMode = 'below'
+			bgColor = 1-bgColor
 			
 		flipResult = (('unsafe' in fileName) or ('false' in fileName))	
 		
-		fout.write('<tr align=\"center\">\n')
+		#fout.write('<tr align=\"center\">\n')
+		fout.write('<tr align=\"center\" style="background-color:'+["white","#BBBBBB"][bgColor]+';">\n')
 		
 		if (runMode == 'below'):
 			fout.write('<td rowspan="2">')
@@ -106,9 +110,11 @@ for line in fin:
 			firstAssertion = False
 		if (flipResult):
 			if (words[1] == "FAIL"):
-				fout.write('<font color=\"#00AA00\">PASS</font><br>')
+				#fout.write('<font color=\"#00AA00\">PASS</font><br>')
+				fout.write('<font color=\"#00AA00\">OKAY</font><br>')
 			elif (words[1] == "PASS"):
-				fout.write('<font color=\"#FF0000\">FAIL</font><br>')
+				fout.write('<b><font color=\"#FF0000\">UNSOUND</font></b><br>')
+				#fout.write('<font color=\"#FF0000\">FAIL</font><br>')
 		else:
 			if (words[1] == "PASS"):
 				fout.write('<font color=\"#00AA00\">PASS</font><br>')
@@ -124,9 +130,11 @@ for line in fin:
 		for i in range(len(words)-1):
 			if (flipResult):
 				if (words[i+1] == "FAIL"):
-					fout.write('<font color=\"#00AA00\">PASS</font><br>')
+					#fout.write('<font color=\"#00AA00\">PASS</font><br>')
+					fout.write('<font color=\"#00AA00\">OKAY</font><br>')
 				elif (words[i+1] == "PASS"):
-					fout.write('<font color=\"#FF0000\">FAIL</font><br>')
+					#fout.write('<font color=\"#FF0000\">FAIL</font><br>')
+					fout.write('<b><font color=\"#FF0000\">UNSOUND</font></b><br>')
 				elif (words[i+1] == "TIMEOUT"):
 					fout.write('<font color=\"#00AAAA\">TIMEOUT</font><br>')
 			else:
