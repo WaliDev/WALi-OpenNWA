@@ -5,16 +5,17 @@
 #define SWAP_ELEMENTS(X,Y) assert(X >= low && X < hi && Y >= low && Y < hi); \
                            __t=a[X]; a[X]=a[Y]; a[Y]=__t 
 #define ASSERT_IN_BOUNDS(X) assert(X >= low && X < hi)
+int length;
 
 // Sort the subregion of a at index positions [low,hi)
 void quicksort(int *a, int low, int hi) {
-	int __t, pivot, pivotIndex, i, j;
+    int __t, pivot, pivotIndex, i, j;
 
-    assert(0 <= low && hi <= LENGTH);
+    assert(0 <= low && hi <= length);
 
-	if (hi - low < 2) return;
+    if (hi - low < 2) return;
 
-	pivotIndex = RANDOM_INCLUSIVE(low, hi-1);
+    pivotIndex = RANDOM_INCLUSIVE(low, hi-1);
     
     SWAP_ELEMENTS(hi-1, pivotIndex);
    
@@ -32,16 +33,22 @@ void quicksort(int *a, int low, int hi) {
 
     SWAP_ELEMENTS(i+1,hi-1);
     
-	quicksort(a, low, i+1);
-	quicksort(a, i+2, hi);
+    quicksort(a, low, i+1);
+    quicksort(a, i+2, hi);
 }
 
-int main()
+int main(int argc)
 {
-	int a[LENGTH];
-	int i;
-	for (i = 0; i < LENGTH; i++)
-		a[i] = __VERIFIER_nondet_int();
-    quicksort(a, 0, LENGTH);
-	return 0;
+    int * a;
+    int i;
+
+    length = argc;
+    __VERIFIER_assume(length > 0);
+
+    a = malloc(length * sizeof(int));
+
+    for (i = 0; i < length; i++)
+        a[i] = __VERIFIER_nondet_int();
+    quicksort(a, 0, length);
+    return 0;
 }
