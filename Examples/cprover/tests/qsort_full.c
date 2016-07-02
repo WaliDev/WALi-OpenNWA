@@ -1,5 +1,4 @@
 // adapted from C4B example "qsort.c"
-#define LENGTH 20
 #define RANDOM_INCLUSIVE(L, H) __t = __VERIFIER_nondet_int(); \
                            __VERIFIER_assume(__t >= L && __t <= H)
 #define SWAP_ELEMENTS(X,Y) assert(X >= low && X < hi && Y >= low && Y < hi); \
