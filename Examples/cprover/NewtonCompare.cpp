@@ -538,6 +538,10 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElemT(
     duetrelpair_t ret;
     
     MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(child);
+
+    //std::cout << "*** Loop body regular expression is:" << std::endl;
+    //tsl_regexp::regExpTPrettyPrint(child, std::cout); 
+    //std::cout << std::endl;
     
     duetrel_t previousValue = 0;
     if (doWideningThisRound) {
@@ -569,6 +573,10 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElem(
     duetrelpair_t ret;
     
     MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(child);
+    
+    //std::cout << "*** Loop body regular expression is:" << std::endl;
+    //tsl_regexp::regExpPrettyPrint(child, std::cout); 
+    //std::cout << std::endl;
     
     duetrel_t previousValue = 0;
     if (doWideningThisRound) {
@@ -4092,6 +4100,10 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 	  }
   }	
 
+
+//map of regExps that have already been seen (should change to an unordered_map for speedup)
+std::map<reg_exp_t, RTG::regExpRefPtr> regExpConversionMap; // This was formerly called "seen" and was local to convertToRegExp --JTB
+
  /*
   *  convertToRegExp
   *
@@ -4111,7 +4123,6 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
   RTG::regExpRefPtr convertToRegExp(int reID, reg_exp_t exp, std::map<int, reg_exp_t> & outNodeRegExpsMap, std::map<int, std::set<int> > & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, std::map<std::pair<int, int>, std::pair<int, int> > & mergeSrcMap, std::vector<int> & wl, std::set<int> & vl, double * elapsedTime, bool insertProjects = true)
   {
 	  std::stack<cFrame> todo;
-	  std::map<reg_exp_t, RTG::regExpRefPtr> seen; //map of regExps that have already been seen (should change to an unordered_map for speedup)
 	  std::map<reg_exp_t, RTG::regExpRefPtr>::iterator it;
 	  wali::util::GoodTimer * tC = new wali::util::GoodTimer("temp");
 	  tC->stop();
@@ -4124,8 +4135,8 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 	  {
 		  cFrame & frame = todo.top();
 		  if (frame.is_new){ //We haven't seen the frame before
-			  it = seen.find(frame.e);
-			  if (it != seen.end())
+			  it = regExpConversionMap.find(frame.e);
+			  if (it != regExpConversionMap.end())
 			  {
 				  todo.pop();
 				  continue;
@@ -4134,15 +4145,25 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 			  if (frame.e->isConstant())
 			  {
 				  if (frame.e->isOne())
-					  seen[frame.e] = RTG::One::make();
+					  regExpConversionMap[frame.e] = RTG::One::make();
 				  else if (frame.e->isZero())
-					  seen[frame.e] = RTG::Zero::make();
+					  regExpConversionMap[frame.e] = RTG::Zero::make();
 				  else {  //If the expresssion isn't a simple constant, make an external TSL wrapper around the constant and create a TSL weight
 					  domain_t w = dynamic_cast<Relation*>(frame.e->get_weight().get_ptr());
 					  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr wt = w;
 					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr wt = CONC_EXTERN_PHYLA::sem_elem_wrapper(w);
-					  //seen[frame.e] = RTG::Weight::make(wt);
-					  seen[frame.e] = CIR::mkWeight(wt);
+					  //regExpConversionMap[frame.e] = RTG::Weight::make(wt);
+					  regExpConversionMap[frame.e] = CIR::mkWeight(wt);
+                      //Added by Jason ---------------------------------
+                      //std::cerr << "The RTG:regExpRefPtr (Weight) at address " << regExpConversionMap[frame.e].get_ptr() << "\n";
+                      //std::cerr << "    was just made from the following weight:" << std::endl;
+                      //wt.v->print(std::cerr);
+                      //std::cerr << "\n" << std::endl;
+                      //---------------------------------
+                      //std::cerr << "+++++\n" << std::endl;
+                      //wt.v->print(std::cerr);
+                      //std::cerr << " @" << regExpConversionMap[frame.e].get_ptr() << "\n";
+                      //---------------------------------
 				  }
 				  todo.pop();
 				  continue;
@@ -4164,10 +4185,10 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 					  vl.insert(mNum);
 				  }
 				  vDep.insert(mNum);  //This regExp is dependent on the regExp represented by mNum
-				  //seen[frame.e] = insertProjects
+				  //regExpConversionMap[frame.e] = insertProjects
 				  //                    ? RTG::Project::make(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), RTG::Var::make(CBTI::INT32(mNum)))
 				  //                    : RTG::Var::make(CBTI::INT32(mNum));
-				  seen[frame.e] = insertProjects
+				  regExpConversionMap[frame.e] = insertProjects
 				                      ? CIR::mkProject(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), CIR::mkVar(CBTI::INT32(mNum)))
 				                      : CIR::mkVar(CBTI::INT32(mNum));
 				  todo.pop();
@@ -4180,13 +4201,19 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 				  frame.op = 0;
 				  reg_exp_t child = frame.e->getChildren().front();
 				  frame.left = child;
-				  it = seen.find(child);
-				  if (it != seen.end())
+				  it = regExpConversionMap.find(child);
+				  if (it != regExpConversionMap.end())
 				  {
 					  tC->start();
 					  RTG::regExpRefPtr ret = CIR::mkKleene(it->second);
+                      //Added by Jason ---------------------------------
+                      //std::cerr << "The RTG:regExpRefPtr at address " << ret.get_ptr() << "\n";
+                      //std::cerr << "    was just made from the following loop body reg_exp_t:" << std::endl;
+                      //frame.left.get_ptr()->print(std::cerr);
+                      //std::cerr << "\n" << std::endl;
+                      //---------------------------------
 					  tC->stop();
-					  seen[frame.e] = ret;
+					  regExpConversionMap[frame.e] = ret;
 					  todo.pop();
 					  continue;
 				  }
@@ -4207,12 +4234,12 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 				  frame.left = *ch;
 				  ch++;
 				  frame.right = *ch;
-				  it = seen.find(frame.left);
-				  if (it != seen.end())
+				  it = regExpConversionMap.find(frame.left);
+				  if (it != regExpConversionMap.end())
 				  {
 					  RTG::regExpRefPtr lch = it->second;
-					  it = seen.find(frame.right);
-					  if (it != seen.end())
+					  it = regExpConversionMap.find(frame.right);
+					  if (it != regExpConversionMap.end())
 					  {
 						  RTG::regExpRefPtr rch = it->second;
 						  RTG::regExpRefPtr ret;
@@ -4222,7 +4249,7 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 						  else
 							  ret = CIR::mkPlus(lch, rch);
 						  tC->stop();
-						  seen[frame.e] = ret;
+						  regExpConversionMap[frame.e] = ret;
 						  todo.pop();
 						  continue;
 					  }
@@ -4235,7 +4262,7 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 				  else
 				  {
 					  todo.push(cFrame(frame.left));
-					  if (seen.find(frame.right) == seen.end())
+					  if (regExpConversionMap.find(frame.right) == regExpConversionMap.end())
 					  {
 						  todo.push(cFrame(frame.right));
 						  continue;
@@ -4246,17 +4273,23 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 		  else  //We've seen this reg_exp_t before, so it's children have been converted
 		  {
 			  //Look up the children and call the appropriate constructor for TSL
-			  RTG::regExpRefPtr lch = seen[frame.left];
+			  RTG::regExpRefPtr lch = regExpConversionMap[frame.left];
 			  RTG::regExpRefPtr ret;
 			  if (frame.op == 0)  //Kleene
 			  {
 				  tC->start();
 				  ret = CIR::mkKleene(lch);
+                  //Added by Jason ---------------------------------
+                  //std::cerr << "The RTG:regExpRefPtr at address " << ret.get_ptr() << "\n";
+                  //std::cerr << "    was just made from the following loop body reg_exp_t:" << std::endl;
+                  //frame.left.get_ptr()->print(std::cerr);
+                  //std::cerr << "\n" << std::endl;
+                  //---------------------------------
 				  tC->stop();
 			  }
 			  else  //Dot or Plus
 			  {
-				  RTG::regExpRefPtr rch = seen[frame.right];
+				  RTG::regExpRefPtr rch = regExpConversionMap[frame.right];
 				  if (frame.op == 1)  //Dot
 				  {
 					  tC->start();
@@ -4270,14 +4303,14 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 					  tC->stop();
 				  }
 			  }
-			  seen[frame.e] = ret;
+			  regExpConversionMap[frame.e] = ret;
 			  todo.pop();
 		  }
 	  }
 
 	  varDependencies[reID] = vDep;   //Put the dependant variable set into varDependencies
 	  *elapsedTime = tC->total_time() - extraTime;
-	  return seen[simpl_exp];
+	  return regExpConversionMap[simpl_exp];
   }
 	  
  /*
@@ -5628,6 +5661,7 @@ NEWROUND:
 			//bool insertProjects = true;
 			bool insertProjects = false;
             baseEvalTime += convertToTSLRegExps(rToConvert, outNodeRegExpMap, regExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl, insertProjects);
+            cout << "  There are " << wl.size() << " regular expressions remaining to be converted." << endl;
 		}
 		//std::cout << "ESIZE: " << E.size() << std::endl;
 		//std::cout << "DSIZE: " << variableIDs.size() << std::endl;
@@ -6741,6 +6775,7 @@ int runBasicNewton(char **args, int runningMode)
     for(wali::wfa::TransSet::iterator tsit = exit_transitions.begin(); tsit != exit_transitions.end(); tsit++)
     {
         std::cout << "Procedure summary for (some as yet unidentified -- FIXME) procedure" << std::endl;
+        //std::cout << "  from=" << (*tsit)->from() << ", to=" << (*tsit)->to() << ", stack=" << (*tsit)->stack() << "." << std::endl;
         duetrel_t nval = ((DuetRel*)((*tsit)->weight().get_ptr()));
         //DuetRel *nval = ((DuetRel*)((*tsit)->weight().get_ptr()));
         //DuetRel *nval = ((DuetRel*)((*tsit)->weight().get_ptr()))->getValue();
