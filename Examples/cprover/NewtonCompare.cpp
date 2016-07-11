@@ -4314,6 +4314,147 @@ std::map<reg_exp_t, RTG::regExpRefPtr> regExpConversionMap; // This was formerly
   }
 	  
  /*
+  *  computeVarDependenciesAndWorklists
+  *
+  *  Add to varDependencies[reID] the IDs of any variables that appear in the regular expression for reID; also, add them to wl and vl.
+  *
+  *  This function was created by copying convertToRegExp and removing all of the code that creates
+  *    TSL regular expressions, only keeping the code that updates varDependencies and wl and vl.
+  *    This function was needed after we changed the function cache (called regExpConversionMap now)
+  *    for convertToRegExp so that that function cache was shared across calls; after that change,
+  *    convertToRegExp cannot update varDependencies anymore.
+  *
+  *  @param: reID - the varID of the regular expressiosn
+  *          exp - the expression to be converted
+  *          varDependencies - a map from reID to the set of variabels it depends on that will be populated as we convert, used for the newton round later
+  *			 updateableMap - a map from updateable node to the intergraph node number it depends on (that node number is still associated with the inter graph)
+  *			 oMap - a map from the intergraph node number to the correct unique number for the tsl regexps
+  *
+  *   Author: Jason Breck
+  */
+  void computeVarDependenciesAndWorklists(int reID, reg_exp_t exp, std::map<int, std::set<int> > & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::vector<int> & wl, std::set<int> & vl)
+  {
+      //void computeVarDependencies(int reID, reg_exp_t exp, std::map<int, reg_exp_t> & outNodeRegExpsMap, std::map<int, std::set<int> > & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, std::map<std::pair<int, int>, std::pair<int, int> > & mergeSrcMap, std::vector<int> & wl, std::set<int> & vl, double * elapsedTime, bool insertProjects = true)
+	  std::stack<cFrame> todo;
+
+	  std::map<reg_exp_t, bool >::iterator it;
+      std::map<reg_exp_t, bool > seen; 
+
+	  reg_exp_t simpl_exp = exp;
+	  todo.push(cFrame(simpl_exp));
+	  std::set<int> vDep;
+	  while (!todo.empty())
+	  {
+		  cFrame & frame = todo.top();
+		  if (frame.is_new){ // We haven't seen the frame before
+			  it = seen.find(frame.e);
+			  if (it != seen.end())
+			  {
+				  todo.pop();
+				  continue;
+			  }
+			  frame.is_new = false;
+			  if (frame.e->isConstant())
+			  {
+				  todo.pop();
+				  continue;
+			  }
+			  else if (frame.e->isUpdatable())  // This means it's a call
+			  {
+				  ////If the expression is updatable/is a variable
+				  ////Then look up the node it depends on - and make a variable associated with it
+				  int node_no = frame.e->updatableNumber();
+				  ////std::cout << "node_no: " << node_no;
+				  int mNum = oMap[updateableMap[node_no]];
+				  ////std::cout << " mNum: " << mNum << std::endl;
+				  //int t1 = mapBack[reID].first.second;
+				  //int t2 = mapBack[mNum].first.second;
+				  //std::pair<int, int> mergePair = mergeSrcMap[std::pair<int, int>(t1, t2)];
+				  if (vl.find(mNum) == vl.end())
+				  {
+				      wl.push_back(mNum); // FIXME - jbreck - Does this need to be changed?
+				      vl.insert(mNum);
+				  }
+				  vDep.insert(mNum);  //This regExp is dependent on the regExp represented by mNum
+				  ////seen[frame.e] = insertProjects
+				  ////                    ? RTG::Project::make(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), RTG::Var::make(CBTI::INT32(mNum)))
+				  ////                    : RTG::Var::make(CBTI::INT32(mNum));
+				  //seen[frame.e] = insertProjects
+				  //                    ? CIR::mkProject(CBTI::INT32(mergePair.first), CBTI::INT32(mergePair.second), CIR::mkVar(CBTI::INT32(mNum)))
+				  //                    : CIR::mkVar(CBTI::INT32(mNum));
+                  seen[frame.e] = true;
+				  todo.pop();
+				  continue;
+			  }
+			  //Determine if the children of this reg_exp_t have been seen before.  If so convert to the TSLRegExp, otherwise
+			  //push the children reg_exp_t onto the stack
+			  else if (frame.e->isStar())
+			  {
+				  frame.op = 0;
+				  reg_exp_t child = frame.e->getChildren().front();
+				  frame.left = child;
+				  it = seen.find(child);
+				  if (it != seen.end())
+				  {
+                      seen[frame.e] = true;
+					  todo.pop();
+					  continue;
+				  }
+				  else
+				  {
+					  todo.push(cFrame(child));
+					  continue;
+				  }
+			  }
+			  else
+			  {
+				  if (frame.e->isExtend())
+					  frame.op = 1;
+				  else
+					  frame.op = 2;
+
+				  list<reg_exp_t>::iterator ch = frame.e->children.begin();
+				  frame.left = *ch;
+				  ch++;
+				  frame.right = *ch;
+				  it = seen.find(frame.left);
+				  if (it != seen.end())
+				  {
+					  it = seen.find(frame.right);
+					  if (it != seen.end())
+					  {
+                          seen[frame.e] = true;
+						  todo.pop();
+						  continue;
+					  }
+					  else
+					  {
+						  todo.push(cFrame(frame.right));
+						  continue;
+					  }
+				  }
+				  else
+				  {
+					  todo.push(cFrame(frame.left));
+					  if (seen.find(frame.right) == seen.end())
+					  {
+						  todo.push(cFrame(frame.right));
+						  continue;
+					  }
+				  }
+			  }
+		  }
+		  else 
+		  {
+              seen[frame.e] = true;
+			  todo.pop();
+		  }
+	  }
+
+	  varDependencies[reID] = vDep;   // Put the dependent variable set into varDependencies
+  }
+	  
+ /*
   *  convertToTSLRegExps
   *
   *  Convert regular expression reg to a TSL regular expression, and
@@ -4335,6 +4476,8 @@ std::map<reg_exp_t, RTG::regExpRefPtr> regExpConversionMap; // This was formerly
 	  //outNodeRegExpMap[reg]->print(std::cout) << std::endl;
 	  double evalTime = 0;
 	  RTG::regExpRefPtr rExp = convertToRegExp(reg, outNodeRegExpMap[reg], outNodeRegExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl, &evalTime, insertProjects);
+
+	  computeVarDependenciesAndWorklists(reg, outNodeRegExpMap[reg], varDependencies, updateableMap, oMap, wl, vl);
 	  //rExp->print(std::cout) << std::endl;
 	  //std::cout << "src: " << mapBack[reg].first.first << "tgt: " << mapBack[reg].first.second << "stack: " << mapBack[reg].second << endl << endl;
 	  regExpMap[reg] = rExp;
@@ -6840,6 +6983,18 @@ int runBasicNewton(char **args, int runningMode)
             duetrel_t composedWeight = contextWeight->Compose(intraprocWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
             duetrel_t finalWeight = composedWeight->Compose(negatedAssertionWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
 
+            std::cout << std::endl << "contextWeight = " << std::endl;
+            contextWeight->print(std::cout);
+            std::cout << std::endl << std::endl;
+
+            std::cout << std::endl << "intraproceduralWeight = " << std::endl;
+            intraprocWeight->print(std::cout);
+            std::cout << std::endl << std::endl;
+
+            std::cout << std::endl << "contextWeight extend intraproceduralWeight = " << std::endl;
+		    composedWeight->print(std::cout);
+		    std::cout << std::endl << std::endl;
+	
             bool isSat = finalWeight->IsSat();
 
 			if (isSat) {
@@ -6853,18 +7008,6 @@ int runBasicNewton(char **args, int runningMode)
 				std::cout << "Is not SAT! (Assertion on line " << it->second.second << " PASSED)" << std::endl;
 			}
 
-            std::cout << std::endl << "contextWeight = " << std::endl;
-            contextWeight->print(std::cout);
-            std::cout << std::endl << std::endl;
-
-            std::cout << std::endl << "intraproceduralWeight = " << std::endl;
-            intraprocWeight->print(std::cout);
-            std::cout << std::endl << std::endl;
-
-            std::cout << std::endl << "contextWeight extend intraproceduralWeight = " << std::endl;
-		    composedWeight->print(std::cout);
-		    std::cout << std::endl << std::endl;
-	
 			if (testMode) {
 				std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
 				testFile << "__ASSERTION " << (isSat ? "FAIL" : "PASS") << std::endl;
