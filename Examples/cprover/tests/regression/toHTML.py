@@ -24,48 +24,52 @@ fout.write('<th>Test Name</th>\n')
 fout.write('<th>Output</th>\n')
 fout.write('<th>Duet Output</th>\n')
 fout.write('<th>No. of Rounds</th>\n')
-fout.write('<th>Run Time</th>\n')
 fout.write('<th>Result</th>\n')
+fout.write('<th>Run Time</th>\n')
 fout.write('<th>Duet Result</th>\n')
 fout.write('</tr>\n')
 
 
 firstElem = True
-firstAssertion = True
 flipResult = False
 dirName=os.getcwd()
+
 # these constants are declared in NewtonCompare.cpp
 NEWTON_BELOW = 1
 NEWTON_ABOVE = 3
 
 bgColor = 0
+colCtr = 6
+
+belowTime = 0.0
+aboveTime = 0.0
 
 for line in fin:
 	words = line.split()
 	if (words[0] == "__DIRECTORY"):	
-		if not(firstAssertion):
-			firstAssertion = True
-			fout.write('</td>\n')
- 		
 		if firstElem:
 			firstElem = False
 		else:
 			fout.write('</tr>\n')
-
+			fout.write('<tr align=\"center\" style="background-color:#000000;">\n')
+			fout.write('<td colspan=\"4\"><font color=\"#FFFFFF\"><b>Total</b></font></td>\n')
+			fout.write('<td colspan=\"3\"><font color=\"#FFFFFF\">')
+			fout.write('Below Time = ' + str(belowTime / 1000.0) + '<br>')
+			fout.write('Above Time = ' + str(aboveTime / 1000.0) + '</font></td>\n')
+			fout.write('</tr>\n')
+			belowTime = 0.0
+			aboveTime = 0.0
+			
 		fout.write('<tr align=\"center\">\n')
 		fout.write('<td colspan=\"7\"><font color=\"#00AAAA\">')
 		fout.write(words[1])
 		fout.write('</font></td>\n')
 
 	if (words[0] == "__FILENAME"):
-		if not(firstAssertion):
-			firstAssertion = True
-			fout.write('</td>\n')
-		
-		if firstElem:
-			firstElem = False
-		else:
-			fout.write('</tr>\n')
+		while (colCtr < 6):
+			colCtr += 1
+			fout.write('<td></td>\n')
+		fout.write('</tr>\n')
 		
 		path=words[1]
 		fileName=os.path.basename(path)
@@ -73,12 +77,11 @@ for line in fin:
 			runMode = 'above'
 		else:
 			runMode = 'below'
-			bgColor = 1-bgColor
+			bgColor = 1 - bgColor
 			
-		flipResult = (('unsafe' in fileName) or ('false' in fileName))	
+		flipResult = (('unsafe' in fileName) or ('false-unreach-call' in fileName))	
 		
-		#fout.write('<tr align=\"center\">\n')
-		fout.write('<tr align=\"center\" style="background-color:'+["white","#BBBBBB"][bgColor]+';">\n')
+		fout.write('<tr align=\"center\" style="background-color:'+["white","#AAAAAA"][bgColor]+';">\n')
 		
 		if (runMode == 'below'):
 			fout.write('<td rowspan="2">')
@@ -94,74 +97,91 @@ for line in fin:
 			fout.write('<a href=\"outputs/' + fileName + '.duet.out\">duet</a>')
 			fout.write('</td>\n')
 		
+		colCtr = 3
+		
 	elif (words[0] == "__NUMRNDS"):
 		fout.write('<td>')
 		fout.write(words[1])
 		fout.write('</td>\n')
+		colCtr += 1
 		
-	elif (words[0] == "__TIME"):
+	elif (words[0] == "__NTIME"):
+		time = int(words[1]) / 1000000
+		if (runMode == 'below'):
+			belowTime += time
+		elif (runMode == 'above'):
+			aboveTime += time
+			
+		while (colCtr < 5):
+			colCtr += 1
+			fout.write('<td></td>\n')
 		fout.write('<td>')
-		fout.write(words[1])
+		fout.write(str(time / 1000.0))
 		fout.write('</td>\n')
+		colCtr += 1
 	
 	elif (words[0] == "__ASSERTION"):
-		if firstAssertion:
-			fout.write('<td>')
-			firstAssertion = False
-		if (flipResult):
-			if (words[1] == "FAIL"):
-				#fout.write('<font color=\"#00AA00\">PASS</font><br>')
-				fout.write('<font color=\"#00AA00\">OKAY</font><br>')
-			elif (words[1] == "PASS"):
-				fout.write('<b><font color=\"#FF0000\">UNSOUND</font></b><br>')
-				#fout.write('<font color=\"#FF0000\">FAIL</font><br>')
-		else:
-			if (words[1] == "PASS"):
-				fout.write('<font color=\"#00AA00\">PASS</font><br>')
-			elif (words[1] == "FAIL"):
-				fout.write('<font color=\"#FF0000\">FAIL</font><br>')
+		fout.write('<td>')
+		for i in range(len(words)-1):
+			if (flipResult):
+				if (words[i+1] == "FAIL"):
+					fout.write('<font color=\"#00AA00\">OKAY</font><br>')
+				elif (words[i+1] == "PASS"):
+					fout.write('<b><font color=\"#FF0000\">UNSOUND</font></b><br>')
+				elif (words[i+1] == "__TIMEOUT"):
+					fout.write('<font color=\"#800080\">TIMEOUT</font><br>')
+				elif (words[i+1] == "__EXCEPTION"):
+					fout.write('<font color=\"#800080\">EXCEPTION</font><br>')
+			else:
+				if (words[i+1] == "PASS"):
+					fout.write('<font color=\"#00AA00\">PASS</font><br>')
+				elif (words[i+1] == "FAIL"):
+					fout.write('<font color=\"#FF0000\">FAIL</font><br>')
+				elif (words[i+1] == "__TIMEOUT"):
+					fout.write('<font color=\"#800080\">TIMEOUT</font><br>')
+				elif (words[i+1] == "__EXCEPTION"):
+					fout.write('<font color=\"#800080\">EXCEPTION</font><br>')
+		fout.write('</td>\n')
+		colCtr += 1
 			
-	elif (words[0] == "__DUET"):
-		if not(firstAssertion):
-			firstAssertion = True
-			fout.write('</td>\n')
-			
+	elif (words[0] == "__DUET"):	
+		while (colCtr < 6):
+			colCtr += 1
+			fout.write('<td></td>\n')
 		fout.write('<td rowspan="2">')
 		for i in range(len(words)-1):
 			if (flipResult):
 				if (words[i+1] == "FAIL"):
-					#fout.write('<font color=\"#00AA00\">PASS</font><br>')
 					fout.write('<font color=\"#00AA00\">OKAY</font><br>')
 				elif (words[i+1] == "PASS"):
-					#fout.write('<font color=\"#FF0000\">FAIL</font><br>')
 					fout.write('<b><font color=\"#FF0000\">UNSOUND</font></b><br>')
 				elif (words[i+1] == "TIMEOUT"):
-					fout.write('<font color=\"#00AAAA\">TIMEOUT</font><br>')
+					fout.write('<font color=\"#800080\">TIMEOUT</font><br>')
 			else:
 				if (words[i+1] == "PASS"):
 					fout.write('<font color=\"#00AA00\">PASS</font><br>')
 				elif (words[i+1] == "FAIL"):
 					fout.write('<font color=\"#FF0000\">FAIL</font><br>')
 				elif (words[i+1] == "TIMEOUT"):
-					fout.write('<font color=\"#00AAAA\">TIMEOUT</font><br>')
-		fout.write('</td>')
+					fout.write('<font color=\"#800080\">TIMEOUT</font><br>')
+		fout.write('</td>\n')
+		colCtr += 1
 		
-	elif (words[0] == "__TIMEOUT"):
-		if firstAssertion:
-			fout.write('<td>')
-			firstAssertion = False
-		
-		fout.write('<font color=\"#00AAAA\">TIMEOUT</font><br>')
+	elif (words[0] == "__TIMEOUT"):	
+		fout.write('<td><font color=\"#800080\">TIMEOUT</font></td>\n')
+		colCtr += 1
 		
 	elif (words[0] == "__EXCEPTION"):
-		if firstAssertion:
-			fout.write('<td>')
-			firstAssertion = False
+		fout.write('<td><font color=\"#800080\">EXCEPTION</font></td>\n')
+		colCtr += 1
 		
-		fout.write('<font color=\"#FF0000\">EXCEPTION</font><br>')
-		
-if not(firstAssertion):
-	fout.write('</td>\n')
+fout.write('</tr>\n')
+fout.write('<tr align=\"center\" style="background-color:#000000;">\n')
+fout.write('<td colspan=\"4\"><font color=\"#FFFFFF\"><b>Total</b></font></td>\n')
+fout.write('<td colspan=\"3\"><font color=\"#FFFFFF\">')
+fout.write('Below Time = ' + str(belowTime / 1000.0) + '<br>')
+fout.write('Above Time = ' + str(aboveTime / 1000.0) + '</font></td>\n')
+
 fout.write('</tr>\n')
 fout.write('</table>\n')
 

@@ -6961,6 +6961,12 @@ int runBasicNewton(char **args, int runningMode)
     //std::cout << std::endl << std::endl;
 
     // Check the assertion at each error point
+    if (testMode) {
+	std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
+	testFile << "__ASSERTION ";
+   	testFile.close();
+    }
+
     for (std::vector<caml_error_rule>::iterator it = errorRuleHolder.begin(); it != errorRuleHolder.end(); it++)
     {
         wali::wfa::TransSet error_transitions;
@@ -7010,7 +7016,7 @@ int runBasicNewton(char **args, int runningMode)
 
 			if (testMode) {
 				std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
-				testFile << "__ASSERTION " << (isSat ? "FAIL" : "PASS") << std::endl;
+				testFile << (isSat ? "FAIL " : "PASS ");
 				testFile.close();
 			}
 
