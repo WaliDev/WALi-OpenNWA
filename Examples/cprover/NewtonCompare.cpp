@@ -7088,6 +7088,8 @@ int main(int argc, char **argv)
         {"verbosity",        required_argument, 0,            'I' },
         {"qe",               required_argument, 0,            'Q' },
         {"cra-guard",        required_argument, 0,            'G' },
+	{"z3-timeout",       required_argument, 0,            'Z' },
+	{"cra-abstract-limit",required_argument,0,            'L' },
         {0,                  0,                 0,             0  }
     };
 
@@ -7122,6 +7124,8 @@ int main(int argc, char **argv)
 			case 'I':
 			case 'Q':
 			case 'G':
+			case 'Z':
+			case 'L':
 				std::cout << "Passing command-line option " << 	argv[optind - 2] << " " << optarg << " to duet." << std::endl;
 				unrecognizedArgs.push_back(argv[optind - 2]);
 				unrecognizedArgs.push_back(optarg);
