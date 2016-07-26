@@ -3,7 +3,7 @@ int main()
   unsigned int N_LIN=1;
   unsigned int N_COL=1;      
   unsigned int j,k;
-  int matriz[N_COL][N_LIN], maior;
+  int matriz[100][100], maior;			// replaced N_LIN and N_COL with 100 and 100
   
   maior = __VERIFIER_nondet_int();
   for(j=0;j<N_COL;j++)
