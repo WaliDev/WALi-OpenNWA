@@ -25,7 +25,10 @@ rm -rf $SUITE/inputs/
 rm -rf $SUITE/outputs/
 
 cd $NEWTON
+echo "ASSERTION CHECKING:"
 $SUITE/test_suite_duet.sh || exit 1
+echo "\n\nBBOUNDS GENERATION:"
+$SUITE/test_suite_print_hull.sh || exit 1
 cd $SUITE
 python $SUITE/compare.py || exit 1
 python $SUITE/updateIndex.py || exit 1
@@ -33,8 +36,9 @@ python $SUITE/updateIndex.py || exit 1
 mkdir -p $SERVER/$TODAY
 cp -f $SUITE/result.html $SERVER/$TODAY
 cp -f $SUITE/compare.html $SERVER/$TODAY
+cp -f $SUITE/print_hull.html $SERVER/$TODAY
 cp -Rf $SUITE/inputs/ $SERVER/$TODAY/
 cp -Rf $SUITE/outputs/ $SERVER/$TODAY/
 cp -f $SUITE/index.html $SERVER
 
-printf "Hello,\n\nThis is to inform you of the result of the Newton test suite. Running the tests finished on $(date).\n\nThe results can be accessed from: http://stac.cs.wisc.edu/$TODAY/result.html\nThe comparison can be accessed from: http://stac.cs.wisc.edu/$TODAY/compare.html\n" | mail -s "Newton Test Result" ashkanfb@cs.wisc.edu jbreck@cs.wisc.edu reps@cs.wisc.edu zkincaid@gmail.com
+printf "Hello,\n\nThis is to inform you of the result of the Newton test suite. Running the tests finished on $(date).\n\nThe results can be accessed from: http://stac.cs.wisc.edu/$TODAY/result.html\nThe comparison can be accessed from: http://stac.cs.wisc.edu/$TODAY/compare.html\nThe bounds generation can be accessed from: http://stac.cs.wisc.edu/$TODAY/print_hull.html\n" | mail -s "Newton Test Result" ashkanfb@cs.wisc.edu jbreck@cs.wisc.edu reps@cs.wisc.edu zkincaid@gmail.com
