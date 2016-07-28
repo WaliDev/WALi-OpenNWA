@@ -40,6 +40,6 @@ int main()
     run(n, m, dir);
 	
 	int bnd = (n > ( n - m)) ? n : (n - m);
-	assert (__cost <= bnd);
+	//assert (__cost <= bnd);
 	return 0;
 }

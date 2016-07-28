@@ -31,6 +31,6 @@ int main()
 	run(x);
 	
 	int bnd = (x > 0) ? x : 0;
-	assert (__cost <= bnd);
+	//assert (__cost <= bnd);
 	return 0;
 }

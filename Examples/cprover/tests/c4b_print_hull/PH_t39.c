@@ -42,7 +42,7 @@ int main()
 	run(y, z);
 	
 	int bnd = 4 + 2 * ((y > z) ? (y - z) : 0);
-	assert(3 * __cost <= bnd);
+	//assert(3 * __cost <= bnd);
 	
 	return 0;
 }

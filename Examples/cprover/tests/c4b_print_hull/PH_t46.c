@@ -40,7 +40,7 @@ int main()
 	
 	run(y, z);
 	
-	assert(__cost <= bnd);
+	//assert(__cost <= bnd);
 	
 	return 0;
 }

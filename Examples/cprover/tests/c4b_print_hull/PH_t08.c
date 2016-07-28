@@ -30,7 +30,7 @@ int main()
 	run(y, z);
 	
 	int bnd = 4 * ((z > y) ? (z - y) : 0) + ((y > 0) ? y : 0);
-	assert(3 * __cost <= bnd);
+	//assert(3 * __cost <= bnd);
 	
 	return 0;
 }

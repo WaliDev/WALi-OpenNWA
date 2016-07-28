@@ -31,7 +31,7 @@ int main()
 	run(i, k);
 	
 	int bnd = 50 + ((i > -1) ? (i + 1) : 0) + ((k > 0) ? k : 0);
-	assert(__cost <= bnd);
+	//assert(__cost <= bnd);
 	
 	return 0;
 }
