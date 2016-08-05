@@ -4,7 +4,7 @@
 # Caution: the name of the test files should be different, even when
 #          they're in different directories; otherwise, one's output
 #          will be overwritten by the other.
-# Puts the result in Examples/cprover/tests/regression/result.html
+# Puts the result in Examples/cprover/tests/regression/print_hull.html
 
 shopt -s nullglob
 
