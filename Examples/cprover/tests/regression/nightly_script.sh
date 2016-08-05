@@ -27,7 +27,7 @@ rm -rf $SUITE/outputs/
 cd $NEWTON
 echo "ASSERTION CHECKING:"
 $SUITE/test_suite_duet.sh || exit 1
-echo "\n\nBBOUNDS GENERATION:"
+echo "BBOUNDS GENERATION:"
 $SUITE/test_suite_print_hull.sh || exit 1
 cd $SUITE
 python $SUITE/compare.py || exit 1
