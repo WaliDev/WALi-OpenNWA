@@ -15,7 +15,7 @@ You will need to clone three repositories:
 
   WALi-OpenNWA
     https://github.com/WaliDev/WALi-OpenNWA.git
-    You need the "NewtonDuet" branch
+    You need the "NewtonDuetGaussian" branch
 
   duet (the Newton branch)
     https://github.com/zkincaid/duet.git
@@ -23,6 +23,7 @@ You will need to clone three repositories:
 
   libtslre
     https://github.com/Grammatech/libtslre.git
+    You need the "Gaussian" branch
 
 We recommend that you position the Duet directory as either a sibling of the 
 WALi-OpenNWA directory, or a child of the WALi-OpenNWA directory, so that
@@ -97,9 +98,29 @@ after making a modification to the Newton-Duet source code.)
 
 If that step is successful, you are ready to run Newton-Duet.
 
-You can try a command like:
 
- _build64/Examples/cprover/NewtonOcaml -cra_newton_basic
- Examples/cprover/tests/sas03_bothbranches.c
+
+You can run the tool with a command like:
+
+ _build64/Examples/cprover/NewtonOcaml -cra_newton_basic Examples/cprover/tests/kmp.c
+
 
 More input programs are stored in "Examples/cprover/tests".
+
+
+
+Typical pull/rebuild steps look like:
+
+    cd ../duet
+    git pull origin Newton
+    ./make_libduet.sh
+    cd ../WALi-OpenNWA
+
+    git pull origin NewtonDuetGaussian
+    ./duet_build.sh
+
+Occasionally, you'll also need to do something like:
+    cd Examples/cprover/libtslre
+    git pull origin Gaussian
+    cd ../../..
+
