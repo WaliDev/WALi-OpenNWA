@@ -12,7 +12,7 @@ NEWTON_DIR="$(pwd)"
 DUET_DIR="$NEWTON_DIR/../duet"
 
 SUITE="$NEWTON_DIR/Examples/cprover/tests/regression"
-TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b $NEWTON_DIR/Examples/cprover/tests/duet $NEWTON_DIR/Examples/cprover/tests $NEWTON_DIR/Examples/cprover/tests/STAC/LESE $NEWTON_DIR/Examples/cprover/tests/STAC/LowerBound $NEWTON_DIR/Examples/cprover/tests/STAC/LZ $NEWTON_DIR/Examples/cprover/tests/sv-benchmarks/* )
+TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b $NEWTON_DIR/Examples/cprover/tests/misc-recursive $NEWTON_DIR/Examples/cprover/tests/duet $NEWTON_DIR/Examples/cprover/tests $NEWTON_DIR/Examples/cprover/tests/STAC/LESE $NEWTON_DIR/Examples/cprover/tests/STAC/LowerBound $NEWTON_DIR/Examples/cprover/tests/STAC/LZ $NEWTON_DIR/Examples/cprover/tests/sv-benchmarks/* )
 
 NEWTON="$NEWTON_DIR/_build64/Examples/cprover/NewtonOcaml"
 DUET="$DUET_DIR/duet.native"
@@ -52,8 +52,9 @@ for directory in ${TESTDIRS[@]}; do
 		echo -n "Running test $i of ${#TESTS[@]} ..."
 		
 		echo -n " Below ..."
+		start=$(date +%s%N)
 		cd $NEWTON_DIR
-		eval "timeout $TIMEOUT sh -c '{ $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf; } &> $below_outfile'"
+		eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf &> $below_outfile"
 		success=$?
 		if (($success==124)); then
 			echo "__TIMEOUT" >> $RESULT
@@ -62,21 +63,28 @@ for directory in ${TESTDIRS[@]}; do
 			echo "__EXCEPTION" >> $RESULT
 			echo -ne "\e[31mException\e[0m"
 		else
-			echo -n " Duet ..."
-			echo -n "__DUET " >> $RESULT
-			cd $DUET_DIR
-			eval "timeout $TIMEOUT sh -c '{ $DUET -cra -cra-forward-inv -cra-split-loops $testf; } &> $duet_outfile'"
-			if (($?==124)); then
-				echo "TIMEOUT" >> $RESULT
-				echo -ne "\e[31mTimeout\e[0m"
-			else
-				echo "" >> $RESULT
-			fi
+			echo "" >> $RESULT
 		fi
-
+		end=$(date +%s%N)
+		len=$(expr $end - $start)
+		echo "__NTIME $len" >> $RESULT
+		
+		
+		echo -n " Duet ..."
+		echo -n "__DUET " >> $RESULT
+		cd $DUET_DIR
+		eval "timeout $TIMEOUT $DUET -cra -cra-forward-inv -cra-split-loops -test $RESULT $testf &> $duet_outfile"
+		if (($?==124)); then
+			echo "TIMEOUT" >> $RESULT
+			echo -ne "\e[31mTimeout\e[0m"
+		else
+			echo "" >> $RESULT
+		fi
+		
 		echo -n " Above ..."
+		start=$(date +%s%N)
 		cd $NEWTON_DIR
-		eval "timeout $TIMEOUT sh -c '{ $NEWTON -cra_newton_above -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf; } &> $above_outfile'"
+		eval "timeout $TIMEOUT $NEWTON -cra_newton_above -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf &> $above_outfile"
 		success=$?
 		if (($success==124)); then
 			echo "__TIMEOUT" >> $RESULT
@@ -85,8 +93,13 @@ for directory in ${TESTDIRS[@]}; do
 			echo "__EXCEPTION" >> $RESULT
 			echo -e "\e[31mException\e[0m"
 		else
-			echo " Done"
+			echo "" >> $RESULT
 		fi
+		end=$(date +%s%N)
+		len=$(expr $end - $start)
+		echo "__NTIME $len" >> $RESULT
+		
+		echo " Done"
 			
 		let i+=1
 	done

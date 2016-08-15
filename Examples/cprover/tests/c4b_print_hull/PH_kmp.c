@@ -71,6 +71,6 @@ int main()
 
         run(t, t_len, p, p_len, b);
 
-        assert(__cost <= t_len + p_len);
+        //assert(__cost <= t_len + p_len);
         return 0;
 }

@@ -38,7 +38,7 @@ int main()
 	run(x, y);
 	
 	int bnd = 1 + 3 * ((x > 0) ? x : 0) + ((y > 0) ? y : 0);
-	assert(__cost <= bnd);
+	//assert(__cost <= bnd);
 	
 	return 0;
 }

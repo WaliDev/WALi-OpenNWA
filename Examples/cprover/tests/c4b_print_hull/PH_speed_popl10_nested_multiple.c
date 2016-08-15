@@ -33,7 +33,7 @@ int main()
 	run(x, n, y, m);
 	
 	int bnd = ((n > x) ? (n - x) : 0) + ((m > y) ? (m - y) : 0);
-	assert(__cost <= bnd);
+	//assert(__cost <= bnd);
 	
 	return 0;
 }
