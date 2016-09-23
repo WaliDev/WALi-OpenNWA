@@ -13,14 +13,13 @@ if Debug:
     print '\n+++ Entered "#/Test/unit-tests/ThirdParty/SConscript"\n'
 
 ThirdParty = os.path.join(WaliDir,'Tests', 'unit-tests', 'ThirdParty')
-GtestDir = 'gtest-1.6.0'
+GtestDir = 'googletest-release-1.6.0'
 
 # download binary distribution archive
-archive = 'gtest-1.6.0.zip'
+archive = 'release-1.6.0.zip'
 env = ProgEnv.Clone(
     archive  = File(archive),
-    mirror   = 'http://googletest.googlecode.com/files',
-    url      = '$mirror/%s' % archive,
+    url      = 'https://codeload.github.com/google/googletest/zip/release-1.6.0.zip/release-1.6.0',
     builddir = BuildDir
     )
 

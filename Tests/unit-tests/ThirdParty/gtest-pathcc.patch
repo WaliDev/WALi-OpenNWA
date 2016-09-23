@@ -1,5 +1,5 @@
-diff -u --recursive gtest-1.6.0/cmake/internal_utils.cmake gtest-pathcc/cmake/internal_utils.cmake
---- gtest-1.6.0/cmake/internal_utils.cmake	2011-04-15 14:49:09.000000000 -0500
+diff -u --recursive googletest-release-1.6.0/cmake/internal_utils.cmake gtest-pathcc/cmake/internal_utils.cmake
+--- googletest-release-1.6.0/cmake/internal_utils.cmake	2011-04-15 14:49:09.000000000 -0500
 +++ gtest-pathcc/cmake/internal_utils.cmake	2012-02-20 13:39:11.000000000 -0600
 @@ -69,7 +69,8 @@
      # whether RTTI is enabled.  Therefore we define GTEST_HAS_RTTI
@@ -11,8 +11,8 @@ diff -u --recursive gtest-1.6.0/cmake/internal_utils.cmake gtest-pathcc/cmake/in
    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "SunPro")
      set(cxx_exception_flags "-features=except")
      # Sun Pro doesn't provide macros to indicate whether exceptions and
-diff -u --recursive gtest-1.6.0/include/gtest/internal/gtest-port.h gtest-pathcc/include/gtest/internal/gtest-port.h
---- gtest-1.6.0/include/gtest/internal/gtest-port.h	2011-04-15 14:49:10.000000000 -0500
+diff -u --recursive googletest-release-1.6.0/include/gtest/internal/gtest-port.h gtest-pathcc/include/gtest/internal/gtest-port.h
+--- googletest-release-1.6.0/include/gtest/internal/gtest-port.h	2011-04-15 14:49:10.000000000 -0500
 +++ gtest-pathcc/include/gtest/internal/gtest-port.h	2012-02-20 13:43:03.000000000 -0600
 @@ -449,8 +449,8 @@
  // defining __GNUC__ and friends, but cannot compile GCC's tuple
