@@ -24,7 +24,7 @@ using namespace wali;
 using namespace wali::domains::binrel;
 using namespace wali::domains::binrel::details;
 
-#include "Common.cpp"
+#include "baselines.hpp"
 
 namespace{
 

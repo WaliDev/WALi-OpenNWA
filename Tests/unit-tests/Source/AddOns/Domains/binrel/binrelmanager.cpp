@@ -15,7 +15,7 @@ using namespace std;
 using namespace wali::domains::binrel;
 using namespace google;
 
-#include "Common.cpp"
+#include "baselines.hpp"
 namespace{
 
   class ProgramBddContextTest: public ::testing::Test{
