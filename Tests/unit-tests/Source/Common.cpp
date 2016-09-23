@@ -7,8 +7,8 @@
 #include <cctype>
 
 namespace{
-  //std::string regrDir = "Tests/harness/unit-tests/regression_baseline";
-  std::string regrDir = "regression_baseline";
+  // waliRoot is prepended to this to get an absolute path
+  std::string regrDir = "Tests/harness/unit-tests/regression_baseline";
 
   //declarations
   static void writeOutput(
@@ -36,7 +36,7 @@ namespace{
       )
   {
     writeOutput(testname, varname, outs);
-    std::string inpath = regrDir + "/" + testname + "_" + varname + ".output";
+    std::string inpath = WALI_DIR "/" + regrDir + "/" + testname + "_" + varname + ".output";
     cout << inpath << endl;
     std::fstream fin(inpath.c_str(),std::ios_base::in);
     if (!fin) {

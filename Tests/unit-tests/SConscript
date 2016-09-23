@@ -44,6 +44,7 @@ env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wsign-compare', '')
 #boost is ill-behaved w.r.t. these flags
 env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wfloat-equal', '')
 
+env['CPPDEFINES']['WALI_DIR'] = r'\"{}\"'.format(WaliDir)
 
 #############################################
 ### NO ENV MODIFICATIONS AFTER THIS POINT ###
