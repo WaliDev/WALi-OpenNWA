@@ -9,7 +9,9 @@ import shutil
 import platform
 import subprocess
 
-glog = 'glog-0.3.2'
+glog = 'glog-0.3.4'
+#url = 'https://github.com/google/glog/archive/v0.3.4.tar.gz'
+url = 'https://codeload.github.com/google/glog/tar.gz/v0.3.4'
 
 Import('Debug')
 Import('LibInstallDir')
@@ -57,9 +59,9 @@ if not Is64:
 # This builds glog
 if not is_file_built_correctly(os.path.join(glog,'.libs','libglog.so')):
     assert ' ' not in os.getcwd()
-    wget = 'curl -O'
+    wget = 'curl'
     targz = glog + '.tar.gz'
-    compileCom = ['%s http://google-glog.googlecode.com/files/%s' % (wget, targz),
+    compileCom = ['%s -o %s.tar.gz %s' % (wget, glog, url),
                   'tar zxvf %s' %targz,
                   'cd %s && ./configure --prefix=%s --libdir=%s %s' %(glog,join(os.getcwd(),glog), LibInstallDir, addl_32_bit_flags),
                   'cd %s && make;' %(glog)]
