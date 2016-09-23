@@ -51,7 +51,7 @@ if MkStatic:
   built += i
   Return('built')
 else:
-  walidomains = env.SharedLibrary('walidomains' , walidomains_files)
+  walidomains = env.SharedLibrary('walidomains' , walidomains_files, LIBS=["boost_serialization"])
   i = env.Install(LibInstallDir, walidomains)
   built += i
   Return('built')

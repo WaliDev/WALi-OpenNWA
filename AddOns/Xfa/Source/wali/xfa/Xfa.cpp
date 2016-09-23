@@ -7,14 +7,7 @@
 #include <buddy/fdd.h>
 
 namespace {
-
     bool include_all_vocabularies(wali::domains::binrel::VectorVocabulary const & UNUSED_PARAMETER(v))
-    {
-        return true;
-    }
-
-    bool
-    is_any_transition(wali::wfa::ITrans const * UNUSED_PARAMETER(trans))
     {
         return true;
     }
@@ -143,7 +136,7 @@ namespace wali {
             FILE* image_data_stream = popen(command.str().c_str(), "r");
 
             if (image_data_stream == NULL) {
-                std::cerr << "Error opening pipe to " << command << ": ";
+                std::cerr << "Error opening pipe to " << command.str() << ": ";
                 perror(NULL);
             }
 

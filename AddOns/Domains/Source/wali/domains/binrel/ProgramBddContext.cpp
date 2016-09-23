@@ -160,10 +160,10 @@ namespace details
 
     // The following is a truth-table for a 1-bit adder, which also conjoins
     // in the appropriate box from the next level.
-    return ((  a &  b & !c & t2)
-            |( a & !b &  c & t1)
-            |(!a &  b &  c & t1)
-            |(!a & !b & !c & t0));
+    return ((   a  &   b  & (!c) & t2)
+            |(  a  & (!b) &   c  & t1)
+            |((!a) &   b  &   c  & t1)
+            |((!a) & (!b) & (!c) & t0));
   }
 
   
