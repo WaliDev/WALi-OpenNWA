@@ -243,8 +243,8 @@ namespace wali {
 	    char const * death_message_left = "Assertion failed: the_left != NULL";
 	    char const * death_message_right = "Assertion failed: the_right != NULL";
 #else
-	    char const * death_message_left = "Assertion `the_left != .?__null.?\' failed";
-	    char const * death_message_right = "Assertion `the_right != .?__null.?\' failed";
+	    char const * death_message_left = "Assertion `the_left != .?(__null|NULL).?\' failed";
+	    char const * death_message_right = "Assertion `the_right != .?(__null|NULL).?\' failed";
 #endif
             
             EXPECT_DEATH({
