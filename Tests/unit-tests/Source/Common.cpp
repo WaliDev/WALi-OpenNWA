@@ -39,6 +39,10 @@ namespace{
     std::string inpath = regrDir + "/" + testname + "_" + varname + ".output";
     cout << inpath << endl;
     std::fstream fin(inpath.c_str(),std::ios_base::in);
+    if (!fin) {
+      cout << "Could not open " << inpath << "\n";
+      return false;
+    }
     std::stringstream ins;
     std::string s;
     char c;
