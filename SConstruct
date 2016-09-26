@@ -246,7 +246,7 @@ if 'help' not in COMMAND_LINE_TARGETS:
     ## ##################
     ## All
     if 'all' in COMMAND_LINE_TARGETS:
-        for d in ['AddOns','Examples','Bindings']:
+        for d in ['AddOns','Examples']:
             built += SConscript('%s/SConscript' % d)
         built += SConscript('Tests/SConscript', variant_dir=os.path.join(BuildDir,'tests'), duplicate=0)
         unit_tests = SConscript('Tests/unit-tests/SConscript', variant_dir=os.path.join(BuildDir,'unit-tests'), duplicate=0)
