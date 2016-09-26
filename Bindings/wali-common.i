@@ -60,6 +60,22 @@ typedef wali::wfa::ITrans::WorklistData WorklistData; // (!)
 %ignore wali_KEY_GUARD;
 %ignore wali_REF_PTR_GUARD;
 %ignore wali_SEM_ELEM_GUARD;
+%ignore wali_HASH_MAP_GUARD;
+%ignore wali_HM_HASH_GUARD;
+%ignore wali_KEY_SOURCE_GUARD;
+%ignore wali_PRINTABLE_GUARD;
+%ignore wali_wfa_TRANSSET_GUARD;
+%ignore wali_wfa_TRANS_GUARD;
+%ignore wali_wfa_WFA_GUARD;
+%ignore wali_wpds_GENKEY_SOURCE_GUARD;
+%ignore wali_wpds_ewpds_EWPDS_GUARD;
+%ignore wali_wpds_fwpds_FWPDS_GUARD;
+%ignore REACH_GUARD;
+
+%ignore HASHMAP_GROWTH_FRACTION;
+%ignore HASHMAP_SHRINK_FRACTION;
+%ignore IMPL_LIST;
+
 
 /* Let's just grab the original header file here */
 %include "../Source/wali/ref_ptr.hpp"
