@@ -26,12 +26,12 @@ reachZeroPtr = wali.SemElemPtr(reachZero)
 wali.test_semelem_impl(reachOnePtr)
 
 myWpds = wali.FWPDS()
-p = wali.getKey("p")
-accept = wali.getKey("accept")
+p = wali.get_key("p")
+accept = wali.get_key("accept")
 
 n = []
 for i in range(0, 12):
-    n += [wali.getKey("n" + str(i))]
+    n += [wali.get_key("n" + str(i))]
 
 #f intraprocedural
 myWpds.add_rule(p, n[0], p, n[1], reachOnePtr)
@@ -60,7 +60,7 @@ print str(myWpds)
 
 # Perform poststar query
 query = wali.WFA()
-query.addTrans( p, n[0], accept, reachOnePtr);
+query.add_trans( p, n[0], accept, reachOnePtr);
 query.set_initial_state( p )
 query.add_final_state( accept )
 print "BEFORE poststar"
@@ -73,7 +73,7 @@ print str(answer)
 
 #Perform prestar query
 prequery = wali.WFA()
-prequery.addTrans( p, n[4], accept, reachOnePtr )
+prequery.add_trans( p, n[4], accept, reachOnePtr )
 prequery.set_initial_state( p )
 prequery.add_final_state( accept )
 print "BEFORE prestar"

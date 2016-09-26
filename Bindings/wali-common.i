@@ -67,6 +67,9 @@ typedef wali::wfa::ITrans::WorklistData WorklistData; // (!)
 %rename(__str__) wali::Printable::to_string;
 %ignore wali::Printable::toString;
 
+%rename("%(undercase)s", %$isfunction) "";
+%rename("%(undercase)s", %$isvariable) "";
+
 %include "../Source/wali/Key.hpp"
 
 /* Helper function for getting epsilon char */
