@@ -13,6 +13,8 @@
 
 *.o
 *.os
+*.so
+*.pyc
 
 # Test output
 /*.output
@@ -40,8 +42,9 @@
 ## Third-party unpacking
 /AddOns/Parse/ThirdParty/xerces-c-*
 /Tests/unit-tests/ThirdParty/gtest-1.6.0.zip
-/Tests/unit-tests/ThirdParty/gtest-1.6.0
-/ThirdParty/glog-0.3.2
+/Tests/unit-tests/ThirdParty/googletest-release-1.6.0
+/ThirdParty/glog-0.3.4
+/ThirdParty/glog-0.3.4.tar.gz
 /ThirdParty/include
 
 
