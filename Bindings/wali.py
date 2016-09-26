@@ -162,6 +162,8 @@ SwigPyIterator_swigregister = _wali.SwigPyIterator_swigregister
 SwigPyIterator_swigregister(SwigPyIterator)
 
 class Printable(_object):
+    """Proxy of C++ wali::Printable class."""
+
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, Printable, name, value)
     __swig_getmethods__ = {}
@@ -174,42 +176,130 @@ class Printable(_object):
     __del__ = lambda self: None
 
     def to_string(self):
+        """
+        to_string(self) -> std::string
+
+        Parameters
+        ----------
+        self: wali::Printable const *
+
+        """
         return _wali.Printable_to_string(self)
 
+
     def toString(self):
+        """
+        toString(self) -> std::string
+
+        Parameters
+        ----------
+        self: wali::Printable const *
+
+        """
         return _wali.Printable_toString(self)
+
 Printable_swigregister = _wali.Printable_swigregister
 Printable_swigregister(Printable)
 
 
 def get_key_space():
+    """get_key_space() -> wali::KeySpace *"""
     return _wali.get_key_space()
-get_key_space = _wali.get_key_space
 
 def clear_keyspace():
+    """clear_keyspace()"""
     return _wali.clear_keyspace()
-clear_keyspace = _wali.clear_keyspace
 
 def get_key(*args):
+    """
+    get_key(ks) -> wali::Key
+
+    Parameters
+    ----------
+    ks: wali::key_src_t
+
+    get_key(s) -> wali::Key
+
+    Parameters
+    ----------
+    s: std::string const &
+
+    get_key(s) -> wali::Key
+
+    Parameters
+    ----------
+    s: char const *
+
+    get_key(i) -> wali::Key
+
+    Parameters
+    ----------
+    i: int
+
+    get_key(k1, k2) -> wali::Key
+
+    Parameters
+    ----------
+    k1: wali::Key
+    k2: wali::Key
+
+    get_key(ks) -> wali::Key
+
+    Parameters
+    ----------
+    ks: std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > >
+
+    """
     return _wali.get_key(*args)
-get_key = _wali.get_key
 
 def get_key_source(k):
+    """
+    get_key_source(k) -> wali::key_src_t
+
+    Parameters
+    ----------
+    k: wali::Key
+
+    """
     return _wali.get_key_source(k)
-get_key_source = _wali.get_key_source
 
 def print_key(o, k, abbreviate=False):
+    """
+    print_key(o, k, abbreviate=False) -> std::ostream
+
+    Parameters
+    ----------
+    o: std::ostream &
+    k: wali::Key
+    abbreviate: bool
+
+    print_key(o, k) -> std::ostream &
+
+    Parameters
+    ----------
+    o: std::ostream &
+    k: wali::Key
+
+    """
     return _wali.print_key(o, k, abbreviate)
-print_key = _wali.print_key
 
 def key_2str(k):
+    """
+    key_2str(k) -> std::string
+
+    Parameters
+    ----------
+    k: wali::Key
+
+    """
     return _wali.key_2str(k)
-key_2str = _wali.key_2str
 
 def get_epsilon_key():
+    """get_epsilon_key() -> wali::Key"""
     return _wali.get_epsilon_key()
-get_epsilon_key = _wali.get_epsilon_key
 class KeySource(Printable):
+    """Proxy of C++ wali::KeySource class."""
+
     __swig_setmethods__ = {}
     for _s in [Printable]:
         __swig_setmethods__.update(getattr(_s, '__swig_setmethods__', {}))
@@ -226,14 +316,34 @@ class KeySource(Printable):
     __del__ = lambda self: None
 
     def equal(self, rhs):
+        """
+        equal(self, rhs) -> bool
+
+        Parameters
+        ----------
+        rhs: wali::KeySource *
+
+        """
         return _wali.KeySource_equal(self, rhs)
 
+
     def hash(self):
+        """
+        hash(self) -> size_t
+
+        Parameters
+        ----------
+        self: wali::KeySource const *
+
+        """
         return _wali.KeySource_hash(self)
+
 KeySource_swigregister = _wali.KeySource_swigregister
 KeySource_swigregister(KeySource)
 
 class GenKeySource(KeySource):
+    """Proxy of C++ wali::wpds::GenKeySource class."""
+
     __swig_setmethods__ = {}
     for _s in [KeySource]:
         __swig_setmethods__.update(getattr(_s, '__swig_setmethods__', {}))
@@ -245,6 +355,15 @@ class GenKeySource(KeySource):
     __repr__ = _swig_repr
 
     def __init__(self, g, k):
+        """
+        __init__(self, g, k) -> GenKeySource
+
+        Parameters
+        ----------
+        g: size_t
+        k: wali::Key
+
+        """
         this = _wali.new_GenKeySource(g, k)
         try:
             self.this.append(this)
@@ -254,20 +373,58 @@ class GenKeySource(KeySource):
     __del__ = lambda self: None
 
     def equal(self, rhs):
+        """
+        equal(self, rhs) -> bool
+
+        Parameters
+        ----------
+        rhs: wali::KeySource *
+
+        """
         return _wali.GenKeySource_equal(self, rhs)
 
+
     def hash(self):
+        """
+        hash(self) -> size_t
+
+        Parameters
+        ----------
+        self: wali::wpds::GenKeySource const *
+
+        """
         return _wali.GenKeySource_hash(self)
 
+
     def get_generation(self):
+        """
+        get_generation(self) -> size_t
+
+        Parameters
+        ----------
+        self: wali::wpds::GenKeySource const *
+
+        """
         return _wali.GenKeySource_get_generation(self)
 
+
     def get_key(self):
+        """
+        get_key(self) -> wali::Key
+
+        Parameters
+        ----------
+        self: wali::wpds::GenKeySource const *
+
+        """
         return _wali.GenKeySource_get_key(self)
+
 GenKeySource_swigregister = _wali.GenKeySource_swigregister
 GenKeySource_swigregister(GenKeySource)
 
 class SemElem(Printable):
+    """Proxy of C++ wali::SemElem class."""
+
     __swig_setmethods__ = {}
     for _s in [Printable]:
         __swig_setmethods__.update(getattr(_s, '__swig_setmethods__', {}))
@@ -284,55 +441,251 @@ class SemElem(Printable):
     __del__ = lambda self: None
 
     def one(self):
+        """
+        one(self) -> SemElemPtr
+
+        Parameters
+        ----------
+        self: wali::SemElem const *
+
+        """
         return _wali.SemElem_one(self)
 
+
     def zero(self):
+        """
+        zero(self) -> SemElemPtr
+
+        Parameters
+        ----------
+        self: wali::SemElem const *
+
+        """
         return _wali.SemElem_zero(self)
 
+
     def marshall_weight(self, o):
+        """
+        marshall_weight(self, o) -> std::ostream &
+
+        Parameters
+        ----------
+        o: std::ostream &
+
+        """
         return _wali.SemElem_marshall_weight(self, o)
 
+
     def quasi_one(self):
+        """
+        quasi_one(self) -> SemElemPtr
+
+        Parameters
+        ----------
+        self: wali::SemElem const *
+
+        """
         return _wali.SemElem_quasi_one(self)
 
+
     def star(self):
+        """
+        star(self) -> SemElemPtr
+
+        Parameters
+        ----------
+        self: wali::SemElem *
+
+        """
         return _wali.SemElem_star(self)
 
+
     def extend(self, *args):
+        """
+        extend(self, se) -> SemElemPtr
+
+        Parameters
+        ----------
+        se: wali::SemElem *
+
+        extend(self, se) -> SemElemPtr
+
+        Parameters
+        ----------
+        se: wali::sem_elem_t
+
+        """
         return _wali.SemElem_extend(self, *args)
 
+
     def combine(self, *args):
+        """
+        combine(self, se) -> SemElemPtr
+
+        Parameters
+        ----------
+        se: wali::SemElem *
+
+        combine(self, se) -> SemElemPtr
+
+        Parameters
+        ----------
+        se: wali::sem_elem_t
+
+        """
         return _wali.SemElem_combine(self, *args)
 
+
     def equal(self, *args):
+        """
+        equal(self, se) -> bool
+
+        Parameters
+        ----------
+        se: wali::SemElem *
+
+        equal(self, se) -> bool
+
+        Parameters
+        ----------
+        se: wali::sem_elem_t
+
+        """
         return _wali.SemElem_equal(self, *args)
 
+
     def under_approximates(self, *args):
+        """
+        under_approximates(self, that) -> bool
+
+        Parameters
+        ----------
+        that: wali::SemElem *
+
+        under_approximates(self, se) -> bool
+
+        Parameters
+        ----------
+        se: wali::sem_elem_t
+
+        """
         return _wali.SemElem_under_approximates(self, *args)
 
+
     def diff(self, *args):
+        """
+        diff(self, se) -> SemElemPtr
+
+        Parameters
+        ----------
+        se: wali::SemElem *
+
+        diff(self, se) -> SemElemPtr
+
+        Parameters
+        ----------
+        se: wali::sem_elem_t
+
+        """
         return _wali.SemElem_diff(self, *args)
 
+
     def delta(self, *args):
+        """
+        delta(self, se) -> std::pair< wali::sem_elem_t,wali::sem_elem_t >
+
+        Parameters
+        ----------
+        se: wali::SemElem *
+
+        delta(self, se) -> std::pair< wali::sem_elem_t,wali::sem_elem_t >
+
+        Parameters
+        ----------
+        se: wali::sem_elem_t
+
+        """
         return _wali.SemElem_delta(self, *args)
 
+
     def extend_and_diff(self, next, subtrahend):
+        """
+        extend_and_diff(self, next, subtrahend) -> SemElemPtr
+
+        Parameters
+        ----------
+        next: wali::sem_elem_t
+        subtrahend: wali::sem_elem_t
+
+        """
         return _wali.SemElem_extend_and_diff(self, next, subtrahend)
 
+
     def container_less_than(self, *args):
+        """
+        container_less_than(self, other) -> bool
+
+        Parameters
+        ----------
+        other: wali::SemElem const *
+
+        container_less_than(self, se) -> bool
+
+        Parameters
+        ----------
+        se: wali::sem_elem_t
+
+        """
         return _wali.SemElem_container_less_than(self, *args)
 
+
     def hash(self):
+        """
+        hash(self) -> size_t
+
+        Parameters
+        ----------
+        self: wali::SemElem const *
+
+        """
         return _wali.SemElem_hash(self)
 
+
     def print_typename(self, os):
+        """
+        print_typename(self, os) -> std::ostream &
+
+        Parameters
+        ----------
+        os: std::ostream &
+
+        """
         return _wali.SemElem_print_typename(self, os)
 
+
     def to_string_typename(self):
+        """
+        to_string_typename(self) -> std::string
+
+        Parameters
+        ----------
+        self: wali::SemElem const *
+
+        """
         return _wali.SemElem_to_string_typename(self)
 
+
     def __str__(self):
+        """
+        __str__(self) -> PyObject *
+
+        Parameters
+        ----------
+        self: wali::SemElem *
+
+        """
         return _wali.SemElem___str__(self)
+
 SemElem_swigregister = _wali.SemElem_swigregister
 SemElem_swigregister(SemElem)
 cvar = _wali.cvar
@@ -340,9 +693,18 @@ SemElem.xmltag = _wali.cvar.SemElem_xmltag
 
 
 def test_semelem_impl(x):
+    """
+    test_semelem_impl(x)
+
+    Parameters
+    ----------
+    x: wali::sem_elem_t
+
+    """
     return _wali.test_semelem_impl(x)
-test_semelem_impl = _wali.test_semelem_impl
 class SemElemRefPtrContainerLessThan(_object):
+    """Proxy of C++ wali::SemElemRefPtrContainerLessThan class."""
+
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, SemElemRefPtrContainerLessThan, name, value)
     __swig_getmethods__ = {}
@@ -350,9 +712,20 @@ class SemElemRefPtrContainerLessThan(_object):
     __repr__ = _swig_repr
 
     def __call__(self, left, right):
+        """
+        __call__(self, left, right) -> bool
+
+        Parameters
+        ----------
+        left: wali::sem_elem_t
+        right: wali::sem_elem_t
+
+        """
         return _wali.SemElemRefPtrContainerLessThan___call__(self, left, right)
 
+
     def __init__(self):
+        """__init__(self) -> SemElemRefPtrContainerLessThan"""
         this = _wali.new_SemElemRefPtrContainerLessThan()
         try:
             self.this.append(this)
@@ -364,6 +737,8 @@ SemElemRefPtrContainerLessThan_swigregister = _wali.SemElemRefPtrContainerLessTh
 SemElemRefPtrContainerLessThan_swigregister(SemElemRefPtrContainerLessThan)
 
 class SemElemRefPtrHash(_object):
+    """Proxy of C++ wali::SemElemRefPtrHash class."""
+
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, SemElemRefPtrHash, name, value)
     __swig_getmethods__ = {}
@@ -371,9 +746,19 @@ class SemElemRefPtrHash(_object):
     __repr__ = _swig_repr
 
     def __call__(self, se):
+        """
+        __call__(self, se) -> size_t
+
+        Parameters
+        ----------
+        se: wali::sem_elem_t
+
+        """
         return _wali.SemElemRefPtrHash___call__(self, se)
 
+
     def __init__(self):
+        """__init__(self) -> SemElemRefPtrHash"""
         this = _wali.new_SemElemRefPtrHash()
         try:
             self.this.append(this)
@@ -385,6 +770,8 @@ SemElemRefPtrHash_swigregister = _wali.SemElemRefPtrHash_swigregister
 SemElemRefPtrHash_swigregister(SemElemRefPtrHash)
 
 class SemElemRefPtrEqual(_object):
+    """Proxy of C++ wali::SemElemRefPtrEqual class."""
+
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, SemElemRefPtrEqual, name, value)
     __swig_getmethods__ = {}
@@ -392,9 +779,20 @@ class SemElemRefPtrEqual(_object):
     __repr__ = _swig_repr
 
     def __call__(self, left, right):
+        """
+        __call__(self, left, right) -> bool
+
+        Parameters
+        ----------
+        left: wali::sem_elem_t
+        right: wali::sem_elem_t
+
+        """
         return _wali.SemElemRefPtrEqual___call__(self, left, right)
 
+
     def __init__(self):
+        """__init__(self) -> SemElemRefPtrEqual"""
         this = _wali.new_SemElemRefPtrEqual()
         try:
             self.this.append(this)
@@ -406,6 +804,8 @@ SemElemRefPtrEqual_swigregister = _wali.SemElemRefPtrEqual_swigregister
 SemElemRefPtrEqual_swigregister(SemElemRefPtrEqual)
 
 class SemElemPtr(_object):
+    """Proxy of C++ wali::ref_ptr<(SemElem)> class."""
+
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, SemElemPtr, name, value)
     __swig_getmethods__ = {}
@@ -413,6 +813,21 @@ class SemElemPtr(_object):
     __repr__ = _swig_repr
 
     def __init__(self, *args):
+        """
+        __init__(self, t=None) -> SemElemPtr
+
+        Parameters
+        ----------
+        t: wali::SemElem *
+
+        __init__(self) -> SemElemPtr
+        __init__(self, rp) -> SemElemPtr
+
+        Parameters
+        ----------
+        rp: wali::ref_ptr< wali::SemElem > const &
+
+        """
         this = _wali.new_SemElemPtr(*args)
         try:
             self.this.append(this)
@@ -422,92 +837,380 @@ class SemElemPtr(_object):
     __del__ = lambda self: None
 
     def __eq__(self, that):
+        """
+        __eq__(self, that) -> bool
+
+        Parameters
+        ----------
+        that: wali::ref_ptr< wali::SemElem > const &
+
+        """
         return _wali.SemElemPtr___eq__(self, that)
 
+
     def __ne__(self, that):
+        """
+        __ne__(self, that) -> bool
+
+        Parameters
+        ----------
+        that: wali::ref_ptr< wali::SemElem > const &
+
+        """
         return _wali.SemElemPtr___ne__(self, that)
 
+
     def get_ptr(self):
+        """
+        get_ptr(self) -> SemElem
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< SemElem > const *
+
+        """
         return _wali.SemElemPtr_get_ptr(self)
 
+
     def __deref__(self):
+        """
+        __deref__(self) -> SemElem
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< SemElem > const *
+
+        """
         return _wali.SemElemPtr___deref__(self)
 
+
     def __ref__(self):
+        """
+        __ref__(self) -> SemElem
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< SemElem > const *
+
+        """
         return _wali.SemElemPtr___ref__(self)
 
+
     def __lt__(self, that):
+        """
+        __lt__(self, that) -> bool
+
+        Parameters
+        ----------
+        that: wali::ref_ptr< wali::SemElem > const &
+
+        """
         return _wali.SemElemPtr___lt__(self, that)
 
+
     def is_empty(self):
+        """
+        is_empty(self) -> bool
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< SemElem > const *
+
+        """
         return _wali.SemElemPtr_is_empty(self)
 
+
     def is_valid(self):
+        """
+        is_valid(self) -> bool
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< SemElem > const *
+
+        """
         return _wali.SemElemPtr_is_valid(self)
+
     __swig_getmethods__["xmltag"] = _wali.SemElemPtr_xmltag_get
     if _newclass:
         xmltag = _swig_property(_wali.SemElemPtr_xmltag_get)
 
     def one(self):
+        """
+        one(self) -> SemElemPtr
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< SemElem > const *
+
+        """
         return _wali.SemElemPtr_one(self)
 
+
     def zero(self):
+        """
+        zero(self) -> SemElemPtr
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< SemElem > const *
+
+        """
         return _wali.SemElemPtr_zero(self)
 
+
     def extend(self, *args):
+        """
+        extend(self, se) -> SemElemPtr
+
+        Parameters
+        ----------
+        se: wali::SemElem *
+
+        extend(self, se) -> SemElemPtr
+
+        Parameters
+        ----------
+        se: wali::sem_elem_t
+
+        """
         return _wali.SemElemPtr_extend(self, *args)
 
+
     def combine(self, *args):
+        """
+        combine(self, se) -> SemElemPtr
+
+        Parameters
+        ----------
+        se: wali::SemElem *
+
+        combine(self, se) -> SemElemPtr
+
+        Parameters
+        ----------
+        se: wali::sem_elem_t
+
+        """
         return _wali.SemElemPtr_combine(self, *args)
 
+
     def equal(self, *args):
+        """
+        equal(self, se) -> bool
+
+        Parameters
+        ----------
+        se: wali::SemElem *
+
+        equal(self, se) -> bool
+
+        Parameters
+        ----------
+        se: wali::sem_elem_t
+
+        """
         return _wali.SemElemPtr_equal(self, *args)
 
+
     def under_approximates(self, *args):
+        """
+        under_approximates(self, that) -> bool
+
+        Parameters
+        ----------
+        that: wali::SemElem *
+
+        under_approximates(self, se) -> bool
+
+        Parameters
+        ----------
+        se: wali::sem_elem_t
+
+        """
         return _wali.SemElemPtr_under_approximates(self, *args)
 
+
     def marshall_weight(self, o):
+        """
+        marshall_weight(self, o) -> std::ostream &
+
+        Parameters
+        ----------
+        o: std::ostream &
+
+        """
         return _wali.SemElemPtr_marshall_weight(self, o)
 
+
     def diff(self, *args):
+        """
+        diff(self, se) -> SemElemPtr
+
+        Parameters
+        ----------
+        se: wali::SemElem *
+
+        diff(self, se) -> SemElemPtr
+
+        Parameters
+        ----------
+        se: wali::sem_elem_t
+
+        """
         return _wali.SemElemPtr_diff(self, *args)
 
+
     def quasi_one(self):
+        """
+        quasi_one(self) -> SemElemPtr
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< SemElem > const *
+
+        """
         return _wali.SemElemPtr_quasi_one(self)
 
+
     def delta(self, *args):
+        """
+        delta(self, se) -> std::pair< wali::sem_elem_t,wali::sem_elem_t >
+
+        Parameters
+        ----------
+        se: wali::SemElem *
+
+        delta(self, se) -> std::pair< wali::sem_elem_t,wali::sem_elem_t >
+
+        Parameters
+        ----------
+        se: wali::sem_elem_t
+
+        """
         return _wali.SemElemPtr_delta(self, *args)
 
+
     def star(self):
+        """
+        star(self) -> SemElemPtr
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< SemElem > *
+
+        """
         return _wali.SemElemPtr_star(self)
 
+
     def extend_and_diff(self, next, subtrahend):
+        """
+        extend_and_diff(self, next, subtrahend) -> SemElemPtr
+
+        Parameters
+        ----------
+        next: wali::sem_elem_t
+        subtrahend: wali::sem_elem_t
+
+        """
         return _wali.SemElemPtr_extend_and_diff(self, next, subtrahend)
 
+
     def container_less_than(self, *args):
+        """
+        container_less_than(self, other) -> bool
+
+        Parameters
+        ----------
+        other: wali::SemElem const *
+
+        container_less_than(self, se) -> bool
+
+        Parameters
+        ----------
+        se: wali::sem_elem_t
+
+        """
         return _wali.SemElemPtr_container_less_than(self, *args)
 
+
     def hash(self):
+        """
+        hash(self) -> size_t
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< SemElem > const *
+
+        """
         return _wali.SemElemPtr_hash(self)
 
+
     def print_typename(self, os):
+        """
+        print_typename(self, os) -> std::ostream &
+
+        Parameters
+        ----------
+        os: std::ostream &
+
+        """
         return _wali.SemElemPtr_print_typename(self, os)
 
+
     def to_string_typename(self):
+        """
+        to_string_typename(self) -> std::string
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< SemElem > const *
+
+        """
         return _wali.SemElemPtr_to_string_typename(self)
 
+
     def __str__(self):
+        """
+        __str__(self) -> PyObject *
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< SemElem > *
+
+        """
         return _wali.SemElemPtr___str__(self)
 
+
     def to_string(self):
+        """
+        to_string(self) -> std::string
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< SemElem > const *
+
+        """
         return _wali.SemElemPtr_to_string(self)
 
+
     def toString(self):
+        """
+        toString(self) -> std::string
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< SemElem > const *
+
+        """
         return _wali.SemElemPtr_toString(self)
+
 SemElemPtr_swigregister = _wali.SemElemPtr_swigregister
 SemElemPtr_swigregister(SemElemPtr)
 
 class KeyPair(_object):
+    """Proxy of C++ std::pair<(Key,Key)> class."""
+
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, KeyPair, name, value)
     __swig_getmethods__ = {}
@@ -515,6 +1218,22 @@ class KeyPair(_object):
     __repr__ = _swig_repr
 
     def __init__(self, *args):
+        """
+        __init__(self) -> KeyPair
+        __init__(self, first, second) -> KeyPair
+
+        Parameters
+        ----------
+        first: Key
+        second: Key
+
+        __init__(self, p) -> KeyPair
+
+        Parameters
+        ----------
+        p: std::pair< Key,Key > const &
+
+        """
         this = _wali.new_KeyPair(*args)
         try:
             self.this.append(this)
@@ -549,9 +1268,18 @@ KeyPair_swigregister(KeyPair)
 
 
 def strhashfn(str):
+    """
+    strhashfn(str) -> unsigned long
+
+    Parameters
+    ----------
+    str: char const *
+
+    """
     return _wali.strhashfn(str)
-strhashfn = _wali.strhashfn
 class KeyPairMap(_object):
+    """Proxy of C++ wali::HashMap<(KeyPair,TransSet,hm_hash<(KeyPair)>,hm_equal<(KeyPair)>)> class."""
+
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, KeyPairMap, name, value)
     __swig_getmethods__ = {}
@@ -560,6 +1288,21 @@ class KeyPairMap(_object):
     SIZE_TYPE_MAX = _wali.KeyPairMap_SIZE_TYPE_MAX
 
     def __init__(self, *args):
+        """
+        __init__(self, the_size=47) -> KeyPairMap
+
+        Parameters
+        ----------
+        the_size: wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::size_type
+
+        __init__(self) -> KeyPairMap
+        __init__(self, hm) -> KeyPairMap
+
+        Parameters
+        ----------
+        hm: wali::HashMap< KeyPair,TransSet,wali::hm_hash< KeyPair >,wali::hm_equal< KeyPair > > const &
+
+        """
         this = _wali.new_KeyPairMap(*args)
         try:
             self.this.append(this)
@@ -569,44 +1312,199 @@ class KeyPairMap(_object):
     __del__ = lambda self: None
 
     def clear(self):
+        """
+        clear(self)
+
+        Parameters
+        ----------
+        self: wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > > *
+
+        """
         return _wali.KeyPairMap_clear(self)
 
+
     def size(self):
+        """
+        size(self) -> wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::size_type
+
+        Parameters
+        ----------
+        self: wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > > const *
+
+        """
         return _wali.KeyPairMap_size(self)
 
+
     def capacity(self):
+        """
+        capacity(self) -> wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::size_type
+
+        Parameters
+        ----------
+        self: wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > > const *
+
+        """
         return _wali.KeyPairMap_capacity(self)
 
+
     def begin(self, *args):
+        """
+        begin(self) -> wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::iterator
+        begin(self) -> wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::const_iterator
+
+        Parameters
+        ----------
+        self: wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > > const *
+
+        """
         return _wali.KeyPairMap_begin(self, *args)
 
+
     def end(self, *args):
+        """
+        end(self) -> wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::iterator
+        end(self) -> wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::const_iterator
+
+        Parameters
+        ----------
+        self: wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > > const *
+
+        """
         return _wali.KeyPairMap_end(self, *args)
 
+
     def key(self, *args):
+        """
+        key(self, it) -> KeyPair
+
+        Parameters
+        ----------
+        it: wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::iterator &
+
+        key(self, it) -> KeyPair const &
+
+        Parameters
+        ----------
+        it: wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::const_iterator &
+
+        """
         return _wali.KeyPairMap_key(self, *args)
 
+
     def value(self, *args):
+        """
+        value(self, it) -> TransSet
+
+        Parameters
+        ----------
+        it: wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::iterator &
+
+        value(self, it) -> TransSet const &
+
+        Parameters
+        ----------
+        it: wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::const_iterator &
+
+        """
         return _wali.KeyPairMap_value(self, *args)
 
+
     def data(self, *args):
+        """
+        data(self, it) -> TransSet
+
+        Parameters
+        ----------
+        it: wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::iterator &
+
+        data(self, it) -> TransSet const &
+
+        Parameters
+        ----------
+        it: wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::const_iterator &
+
+        """
         return _wali.KeyPairMap_data(self, *args)
 
+
     def print_stats(self, *args):
+        """
+        print_stats(self, o)
+
+        Parameters
+        ----------
+        o: std::ostream &
+
+        print_stats(self)
+
+        Parameters
+        ----------
+        self: wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > > const *
+
+        """
         return _wali.KeyPairMap_print_stats(self, *args)
 
+
     def insert(self, *args):
+        """
+        insert(self, k, d) -> std::pair< wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::iterator,bool >
+
+        Parameters
+        ----------
+        k: KeyPair const &
+        d: TransSet const &
+
+        insert(self, arg2) -> std::pair< wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::iterator,bool >
+
+        Parameters
+        ----------
+        arg2: wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::value_type const &
+
+        """
         return _wali.KeyPairMap_insert(self, *args)
 
+
     def find(self, *args):
+        """
+        find(self, arg2) -> wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::iterator
+
+        Parameters
+        ----------
+        arg2: KeyPair const &
+
+        find(self, arg2) -> wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::const_iterator
+
+        Parameters
+        ----------
+        arg2: KeyPair const &
+
+        """
         return _wali.KeyPairMap_find(self, *args)
 
+
     def erase(self, *args):
+        """
+        erase(self, key_to_erase)
+
+        Parameters
+        ----------
+        key_to_erase: KeyPair const &
+
+        erase(self, it)
+
+        Parameters
+        ----------
+        it: wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::iterator
+
+        """
         return _wali.KeyPairMap_erase(self, *args)
+
 KeyPairMap_swigregister = _wali.KeyPairMap_swigregister
 KeyPairMap_swigregister(KeyPairMap)
 
 class PySemElem(SemElem):
+    """Proxy of C++ PySemElem class."""
+
     __swig_setmethods__ = {}
     for _s in [SemElem]:
         __swig_setmethods__.update(getattr(_s, '__swig_setmethods__', {}))
@@ -701,15 +1599,50 @@ class PySemElem(SemElem):
 
 
     def setuserdata(self, data):
+        """
+        setuserdata(self, data)
+
+        Parameters
+        ----------
+        data: PyObject *
+
+        """
         return _wali.PySemElem_setuserdata(self, data)
 
+
     def getuserdata(self):
+        """
+        getuserdata(self) -> PyObject *
+
+        Parameters
+        ----------
+        self: PySemElem *
+
+        """
         return _wali.PySemElem_getuserdata(self)
 
+
     def __str__(self):
+        """
+        __str__(self) -> std::string
+
+        Parameters
+        ----------
+        self: PySemElem const *
+
+        """
         return _wali.PySemElem___str__(self)
 
+
     def pycombine(self, se):
+        """
+        pycombine(self, se) -> PySemElemPtr
+
+        Parameters
+        ----------
+        se: PySemElem *
+
+        """
 
                 #Deref smart pointer if needed
         if hasattr(args[1], '__deref__'):
@@ -722,6 +1655,14 @@ class PySemElem(SemElem):
 
 
     def combine(self, se):
+        """
+        combine(self, se) -> sem_elem_t
+
+        Parameters
+        ----------
+        se: SemElem *
+
+        """
 
                 #Deref smart pointer if needed
         if hasattr(args[1], '__deref__'):
@@ -734,6 +1675,14 @@ class PySemElem(SemElem):
 
 
     def pyextend(self, se):
+        """
+        pyextend(self, se) -> PySemElemPtr
+
+        Parameters
+        ----------
+        se: PySemElem *
+
+        """
 
                 #Deref smart pointer if needed
         if hasattr(args[1], '__deref__'):
@@ -746,6 +1695,14 @@ class PySemElem(SemElem):
 
 
     def extend(self, se):
+        """
+        extend(self, se) -> sem_elem_t
+
+        Parameters
+        ----------
+        se: SemElem *
+
+        """
 
                 #Deref smart pointer if needed
         if hasattr(args[1], '__deref__'):
@@ -770,25 +1727,88 @@ class PySemElem(SemElem):
 
 
     def delta(self, se):
+        """
+        delta(self, se) -> SemElemPtrPair
+
+        Parameters
+        ----------
+        se: SemElem *
+
+        """
         return _wali.PySemElem_delta(self, se)
 
+
     def pyequal(self, se):
+        """
+        pyequal(self, se) -> bool
+
+        Parameters
+        ----------
+        se: PySemElem *
+
+        """
         return _wali.PySemElem_pyequal(self, se)
 
+
     def equal(self, se):
+        """
+        equal(self, se) -> bool
+
+        Parameters
+        ----------
+        se: SemElem *
+
+        """
         return _wali.PySemElem_equal(self, se)
 
+
     def pyone(self):
+        """
+        pyone(self) -> PySemElemPtr
+
+        Parameters
+        ----------
+        self: PySemElem const *
+
+        """
         return _wali.PySemElem_pyone(self)
 
+
     def pyzero(self):
+        """
+        pyzero(self) -> PySemElemPtr
+
+        Parameters
+        ----------
+        self: PySemElem const *
+
+        """
         return _wali.PySemElem_pyzero(self)
 
+
     def one(self):
+        """
+        one(self) -> sem_elem_t
+
+        Parameters
+        ----------
+        self: PySemElem const *
+
+        """
         return _wali.PySemElem_one(self)
 
+
     def zero(self):
+        """
+        zero(self) -> sem_elem_t
+
+        Parameters
+        ----------
+        self: PySemElem const *
+
+        """
         return _wali.PySemElem_zero(self)
+
     __swig_destroy__ = _wali.delete_PySemElem
     __del__ = lambda self: None
     def __disown__(self):
@@ -799,6 +1819,8 @@ PySemElem_swigregister = _wali.PySemElem_swigregister
 PySemElem_swigregister(PySemElem)
 
 class SemElemPtrPair(_object):
+    """Proxy of C++ std::pair<(sem_elem_t,sem_elem_t)> class."""
+
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, SemElemPtrPair, name, value)
     __swig_getmethods__ = {}
@@ -806,6 +1828,22 @@ class SemElemPtrPair(_object):
     __repr__ = _swig_repr
 
     def __init__(self, *args):
+        """
+        __init__(self) -> SemElemPtrPair
+        __init__(self, first, second) -> SemElemPtrPair
+
+        Parameters
+        ----------
+        first: sem_elem_t
+        second: sem_elem_t
+
+        __init__(self, p) -> SemElemPtrPair
+
+        Parameters
+        ----------
+        p: std::pair< sem_elem_t,sem_elem_t > const &
+
+        """
         this = _wali.new_SemElemPtrPair(*args)
         try:
             self.this.append(this)
@@ -839,6 +1877,8 @@ SemElemPtrPair_swigregister = _wali.SemElemPtrPair_swigregister
 SemElemPtrPair_swigregister(SemElemPtrPair)
 
 class PySemElemPtr(_object):
+    """Proxy of C++ wali::ref_ptr<(PySemElem)> class."""
+
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, PySemElemPtr, name, value)
     __swig_getmethods__ = {}
@@ -846,6 +1886,21 @@ class PySemElemPtr(_object):
     __repr__ = _swig_repr
 
     def __init__(self, *args):
+        """
+        __init__(self, t=None) -> PySemElemPtr
+
+        Parameters
+        ----------
+        t: PySemElem *
+
+        __init__(self) -> PySemElemPtr
+        __init__(self, rp) -> PySemElemPtr
+
+        Parameters
+        ----------
+        rp: wali::ref_ptr< PySemElem > const &
+
+        """
         this = _wali.new_PySemElemPtr(*args)
         try:
             self.this.append(this)
@@ -855,39 +1910,146 @@ class PySemElemPtr(_object):
     __del__ = lambda self: None
 
     def __eq__(self, that):
+        """
+        __eq__(self, that) -> bool
+
+        Parameters
+        ----------
+        that: wali::ref_ptr< PySemElem > const &
+
+        """
         return _wali.PySemElemPtr___eq__(self, that)
 
+
     def __ne__(self, that):
+        """
+        __ne__(self, that) -> bool
+
+        Parameters
+        ----------
+        that: wali::ref_ptr< PySemElem > const &
+
+        """
         return _wali.PySemElemPtr___ne__(self, that)
 
+
     def get_ptr(self):
+        """
+        get_ptr(self) -> PySemElem
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< PySemElem > const *
+
+        """
         return _wali.PySemElemPtr_get_ptr(self)
 
+
     def __deref__(self):
+        """
+        __deref__(self) -> PySemElem
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< PySemElem > const *
+
+        """
         return _wali.PySemElemPtr___deref__(self)
 
+
     def __ref__(self):
+        """
+        __ref__(self) -> PySemElem
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< PySemElem > const *
+
+        """
         return _wali.PySemElemPtr___ref__(self)
 
+
     def __lt__(self, that):
+        """
+        __lt__(self, that) -> bool
+
+        Parameters
+        ----------
+        that: wali::ref_ptr< PySemElem > const &
+
+        """
         return _wali.PySemElemPtr___lt__(self, that)
 
+
     def is_empty(self):
+        """
+        is_empty(self) -> bool
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< PySemElem > const *
+
+        """
         return _wali.PySemElemPtr_is_empty(self)
 
+
     def is_valid(self):
+        """
+        is_valid(self) -> bool
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< PySemElem > const *
+
+        """
         return _wali.PySemElemPtr_is_valid(self)
 
+
     def setuserdata(self, data):
+        """
+        setuserdata(self, data)
+
+        Parameters
+        ----------
+        data: PyObject *
+
+        """
         return _wali.PySemElemPtr_setuserdata(self, data)
 
+
     def getuserdata(self):
+        """
+        getuserdata(self) -> PyObject *
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< PySemElem > *
+
+        """
         return _wali.PySemElemPtr_getuserdata(self)
 
+
     def __str__(self):
+        """
+        __str__(self) -> std::string
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< PySemElem > const *
+
+        """
         return _wali.PySemElemPtr___str__(self)
 
+
     def pycombine(self, se):
+        """
+        pycombine(self, se) -> PySemElemPtr
+
+        Parameters
+        ----------
+        se: PySemElem *
+
+        """
 
                 #Deref smart pointer if needed
         if hasattr(args[1], '__deref__'):
@@ -900,6 +2062,14 @@ class PySemElemPtr(_object):
 
 
     def combine(self, se):
+        """
+        combine(self, se) -> sem_elem_t
+
+        Parameters
+        ----------
+        se: SemElem *
+
+        """
 
                 #Deref smart pointer if needed
         if hasattr(args[1], '__deref__'):
@@ -912,6 +2082,14 @@ class PySemElemPtr(_object):
 
 
     def pyextend(self, se):
+        """
+        pyextend(self, se) -> PySemElemPtr
+
+        Parameters
+        ----------
+        se: PySemElem *
+
+        """
 
                 #Deref smart pointer if needed
         if hasattr(args[1], '__deref__'):
@@ -924,6 +2102,14 @@ class PySemElemPtr(_object):
 
 
     def extend(self, se):
+        """
+        extend(self, se) -> sem_elem_t
+
+        Parameters
+        ----------
+        se: SemElem *
+
+        """
 
                 #Deref smart pointer if needed
         if hasattr(args[1], '__deref__'):
@@ -948,68 +2134,260 @@ class PySemElemPtr(_object):
 
 
     def delta(self, se):
+        """
+        delta(self, se) -> SemElemPtrPair
+
+        Parameters
+        ----------
+        se: SemElem *
+
+        """
         return _wali.PySemElemPtr_delta(self, se)
 
+
     def pyequal(self, se):
+        """
+        pyequal(self, se) -> bool
+
+        Parameters
+        ----------
+        se: PySemElem *
+
+        """
         return _wali.PySemElemPtr_pyequal(self, se)
 
+
     def equal(self, se):
+        """
+        equal(self, se) -> bool
+
+        Parameters
+        ----------
+        se: SemElem *
+
+        """
         return _wali.PySemElemPtr_equal(self, se)
 
+
     def pyone(self):
+        """
+        pyone(self) -> PySemElemPtr
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< PySemElem > const *
+
+        """
         return _wali.PySemElemPtr_pyone(self)
 
+
     def pyzero(self):
+        """
+        pyzero(self) -> PySemElemPtr
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< PySemElem > const *
+
+        """
         return _wali.PySemElemPtr_pyzero(self)
 
+
     def one(self):
+        """
+        one(self) -> sem_elem_t
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< PySemElem > const *
+
+        """
         return _wali.PySemElemPtr_one(self)
 
+
     def zero(self):
+        """
+        zero(self) -> sem_elem_t
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< PySemElem > const *
+
+        """
         return _wali.PySemElemPtr_zero(self)
+
     __swig_getmethods__["xmltag"] = _wali.PySemElemPtr_xmltag_get
     if _newclass:
         xmltag = _swig_property(_wali.PySemElemPtr_xmltag_get)
 
     def under_approximates(self, *args):
+        """
+        under_approximates(self, that) -> bool
+
+        Parameters
+        ----------
+        that: wali::SemElem *
+
+        under_approximates(self, se) -> bool
+
+        Parameters
+        ----------
+        se: wali::sem_elem_t
+
+        """
         return _wali.PySemElemPtr_under_approximates(self, *args)
 
+
     def marshall_weight(self, o):
+        """
+        marshall_weight(self, o) -> std::ostream &
+
+        Parameters
+        ----------
+        o: std::ostream &
+
+        """
         return _wali.PySemElemPtr_marshall_weight(self, o)
 
+
     def diff(self, *args):
+        """
+        diff(self, se) -> SemElemPtr
+
+        Parameters
+        ----------
+        se: wali::SemElem *
+
+        diff(self, se) -> SemElemPtr
+
+        Parameters
+        ----------
+        se: wali::sem_elem_t
+
+        """
         return _wali.PySemElemPtr_diff(self, *args)
 
+
     def quasi_one(self):
+        """
+        quasi_one(self) -> SemElemPtr
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< PySemElem > const *
+
+        """
         return _wali.PySemElemPtr_quasi_one(self)
 
+
     def star(self):
+        """
+        star(self) -> SemElemPtr
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< PySemElem > *
+
+        """
         return _wali.PySemElemPtr_star(self)
 
+
     def extend_and_diff(self, next, subtrahend):
+        """
+        extend_and_diff(self, next, subtrahend) -> SemElemPtr
+
+        Parameters
+        ----------
+        next: wali::sem_elem_t
+        subtrahend: wali::sem_elem_t
+
+        """
         return _wali.PySemElemPtr_extend_and_diff(self, next, subtrahend)
 
+
     def container_less_than(self, *args):
+        """
+        container_less_than(self, other) -> bool
+
+        Parameters
+        ----------
+        other: wali::SemElem const *
+
+        container_less_than(self, se) -> bool
+
+        Parameters
+        ----------
+        se: wali::sem_elem_t
+
+        """
         return _wali.PySemElemPtr_container_less_than(self, *args)
 
+
     def hash(self):
+        """
+        hash(self) -> size_t
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< PySemElem > const *
+
+        """
         return _wali.PySemElemPtr_hash(self)
 
+
     def print_typename(self, os):
+        """
+        print_typename(self, os) -> std::ostream &
+
+        Parameters
+        ----------
+        os: std::ostream &
+
+        """
         return _wali.PySemElemPtr_print_typename(self, os)
 
+
     def to_string_typename(self):
+        """
+        to_string_typename(self) -> std::string
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< PySemElem > const *
+
+        """
         return _wali.PySemElemPtr_to_string_typename(self)
 
+
     def to_string(self):
+        """
+        to_string(self) -> std::string
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< PySemElem > const *
+
+        """
         return _wali.PySemElemPtr_to_string(self)
 
+
     def toString(self):
+        """
+        toString(self) -> std::string
+
+        Parameters
+        ----------
+        self: wali::ref_ptr< PySemElem > const *
+
+        """
         return _wali.PySemElemPtr_toString(self)
+
 PySemElemPtr_swigregister = _wali.PySemElemPtr_swigregister
 PySemElemPtr_swigregister(PySemElemPtr)
 
 class PySemElemPtrPair(_object):
+    """Proxy of C++ std::pair<(wali::ref_ptr<(PySemElem)>,wali::ref_ptr<(PySemElem)>)> class."""
+
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, PySemElemPtrPair, name, value)
     __swig_getmethods__ = {}
@@ -1017,6 +2395,22 @@ class PySemElemPtrPair(_object):
     __repr__ = _swig_repr
 
     def __init__(self, *args):
+        """
+        __init__(self) -> PySemElemPtrPair
+        __init__(self, first, second) -> PySemElemPtrPair
+
+        Parameters
+        ----------
+        first: wali::ref_ptr< PySemElem >
+        second: wali::ref_ptr< PySemElem >
+
+        __init__(self, p) -> PySemElemPtrPair
+
+        Parameters
+        ----------
+        p: std::pair< wali::ref_ptr< PySemElem >,wali::ref_ptr< PySemElem > > const &
+
+        """
         this = _wali.new_PySemElemPtrPair(*args)
         try:
             self.this.append(this)
@@ -1050,6 +2444,8 @@ PySemElemPtrPair_swigregister = _wali.PySemElemPtrPair_swigregister
 PySemElemPtrPair_swigregister(PySemElemPtrPair)
 
 class Trans(_object):
+    """Proxy of C++ wali::wfa::Trans class."""
+
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, Trans, name, value)
     __swig_getmethods__ = {}
@@ -1061,6 +2457,30 @@ class Trans(_object):
         num_trans = _swig_property(_wali.Trans_num_trans_get, _wali.Trans_num_trans_set)
 
     def __init__(self, *args):
+        """
+        __init__(self) -> Trans
+        __init__(self, arg2, stack, to, se) -> Trans
+
+        Parameters
+        ----------
+        from: wali::Key
+        stack: wali::Key
+        to: wali::Key
+        se: wali::sem_elem_t
+
+        __init__(self, t) -> Trans
+
+        Parameters
+        ----------
+        t: wali::wfa::Trans const &
+
+        __init__(self, t) -> Trans
+
+        Parameters
+        ----------
+        t: ITrans const &
+
+        """
         this = _wali.new_Trans(*args)
         try:
             self.this.append(this)
@@ -1070,71 +2490,272 @@ class Trans(_object):
     __del__ = lambda self: None
 
     def copy(self, *args):
+        """
+        copy(self) -> Trans
+        copy(self, f, s, t) -> Trans
+
+        Parameters
+        ----------
+        f: wali::Key
+        s: wali::Key
+        t: wali::Key
+
+        """
         return _wali.Trans_copy(self, *args)
 
+
     def worklist_data(self):
+        """
+        worklist_data(self) -> wali::ref_ptr< WorklistData >
+
+        Parameters
+        ----------
+        self: wali::wfa::Trans const *
+
+        """
         return _wali.Trans_worklist_data(self)
 
+
     def fromState(self, *args):
+        """
+        fromState(self) -> wali::Key
+        fromState(self) -> wali::Key
+
+        Parameters
+        ----------
+        self: wali::wfa::Trans *
+
+        """
         return _wali.Trans_fromState(self, *args)
 
+
     def from_state(self, *args):
+        """
+        from_state(self) -> wali::Key
+        from_state(self) -> wali::Key
+
+        Parameters
+        ----------
+        self: wali::wfa::Trans *
+
+        """
         return _wali.Trans_from_state(self, *args)
 
+
     def stack(self, *args):
+        """
+        stack(self) -> wali::Key
+        stack(self) -> wali::Key
+
+        Parameters
+        ----------
+        self: wali::wfa::Trans *
+
+        """
         return _wali.Trans_stack(self, *args)
 
+
     def toState(self, *args):
+        """
+        toState(self) -> wali::Key
+        toState(self) -> wali::Key
+
+        Parameters
+        ----------
+        self: wali::wfa::Trans *
+
+        """
         return _wali.Trans_toState(self, *args)
 
+
     def to_state(self, *args):
+        """
+        to_state(self) -> wali::Key
+        to_state(self) -> wali::Key
+
+        Parameters
+        ----------
+        self: wali::wfa::Trans *
+
+        """
         return _wali.Trans_to_state(self, *args)
 
+
     def weight(self, *args):
+        """
+        weight(self) -> SemElemPtr
+        weight(self) -> SemElemPtr
+
+        Parameters
+        ----------
+        self: wali::wfa::Trans *
+
+        """
         return _wali.Trans_weight(self, *args)
 
+
     def get_delta(self, *args):
+        """
+        get_delta(self) -> SemElemPtr
+        get_delta(self) -> SemElemPtr
+
+        Parameters
+        ----------
+        self: wali::wfa::Trans *
+
+        """
         return _wali.Trans_get_delta(self, *args)
 
+
     def set_weight(self, w):
+        """
+        set_weight(self, w)
+
+        Parameters
+        ----------
+        w: wali::sem_elem_t
+
+        """
         return _wali.Trans_set_weight(self, w)
 
+
     def set_delta(self, w):
+        """
+        set_delta(self, w)
+
+        Parameters
+        ----------
+        w: wali::sem_elem_t const
+
+        """
         return _wali.Trans_set_delta(self, w)
 
+
     def set_worklist_data(self, wd):
+        """
+        set_worklist_data(self, wd)
+
+        Parameters
+        ----------
+        wd: wali::ref_ptr< WorklistData >
+
+        """
         return _wali.Trans_set_worklist_data(self, wd)
 
+
     def combine_trans(self, tp):
+        """
+        combine_trans(self, tp)
+
+        Parameters
+        ----------
+        tp: ITrans *
+
+        """
         return _wali.Trans_combine_trans(self, tp)
 
+
     def keypair(self):
+        """
+        keypair(self) -> KeyPair const &
+
+        Parameters
+        ----------
+        self: wali::wfa::Trans const *
+
+        """
         return _wali.Trans_keypair(self)
 
+
     def modified(self):
+        """
+        modified(self) -> bool
+
+        Parameters
+        ----------
+        self: wali::wfa::Trans const *
+
+        """
         return _wali.Trans_modified(self)
 
+
     def get_config(self):
+        """
+        get_config(self) -> wali::wpds::Config *
+
+        Parameters
+        ----------
+        self: wali::wfa::Trans const *
+
+        """
         return _wali.Trans_get_config(self)
 
+
     def set_config(self, c):
+        """
+        set_config(self, c)
+
+        Parameters
+        ----------
+        c: wali::wpds::Config *
+
+        """
         return _wali.Trans_set_config(self, c)
 
+
     def poststar_eps_closure(self, se):
+        """
+        poststar_eps_closure(self, se) -> SemElemPtr
+
+        Parameters
+        ----------
+        se: wali::sem_elem_t
+
+        """
         return _wali.Trans_poststar_eps_closure(self, se)
 
+
     def apply_post(self, tw):
+        """
+        apply_post(self, tw) -> TaggedWeight
+
+        Parameters
+        ----------
+        tw: TaggedWeight
+
+        """
         return _wali.Trans_apply_post(self, tw)
 
+
     def apply_pre(self, tw):
+        """
+        apply_pre(self, tw) -> TaggedWeight
+
+        Parameters
+        ----------
+        tw: TaggedWeight
+
+        """
         return _wali.Trans_apply_pre(self, tw)
 
+
     def apply_weight_changer(self, wc):
+        """
+        apply_weight_changer(self, wc)
+
+        Parameters
+        ----------
+        wc: util::WeightChanger &
+
+        """
         return _wali.Trans_apply_weight_changer(self, wc)
+
 Trans_swigregister = _wali.Trans_swigregister
 Trans_swigregister(Trans)
 
 class TransSetImpl(_object):
+    """Proxy of C++ std::set<(p.ITrans,ITransLT)> class."""
+
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, TransSetImpl, name, value)
     __swig_getmethods__ = {}
@@ -1142,35 +2763,131 @@ class TransSetImpl(_object):
     __repr__ = _swig_repr
 
     def iterator(self):
+        """
+        iterator(self) -> SwigPyIterator
+
+        Parameters
+        ----------
+        self: std::set< ITrans *,ITransLT > *
+
+        """
         return _wali.TransSetImpl_iterator(self)
+
     def __iter__(self):
         return self.iterator()
 
     def __nonzero__(self):
+        """
+        __nonzero__(self) -> bool
+
+        Parameters
+        ----------
+        self: std::set< ITrans *,ITransLT > const *
+
+        """
         return _wali.TransSetImpl___nonzero__(self)
 
+
     def __bool__(self):
+        """
+        __bool__(self) -> bool
+
+        Parameters
+        ----------
+        self: std::set< ITrans *,ITransLT > const *
+
+        """
         return _wali.TransSetImpl___bool__(self)
 
+
     def __len__(self):
+        """
+        __len__(self) -> std::set< ITrans *,ITransLT >::size_type
+
+        Parameters
+        ----------
+        self: std::set< ITrans *,ITransLT > const *
+
+        """
         return _wali.TransSetImpl___len__(self)
 
+
     def append(self, x):
+        """
+        append(self, x)
+
+        Parameters
+        ----------
+        x: std::set< ITrans *,ITransLT >::value_type
+
+        """
         return _wali.TransSetImpl_append(self, x)
 
+
     def __contains__(self, x):
+        """
+        __contains__(self, x) -> bool
+
+        Parameters
+        ----------
+        x: std::set< ITrans *,ITransLT >::value_type
+
+        """
         return _wali.TransSetImpl___contains__(self, x)
 
+
     def __getitem__(self, i):
+        """
+        __getitem__(self, i) -> std::set< ITrans *,ITransLT >::value_type
+
+        Parameters
+        ----------
+        i: std::set< ITrans *,ITransLT >::difference_type
+
+        """
         return _wali.TransSetImpl___getitem__(self, i)
 
+
     def add(self, x):
+        """
+        add(self, x)
+
+        Parameters
+        ----------
+        x: std::set< ITrans *,ITransLT >::value_type
+
+        """
         return _wali.TransSetImpl_add(self, x)
 
+
     def discard(self, x):
+        """
+        discard(self, x)
+
+        Parameters
+        ----------
+        x: std::set< ITrans *,ITransLT >::value_type
+
+        """
         return _wali.TransSetImpl_discard(self, x)
 
+
     def __init__(self, *args):
+        """
+        __init__(self, arg2) -> TransSetImpl
+
+        Parameters
+        ----------
+        arg2: ITransLT const &
+
+        __init__(self) -> TransSetImpl
+        __init__(self, arg2) -> TransSetImpl
+
+        Parameters
+        ----------
+        arg2: std::set< ITrans *,ITransLT > const &
+
+        """
         this = _wali.new_TransSetImpl(*args)
         try:
             self.this.append(this)
@@ -1178,28 +2895,84 @@ class TransSetImpl(_object):
             self.this = this
 
     def empty(self):
+        """
+        empty(self) -> bool
+
+        Parameters
+        ----------
+        self: std::set< ITrans *,ITransLT > const *
+
+        """
         return _wali.TransSetImpl_empty(self)
 
+
     def size(self):
+        """
+        size(self) -> std::set< ITrans *,ITransLT >::size_type
+
+        Parameters
+        ----------
+        self: std::set< ITrans *,ITransLT > const *
+
+        """
         return _wali.TransSetImpl_size(self)
 
+
     def clear(self):
+        """
+        clear(self)
+
+        Parameters
+        ----------
+        self: std::set< ITrans *,ITransLT > *
+
+        """
         return _wali.TransSetImpl_clear(self)
 
+
     def swap(self, v):
+        """
+        swap(self, v)
+
+        Parameters
+        ----------
+        v: std::set< ITrans *,ITransLT > &
+
+        """
         return _wali.TransSetImpl_swap(self, v)
 
+
     def erase(self, x):
+        """
+        erase(self, x) -> std::set< ITrans *,ITransLT >::size_type
+
+        Parameters
+        ----------
+        x: std::set< ITrans *,ITransLT >::key_type const &
+
+        """
         return _wali.TransSetImpl_erase(self, x)
 
+
     def count(self, x):
+        """
+        count(self, x) -> std::set< ITrans *,ITransLT >::size_type
+
+        Parameters
+        ----------
+        x: std::set< ITrans *,ITransLT >::key_type const &
+
+        """
         return _wali.TransSetImpl_count(self, x)
+
     __swig_destroy__ = _wali.delete_TransSetImpl
     __del__ = lambda self: None
 TransSetImpl_swigregister = _wali.TransSetImpl_swigregister
 TransSetImpl_swigregister(TransSetImpl)
 
 class TransSet(Printable):
+    """Proxy of C++ wali::wfa::TransSet class."""
+
     __swig_setmethods__ = {}
     for _s in [Printable]:
         __swig_setmethods__.update(getattr(_s, '__swig_setmethods__', {}))
@@ -1211,6 +2984,7 @@ class TransSet(Printable):
     __repr__ = _swig_repr
 
     def __init__(self):
+        """__init__(self) -> TransSet"""
         this = _wali.new_TransSet()
         try:
             self.this.append(this)
@@ -1220,41 +2994,198 @@ class TransSet(Printable):
     __del__ = lambda self: None
 
     def find(self, *args):
+        """
+        find(self, arg2, stack, to) -> wali::wfa::TransSet::iterator
+
+        Parameters
+        ----------
+        from: wali::Key
+        stack: wali::Key
+        to: wali::Key
+
+        find(self, t) -> wali::wfa::TransSet::iterator
+
+        Parameters
+        ----------
+        t: ITrans *
+
+        find(self, arg2, stack, to) -> wali::wfa::TransSet::const_iterator
+
+        Parameters
+        ----------
+        from: wali::Key
+        stack: wali::Key
+        to: wali::Key
+
+        find(self, t) -> wali::wfa::TransSet::const_iterator
+
+        Parameters
+        ----------
+        t: ITrans *
+
+        """
         return _wali.TransSet_find(self, *args)
 
+
     def each(self, *args):
+        """
+        each(self, tf)
+
+        Parameters
+        ----------
+        tf: wali::wfa::TransFunctor &
+
+        each(self, tf)
+
+        Parameters
+        ----------
+        tf: wali::wfa::ConstTransFunctor &
+
+        each(self, tf)
+
+        Parameters
+        ----------
+        tf: boost::function< void (ITrans *) > &
+
+        each(self, tf)
+
+        Parameters
+        ----------
+        tf: boost::function< void (ITrans const *) > &
+
+        """
         return _wali.TransSet_each(self, *args)
 
+
     def insert(self, t):
+        """
+        insert(self, t) -> bool
+
+        Parameters
+        ----------
+        t: ITrans *
+
+        """
         return _wali.TransSet_insert(self, t)
 
+
     def erase(self, *args):
+        """
+        erase(self, t) -> ITrans
+
+        Parameters
+        ----------
+        t: ITrans *
+
+        erase(self, arg2, stack, to) -> ITrans
+
+        Parameters
+        ----------
+        from: wali::Key
+        stack: wali::Key
+        to: wali::Key
+
+        erase(self, it)
+
+        Parameters
+        ----------
+        it: wali::wfa::TransSet::iterator
+
+        """
         return _wali.TransSet_erase(self, *args)
 
+
     def clear(self):
+        """
+        clear(self)
+
+        Parameters
+        ----------
+        self: wali::wfa::TransSet *
+
+        """
         return _wali.TransSet_clear(self)
 
+
     def empty(self):
+        """
+        empty(self) -> bool
+
+        Parameters
+        ----------
+        self: wali::wfa::TransSet const *
+
+        """
         return _wali.TransSet_empty(self)
 
+
     def clear_and_release_resources(self):
+        """
+        clear_and_release_resources(self)
+
+        Parameters
+        ----------
+        self: wali::wfa::TransSet *
+
+        """
         return _wali.TransSet_clear_and_release_resources(self)
 
+
     def begin(self, *args):
+        """
+        begin(self) -> wali::wfa::TransSet::iterator
+        begin(self) -> wali::wfa::TransSet::const_iterator
+
+        Parameters
+        ----------
+        self: wali::wfa::TransSet const *
+
+        """
         return _wali.TransSet_begin(self, *args)
 
+
     def end(self, *args):
+        """
+        end(self) -> wali::wfa::TransSet::iterator
+        end(self) -> wali::wfa::TransSet::const_iterator
+
+        Parameters
+        ----------
+        self: wali::wfa::TransSet const *
+
+        """
         return _wali.TransSet_end(self, *args)
 
+
     def size(self):
+        """
+        size(self) -> size_t
+
+        Parameters
+        ----------
+        self: wali::wfa::TransSet const *
+
+        """
         return _wali.TransSet_size(self)
 
+
     def as_list(self):
+        """
+        as_list(self) -> TransVector
+
+        Parameters
+        ----------
+        self: wali::wfa::TransSet *
+
+        """
         return _wali.TransSet_as_list(self)
+
 TransSet_swigregister = _wali.TransSet_swigregister
 TransSet_swigregister(TransSet)
 
 class TransVector(_object):
+    """Proxy of C++ std::vector<(p.wali::wfa::Trans)> class."""
+
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, TransVector, name, value)
     __swig_getmethods__ = {}
@@ -1262,62 +3193,283 @@ class TransVector(_object):
     __repr__ = _swig_repr
 
     def iterator(self):
+        """
+        iterator(self) -> SwigPyIterator
+
+        Parameters
+        ----------
+        self: std::vector< wali::wfa::Trans * > *
+
+        """
         return _wali.TransVector_iterator(self)
+
     def __iter__(self):
         return self.iterator()
 
     def __nonzero__(self):
+        """
+        __nonzero__(self) -> bool
+
+        Parameters
+        ----------
+        self: std::vector< wali::wfa::Trans * > const *
+
+        """
         return _wali.TransVector___nonzero__(self)
 
+
     def __bool__(self):
+        """
+        __bool__(self) -> bool
+
+        Parameters
+        ----------
+        self: std::vector< wali::wfa::Trans * > const *
+
+        """
         return _wali.TransVector___bool__(self)
 
+
     def __len__(self):
+        """
+        __len__(self) -> std::vector< wali::wfa::Trans * >::size_type
+
+        Parameters
+        ----------
+        self: std::vector< wali::wfa::Trans * > const *
+
+        """
         return _wali.TransVector___len__(self)
 
+
     def __getslice__(self, i, j):
+        """
+        __getslice__(self, i, j) -> TransVector
+
+        Parameters
+        ----------
+        i: std::vector< wali::wfa::Trans * >::difference_type
+        j: std::vector< wali::wfa::Trans * >::difference_type
+
+        """
         return _wali.TransVector___getslice__(self, i, j)
 
+
     def __setslice__(self, *args):
+        """
+        __setslice__(self, i, j)
+
+        Parameters
+        ----------
+        i: std::vector< wali::wfa::Trans * >::difference_type
+        j: std::vector< wali::wfa::Trans * >::difference_type
+
+        __setslice__(self, i, j, v)
+
+        Parameters
+        ----------
+        i: std::vector< wali::wfa::Trans * >::difference_type
+        j: std::vector< wali::wfa::Trans * >::difference_type
+        v: std::vector< wali::wfa::Trans *,std::allocator< wali::wfa::Trans * > > const &
+
+        """
         return _wali.TransVector___setslice__(self, *args)
 
+
     def __delslice__(self, i, j):
+        """
+        __delslice__(self, i, j)
+
+        Parameters
+        ----------
+        i: std::vector< wali::wfa::Trans * >::difference_type
+        j: std::vector< wali::wfa::Trans * >::difference_type
+
+        """
         return _wali.TransVector___delslice__(self, i, j)
 
+
     def __delitem__(self, *args):
+        """
+        __delitem__(self, i)
+
+        Parameters
+        ----------
+        i: std::vector< wali::wfa::Trans * >::difference_type
+
+        __delitem__(self, slice)
+
+        Parameters
+        ----------
+        slice: PySliceObject *
+
+        """
         return _wali.TransVector___delitem__(self, *args)
 
+
     def __getitem__(self, *args):
+        """
+        __getitem__(self, slice) -> TransVector
+
+        Parameters
+        ----------
+        slice: PySliceObject *
+
+        __getitem__(self, i) -> Trans
+
+        Parameters
+        ----------
+        i: std::vector< wali::wfa::Trans * >::difference_type
+
+        """
         return _wali.TransVector___getitem__(self, *args)
 
+
     def __setitem__(self, *args):
+        """
+        __setitem__(self, slice, v)
+
+        Parameters
+        ----------
+        slice: PySliceObject *
+        v: std::vector< wali::wfa::Trans *,std::allocator< wali::wfa::Trans * > > const &
+
+        __setitem__(self, slice)
+
+        Parameters
+        ----------
+        slice: PySliceObject *
+
+        __setitem__(self, i, x)
+
+        Parameters
+        ----------
+        i: std::vector< wali::wfa::Trans * >::difference_type
+        x: std::vector< wali::wfa::Trans * >::value_type
+
+        """
         return _wali.TransVector___setitem__(self, *args)
 
+
     def pop(self):
+        """
+        pop(self) -> Trans
+
+        Parameters
+        ----------
+        self: std::vector< wali::wfa::Trans * > *
+
+        """
         return _wali.TransVector_pop(self)
 
+
     def append(self, x):
+        """
+        append(self, x)
+
+        Parameters
+        ----------
+        x: std::vector< wali::wfa::Trans * >::value_type
+
+        """
         return _wali.TransVector_append(self, x)
 
+
     def empty(self):
+        """
+        empty(self) -> bool
+
+        Parameters
+        ----------
+        self: std::vector< wali::wfa::Trans * > const *
+
+        """
         return _wali.TransVector_empty(self)
 
+
     def size(self):
+        """
+        size(self) -> std::vector< wali::wfa::Trans * >::size_type
+
+        Parameters
+        ----------
+        self: std::vector< wali::wfa::Trans * > const *
+
+        """
         return _wali.TransVector_size(self)
 
+
     def swap(self, v):
+        """
+        swap(self, v)
+
+        Parameters
+        ----------
+        v: std::vector< wali::wfa::Trans * > &
+
+        """
         return _wali.TransVector_swap(self, v)
 
+
     def clear(self):
+        """
+        clear(self)
+
+        Parameters
+        ----------
+        self: std::vector< wali::wfa::Trans * > *
+
+        """
         return _wali.TransVector_clear(self)
 
+
     def get_allocator(self):
+        """
+        get_allocator(self) -> std::vector< wali::wfa::Trans * >::allocator_type
+
+        Parameters
+        ----------
+        self: std::vector< wali::wfa::Trans * > const *
+
+        """
         return _wali.TransVector_get_allocator(self)
 
+
     def pop_back(self):
+        """
+        pop_back(self)
+
+        Parameters
+        ----------
+        self: std::vector< wali::wfa::Trans * > *
+
+        """
         return _wali.TransVector_pop_back(self)
 
+
     def __init__(self, *args):
+        """
+        __init__(self) -> TransVector
+        __init__(self, arg2) -> TransVector
+
+        Parameters
+        ----------
+        arg2: std::vector< wali::wfa::Trans * > const &
+
+        __init__(self, size) -> TransVector
+
+        Parameters
+        ----------
+        size: std::vector< wali::wfa::Trans * >::size_type
+
+        __init__(self, size, value) -> TransVector
+
+        Parameters
+        ----------
+        size: std::vector< wali::wfa::Trans * >::size_type
+        value: std::vector< wali::wfa::Trans * >::value_type
+
+        """
         this = _wali.new_TransVector(*args)
         try:
             self.this.append(this)
@@ -1325,31 +3477,104 @@ class TransVector(_object):
             self.this = this
 
     def push_back(self, x):
+        """
+        push_back(self, x)
+
+        Parameters
+        ----------
+        x: std::vector< wali::wfa::Trans * >::value_type
+
+        """
         return _wali.TransVector_push_back(self, x)
 
+
     def front(self):
+        """
+        front(self) -> Trans
+
+        Parameters
+        ----------
+        self: std::vector< wali::wfa::Trans * > const *
+
+        """
         return _wali.TransVector_front(self)
 
+
     def back(self):
+        """
+        back(self) -> Trans
+
+        Parameters
+        ----------
+        self: std::vector< wali::wfa::Trans * > const *
+
+        """
         return _wali.TransVector_back(self)
 
+
     def assign(self, n, x):
+        """
+        assign(self, n, x)
+
+        Parameters
+        ----------
+        n: std::vector< wali::wfa::Trans * >::size_type
+        x: std::vector< wali::wfa::Trans * >::value_type
+
+        """
         return _wali.TransVector_assign(self, n, x)
 
+
     def resize(self, *args):
+        """
+        resize(self, new_size)
+
+        Parameters
+        ----------
+        new_size: std::vector< wali::wfa::Trans * >::size_type
+
+        resize(self, new_size, x)
+
+        Parameters
+        ----------
+        new_size: std::vector< wali::wfa::Trans * >::size_type
+        x: std::vector< wali::wfa::Trans * >::value_type
+
+        """
         return _wali.TransVector_resize(self, *args)
 
+
     def reserve(self, n):
+        """
+        reserve(self, n)
+
+        Parameters
+        ----------
+        n: std::vector< wali::wfa::Trans * >::size_type
+
+        """
         return _wali.TransVector_reserve(self, n)
 
+
     def capacity(self):
+        """
+        capacity(self) -> std::vector< wali::wfa::Trans * >::size_type
+
+        Parameters
+        ----------
+        self: std::vector< wali::wfa::Trans * > const *
+
+        """
         return _wali.TransVector_capacity(self)
+
     __swig_destroy__ = _wali.delete_TransVector
     __del__ = lambda self: None
 TransVector_swigregister = _wali.TransVector_swigregister
 TransVector_swigregister(TransVector)
 
 class DotAttributePrinter(_object):
+    """Proxy of C++ wali::wfa::DotAttributePrinter class."""
+
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, DotAttributePrinter, name, value)
     __swig_getmethods__ = {}
@@ -1360,7 +3585,24 @@ class DotAttributePrinter(_object):
     __repr__ = _swig_repr
 
     def print_extra_attributes(self, *args):
+        """
+        print_extra_attributes(self, state, o)
+
+        Parameters
+        ----------
+        state: wali::wfa::State const *
+        o: std::ostream &
+
+        print_extra_attributes(self, trans, o)
+
+        Parameters
+        ----------
+        trans: ITrans const *
+        o: std::ostream &
+
+        """
         return _wali.DotAttributePrinter_print_extra_attributes(self, *args)
+
     __swig_destroy__ = _wali.delete_DotAttributePrinter
     __del__ = lambda self: None
 DotAttributePrinter_swigregister = _wali.DotAttributePrinter_swigregister
@@ -1368,13 +3610,29 @@ DotAttributePrinter_swigregister(DotAttributePrinter)
 
 
 def is_epsilon_transition(trans):
+    """
+    is_epsilon_transition(trans) -> bool
+
+    Parameters
+    ----------
+    trans: ITrans const *
+
+    """
     return _wali.is_epsilon_transition(trans)
-is_epsilon_transition = _wali.is_epsilon_transition
 
 def is_any_transition(trans):
+    """
+    is_any_transition(trans) -> bool
+
+    Parameters
+    ----------
+    trans: ITrans const *
+
+    """
     return _wali.is_any_transition(trans)
-is_any_transition = _wali.is_any_transition
 class WFA(Printable):
+    """Proxy of C++ wali::wfa::WFA class."""
+
     __swig_setmethods__ = {}
     for _s in [Printable]:
         __swig_setmethods__.update(getattr(_s, '__swig_setmethods__', {}))
@@ -1401,6 +3659,28 @@ class WFA(Printable):
         global_default_path_summary_fwpds_top_down = _swig_property(_wali.WFA_global_default_path_summary_fwpds_top_down_get, _wali.WFA_global_default_path_summary_fwpds_top_down_set)
 
     def __init__(self, *args):
+        """
+        __init__(self, q, prog=0) -> WFA
+
+        Parameters
+        ----------
+        q: enum wali::wfa::WFA::query_t
+        prog: progress_t
+
+        __init__(self, q) -> WFA
+
+        Parameters
+        ----------
+        q: enum wali::wfa::WFA::query_t
+
+        __init__(self) -> WFA
+        __init__(self, rhs) -> WFA
+
+        Parameters
+        ----------
+        rhs: wali::wfa::WFA const &
+
+        """
         this = _wali.new_WFA(*args)
         try:
             self.this.append(this)
@@ -1410,232 +3690,1121 @@ class WFA(Printable):
     __del__ = lambda self: None
 
     def clear(self):
+        """
+        clear(self)
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA *
+
+        """
         return _wali.WFA_clear(self)
 
+
     def set_initial_state(self, key):
+        """
+        set_initial_state(self, key) -> wali::Key
+
+        Parameters
+        ----------
+        key: wali::Key
+
+        """
         return _wali.WFA_set_initial_state(self, key)
 
+
     def initial_state(self):
+        """
+        initial_state(self) -> wali::Key
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA const *
+
+        """
         return _wali.WFA_initial_state(self)
 
+
     def get_initial_state(self):
+        """
+        get_initial_state(self) -> wali::Key
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA const *
+
+        """
         return _wali.WFA_get_initial_state(self)
 
+
     def is_initial_state(self, key):
+        """
+        is_initial_state(self, key) -> bool
+
+        Parameters
+        ----------
+        key: wali::Key
+
+        """
         return _wali.WFA_is_initial_state(self, key)
 
+
     def add_final_state(self, *args):
+        """
+        add_final_state(self, key)
+
+        Parameters
+        ----------
+        key: wali::Key
+
+        add_final_state(self, key, accept_weight)
+
+        Parameters
+        ----------
+        key: wali::Key
+        accept_weight: wali::sem_elem_t
+
+        """
         return _wali.WFA_add_final_state(self, *args)
 
+
     def is_final_state(self, key):
+        """
+        is_final_state(self, key) -> bool
+
+        Parameters
+        ----------
+        key: wali::Key
+
+        """
         return _wali.WFA_is_final_state(self, key)
 
+
     def set_query(self, newQuery):
+        """
+        set_query(self, newQuery) -> wali::wfa::WFA::query_t
+
+        Parameters
+        ----------
+        newQuery: enum wali::wfa::WFA::query_t
+
+        """
         return _wali.WFA_set_query(self, newQuery)
 
+
     def get_query(self):
+        """
+        get_query(self) -> wali::wfa::WFA::query_t
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA const *
+
+        """
         return _wali.WFA_get_query(self)
 
+
     def get_generation(self):
+        """
+        get_generation(self) -> size_t
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA const *
+
+        """
         return _wali.WFA_get_generation(self)
 
+
     def set_generation(self, g):
+        """
+        set_generation(self, g)
+
+        Parameters
+        ----------
+        g: size_t
+
+        """
         return _wali.WFA_set_generation(self, g)
 
+
     def get_some_weight(self):
+        """
+        get_some_weight(self) -> SemElemPtr
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA const *
+
+        """
         return _wali.WFA_get_some_weight(self)
 
+
     def add_trans(self, *args):
+        """
+        add_trans(self, p, g, q, se)
+
+        Parameters
+        ----------
+        p: wali::Key
+        g: wali::Key
+        q: wali::Key
+        se: wali::sem_elem_t
+
+        add_trans(self, t)
+
+        Parameters
+        ----------
+        t: ITrans *
+
+        """
         return _wali.WFA_add_trans(self, *args)
 
+
     def erase(self, arg2, stack, to):
+        """
+        erase(self, arg2, stack, to)
+
+        Parameters
+        ----------
+        from: wali::Key
+        stack: wali::Key
+        to: wali::Key
+
+        """
         return _wali.WFA_erase(self, arg2, stack, to)
 
+
     def erase_state(self, q):
+        """
+        erase_state(self, q) -> bool
+
+        Parameters
+        ----------
+        q: wali::Key
+
+        """
         return _wali.WFA_erase_state(self, q)
 
+
     def find(self, p, g, q, t):
+        """
+        find(self, p, g, q, t) -> bool
+
+        Parameters
+        ----------
+        p: wali::Key
+        g: wali::Key
+        q: wali::Key
+        t: wali::wfa::Trans &
+
+        """
         return _wali.WFA_find(self, p, g, q, t)
 
+
     def for_each(self, *args):
+        """
+        for_each(self, tf)
+
+        Parameters
+        ----------
+        tf: wali::wfa::TransFunctor &
+
+        for_each(self, arg2)
+
+        Parameters
+        ----------
+        arg2: boost::function< void (ITrans *) > &
+
+        for_each(self, tf)
+
+        Parameters
+        ----------
+        tf: wali::wfa::ConstTransFunctor &
+
+        for_each(self, arg2)
+
+        Parameters
+        ----------
+        arg2: boost::function< void (ITrans const *) > &
+
+        """
         return _wali.WFA_for_each(self, *args)
 
+
     def intersect(self, *args):
+        """
+        intersect(self, fa) -> WFA
+
+        Parameters
+        ----------
+        fa: wali::wfa::WFA const &
+
+        intersect(self, fa, dest)
+
+        Parameters
+        ----------
+        fa: wali::wfa::WFA const &
+        dest: wali::wfa::WFA &
+
+        intersect(self, wmaker, fa) -> WFA
+
+        Parameters
+        ----------
+        wmaker: WeightMaker &
+        fa: wali::wfa::WFA const &
+
+        intersect(self, wmaker, fa, dest)
+
+        Parameters
+        ----------
+        wmaker: WeightMaker &
+        fa: wali::wfa::WFA const &
+        dest: wali::wfa::WFA &
+
+        """
         return _wali.WFA_intersect(self, *args)
 
+
     def intersect_worklist(self, wmaker, fa, dest):
+        """
+        intersect_worklist(self, wmaker, fa, dest)
+
+        Parameters
+        ----------
+        wmaker: WeightMaker &
+        fa: wali::wfa::WFA const &
+        dest: wali::wfa::WFA &
+
+        """
         return _wali.WFA_intersect_worklist(self, wmaker, fa, dest)
 
+
     def intersect_cross(self, wmaker, fa, dest):
+        """
+        intersect_cross(self, wmaker, fa, dest)
+
+        Parameters
+        ----------
+        wmaker: WeightMaker &
+        fa: wali::wfa::WFA const &
+        dest: wali::wfa::WFA &
+
+        """
         return _wali.WFA_intersect_cross(self, wmaker, fa, dest)
 
+
     def to_regex(self):
+        """
+        to_regex(self) -> wali::regex::regex_t
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA *
+
+        """
         return _wali.WFA_to_regex(self)
 
+
     def path_summary(self):
+        """
+        path_summary(self)
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA *
+
+        """
         return _wali.WFA_path_summary(self)
 
+
     def path_summary_iterative_original(self, *args):
+        """
+        path_summary_iterative_original(self)
+        path_summary_iterative_original(self, wl)
+
+        Parameters
+        ----------
+        wl: wali::Worklist< wali::wfa::State > &
+
+        path_summary_iterative_original(self, wt)
+
+        Parameters
+        ----------
+        wt: wali::sem_elem_t
+
+        path_summary_iterative_original(self, wl, wt)
+
+        Parameters
+        ----------
+        wl: wali::Worklist< wali::wfa::State > &
+        wt: wali::sem_elem_t
+
+        """
         return _wali.WFA_path_summary_iterative_original(self, *args)
 
+
     def path_summary_iterative_wpds(self):
+        """
+        path_summary_iterative_wpds(self)
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA *
+
+        """
         return _wali.WFA_path_summary_iterative_wpds(self)
 
+
     def path_summary_tarjan_fwpds(self, *args):
+        """
+        path_summary_tarjan_fwpds(self)
+        path_summary_tarjan_fwpds(self, top_down)
+
+        Parameters
+        ----------
+        top_down: bool
+
+        """
         return _wali.WFA_path_summary_tarjan_fwpds(self, *args)
 
+
     def path_summary_crosscheck_all(self):
+        """
+        path_summary_crosscheck_all(self)
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA *
+
+        """
         return _wali.WFA_path_summary_crosscheck_all(self)
 
+
     def path_summary_via_wpds(self, wpds):
+        """
+        path_summary_via_wpds(self, wpds)
+
+        Parameters
+        ----------
+        wpds: wali::wpds::WPDS &
+
+        """
         return _wali.WFA_path_summary_via_wpds(self, wpds)
 
+
     def prune(self):
+        """
+        prune(self)
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA *
+
+        """
         return _wali.WFA_prune(self)
 
+
     def filter(self, *args):
+        """
+        filter(self, stk)
+
+        Parameters
+        ----------
+        stk: wali::Key
+
+        filter(self, stkset)
+
+        Parameters
+        ----------
+        stkset: std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > &
+
+        """
         return _wali.WFA_filter(self, *args)
 
+
     def duplicate_states(self, st, output):
+        """
+        duplicate_states(self, st, output)
+
+        Parameters
+        ----------
+        st: std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > &
+        output: wali::wfa::WFA &
+
+        """
         return _wali.WFA_duplicate_states(self, st, output)
 
+
     def marshall(self, o):
+        """
+        marshall(self, o) -> std::ostream &
+
+        Parameters
+        ----------
+        o: std::ostream &
+
+        """
         return _wali.WFA_marshall(self, o)
 
+
     def marshall_state(self, o, key):
+        """
+        marshall_state(self, o, key) -> std::ostream &
+
+        Parameters
+        ----------
+        o: std::ostream &
+        key: wali::Key
+
+        """
         return _wali.WFA_marshall_state(self, o, key)
 
+
     def insert(self, tnew):
+        """
+        insert(self, tnew) -> ITrans *
+
+        Parameters
+        ----------
+        tnew: ITrans *
+
+        """
         return _wali.WFA_insert(self, tnew)
 
+
     def match(self, p, y):
+        """
+        match(self, p, y) -> TransSet
+
+        Parameters
+        ----------
+        p: wali::Key
+        y: wali::Key
+
+        """
         return _wali.WFA_match(self, p, y)
 
+
     def add_state(self, key, zero):
+        """
+        add_state(self, key, zero)
+
+        Parameters
+        ----------
+        key: wali::Key
+        zero: wali::sem_elem_t
+
+        """
         return _wali.WFA_add_state(self, key, zero)
 
+
     def get_state(self, *args):
+        """
+        get_state(self, name) -> wali::wfa::State const
+
+        Parameters
+        ----------
+        name: wali::Key
+
+        get_state(self, name) -> wali::wfa::State *
+
+        Parameters
+        ----------
+        name: wali::Key
+
+        """
         return _wali.WFA_get_state(self, *args)
 
+
     def get_states(self):
+        """
+        get_states(self) -> std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > const &
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA const *
+
+        """
         return _wali.WFA_get_states(self)
 
+
     def get_final_states(self):
+        """
+        get_final_states(self) -> std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > const &
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA const *
+
+        """
         return _wali.WFA_get_final_states(self)
 
+
     def num_states(self):
+        """
+        num_states(self) -> size_t
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA const *
+
+        """
         return _wali.WFA_num_states(self)
 
+
     def num_transitions(self):
+        """
+        num_transitions(self) -> size_t
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA const *
+
+        """
         return _wali.WFA_num_transitions(self)
 
+
     def read_out_combine_over_all_paths_values(self, *args):
+        """
+        read_out_combine_over_all_paths_values(self, alpha) -> std::map< wali::Key,wali::sem_elem_t,std::less< wali::Key >,std::allocator< std::pair< wali::Key const,wali::sem_elem_t > > >
+
+        Parameters
+        ----------
+        alpha: std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > const &
+
+        read_out_combine_over_all_paths_values(self) -> std::map< wali::Key,wali::sem_elem_t,std::less< wali::Key >,std::allocator< std::pair< wali::Key const,wali::sem_elem_t > > >
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA const *
+
+        """
         return _wali.WFA_read_out_combine_over_all_paths_values(self, *args)
 
+
     def set_default_path_summary_implementation(self, i):
+        """
+        set_default_path_summary_implementation(self, i)
+
+        Parameters
+        ----------
+        i: enum wali::wfa::WFA::PathSummaryImplementation
+
+        """
         return _wali.WFA_set_default_path_summary_implementation(self, i)
 
+
     def get_default_path_summary_implementation(self):
+        """
+        get_default_path_summary_implementation(self) -> wali::wfa::WFA::PathSummaryImplementation
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA const *
+
+        """
         return _wali.WFA_get_default_path_summary_implementation(self)
 
+
     def epsilon_close(self, start):
+        """
+        epsilon_close(self, start) -> wali::wfa::WFA::AccessibleStateMap
+
+        Parameters
+        ----------
+        start: wali::Key
+
+        """
         return _wali.WFA_epsilon_close(self, start)
 
+
     def epsilon_close_cached(self, start, cache):
+        """
+        epsilon_close_cached(self, start, cache) -> wali::wfa::WFA::AccessibleStateMap
+
+        Parameters
+        ----------
+        start: wali::Key
+        cache: wali::wfa::WFA::EpsilonCloseCache &
+
+        """
         return _wali.WFA_epsilon_close_cached(self, start, cache)
 
+
     def epsilon_close_mohri(self, start):
+        """
+        epsilon_close_mohri(self, start) -> wali::wfa::WFA::AccessibleStateMap
+
+        Parameters
+        ----------
+        start: wali::Key
+
+        """
         return _wali.WFA_epsilon_close_mohri(self, start)
 
+
     def epsilon_close_fwpds(self, start):
+        """
+        epsilon_close_fwpds(self, start) -> wali::wfa::WFA::AccessibleStateMap
+
+        Parameters
+        ----------
+        start: wali::Key
+
+        """
         return _wali.WFA_epsilon_close_fwpds(self, start)
 
+
     def epsilon_close_cached_mohri_demand(self, start, cache):
+        """
+        epsilon_close_cached_mohri_demand(self, start, cache) -> wali::wfa::WFA::AccessibleStateMap
+
+        Parameters
+        ----------
+        start: wali::Key
+        cache: wali::wfa::WFA::EpsilonCloseCache &
+
+        """
         return _wali.WFA_epsilon_close_cached_mohri_demand(self, start, cache)
 
+
     def epsilon_close_cached_fwpds_demand(self, start, cache):
+        """
+        epsilon_close_cached_fwpds_demand(self, start, cache) -> wali::wfa::WFA::AccessibleStateMap
+
+        Parameters
+        ----------
+        start: wali::Key
+        cache: wali::wfa::WFA::EpsilonCloseCache &
+
+        """
         return _wali.WFA_epsilon_close_cached_fwpds_demand(self, start, cache)
 
+
     def epsilon_close_cached_mohri_all(self, start, cache):
+        """
+        epsilon_close_cached_mohri_all(self, start, cache) -> wali::wfa::WFA::AccessibleStateMap
+
+        Parameters
+        ----------
+        start: wali::Key
+        cache: wali::wfa::WFA::EpsilonCloseCache &
+
+        """
         return _wali.WFA_epsilon_close_cached_mohri_all(self, start, cache)
 
+
     def epsilon_close_cached_fwpds_all_singles(self, start, cache):
+        """
+        epsilon_close_cached_fwpds_all_singles(self, start, cache) -> wali::wfa::WFA::AccessibleStateMap
+
+        Parameters
+        ----------
+        start: wali::Key
+        cache: wali::wfa::WFA::EpsilonCloseCache &
+
+        """
         return _wali.WFA_epsilon_close_cached_fwpds_all_singles(self, start, cache)
 
+
     def epsilon_close_cached_fwpds_all_multi(self, start, cache):
+        """
+        epsilon_close_cached_fwpds_all_multi(self, start, cache) -> wali::wfa::WFA::AccessibleStateMap
+
+        Parameters
+        ----------
+        start: wali::Key
+        cache: wali::wfa::WFA::EpsilonCloseCache &
+
+        """
         return _wali.WFA_epsilon_close_cached_fwpds_all_multi(self, start, cache)
 
+
     def generic_fwpds_poststar(self, sources, trans_accept):
+        """
+        generic_fwpds_poststar(self, sources, trans_accept) -> wali::wfa::WFA::EpsilonCloseCache
+
+        Parameters
+        ----------
+        sources: std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > const &
+        trans_accept: boost::function< bool (ITrans const *) >
+
+        """
         return _wali.WFA_generic_fwpds_poststar(self, sources, trans_accept)
 
+
     def generic_wpds_poststar(self, sources, trans_accept, wpds, query_weight, state_weight):
+        """
+        generic_wpds_poststar(self, sources, trans_accept, wpds, query_weight, state_weight) -> wali::wfa::WFA::EpsilonCloseCache
+
+        Parameters
+        ----------
+        sources: std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > const &
+        trans_accept: boost::function< bool (ITrans const *) >
+        wpds: wali::wpds::WPDS &
+        query_weight: wali::sem_elem_t
+        state_weight: wali::sem_elem_t
+
+        """
         return _wali.WFA_generic_wpds_poststar(self, sources, trans_accept, wpds, query_weight, state_weight)
 
+
     def compute_all_reaching_weights(self, *args):
+        """
+        compute_all_reaching_weights(self) -> wali::wfa::WFA::AccessibleStateSetMap
+        compute_all_reaching_weights(self, arg2, include_zeroes) -> wali::wfa::WFA::AccessibleStateSetMap
+
+        Parameters
+        ----------
+        arg2: domains::SemElemSet::SemElemSubsumptionComputer
+        include_zeroes: bool
+
+        """
         return _wali.WFA_compute_all_reaching_weights(self, *args)
 
+
     def remove_epsilons(self):
+        """
+        remove_epsilons(self) -> WFA
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA const *
+
+        """
         return _wali.WFA_remove_epsilons(self)
 
+
     def simulate(self, start, word):
+        """
+        simulate(self, start, word) -> wali::wfa::WFA::AccessibleStateMap
+
+        Parameters
+        ----------
+        start: wali::wfa::WFA::AccessibleStateMap const &
+        word: wali::wfa::WFA::Word const &
+
+        """
         return _wali.WFA_simulate(self, start, word)
 
+
     def is_accepted_with_nonzero_weight(self, word):
+        """
+        is_accepted_with_nonzero_weight(self, word) -> bool
+
+        Parameters
+        ----------
+        word: wali::wfa::WFA::Word const &
+
+        """
         return _wali.WFA_is_accepted_with_nonzero_weight(self, word)
 
+
     def determinize(self, *args):
+        """
+        determinize(self) -> WFA
+        determinize(self, weight_gen) -> WFA
+
+        Parameters
+        ----------
+        weight_gen: wali::wfa::DeterminizeWeightGen const &
+
+        """
         return _wali.WFA_determinize(self, *args)
 
+
     def semideterminize(self, *args):
+        """
+        semideterminize(self) -> WFA
+        semideterminize(self, weight_gen) -> WFA
+
+        Parameters
+        ----------
+        weight_gen: wali::wfa::DeterminizeWeightGen const &
+
+        """
         return _wali.WFA_semideterminize(self, *args)
 
+
     def is_isomorphic_to(self, *args):
+        """
+        is_isomorphic_to(self, other) -> bool
+
+        Parameters
+        ----------
+        other: wali::wfa::WFA const &
+
+        is_isomorphic_to(self, other, check_weights) -> bool
+
+        Parameters
+        ----------
+        other: wali::wfa::WFA const &
+        check_weights: bool
+
+        """
         return _wali.WFA_is_isomorphic_to(self, *args)
 
+
     def equal(self, other):
+        """
+        equal(self, other) -> bool
+
+        Parameters
+        ----------
+        other: wali::wfa::WFA const &
+
+        """
         return _wali.WFA_equal(self, other)
 
+
     def complete(self, *args):
+        """
+        complete(self, symbols, sink_state)
+
+        Parameters
+        ----------
+        symbols: std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > const &
+        sink_state: wali::Key
+
+        complete(self, symbols)
+
+        Parameters
+        ----------
+        symbols: std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > const &
+
+        complete(self, sink_state)
+
+        Parameters
+        ----------
+        sink_state: wali::Key
+
+        complete(self)
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA *
+
+        """
         return _wali.WFA_complete(self, *args)
 
+
     def complement_states(self):
+        """
+        complement_states(self)
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA *
+
+        """
         return _wali.WFA_complement_states(self)
-    __swig_getmethods__["is_isomorphism"] = lambda x: _wali.WFA_is_isomorphism
+
+
+    def is_isomorphism(left, left_states, right, right_states, check_weights):
+        """
+        is_isomorphism(left, left_states, right, right_states, check_weights) -> bool
+
+        Parameters
+        ----------
+        left: wali::wfa::WFA const &
+        left_states: std::vector< wali::Key,std::allocator< wali::Key > > const &
+        right: wali::wfa::WFA const &
+        right_states: std::vector< wali::Key,std::allocator< wali::Key > > const &
+        check_weights: bool
+
+        """
+        return _wali.WFA_is_isomorphism(left, left_states, right, right_states, check_weights)
+
     if _newclass:
-        is_isomorphism = staticmethod(_wali.WFA_is_isomorphism)
-    __swig_getmethods__["next_states_no_eclose"] = lambda x: _wali.WFA_next_states_no_eclose
+        is_isomorphism = staticmethod(is_isomorphism)
+    __swig_getmethods__["is_isomorphism"] = lambda x: is_isomorphism
+
+    def next_states_no_eclose(wfa, froms):
+        """
+        next_states_no_eclose(wfa, froms) -> std::map< wali::Key,std::map< wali::Key,std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > >,std::less< wali::Key >,std::allocator< std::pair< wali::Key const,std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > > > >,std::less< wali::Key >,std::allocator< std::pair< wali::Key const,std::map< wali::Key,std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > >,std::less< wali::Key >,std::allocator< std::pair< wali::Key const,std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > > > > > > >
+
+        Parameters
+        ----------
+        wfa: wali::wfa::WFA const &
+        froms: std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > const &
+
+        """
+        return _wali.WFA_next_states_no_eclose(wfa, froms)
+
     if _newclass:
-        next_states_no_eclose = staticmethod(_wali.WFA_next_states_no_eclose)
+        next_states_no_eclose = staticmethod(next_states_no_eclose)
+    __swig_getmethods__["next_states_no_eclose"] = lambda x: next_states_no_eclose
 
     def print_statistics(self, os):
+        """
+        print_statistics(self, os)
+
+        Parameters
+        ----------
+        os: std::ostream &
+
+        """
         return _wali.WFA_print_statistics(self, os)
 
+
     def to_wpds(self, *args):
+        """
+        to_wpds(self, p_state, wpds, trans_accept, reverse=False, weight_wrapper)
+
+        Parameters
+        ----------
+        p_state: wali::Key
+        wpds: wali::wpds::WPDS *
+        trans_accept: boost::function< bool (ITrans const *) >
+        reverse: bool
+        weight_wrapper: boost::function< wali::sem_elem_t (wali::sem_elem_t) >
+
+        to_wpds(self, p_state, wpds, trans_accept, reverse=False)
+
+        Parameters
+        ----------
+        p_state: wali::Key
+        wpds: wali::wpds::WPDS *
+        trans_accept: boost::function< bool (ITrans const *) >
+        reverse: bool
+
+        to_wpds(self, p_state, wpds, trans_accept)
+
+        Parameters
+        ----------
+        p_state: wali::Key
+        wpds: wali::wpds::WPDS *
+        trans_accept: boost::function< bool (ITrans const *) >
+
+        """
         return _wali.WFA_to_wpds(self, *args)
 
+
     def alphabet(self):
+        """
+        alphabet(self) -> std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > >
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA const *
+
+        """
         return _wali.WFA_alphabet(self)
 
+
     def outgoing_trans_set(self, *args):
+        """
+        outgoing_trans_set(self, state, symbol) -> TransSet
+
+        Parameters
+        ----------
+        state: wali::Key
+        symbol: wali::Key
+
+        outgoing_trans_set(self, state, symbol) -> TransSet
+
+        Parameters
+        ----------
+        state: wali::Key
+        symbol: wali::Key
+
+        """
         return _wali.WFA_outgoing_trans_set(self, *args)
 
+
     def end_of_epsilon_chain(self, starting_state):
+        """
+        end_of_epsilon_chain(self, starting_state) -> std::pair< wali::Key,wali::sem_elem_t >
+
+        Parameters
+        ----------
+        starting_state: wali::Key
+
+        """
         return _wali.WFA_end_of_epsilon_chain(self, starting_state)
 
+
     def collapse_transitions_forward_from(self, state):
+        """
+        collapse_transitions_forward_from(self, state)
+
+        Parameters
+        ----------
+        state: wali::Key
+
+        """
         return _wali.WFA_collapse_transitions_forward_from(self, state)
 
+
     def remove_states_with_in_degree0(self):
+        """
+        remove_states_with_in_degree0(self)
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA *
+
+        """
         return _wali.WFA_remove_states_with_in_degree0(self)
 
+
     def collapse_epsilon_chains(self):
+        """
+        collapse_epsilon_chains(self)
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA *
+
+        """
         return _wali.WFA_collapse_epsilon_chains(self)
 
+
     def __str__(self):
+        """
+        __str__(self) -> PyObject *
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA *
+
+        """
         return _wali.WFA___str__(self)
 
+
     def print_dot(self, *args):
+        """
+        print_dot(self, o, print_weights=False, attribute_printer=None) -> std::ostream
+
+        Parameters
+        ----------
+        o: std::ostream &
+        print_weights: bool
+        attribute_printer: wali::wfa::DotAttributePrinter *
+
+        print_dot(self, o, print_weights=False) -> std::ostream
+
+        Parameters
+        ----------
+        o: std::ostream &
+        print_weights: bool
+
+        print_dot(self, o) -> std::ostream
+
+        Parameters
+        ----------
+        o: std::ostream &
+
+        print_dot(self) -> PyObject *
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA *
+
+        """
         return _wali.WFA_print_dot(self, *args)
+
 WFA_swigregister = _wali.WFA_swigregister
 WFA_swigregister(WFA)
 WFA.xmltag = _wali.cvar.WFA_xmltag
@@ -1644,12 +4813,31 @@ WFA.xmlinorder_tag = _wali.cvar.WFA_xmlinorder_tag
 WFA.xmlreverse_tag = _wali.cvar.WFA_xmlreverse_tag
 
 def WFA_is_isomorphism(left, left_states, right, right_states, check_weights):
+    """
+    WFA_is_isomorphism(left, left_states, right, right_states, check_weights) -> bool
+
+    Parameters
+    ----------
+    left: wali::wfa::WFA const &
+    left_states: std::vector< wali::Key,std::allocator< wali::Key > > const &
+    right: wali::wfa::WFA const &
+    right_states: std::vector< wali::Key,std::allocator< wali::Key > > const &
+    check_weights: bool
+
+    """
     return _wali.WFA_is_isomorphism(left, left_states, right, right_states, check_weights)
-WFA_is_isomorphism = _wali.WFA_is_isomorphism
 
 def WFA_next_states_no_eclose(wfa, froms):
+    """
+    WFA_next_states_no_eclose(wfa, froms) -> std::map< wali::Key,std::map< wali::Key,std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > >,std::less< wali::Key >,std::allocator< std::pair< wali::Key const,std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > > > >,std::less< wali::Key >,std::allocator< std::pair< wali::Key const,std::map< wali::Key,std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > >,std::less< wali::Key >,std::allocator< std::pair< wali::Key const,std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > > > > > > >
+
+    Parameters
+    ----------
+    wfa: wali::wfa::WFA const &
+    froms: std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > const &
+
+    """
     return _wali.WFA_next_states_no_eclose(wfa, froms)
-WFA_next_states_no_eclose = _wali.WFA_next_states_no_eclose
 
 
 _wali.Interesting_swigconstant(_wali)
@@ -1662,9 +4850,19 @@ _wali.Invalid_swigconstant(_wali)
 Invalid = _wali.Invalid
 
 def simplify(input, tester):
+    """
+    simplify(input, tester) -> WFA
+
+    Parameters
+    ----------
+    input: wali::wfa::WFA const &
+    tester: boost::function< wali::wfa::delta::DeltaResult (wali::wfa::WFA const &) >
+
+    """
     return _wali.simplify(input, tester)
-simplify = _wali.simplify
 class WPDS(Printable):
+    """Proxy of C++ wali::wpds::WPDS class."""
+
     __swig_setmethods__ = {}
     for _s in [Printable]:
         __swig_setmethods__.update(getattr(_s, '__swig_setmethods__', {}))
@@ -1676,6 +4874,21 @@ class WPDS(Printable):
     __repr__ = _swig_repr
 
     def __init__(self, *args):
+        """
+        __init__(self) -> WPDS
+        __init__(self, wrapper) -> WPDS
+
+        Parameters
+        ----------
+        wrapper: wali::ref_ptr< Wrapper >
+
+        __init__(self, w) -> WPDS
+
+        Parameters
+        ----------
+        w: wali::wpds::WPDS const &
+
+        """
         this = _wali.new_WPDS(*args)
         try:
             self.this.append(this)
@@ -1685,69 +4898,332 @@ class WPDS(Printable):
     __del__ = lambda self: None
 
     def clear(self):
+        """
+        clear(self)
+
+        Parameters
+        ----------
+        self: wali::wpds::WPDS *
+
+        """
         return _wali.WPDS_clear(self)
 
+
     def set_worklist(self, wl):
+        """
+        set_worklist(self, wl)
+
+        Parameters
+        ----------
+        wl: wali::ref_ptr< wali::Worklist< wali::wfa::ITrans > >
+
+        """
         return _wali.WPDS_set_worklist(self, wl)
 
+
     def add_rule(self, *args):
+        """
+        add_rule(self, from_state, from_stack, to_state, se) -> bool
+
+        Parameters
+        ----------
+        from_state: wali::Key
+        from_stack: wali::Key
+        to_state: wali::Key
+        se: wali::sem_elem_t
+
+        add_rule(self, from_state, from_stack, to_state, to_stack1, se) -> bool
+
+        Parameters
+        ----------
+        from_state: wali::Key
+        from_stack: wali::Key
+        to_state: wali::Key
+        to_stack1: wali::Key
+        se: wali::sem_elem_t
+
+        add_rule(self, from_state, from_stack, to_state, to_stack1, to_stack2, se) -> bool
+
+        Parameters
+        ----------
+        from_state: wali::Key
+        from_stack: wali::Key
+        to_state: wali::Key
+        to_stack1: wali::Key
+        to_stack2: wali::Key
+        se: wali::sem_elem_t
+
+        """
         return _wali.WPDS_add_rule(self, *args)
 
+
     def replace_rule(self, *args):
+        """
+        replace_rule(self, from_state, from_stack, to_state, se) -> bool
+
+        Parameters
+        ----------
+        from_state: wali::Key
+        from_stack: wali::Key
+        to_state: wali::Key
+        se: wali::sem_elem_t
+
+        replace_rule(self, from_state, from_stack, to_state, to_stack1, se) -> bool
+
+        Parameters
+        ----------
+        from_state: wali::Key
+        from_stack: wali::Key
+        to_state: wali::Key
+        to_stack1: wali::Key
+        se: wali::sem_elem_t
+
+        replace_rule(self, from_state, from_stack, to_state, to_stack1, to_stack2, se) -> bool
+
+        Parameters
+        ----------
+        from_state: wali::Key
+        from_stack: wali::Key
+        to_state: wali::Key
+        to_stack1: wali::Key
+        to_stack2: wali::Key
+        se: wali::sem_elem_t
+
+        """
         return _wali.WPDS_replace_rule(self, *args)
 
+
     def erase_rule(self, from_state, from_stack, to_state, to_stack1, to_stack2):
+        """
+        erase_rule(self, from_state, from_stack, to_state, to_stack1, to_stack2) -> bool
+
+        Parameters
+        ----------
+        from_state: wali::Key
+        from_stack: wali::Key
+        to_state: wali::Key
+        to_stack1: wali::Key
+        to_stack2: wali::Key
+
+        """
         return _wali.WPDS_erase_rule(self, from_state, from_stack, to_state, to_stack1, to_stack2)
 
+
     def prestar(self, *args):
+        """
+        prestar(self, input) -> WFA
+
+        Parameters
+        ----------
+        input: wali::wfa::WFA const &
+
+        prestar(self, input, output)
+
+        Parameters
+        ----------
+        input: wali::wfa::WFA const &
+        output: wali::wfa::WFA &
+
+        """
         return _wali.WPDS_prestar(self, *args)
 
+
     def poststar(self, *args):
+        """
+        poststar(self, input) -> WFA
+
+        Parameters
+        ----------
+        input: wali::wfa::WFA const &
+
+        poststar(self, input, output)
+
+        Parameters
+        ----------
+        input: wali::wfa::WFA const &
+        output: wali::wfa::WFA &
+
+        """
         return _wali.WPDS_poststar(self, *args)
 
+
     def marshall(self, o):
+        """
+        marshall(self, o) -> std::ostream &
+
+        Parameters
+        ----------
+        o: std::ostream &
+
+        """
         return _wali.WPDS_marshall(self, o)
 
+
     def print_dot(self, o, print_state=False):
+        """
+        print_dot(self, o, print_state=False) -> std::ostream
+
+        Parameters
+        ----------
+        o: std::ostream &
+        print_state: bool
+
+        print_dot(self, o) -> std::ostream &
+
+        Parameters
+        ----------
+        o: std::ostream &
+
+        """
         return _wali.WPDS_print_dot(self, o, print_state)
 
+
     def count_rules(self):
+        """
+        count_rules(self) -> int
+
+        Parameters
+        ----------
+        self: wali::wpds::WPDS const *
+
+        """
         return _wali.WPDS_count_rules(self)
 
+
     def for_each(self, *args):
+        """
+        for_each(self, func)
+
+        Parameters
+        ----------
+        func: wali::wpds::ConstRuleFunctor &
+
+        for_each(self, func)
+
+        Parameters
+        ----------
+        func: wali::wpds::RuleFunctor &
+
+        """
         return _wali.WPDS_for_each(self, *args)
 
+
     def __call__(self, t):
+        """
+        __call__(self, t)
+
+        Parameters
+        ----------
+        t: wali::wfa::ITrans const *
+
+        """
         return _wali.WPDS___call__(self, t)
 
+
     def is_pds_state(self, k):
+        """
+        is_pds_state(self, k) -> bool
+
+        Parameters
+        ----------
+        k: wali::Key
+
+        """
         return _wali.WPDS_is_pds_state(self, k)
 
+
     def num_pds_states(self):
+        """
+        num_pds_states(self) -> int
+
+        Parameters
+        ----------
+        self: wali::wpds::WPDS const *
+
+        """
         return _wali.WPDS_num_pds_states(self)
 
+
     def get_states(self):
+        """
+        get_states(self) -> std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > const &
+
+        Parameters
+        ----------
+        self: wali::wpds::WPDS const *
+
+        """
         return _wali.WPDS_get_states(self)
 
+
     def construct_cfg(self, entries, entryState, cfg):
+        """
+        construct_cfg(self, entries, entryState, cfg) -> wali::Key
+
+        Parameters
+        ----------
+        entries: std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > &
+        entryState: std::map< wali::Key,wali::Key,std::less< wali::Key >,std::allocator< std::pair< wali::Key const,wali::Key > > > &
+        cfg: wali::wfa::WFA &
+
+        """
         return _wali.WPDS_construct_cfg(self, entries, entryState, cfg)
 
+
     def get_the_zero(self):
+        """
+        get_the_zero(self) -> SemElemPtr
+
+        Parameters
+        ----------
+        self: wali::wpds::WPDS *
+
+        """
         return _wali.WPDS_get_the_zero(self)
 
+
     def print_statistics(self, os):
+        """
+        print_statistics(self, os)
+
+        Parameters
+        ----------
+        os: std::ostream &
+
+        """
         return _wali.WPDS_print_statistics(self, os)
 
+
     def to_wfa(self, wfa):
+        """
+        to_wfa(self, wfa)
+
+        Parameters
+        ----------
+        wfa: wali::wfa::WFA &
+
+        """
         return _wali.WPDS_to_wfa(self, wfa)
 
+
     def __str__(self):
+        """
+        __str__(self) -> PyObject *
+
+        Parameters
+        ----------
+        self: wali::wpds::WPDS *
+
+        """
         return _wali.WPDS___str__(self)
+
 WPDS_swigregister = _wali.WPDS_swigregister
 WPDS_swigregister(WPDS)
 WPDS.xmltag = _wali.cvar.WPDS_xmltag
 
 class EWPDS(WPDS):
+    """Proxy of C++ wali::wpds::ewpds::EWPDS class."""
+
     __swig_setmethods__ = {}
     for _s in [WPDS]:
         __swig_setmethods__.update(getattr(_s, '__swig_setmethods__', {}))
@@ -1759,6 +5235,21 @@ class EWPDS(WPDS):
     __repr__ = _swig_repr
 
     def __init__(self, *args):
+        """
+        __init__(self) -> EWPDS
+        __init__(self, wrapper) -> EWPDS
+
+        Parameters
+        ----------
+        wrapper: wali::ref_ptr< wali::wpds::Wrapper >
+
+        __init__(self, e) -> EWPDS
+
+        Parameters
+        ----------
+        e: wali::wpds::ewpds::EWPDS const &
+
+        """
         this = _wali.new_EWPDS(*args)
         try:
             self.this.append(this)
@@ -1768,30 +5259,176 @@ class EWPDS(WPDS):
     __del__ = lambda self: None
 
     def add_rule(self, *args):
+        """
+        add_rule(self, from_state, from_stack, to_state, se) -> bool
+
+        Parameters
+        ----------
+        from_state: wali::Key
+        from_stack: wali::Key
+        to_state: wali::Key
+        se: wali::sem_elem_t
+
+        add_rule(self, from_state, from_stack, to_state, to_stack1, se) -> bool
+
+        Parameters
+        ----------
+        from_state: wali::Key
+        from_stack: wali::Key
+        to_state: wali::Key
+        to_stack1: wali::Key
+        se: wali::sem_elem_t
+
+        add_rule(self, from_state, from_stack, to_state, to_stack1, to_stack2, se) -> bool
+
+        Parameters
+        ----------
+        from_state: wali::Key
+        from_stack: wali::Key
+        to_state: wali::Key
+        to_stack1: wali::Key
+        to_stack2: wali::Key
+        se: wali::sem_elem_t
+
+        add_rule(self, from_state, from_stack, to_state, to_stack1, to_stack2, se, mf) -> bool
+
+        Parameters
+        ----------
+        from_state: wali::Key
+        from_stack: wali::Key
+        to_state: wali::Key
+        to_stack1: wali::Key
+        to_stack2: wali::Key
+        se: wali::sem_elem_t
+        mf: merge_fn_t
+
+        """
         return _wali.EWPDS_add_rule(self, *args)
 
+
     def prestar(self, *args):
+        """
+        prestar(self, input, output)
+
+        Parameters
+        ----------
+        input: wali::wpds::ewpds::WFA const &
+        output: wali::wpds::ewpds::WFA &
+
+        prestar(self, input) -> WFA
+
+        Parameters
+        ----------
+        input: wali::wfa::WFA const &
+
+        """
         return _wali.EWPDS_prestar(self, *args)
 
+
     def marshall(self, o):
+        """
+        marshall(self, o) -> std::ostream &
+
+        Parameters
+        ----------
+        o: std::ostream &
+
+        """
         return _wali.EWPDS_marshall(self, o)
 
+
     def __call__(self, t):
+        """
+        __call__(self, t)
+
+        Parameters
+        ----------
+        t: wali::wfa::ITrans const *
+
+        """
         return _wali.EWPDS___call__(self, t)
 
+
     def lookup_rule(self, to_state, to_stack1, to_stack2):
+        """
+        lookup_rule(self, to_state, to_stack1, to_stack2) -> wali::wpds::rule_t
+
+        Parameters
+        ----------
+        to_state: wali::Key
+        to_stack1: wali::Key
+        to_stack2: wali::Key
+
+        """
         return _wali.EWPDS_lookup_rule(self, to_state, to_stack1, to_stack2)
 
+
     def replace_rule(self, *args):
+        """
+        replace_rule(self, from_state, from_stack, to_state, to_stack1, to_stack2, se) -> bool
+
+        Parameters
+        ----------
+        from_state: wali::Key
+        from_stack: wali::Key
+        to_state: wali::Key
+        to_stack1: wali::Key
+        to_stack2: wali::Key
+        se: wali::sem_elem_t
+
+        replace_rule(self, from_state, from_stack, to_state, to_stack1, to_stack2, se, mf) -> bool
+
+        Parameters
+        ----------
+        from_state: wali::Key
+        from_stack: wali::Key
+        to_state: wali::Key
+        to_stack1: wali::Key
+        to_stack2: wali::Key
+        se: wali::sem_elem_t
+        mf: merge_fn_t
+
+        replace_rule(self, from_state, from_stack, to_state, se) -> bool
+
+        Parameters
+        ----------
+        from_state: wali::Key
+        from_stack: wali::Key
+        to_state: wali::Key
+        se: wali::sem_elem_t
+
+        replace_rule(self, from_state, from_stack, to_state, to_stack1, se) -> bool
+
+        Parameters
+        ----------
+        from_state: wali::Key
+        from_stack: wali::Key
+        to_state: wali::Key
+        to_stack1: wali::Key
+        se: wali::sem_elem_t
+
+        """
         return _wali.EWPDS_replace_rule(self, *args)
 
+
     def __str__(self):
+        """
+        __str__(self) -> PyObject *
+
+        Parameters
+        ----------
+        self: wali::wpds::ewpds::EWPDS *
+
+        """
         return _wali.EWPDS___str__(self)
+
 EWPDS_swigregister = _wali.EWPDS_swigregister
 EWPDS_swigregister(EWPDS)
 EWPDS.xmltag = _wali.cvar.EWPDS_xmltag
 
 class FWPDS(EWPDS):
+    """Proxy of C++ wali::wpds::fwpds::FWPDS class."""
+
     __swig_setmethods__ = {}
     for _s in [EWPDS]:
         __swig_setmethods__.update(getattr(_s, '__swig_setmethods__', {}))
@@ -1803,6 +5440,27 @@ class FWPDS(EWPDS):
     __repr__ = _swig_repr
 
     def __init__(self, *args):
+        """
+        __init__(self) -> FWPDS
+        __init__(self, newton) -> FWPDS
+
+        Parameters
+        ----------
+        newton: bool
+
+        __init__(self, wrapper) -> FWPDS
+
+        Parameters
+        ----------
+        wrapper: wali::ref_ptr< wali::wpds::Wrapper >
+
+        __init__(self, f) -> FWPDS
+
+        Parameters
+        ----------
+        f: wali::wpds::fwpds::FWPDS const &
+
+        """
         this = _wali.new_FWPDS(*args)
         try:
             self.this.append(this)
@@ -1812,27 +5470,98 @@ class FWPDS(EWPDS):
     __del__ = lambda self: None
 
     def use_newton(self, set):
+        """
+        use_newton(self, set)
+
+        Parameters
+        ----------
+        set: bool
+
+        """
         return _wali.FWPDS_use_newton(self, set)
 
+
     def is_output_tensored(self):
+        """
+        is_output_tensored(self) -> bool
+
+        Parameters
+        ----------
+        self: wali::wpds::fwpds::FWPDS *
+
+        """
         return _wali.FWPDS_is_output_tensored(self)
 
+
     def prestar(self, *args):
+        """
+        prestar(self, input, output)
+
+        Parameters
+        ----------
+        input: wali::wfa::WFA const &
+        output: wali::wfa::WFA &
+
+        prestar(self, input) -> WFA
+
+        Parameters
+        ----------
+        input: wali::wfa::WFA const &
+
+        """
         return _wali.FWPDS_prestar(self, *args)
 
+
     def poststar(self, *args):
+        """
+        poststar(self, input, output)
+
+        Parameters
+        ----------
+        input: wali::wfa::WFA const &
+        output: wali::wfa::WFA &
+
+        poststar(self, input) -> WFA
+
+        Parameters
+        ----------
+        input: wali::wfa::WFA const &
+
+        """
         return _wali.FWPDS_poststar(self, *args)
 
+
     def poststar_igr(self, input, output):
+        """
+        poststar_igr(self, input, output)
+
+        Parameters
+        ----------
+        input: wali::wfa::WFA const &
+        output: wali::wfa::WFA &
+
+        """
         return _wali.FWPDS_poststar_igr(self, input, output)
 
+
     def top_down_eval(self, f):
+        """
+        top_down_eval(self, f)
+
+        Parameters
+        ----------
+        f: bool
+
+        """
         return _wali.FWPDS_top_down_eval(self, f)
+
 FWPDS_swigregister = _wali.FWPDS_swigregister
 FWPDS_swigregister(FWPDS)
 FWPDS.xmltag = _wali.cvar.FWPDS_xmltag
 
 class Reach(SemElem):
+    """Proxy of C++ wali::Reach class."""
+
     __swig_setmethods__ = {}
     for _s in [SemElem]:
         __swig_setmethods__.update(getattr(_s, '__swig_setmethods__', {}))
@@ -1844,6 +5573,14 @@ class Reach(SemElem):
     __repr__ = _swig_repr
 
     def __init__(self, b):
+        """
+        __init__(self, b) -> Reach
+
+        Parameters
+        ----------
+        b: bool
+
+        """
         this = _wali.new_Reach(b)
         try:
             self.this.append(this)
@@ -1853,12 +5590,38 @@ class Reach(SemElem):
     __del__ = lambda self: None
 
     def one(self):
+        """
+        one(self) -> SemElemPtr
+
+        Parameters
+        ----------
+        self: wali::Reach const *
+
+        """
         return _wali.Reach_one(self)
 
+
     def zero(self):
+        """
+        zero(self) -> SemElemPtr
+
+        Parameters
+        ----------
+        self: wali::Reach const *
+
+        """
         return _wali.Reach_zero(self)
 
+
     def extend(self, rhs):
+        """
+        extend(self, rhs) -> SemElemPtr
+
+        Parameters
+        ----------
+        rhs: wali::SemElem *
+
+        """
 
                 #Deref smart pointer if needed
         if hasattr(args[1], '__deref__'):
@@ -1871,6 +5634,14 @@ class Reach(SemElem):
 
 
     def combine(self, rhs):
+        """
+        combine(self, rhs) -> SemElemPtr
+
+        Parameters
+        ----------
+        rhs: wali::SemElem *
+
+        """
 
                 #Deref smart pointer if needed
         if hasattr(args[1], '__deref__'):
@@ -1883,10 +5654,28 @@ class Reach(SemElem):
 
 
     def equal(self, rhs):
+        """
+        equal(self, rhs) -> bool
+
+        Parameters
+        ----------
+        rhs: wali::SemElem *
+
+        """
         return _wali.Reach_equal(self, rhs)
 
+
     def from_string(self, s):
+        """
+        from_string(self, s) -> SemElemPtr
+
+        Parameters
+        ----------
+        s: std::string const &
+
+        """
         return _wali.Reach_from_string(self, s)
+
     __swig_setmethods__["num_reaches"] = _wali.Reach_num_reaches_set
     __swig_getmethods__["num_reaches"] = _wali.Reach_num_reaches_get
     if _newclass:
