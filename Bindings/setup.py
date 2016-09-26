@@ -8,8 +8,8 @@ lib64_dir = os.path.normpath(os.path.join(os.getcwd(), '..', 'lib64'))
 wali_c_module = Extension(
     '_wali',
     sources=[
-        #'wali_wrap.cc'
-        'wali.i',
+        'wali_wrap.cpp'
+        #'wali.i',
     ],
     swig_opts = [
         '-c++',
