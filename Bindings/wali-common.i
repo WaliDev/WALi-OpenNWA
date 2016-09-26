@@ -6,7 +6,7 @@ and access them from Python.
 %include "typemaps.i"
 %include "std_string.i"
 %include "std_pair.i"
-%define SWIG_EXPORT_ITERATOR_METHODS
+%define SWIG_EXPORT_ITERATOR_METHODS 1
 %enddef
 %include "std_set.i"
 %include "std_map.i"

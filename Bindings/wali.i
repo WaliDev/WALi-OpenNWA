@@ -351,4 +351,4 @@ but swig is not cased for - therefore do it here */
 }
 
 /* ==================== Examples ====================== */
-%include "../Examples/Reach/Reach.hpp"
+%include "../Source/wali/Reach.hpp"
