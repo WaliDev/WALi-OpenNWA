@@ -47,6 +47,7 @@ using namespace wali::wfa;
 typedef wali::wfa::ITrans::WorklistData WorklistData; // (!)
 %}
 
+// I am HIGHLY suspicious of this working correctly
 %feature("ref")   SemElem "$this->count++;"
 %feature("unref") SemElem "$this->count--;"
 
