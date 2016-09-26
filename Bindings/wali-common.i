@@ -36,7 +36,7 @@ and access them from Python.
 #include "../Source/wali/wpds/fwpds/FWPDS.hpp"
 
 /* Example Weight Domains */
-#include "../Examples/Reach/Reach.cpp"
+#include "../Source/wali/Reach.cpp"
 
 #include <sstream>
 #include <utility>
@@ -44,6 +44,7 @@ and access them from Python.
 using namespace wali;
 using namespace wali::wpds;
 using namespace wali::wfa;
+typedef wali::wfa::ITrans::WorklistData WorklistData; // (!)
 %}
 
 %feature("ref")   SemElem "$this->count++;"

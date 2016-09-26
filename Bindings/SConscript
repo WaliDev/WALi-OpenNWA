@@ -19,6 +19,7 @@ if MkStatic:
     raise Exception("Can't build bindings statically")
 else:
     env = ProgEnv.Clone(SWIGFLAGS=['-c++', '-python'])
+    env['WARNING_FLAGS'] = ''
     env.Append(CPPPATH=[distutils.sysconfig.get_python_inc()])
     ## Changed to SharedLibrary b/c env.LoadableModule failed on OS X
     ##   - Could revert back with some work to ensure that 32bit is built,

@@ -118,7 +118,6 @@ BaseEnv['CPPDEFINES'] = {
    'BOOST_NO_DEFAULTED_FUNCTIONS': 1,
 }
 
-
 if 'gcc' == BaseEnv['compiler']:
     # -Waddress -Wlogical-op
 
