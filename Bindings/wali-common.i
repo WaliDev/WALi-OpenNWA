@@ -12,7 +12,7 @@ and access them from Python.
 %include "std_map.i"
 %include "std_vector.i"
 
-%feature(autodoc,2); 
+%feature(autodoc,2);
 
 %{
 /* Util stuff */
