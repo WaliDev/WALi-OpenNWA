@@ -14,6 +14,7 @@ namespace opennwa
 {
   using wali::Key; // TODO remove
   using wali::sem_elem_t;
+  using wali::Reach;
   
   /**
    *

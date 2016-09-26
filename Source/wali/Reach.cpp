@@ -4,6 +4,8 @@
 
 #include "Reach.hpp"
 
+namespace wali {
+
 int Reach::numReaches = 0;
 
 Reach::Reach( bool b ) :
@@ -66,3 +68,4 @@ sem_elem_t Reach::from_string( const std::string& s ) const {
   return (s == "ONE") ? one() : zero();
 }
 
+}

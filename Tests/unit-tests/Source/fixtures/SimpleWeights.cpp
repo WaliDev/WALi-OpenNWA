@@ -34,7 +34,7 @@ namespace testing
 
   namespace ReachWeights
   {
-    wali::sem_elem_t reach_dummy(new Reach(true)),
+    wali::sem_elem_t reach_dummy(new wali::Reach(true)),
       reachOne = reach_dummy->one(),
       reachZero = reach_dummy->zero();
   }

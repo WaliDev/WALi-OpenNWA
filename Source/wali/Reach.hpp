@@ -7,7 +7,9 @@
 
 #include "wali/SemElem.hpp"
 
-class Reach : public wali::SemElem
+namespace wali {
+
+class Reach : public SemElem
 {
 
   public:
@@ -16,21 +18,21 @@ class Reach : public wali::SemElem
 
     virtual ~Reach();
 
-    wali::sem_elem_t one() const;
+    sem_elem_t one() const;
 
-    wali::sem_elem_t zero() const;
+    sem_elem_t zero() const;
 
     // zero is the annihilator for extend
-    wali::sem_elem_t extend( wali::SemElem* rhs );
+    sem_elem_t extend( SemElem* rhs );
 
     // zero is neutral for combine
-    wali::sem_elem_t combine( wali::SemElem* rhs );
+    sem_elem_t combine( SemElem* rhs );
 
-    bool equal( wali::SemElem* rhs ) const;
+    bool equal( SemElem* rhs ) const;
 
     std::ostream & print( std::ostream & o ) const;
 
-    wali::sem_elem_t from_string( const std::string& s ) const;
+    sem_elem_t from_string( const std::string& s ) const;
 
     static int numReaches;
 
@@ -38,6 +40,8 @@ class Reach : public wali::SemElem
     bool isreached;
 
 };
+
+}
 
 #endif	// REACH_GUARD
 
