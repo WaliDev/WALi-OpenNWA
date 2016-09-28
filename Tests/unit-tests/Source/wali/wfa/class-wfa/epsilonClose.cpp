@@ -560,6 +560,42 @@ namespace wali {
             EXPECT_CONTAINS(eclose_A, A);
         }
 
-        
+    
+        TEST(wali$wfa$$epsilonClose, epsilonTransitions)
+        {
+            //       A      *     *         *         *
+            // -> A ---> 1 ---> 2 ---> ... ---> 100 -----> B
+            Key A = getKey("A");
+            Key B = getKey("B");
+
+            const size_t N = 100;
+
+            Key keys[N];
+            for (size_t i = 0; i < N; ++i)
+                keys[i] = getKey(i);
+            
+            sem_elem_t zero = Reach(true).zero();
+            sem_elem_t one = Reach(true).one();
+
+            WFA wfa;
+            wfa.addState(A, zero);
+            wfa.addState(B, zero);
+            for (size_t i = 0; i < N; ++i)
+                wfa.addState(keys[i], zero);
+
+            wfa.addTrans(A, A, keys[0], one);
+            for (size_t i = 0; i < N-1; ++i)
+                wfa.addTrans(keys[i], WALI_EPSILON, keys[i+1], one);
+            wfa.addTrans(keys[N-1], WALI_EPSILON, B, one);
+
+            wfa.setInitialState(A);
+            wfa.addFinalState(B);
+
+            wfa = wfa.removeEpsilons();
+            wfa.prune();
+
+            EXPECT_EQ(2u, wfa.getStates().size());
+            EXPECT_EQ(1u, wfa.getFinalStates().size());
+        }
     }
 }

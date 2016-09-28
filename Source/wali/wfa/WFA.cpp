@@ -2275,6 +2275,14 @@ namespace wali
             continue;
           }
 
+          if (F.find(mid) != F.end()) {
+            //         eps path
+            // *q - - - - - - - - -> (mid)
+            //
+            // So *q is effectively final.
+            result.addFinalState(*q);
+          }
+
           //                eps path (w_eps)
           // We have:   *q - - - - - - - - - > mid
           //
