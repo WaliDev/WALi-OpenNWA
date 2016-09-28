@@ -17,6 +17,9 @@ wali_c_module = Extension(
     include_dirs = [
         '../Source',
     ],
+    define_macros = [
+        ('SWIG_PYTHON_2_UNICODE', 1),
+    ],
     libraries = [
         'wali',
     ],
