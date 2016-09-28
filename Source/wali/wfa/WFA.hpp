@@ -923,6 +923,32 @@ namespace wali
 
         void
         collapseEpsilonChains();
+
+        /// Inverts states and transitions.
+        ///
+        /// Given (Q, delta, Q0, F):
+        ///
+        /// Q' = delta + {q0, qf}
+        ///
+        /// delta' = { ((_,_,q), q, (q,_,_)) | two triples in delta }
+        ///          union { (q0, *, (qq,_,_)) | qq in Q0 and triple in delta }
+        ///          union { ((_,_,f), *, qf)  | f in F and triple in delta }
+        ///
+        /// Q0 = {q0}
+        ///    conceptually what we want is:
+        ///       {(q0,_,_) | q0 in Q0 and triple in delta}
+        ///    but we can't represent that
+        ///
+        /// F = {qf}
+        ///   we could do this
+        ///       { (_,_,f) | f in F, triple in delta }
+        ///   but I decided I don't want that.
+        ///
+        ///
+        /// NOTE: Weights for the resulting automaton won't be
+        /// particularly meaningful. Currently everything will be
+        /// one/zero.
+        WFA invertStatesAndTransitions() const;
     };
 
     namespace delta

@@ -4761,6 +4761,18 @@ class WFA(Printable):
         return _wali.WFA_collapse_epsilon_chains(self)
 
 
+    def invert_states_and_transitions(self):
+        """
+        invert_states_and_transitions(self) -> WFA
+
+        Parameters
+        ----------
+        self: wali::wfa::WFA const *
+
+        """
+        return _wali.WFA_invert_states_and_transitions(self)
+
+
     def __str__(self):
         """
         __str__(self) -> PyObject *

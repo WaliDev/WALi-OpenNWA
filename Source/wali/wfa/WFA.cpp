@@ -2704,6 +2704,130 @@ namespace wali
       removeStatesWithInDegree0();
     }
 
+    namespace details {
+      Key get_key(ITrans const * trans)
+      {
+        return getKey(trans->from(), getKey(trans->stack(), trans->to()));
+      }
+
+      struct AddTransAsState : ConstTransFunctor {
+        WFA & m_wfa;
+        sem_elem_t m_zero;
+
+        AddTransAsState(WFA & wfa, sem_elem_t zero)
+          : m_wfa(wfa)
+          , m_zero(zero)
+        {}
+
+        void operator() (ITrans const * trans) {
+          /// Given (Q, delta, Q0, F):
+          ///
+          /// Q' = delta + {q0}
+          Key trans_key = get_key(trans);
+          m_wfa.addState(trans_key, m_zero);
+        }
+      };
+
+      struct AddInvertedTrans : ConstTransFunctor{
+        WFA & m_wfa;
+        sem_elem_t m_one;
+        Key m_new_q0;
+        Key m_old_q0;
+        std::set<Key> const & m_old_f;
+        Key m_new_qf;
+
+        typedef std::vector<ITrans const *> TransVec;
+        typedef std::map<Key, std::vector<ITrans const *> > TransViewMap;
+        TransViewMap const & m_trans_view;
+
+        AddInvertedTrans(WFA & wfa, sem_elem_t one,
+                         Key old_q0, Key new_q0,
+                         std::set<Key> const & old_f, Key new_qf,
+                         TransViewMap const & trans_view)
+          : m_wfa(wfa)
+          , m_one(one)
+          , m_new_q0(new_q0)
+          , m_old_q0(old_q0)
+          , m_old_f(old_f)
+          , m_new_qf(new_qf)
+          , m_trans_view(trans_view)
+        {}
+
+        void operator() (ITrans const * trans) {
+          /// delta' = { ((_,_,q), q, (q,_,_)) | two triples in delta }
+          ///          union { (q0, *, (qq,_,_)) | qq in Q0 and triple in delta }
+          ///          union { ((_,_,f), *, qf)  | f in F and triple in delta }
+          Key trans_key = get_key(trans);
+
+          // Let's start with the middle set comprehension:
+          //    { (q0, *, (qq,_,_)) | qq in Q0 and triple in delta }
+          if (trans->from() == m_old_q0)
+            m_wfa.addTrans(m_new_q0, WALI_EPSILON, trans_key, m_one);
+
+          // And now the third:
+          //    { ((_,_,f), *, qf)  | f in F and triple in delta }
+          if (m_old_f.find(trans->to()) != m_old_f.end())
+            m_wfa.addTrans(trans_key, WALI_EPSILON, m_new_qf, m_one);
+
+          // And now the complicated one:
+          //    { ((_,_,q), q, (q,_,_)) | two triples in delta }
+          Key q = trans->to();
+          TransViewMap::const_iterator iter = m_trans_view.find(q);
+          if (iter != m_trans_view.end()) {
+            for (TransVec::const_iterator iter_trans = iter->second.begin();
+                 iter_trans != iter->second.end(); ++iter_trans)
+            {
+              Key target_trans_key = get_key(*iter_trans);
+              m_wfa.addTrans(trans_key, q, target_trans_key, m_one);
+            }
+          }
+        }
+      };
+    }
+
+    WFA
+    WFA::invertStatesAndTransitions() const
+    {
+      using namespace details;
+
+      std::map<Key, std::vector<ITrans const *> > trans_view;
+      for (kp_map_t::const_iterator iter = kpmap.begin();
+           iter != kpmap.end(); ++iter)
+      {
+        TransSet const & transSet = iter->second;
+        for (TransSet::iterator tsit = transSet.begin();
+             tsit != transSet.end(); ++tsit)
+        {
+          trans_view[(*tsit)->from()].push_back(*tsit);
+        }
+      }
+
+      sem_elem_t zero = getSomeWeight()->zero();
+      sem_elem_t one = zero->one();
+
+      Key q0 = getKey("start");
+      Key qf = getKey("accept");
+
+      WFA result;
+      result.addState(q0, zero);
+      result.addState(qf, zero);
+      result.setInitialState(q0);
+      result.addFinalState(qf);
+
+      // Sets Q
+      AddTransAsState tf1(result, zero);
+      for_each(tf1);
+
+      // Sets delta
+      AddInvertedTrans tf2(result, one,
+                           getInitialState(), q0,
+                           getFinalStates(), qf,
+                           trans_view);
+      for_each(tf2);
+
+      return result;
+    }
+
 
     namespace delta
     {

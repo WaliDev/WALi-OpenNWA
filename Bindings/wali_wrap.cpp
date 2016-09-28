@@ -24699,6 +24699,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_WFA_invert_states_and_transitions(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::WFA *arg1 = (wali::wfa::WFA *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  wali::wfa::WFA result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:WFA_invert_states_and_transitions",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__WFA, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "WFA_invert_states_and_transitions" "', argument " "1"" of type '" "wali::wfa::WFA const *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::WFA * >(argp1);
+  result = ((wali::wfa::WFA const *)arg1)->invertStatesAndTransitions();
+  resultobj = SWIG_NewPointerObj((new wali::wfa::WFA(static_cast< const wali::wfa::WFA& >(result))), SWIGTYPE_p_wali__wfa__WFA, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_WFA___str__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   wali::wfa::WFA *arg1 = (wali::wfa::WFA *) 0 ;
@@ -32911,6 +32933,14 @@ static PyMethodDef SwigMethods[] = {
 		"Parameters\n"
 		"----------\n"
 		"self: wali::wfa::WFA *\n"
+		"\n"
+		""},
+	 { (char *)"WFA_invert_states_and_transitions", _wrap_WFA_invert_states_and_transitions, METH_VARARGS, (char *)"\n"
+		"WFA_invert_states_and_transitions(self) -> WFA\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"self: wali::wfa::WFA const *\n"
 		"\n"
 		""},
 	 { (char *)"WFA___str__", _wrap_WFA___str__, METH_VARARGS, (char *)"\n"
