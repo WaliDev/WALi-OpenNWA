@@ -323,7 +323,7 @@ but swig is not cased for - therefore do it here */
     }
 }
 
-
+%template(KeySet) std::set<size_t>;
 
 /* ==================== WPDS ====================== */
 

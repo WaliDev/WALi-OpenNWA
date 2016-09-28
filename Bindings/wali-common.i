@@ -132,7 +132,7 @@ wali::Key getEpsilonKey() {
             args = tuple(tmp)
 %}
 
-%template(KeyPair) std::pair< Key,Key >;
+%template(KeyPair) std::pair<size_t, size_t>;
 
 %include "../Source/wali/hm_hash.hpp"
 %include "../Source/wali/HashMap.hpp"

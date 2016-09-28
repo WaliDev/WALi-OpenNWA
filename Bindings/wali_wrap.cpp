@@ -3460,51 +3460,51 @@ namespace Swig {
 #define SWIGTYPE_p_ITrans swig_types[3]
 #define SWIGTYPE_p_ITransLT swig_types[4]
 #define SWIGTYPE_p_IncomingTransMap_t swig_types[5]
-#define SWIGTYPE_p_Key swig_types[6]
-#define SWIGTYPE_p_KeyPair swig_types[7]
-#define SWIGTYPE_p_PredHash_t swig_types[8]
-#define SWIGTYPE_p_PySemElem swig_types[9]
-#define SWIGTYPE_p_SemElem swig_types[10]
-#define SWIGTYPE_p_StateSet_t swig_types[11]
-#define SWIGTYPE_p_TaggedWeight swig_types[12]
-#define SWIGTYPE_p_TransSet swig_types[13]
-#define SWIGTYPE_p_WeightMaker swig_types[14]
-#define SWIGTYPE_p_Word swig_types[15]
-#define SWIGTYPE_p_allocator_type swig_types[16]
-#define SWIGTYPE_p_boost__functionT_bool_fITrans_const_pF_t swig_types[17]
-#define SWIGTYPE_p_boost__functionT_void_fITrans_const_pF_t swig_types[18]
-#define SWIGTYPE_p_boost__functionT_void_fITrans_pF_t swig_types[19]
-#define SWIGTYPE_p_boost__functionT_wali__sem_elem_t_fwali__sem_elem_tF_t swig_types[20]
-#define SWIGTYPE_p_boost__functionT_wali__wfa__delta__DeltaResult_fwali__wfa__WFA_const_RF_t swig_types[21]
-#define SWIGTYPE_p_bucket_type swig_types[22]
-#define SWIGTYPE_p_char swig_types[23]
-#define SWIGTYPE_p_const_iterator swig_types[24]
-#define SWIGTYPE_p_const_reference swig_types[25]
-#define SWIGTYPE_p_count_t swig_types[26]
-#define SWIGTYPE_p_difference_type swig_types[27]
-#define SWIGTYPE_p_domains__SemElemSet__SemElemSubsumptionComputer swig_types[28]
-#define SWIGTYPE_p_element_type swig_types[29]
-#define SWIGTYPE_p_eps_map_t swig_types[30]
-#define SWIGTYPE_p_first_type swig_types[31]
-#define SWIGTYPE_p_hashmap_type swig_types[32]
-#define SWIGTYPE_p_impl_t swig_types[33]
-#define SWIGTYPE_p_iterator swig_types[34]
-#define SWIGTYPE_p_key_type swig_types[35]
-#define SWIGTYPE_p_kp_map_t swig_types[36]
-#define SWIGTYPE_p_mapped_type swig_types[37]
-#define SWIGTYPE_p_merge_fn_t swig_types[38]
-#define SWIGTYPE_p_merge_rule_hash_t swig_types[39]
-#define SWIGTYPE_p_p_PyObject swig_types[40]
-#define SWIGTYPE_p_pair_type swig_types[41]
-#define SWIGTYPE_p_progress_t swig_types[42]
-#define SWIGTYPE_p_reference swig_types[43]
-#define SWIGTYPE_p_second_type swig_types[44]
-#define SWIGTYPE_p_sem_elem_t swig_types[45]
-#define SWIGTYPE_p_size_t swig_types[46]
-#define SWIGTYPE_p_size_type swig_types[47]
-#define SWIGTYPE_p_state_map_t swig_types[48]
-#define SWIGTYPE_p_std__allocatorT_wali__wfa__Trans_p_t swig_types[49]
-#define SWIGTYPE_p_std__invalid_argument swig_types[50]
+#define SWIGTYPE_p_KeyPair swig_types[6]
+#define SWIGTYPE_p_PredHash_t swig_types[7]
+#define SWIGTYPE_p_PySemElem swig_types[8]
+#define SWIGTYPE_p_SemElem swig_types[9]
+#define SWIGTYPE_p_StateSet_t swig_types[10]
+#define SWIGTYPE_p_TaggedWeight swig_types[11]
+#define SWIGTYPE_p_TransSet swig_types[12]
+#define SWIGTYPE_p_WeightMaker swig_types[13]
+#define SWIGTYPE_p_Word swig_types[14]
+#define SWIGTYPE_p_allocator_type swig_types[15]
+#define SWIGTYPE_p_boost__functionT_bool_fITrans_const_pF_t swig_types[16]
+#define SWIGTYPE_p_boost__functionT_void_fITrans_const_pF_t swig_types[17]
+#define SWIGTYPE_p_boost__functionT_void_fITrans_pF_t swig_types[18]
+#define SWIGTYPE_p_boost__functionT_wali__sem_elem_t_fwali__sem_elem_tF_t swig_types[19]
+#define SWIGTYPE_p_boost__functionT_wali__wfa__delta__DeltaResult_fwali__wfa__WFA_const_RF_t swig_types[20]
+#define SWIGTYPE_p_bucket_type swig_types[21]
+#define SWIGTYPE_p_char swig_types[22]
+#define SWIGTYPE_p_const_iterator swig_types[23]
+#define SWIGTYPE_p_const_reference swig_types[24]
+#define SWIGTYPE_p_count_t swig_types[25]
+#define SWIGTYPE_p_difference_type swig_types[26]
+#define SWIGTYPE_p_domains__SemElemSet__SemElemSubsumptionComputer swig_types[27]
+#define SWIGTYPE_p_element_type swig_types[28]
+#define SWIGTYPE_p_eps_map_t swig_types[29]
+#define SWIGTYPE_p_first_type swig_types[30]
+#define SWIGTYPE_p_hashmap_type swig_types[31]
+#define SWIGTYPE_p_impl_t swig_types[32]
+#define SWIGTYPE_p_iterator swig_types[33]
+#define SWIGTYPE_p_key_type swig_types[34]
+#define SWIGTYPE_p_kp_map_t swig_types[35]
+#define SWIGTYPE_p_mapped_type swig_types[36]
+#define SWIGTYPE_p_merge_fn_t swig_types[37]
+#define SWIGTYPE_p_merge_rule_hash_t swig_types[38]
+#define SWIGTYPE_p_p_PyObject swig_types[39]
+#define SWIGTYPE_p_pair_type swig_types[40]
+#define SWIGTYPE_p_progress_t swig_types[41]
+#define SWIGTYPE_p_reference swig_types[42]
+#define SWIGTYPE_p_second_type swig_types[43]
+#define SWIGTYPE_p_sem_elem_t swig_types[44]
+#define SWIGTYPE_p_size_t swig_types[45]
+#define SWIGTYPE_p_size_type swig_types[46]
+#define SWIGTYPE_p_state_map_t swig_types[47]
+#define SWIGTYPE_p_std__allocatorT_wali__wfa__Trans_p_t swig_types[48]
+#define SWIGTYPE_p_std__invalid_argument swig_types[49]
+#define SWIGTYPE_p_std__lessT_size_t_t swig_types[50]
 #define SWIGTYPE_p_std__mapT_size_t_domains__SemElemSet__ElementSet_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_domains__SemElemSet__ElementSet_t_t_t swig_types[51]
 #define SWIGTYPE_p_std__mapT_size_t_size_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_size_t_t_t_t swig_types[52]
 #define SWIGTYPE_p_std__mapT_size_t_std__mapT_size_t_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__mapT_size_t_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_t_t_t_t_t_t swig_types[53]
@@ -3512,8 +3512,8 @@ namespace Swig {
 #define SWIGTYPE_p_std__mapT_size_t_wali__ref_ptrT_wali__SemElem_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_wali__ref_ptrT_wali__SemElem_t_t_t_t swig_types[55]
 #define SWIGTYPE_p_std__ostream swig_types[56]
 #define SWIGTYPE_p_std__pairT_KeyPair_TransSet_t swig_types[57]
-#define SWIGTYPE_p_std__pairT_Key_Key_t swig_types[58]
-#define SWIGTYPE_p_std__pairT_sem_elem_t_sem_elem_t_t swig_types[59]
+#define SWIGTYPE_p_std__pairT_sem_elem_t_sem_elem_t_t swig_types[58]
+#define SWIGTYPE_p_std__pairT_size_t_size_t_t swig_types[59]
 #define SWIGTYPE_p_std__pairT_size_t_wali__ref_ptrT_wali__SemElem_t_t swig_types[60]
 #define SWIGTYPE_p_std__pairT_wali__HashMapIteratorT_KeyPair_TransSet_wali__hm_hashT_KeyPair_t_wali__hm_equalT_KeyPair_t_t_bool_t swig_types[61]
 #define SWIGTYPE_p_std__pairT_wali__ref_ptrT_PySemElem_t_wali__ref_ptrT_PySemElem_t_t swig_types[62]
@@ -4588,12 +4588,24 @@ namespace swig {
 }
 
 
-  namespace swig {
-    template <>  struct traits< Key > {
-      typedef pointer_category category;
-      static const char* type_name() { return"Key"; }
-    };
-  }
+namespace swig {
+  template <> struct traits< size_t > {
+    typedef value_category category;
+    static const char* type_name() { return"size_t"; }
+  };
+  template <>  struct traits_asval< size_t > {
+    typedef size_t value_type;
+    static int asval(PyObject *obj, value_type *val) {
+      return SWIG_AsVal_size_t (obj, val);
+    }
+  };
+  template <>  struct traits_from< size_t > {
+    typedef size_t value_type;
+    static PyObject *from(const value_type& val) {
+      return SWIG_From_size_t  (val);
+    }
+  };
+}
 
 
   namespace swig {
@@ -4744,10 +4756,10 @@ namespace swig {
 
 
       namespace swig {
-	template <>  struct traits<std::pair< Key, Key > > {
+	template <>  struct traits<std::pair< size_t, size_t > > {
 	  typedef pointer_category category;
 	  static const char* type_name() {
-	    return "std::pair<" "Key" "," "Key" " >";
+	    return "std::pair<" "size_t" "," "size_t" " >";
 	  }
 	};
       }
@@ -5938,6 +5950,43 @@ SWIGINTERN PyObject *wali_wfa_WFA_print_dot__SWIG_3(wali::wfa::WFA *self){
 
         return PyString_FromString(outs.str().c_str());
     }
+
+      namespace swig {
+	template <>  struct traits<std::set< size_t, std::less< size_t >, std::allocator< size_t > > > {
+	  typedef pointer_category category;
+	  static const char* type_name() {
+	    return "std::set<" "size_t" "," "std::less< size_t >" "," "std::allocator< size_t >" " >";
+	  }
+	};
+      }
+    
+SWIGINTERN swig::SwigPyIterator *std_set_Sl_size_t_Sg__iterator(std::set< size_t > *self,PyObject **PYTHON_SELF){
+      return swig::make_output_iterator(self->begin(), self->begin(), self->end(), *PYTHON_SELF);
+    }
+SWIGINTERN bool std_set_Sl_size_t_Sg____nonzero__(std::set< size_t > const *self){
+      return !(self->empty());
+    }
+SWIGINTERN bool std_set_Sl_size_t_Sg____bool__(std::set< size_t > const *self){
+      return !(self->empty());
+    }
+SWIGINTERN std::set< size_t >::size_type std_set_Sl_size_t_Sg____len__(std::set< size_t > const *self){
+      return self->size();
+    }
+SWIGINTERN void std_set_Sl_size_t_Sg__append(std::set< size_t > *self,std::set< size_t >::value_type x){
+       self->insert(x);
+     }
+SWIGINTERN bool std_set_Sl_size_t_Sg____contains__(std::set< size_t > *self,std::set< size_t >::value_type x){
+       return self->find(x) != self->end();
+     }
+SWIGINTERN std::set< size_t >::value_type std_set_Sl_size_t_Sg____getitem__(std::set< size_t > const *self,std::set< size_t >::difference_type i){
+       return *(swig::cgetpos(self, i));
+     }
+SWIGINTERN void std_set_Sl_size_t_Sg__add(std::set< size_t > *self,std::set< size_t >::value_type x){
+       self->insert(x);
+     }
+SWIGINTERN void std_set_Sl_size_t_Sg__discard(std::set< size_t > *self,std::set< size_t >::value_type x){
+       self->erase(x);
+     }
 SWIGINTERN PyObject *wali_wpds_WPDS___str__(wali::wpds::WPDS *self){
         std::ostringstream outs;
         self->print(outs);
@@ -7520,7 +7569,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_get_key__SWIG_5(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  SwigValueWrapper< std::set< size_t,std::less< size_t >,std::allocator< size_t > > > arg1 ;
+  std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > arg1 ;
   void *argp1 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
@@ -11039,11 +11088,11 @@ SWIGINTERN PyObject *SemElemPtr_swigregister(PyObject *SWIGUNUSEDPARM(self), PyO
 
 SWIGINTERN PyObject *_wrap_new_KeyPair__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  std::pair< Key,Key > *result = 0 ;
+  std::pair< size_t,size_t > *result = 0 ;
   
   if (!PyArg_ParseTuple(args,(char *)":new_KeyPair")) SWIG_fail;
-  result = (std::pair< Key,Key > *)new std::pair< Key,Key >();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_std__pairT_Key_Key_t, SWIG_POINTER_NEW |  0 );
+  result = (std::pair< size_t,size_t > *)new std::pair< size_t,size_t >();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_std__pairT_size_t_size_t_t, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -11052,45 +11101,29 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_KeyPair__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  Key arg1 ;
-  Key arg2 ;
-  void *argp1 ;
-  int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  size_t arg1 ;
+  size_t arg2 ;
+  size_t val1 ;
+  int ecode1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  std::pair< Key,Key > *result = 0 ;
+  std::pair< size_t,size_t > *result = 0 ;
   
   if (!PyArg_ParseTuple(args,(char *)"OO:new_KeyPair",&obj0,&obj1)) SWIG_fail;
-  {
-    res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_Key,  0  | 0);
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_KeyPair" "', argument " "1"" of type '" "Key""'"); 
-    }  
-    if (!argp1) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_KeyPair" "', argument " "1"" of type '" "Key""'");
-    } else {
-      Key * temp = reinterpret_cast< Key * >(argp1);
-      arg1 = *temp;
-      if (SWIG_IsNewObj(res1)) delete temp;
-    }
-  }
-  {
-    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_Key,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "new_KeyPair" "', argument " "2"" of type '" "Key""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_KeyPair" "', argument " "2"" of type '" "Key""'");
-    } else {
-      Key * temp = reinterpret_cast< Key * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
-  result = (std::pair< Key,Key > *)new std::pair< Key,Key >(arg1,arg2);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_std__pairT_Key_Key_t, SWIG_POINTER_NEW |  0 );
+  ecode1 = SWIG_AsVal_size_t(obj0, &val1);
+  if (!SWIG_IsOK(ecode1)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_KeyPair" "', argument " "1"" of type '" "size_t""'");
+  } 
+  arg1 = static_cast< size_t >(val1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_KeyPair" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  result = (std::pair< size_t,size_t > *)new std::pair< size_t,size_t >(arg1,arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_std__pairT_size_t_size_t_t, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -11099,25 +11132,25 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_KeyPair__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  std::pair< Key,Key > *arg1 = 0 ;
+  std::pair< size_t,size_t > *arg1 = 0 ;
   int res1 = SWIG_OLDOBJ ;
   PyObject * obj0 = 0 ;
-  std::pair< Key,Key > *result = 0 ;
+  std::pair< size_t,size_t > *result = 0 ;
   
   if (!PyArg_ParseTuple(args,(char *)"O:new_KeyPair",&obj0)) SWIG_fail;
   {
-    std::pair< Key,Key > *ptr = (std::pair< Key,Key > *)0;
+    std::pair< size_t,size_t > *ptr = (std::pair< size_t,size_t > *)0;
     res1 = swig::asptr(obj0, &ptr);
     if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_KeyPair" "', argument " "1"" of type '" "std::pair< Key,Key > const &""'"); 
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_KeyPair" "', argument " "1"" of type '" "std::pair< size_t,size_t > const &""'"); 
     }
     if (!ptr) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_KeyPair" "', argument " "1"" of type '" "std::pair< Key,Key > const &""'"); 
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_KeyPair" "', argument " "1"" of type '" "std::pair< size_t,size_t > const &""'"); 
     }
     arg1 = ptr;
   }
-  result = (std::pair< Key,Key > *)new std::pair< Key,Key >((std::pair< Key,Key > const &)*arg1);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_std__pairT_Key_Key_t, SWIG_POINTER_NEW |  0 );
+  result = (std::pair< size_t,size_t > *)new std::pair< size_t,size_t >((std::pair< size_t,size_t > const &)*arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_std__pairT_size_t_size_t_t, SWIG_POINTER_NEW |  0 );
   if (SWIG_IsNewObj(res1)) delete arg1;
   return resultobj;
 fail:
@@ -11143,7 +11176,7 @@ SWIGINTERN PyObject *_wrap_new_KeyPair(PyObject *self, PyObject *args) {
   }
   if (argc == 1) {
     int _v;
-    int res = swig::asptr(argv[0], (std::pair< Key,Key >**)(0));
+    int res = swig::asptr(argv[0], (std::pair< size_t,size_t >**)(0));
     _v = SWIG_CheckState(res);
     if (_v) {
       return _wrap_new_KeyPair__SWIG_2(self, args);
@@ -11151,11 +11184,15 @@ SWIGINTERN PyObject *_wrap_new_KeyPair(PyObject *self, PyObject *args) {
   }
   if (argc == 2) {
     int _v;
-    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_Key, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_Key, 0);
+    {
+      int res = SWIG_AsVal_size_t(argv[0], NULL);
       _v = SWIG_CheckState(res);
+    }
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
       if (_v) {
         return _wrap_new_KeyPair__SWIG_1(self, args);
       }
@@ -11165,43 +11202,35 @@ SWIGINTERN PyObject *_wrap_new_KeyPair(PyObject *self, PyObject *args) {
 fail:
   SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number or type of arguments for overloaded function 'new_KeyPair'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    std::pair< Key,Key >::pair()\n"
-    "    std::pair< Key,Key >::pair(Key,Key)\n"
-    "    std::pair< Key,Key >::pair(std::pair< Key,Key > const &)\n");
+    "    std::pair< size_t,size_t >::pair()\n"
+    "    std::pair< size_t,size_t >::pair(size_t,size_t)\n"
+    "    std::pair< size_t,size_t >::pair(std::pair< size_t,size_t > const &)\n");
   return 0;
 }
 
 
 SWIGINTERN PyObject *_wrap_KeyPair_first_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  std::pair< Key,Key > *arg1 = (std::pair< Key,Key > *) 0 ;
-  Key arg2 ;
+  std::pair< size_t,size_t > *arg1 = (std::pair< size_t,size_t > *) 0 ;
+  size_t arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
   if (!PyArg_ParseTuple(args,(char *)"OO:KeyPair_first_set",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__pairT_Key_Key_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__pairT_size_t_size_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeyPair_first_set" "', argument " "1"" of type '" "std::pair< Key,Key > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeyPair_first_set" "', argument " "1"" of type '" "std::pair< size_t,size_t > *""'"); 
   }
-  arg1 = reinterpret_cast< std::pair< Key,Key > * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_Key,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "KeyPair_first_set" "', argument " "2"" of type '" "Key""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "KeyPair_first_set" "', argument " "2"" of type '" "Key""'");
-    } else {
-      Key * temp = reinterpret_cast< Key * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  arg1 = reinterpret_cast< std::pair< size_t,size_t > * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "KeyPair_first_set" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
   if (arg1) (arg1)->first = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -11212,20 +11241,20 @@ fail:
 
 SWIGINTERN PyObject *_wrap_KeyPair_first_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  std::pair< Key,Key > *arg1 = (std::pair< Key,Key > *) 0 ;
+  std::pair< size_t,size_t > *arg1 = (std::pair< size_t,size_t > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  Key result;
+  size_t result;
   
   if (!PyArg_ParseTuple(args,(char *)"O:KeyPair_first_get",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__pairT_Key_Key_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__pairT_size_t_size_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeyPair_first_get" "', argument " "1"" of type '" "std::pair< Key,Key > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeyPair_first_get" "', argument " "1"" of type '" "std::pair< size_t,size_t > *""'"); 
   }
-  arg1 = reinterpret_cast< std::pair< Key,Key > * >(argp1);
+  arg1 = reinterpret_cast< std::pair< size_t,size_t > * >(argp1);
   result =  ((arg1)->first);
-  resultobj = SWIG_NewPointerObj((new Key(static_cast< const Key& >(result))), SWIGTYPE_p_Key, SWIG_POINTER_OWN |  0 );
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
 fail:
   return NULL;
@@ -11234,34 +11263,26 @@ fail:
 
 SWIGINTERN PyObject *_wrap_KeyPair_second_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  std::pair< Key,Key > *arg1 = (std::pair< Key,Key > *) 0 ;
-  Key arg2 ;
+  std::pair< size_t,size_t > *arg1 = (std::pair< size_t,size_t > *) 0 ;
+  size_t arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
   if (!PyArg_ParseTuple(args,(char *)"OO:KeyPair_second_set",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__pairT_Key_Key_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__pairT_size_t_size_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeyPair_second_set" "', argument " "1"" of type '" "std::pair< Key,Key > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeyPair_second_set" "', argument " "1"" of type '" "std::pair< size_t,size_t > *""'"); 
   }
-  arg1 = reinterpret_cast< std::pair< Key,Key > * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_Key,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "KeyPair_second_set" "', argument " "2"" of type '" "Key""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "KeyPair_second_set" "', argument " "2"" of type '" "Key""'");
-    } else {
-      Key * temp = reinterpret_cast< Key * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  arg1 = reinterpret_cast< std::pair< size_t,size_t > * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "KeyPair_second_set" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
   if (arg1) (arg1)->second = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -11272,20 +11293,20 @@ fail:
 
 SWIGINTERN PyObject *_wrap_KeyPair_second_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  std::pair< Key,Key > *arg1 = (std::pair< Key,Key > *) 0 ;
+  std::pair< size_t,size_t > *arg1 = (std::pair< size_t,size_t > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  Key result;
+  size_t result;
   
   if (!PyArg_ParseTuple(args,(char *)"O:KeyPair_second_get",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__pairT_Key_Key_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__pairT_size_t_size_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeyPair_second_get" "', argument " "1"" of type '" "std::pair< Key,Key > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeyPair_second_get" "', argument " "1"" of type '" "std::pair< size_t,size_t > *""'"); 
   }
-  arg1 = reinterpret_cast< std::pair< Key,Key > * >(argp1);
+  arg1 = reinterpret_cast< std::pair< size_t,size_t > * >(argp1);
   result =  ((arg1)->second);
-  resultobj = SWIG_NewPointerObj((new Key(static_cast< const Key& >(result))), SWIGTYPE_p_Key, SWIG_POINTER_OWN |  0 );
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
 fail:
   return NULL;
@@ -11294,17 +11315,17 @@ fail:
 
 SWIGINTERN PyObject *_wrap_delete_KeyPair(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  std::pair< Key,Key > *arg1 = (std::pair< Key,Key > *) 0 ;
+  std::pair< size_t,size_t > *arg1 = (std::pair< size_t,size_t > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
   if (!PyArg_ParseTuple(args,(char *)"O:delete_KeyPair",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__pairT_Key_Key_t, SWIG_POINTER_DISOWN |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__pairT_size_t_size_t_t, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_KeyPair" "', argument " "1"" of type '" "std::pair< Key,Key > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_KeyPair" "', argument " "1"" of type '" "std::pair< size_t,size_t > *""'"); 
   }
-  arg1 = reinterpret_cast< std::pair< Key,Key > * >(argp1);
+  arg1 = reinterpret_cast< std::pair< size_t,size_t > * >(argp1);
   delete arg1;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -11316,7 +11337,7 @@ fail:
 SWIGINTERN PyObject *KeyPair_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_ParseTuple(args,(char*)"O:swigregister", &obj)) return NULL;
-  SWIG_TypeNewClientData(SWIGTYPE_p_std__pairT_Key_Key_t, SWIG_NewClientData(obj));
+  SWIG_TypeNewClientData(SWIGTYPE_p_std__pairT_size_t_size_t_t, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
 
@@ -24415,7 +24436,7 @@ SWIGINTERN PyObject *_wrap_WFA_alphabet(PyObject *SWIGUNUSEDPARM(self), PyObject
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  SwigValueWrapper< std::set< size_t,std::less< size_t >,std::allocator< size_t > > > result;
+  std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > result;
   
   if (!PyArg_ParseTuple(args,(char *)"O:WFA_alphabet",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__WFA, 0 |  0 );
@@ -24895,6 +24916,555 @@ fail:
   return NULL;
 }
 
+
+SWIGINTERN PyObject *_wrap_new_KeySet__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  std::less< size_t > *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  std::set< size_t > *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:new_KeySet",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_std__lessT_size_t_t,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_KeySet" "', argument " "1"" of type '" "std::less< size_t > const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_KeySet" "', argument " "1"" of type '" "std::less< size_t > const &""'"); 
+  }
+  arg1 = reinterpret_cast< std::less< size_t > * >(argp1);
+  result = (std::set< size_t > *)new std::set< size_t >((std::less< size_t > const &)*arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_KeySet_iterator(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  std::set< size_t > *arg1 = (std::set< size_t > *) 0 ;
+  PyObject **arg2 = (PyObject **) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  swig::SwigPyIterator *result = 0 ;
+  
+  arg2 = &obj0;
+  if (!PyArg_ParseTuple(args,(char *)"O:KeySet_iterator",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeySet_iterator" "', argument " "1"" of type '" "std::set< size_t > *""'"); 
+  }
+  arg1 = reinterpret_cast< std::set< size_t > * >(argp1);
+  result = (swig::SwigPyIterator *)std_set_Sl_size_t_Sg__iterator(arg1,arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_swig__SwigPyIterator, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_KeySet___nonzero__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  std::set< size_t > *arg1 = (std::set< size_t > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:KeySet___nonzero__",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeySet___nonzero__" "', argument " "1"" of type '" "std::set< size_t > const *""'"); 
+  }
+  arg1 = reinterpret_cast< std::set< size_t > * >(argp1);
+  result = (bool)std_set_Sl_size_t_Sg____nonzero__((std::set< size_t > const *)arg1);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_KeySet___bool__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  std::set< size_t > *arg1 = (std::set< size_t > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:KeySet___bool__",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeySet___bool__" "', argument " "1"" of type '" "std::set< size_t > const *""'"); 
+  }
+  arg1 = reinterpret_cast< std::set< size_t > * >(argp1);
+  result = (bool)std_set_Sl_size_t_Sg____bool__((std::set< size_t > const *)arg1);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_KeySet___len__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  std::set< size_t > *arg1 = (std::set< size_t > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  std::set< size_t >::size_type result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:KeySet___len__",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeySet___len__" "', argument " "1"" of type '" "std::set< size_t > const *""'"); 
+  }
+  arg1 = reinterpret_cast< std::set< size_t > * >(argp1);
+  result = std_set_Sl_size_t_Sg____len__((std::set< size_t > const *)arg1);
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_KeySet_append(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  std::set< size_t > *arg1 = (std::set< size_t > *) 0 ;
+  std::set< size_t >::value_type arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:KeySet_append",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeySet_append" "', argument " "1"" of type '" "std::set< size_t > *""'"); 
+  }
+  arg1 = reinterpret_cast< std::set< size_t > * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "KeySet_append" "', argument " "2"" of type '" "std::set< size_t >::value_type""'");
+  } 
+  arg2 = static_cast< std::set< size_t >::value_type >(val2);
+  std_set_Sl_size_t_Sg__append(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_KeySet___contains__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  std::set< size_t > *arg1 = (std::set< size_t > *) 0 ;
+  std::set< size_t >::value_type arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  bool result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:KeySet___contains__",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeySet___contains__" "', argument " "1"" of type '" "std::set< size_t > *""'"); 
+  }
+  arg1 = reinterpret_cast< std::set< size_t > * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "KeySet___contains__" "', argument " "2"" of type '" "std::set< size_t >::value_type""'");
+  } 
+  arg2 = static_cast< std::set< size_t >::value_type >(val2);
+  result = (bool)std_set_Sl_size_t_Sg____contains__(arg1,arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_KeySet___getitem__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  std::set< size_t > *arg1 = (std::set< size_t > *) 0 ;
+  std::set< size_t >::difference_type arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  ptrdiff_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  std::set< size_t >::value_type result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:KeySet___getitem__",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeySet___getitem__" "', argument " "1"" of type '" "std::set< size_t > const *""'"); 
+  }
+  arg1 = reinterpret_cast< std::set< size_t > * >(argp1);
+  ecode2 = SWIG_AsVal_ptrdiff_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "KeySet___getitem__" "', argument " "2"" of type '" "std::set< size_t >::difference_type""'");
+  } 
+  arg2 = static_cast< std::set< size_t >::difference_type >(val2);
+  try {
+    result = std_set_Sl_size_t_Sg____getitem__((std::set< size_t > const *)arg1,arg2);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_exception_fail(SWIG_IndexError, (&_e)->what());
+  }
+  
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_KeySet_add(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  std::set< size_t > *arg1 = (std::set< size_t > *) 0 ;
+  std::set< size_t >::value_type arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:KeySet_add",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeySet_add" "', argument " "1"" of type '" "std::set< size_t > *""'"); 
+  }
+  arg1 = reinterpret_cast< std::set< size_t > * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "KeySet_add" "', argument " "2"" of type '" "std::set< size_t >::value_type""'");
+  } 
+  arg2 = static_cast< std::set< size_t >::value_type >(val2);
+  std_set_Sl_size_t_Sg__add(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_KeySet_discard(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  std::set< size_t > *arg1 = (std::set< size_t > *) 0 ;
+  std::set< size_t >::value_type arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:KeySet_discard",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeySet_discard" "', argument " "1"" of type '" "std::set< size_t > *""'"); 
+  }
+  arg1 = reinterpret_cast< std::set< size_t > * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "KeySet_discard" "', argument " "2"" of type '" "std::set< size_t >::value_type""'");
+  } 
+  arg2 = static_cast< std::set< size_t >::value_type >(val2);
+  std_set_Sl_size_t_Sg__discard(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_KeySet__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  std::set< size_t > *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)":new_KeySet")) SWIG_fail;
+  result = (std::set< size_t > *)new std::set< size_t >();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_KeySet__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  std::set< size_t > *arg1 = 0 ;
+  int res1 = SWIG_OLDOBJ ;
+  PyObject * obj0 = 0 ;
+  std::set< size_t > *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:new_KeySet",&obj0)) SWIG_fail;
+  {
+    std::set< size_t,std::less< size_t >,std::allocator< size_t > > *ptr = (std::set< size_t,std::less< size_t >,std::allocator< size_t > > *)0;
+    res1 = swig::asptr(obj0, &ptr);
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_KeySet" "', argument " "1"" of type '" "std::set< size_t > const &""'"); 
+    }
+    if (!ptr) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_KeySet" "', argument " "1"" of type '" "std::set< size_t > const &""'"); 
+    }
+    arg1 = ptr;
+  }
+  result = (std::set< size_t > *)new std::set< size_t >((std::set< size_t > const &)*arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, SWIG_POINTER_NEW |  0 );
+  if (SWIG_IsNewObj(res1)) delete arg1;
+  return resultobj;
+fail:
+  if (SWIG_IsNewObj(res1)) delete arg1;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_KeySet(PyObject *self, PyObject *args) {
+  Py_ssize_t argc;
+  PyObject *argv[2] = {
+    0
+  };
+  Py_ssize_t ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = args ? PyObject_Length(args) : 0;
+  for (ii = 0; (ii < 1) && (ii < argc); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 0) {
+    return _wrap_new_KeySet__SWIG_1(self, args);
+  }
+  if (argc == 1) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_std__lessT_size_t_t, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_new_KeySet__SWIG_0(self, args);
+    }
+  }
+  if (argc == 1) {
+    int _v;
+    int res = swig::asptr(argv[0], (std::set< size_t,std::less< size_t >,std::allocator< size_t > >**)(0));
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_new_KeySet__SWIG_2(self, args);
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number or type of arguments for overloaded function 'new_KeySet'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    std::set< size_t >::set(std::less< size_t > const &)\n"
+    "    std::set< size_t >::set()\n"
+    "    std::set< size_t >::set(std::set< size_t > const &)\n");
+  return 0;
+}
+
+
+SWIGINTERN PyObject *_wrap_KeySet_empty(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  std::set< size_t > *arg1 = (std::set< size_t > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:KeySet_empty",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeySet_empty" "', argument " "1"" of type '" "std::set< size_t > const *""'"); 
+  }
+  arg1 = reinterpret_cast< std::set< size_t > * >(argp1);
+  result = (bool)((std::set< size_t > const *)arg1)->empty();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_KeySet_size(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  std::set< size_t > *arg1 = (std::set< size_t > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  std::set< size_t >::size_type result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:KeySet_size",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeySet_size" "', argument " "1"" of type '" "std::set< size_t > const *""'"); 
+  }
+  arg1 = reinterpret_cast< std::set< size_t > * >(argp1);
+  result = ((std::set< size_t > const *)arg1)->size();
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_KeySet_clear(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  std::set< size_t > *arg1 = (std::set< size_t > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:KeySet_clear",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeySet_clear" "', argument " "1"" of type '" "std::set< size_t > *""'"); 
+  }
+  arg1 = reinterpret_cast< std::set< size_t > * >(argp1);
+  (arg1)->clear();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_KeySet_swap(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  std::set< size_t > *arg1 = (std::set< size_t > *) 0 ;
+  std::set< size_t > *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:KeySet_swap",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeySet_swap" "', argument " "1"" of type '" "std::set< size_t > *""'"); 
+  }
+  arg1 = reinterpret_cast< std::set< size_t > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t,  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "KeySet_swap" "', argument " "2"" of type '" "std::set< size_t > &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "KeySet_swap" "', argument " "2"" of type '" "std::set< size_t > &""'"); 
+  }
+  arg2 = reinterpret_cast< std::set< size_t > * >(argp2);
+  (arg1)->swap(*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_KeySet_erase(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  std::set< size_t > *arg1 = (std::set< size_t > *) 0 ;
+  std::set< size_t >::key_type *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  std::set< size_t >::key_type temp2 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  std::set< size_t >::size_type result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:KeySet_erase",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeySet_erase" "', argument " "1"" of type '" "std::set< size_t > *""'"); 
+  }
+  arg1 = reinterpret_cast< std::set< size_t > * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "KeySet_erase" "', argument " "2"" of type '" "std::set< size_t >::key_type""'");
+  } 
+  temp2 = static_cast< std::set< size_t >::key_type >(val2);
+  arg2 = &temp2;
+  result = (arg1)->erase((std::set< size_t >::key_type const &)*arg2);
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_KeySet_count(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  std::set< size_t > *arg1 = (std::set< size_t > *) 0 ;
+  std::set< size_t >::key_type *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  std::set< size_t >::key_type temp2 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  std::set< size_t >::size_type result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:KeySet_count",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "KeySet_count" "', argument " "1"" of type '" "std::set< size_t > const *""'"); 
+  }
+  arg1 = reinterpret_cast< std::set< size_t > * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "KeySet_count" "', argument " "2"" of type '" "std::set< size_t >::key_type""'");
+  } 
+  temp2 = static_cast< std::set< size_t >::key_type >(val2);
+  arg2 = &temp2;
+  result = ((std::set< size_t > const *)arg1)->count((std::set< size_t >::key_type const &)*arg2);
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_delete_KeySet(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  std::set< size_t > *arg1 = (std::set< size_t > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:delete_KeySet",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_KeySet" "', argument " "1"" of type '" "std::set< size_t > *""'"); 
+  }
+  arg1 = reinterpret_cast< std::set< size_t > * >(argp1);
+  delete arg1;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *KeySet_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!PyArg_ParseTuple(args,(char*)"O:swigregister", &obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
 
 SWIGINTERN int Swig_var_WPDS_xmltag_set(PyObject *) {
   SWIG_Error(SWIG_AttributeError,"Variable WPDS_xmltag is read-only.");
@@ -26552,7 +27122,7 @@ SWIGINTERN PyObject *_wrap_WPDS_get_states(PyObject *SWIGUNUSEDPARM(self), PyObj
   }
   arg1 = reinterpret_cast< wali::wpds::WPDS * >(argp1);
   result = (std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > *) &((wali::wpds::WPDS const *)arg1)->get_states();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t, 0 |  0 );
+  resultobj = swig::from(static_cast< std::set< size_t,std::less< size_t >,std::allocator< size_t > > >(*result));
   return resultobj;
 fail:
   return NULL;
@@ -29781,14 +30351,14 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		"Parameters\n"
 		"----------\n"
-		"first: Key\n"
-		"second: Key\n"
+		"first: size_t\n"
+		"second: size_t\n"
 		"\n"
 		"new_KeyPair(p) -> KeyPair\n"
 		"\n"
 		"Parameters\n"
 		"----------\n"
-		"p: std::pair< Key,Key > const &\n"
+		"p: std::pair< size_t,size_t > const &\n"
 		"\n"
 		""},
 	 { (char *)"KeyPair_first_set", _wrap_KeyPair_first_set, METH_VARARGS, (char *)"\n"
@@ -29796,16 +30366,16 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		"Parameters\n"
 		"----------\n"
-		"self: std::pair< Key,Key > *\n"
-		"first: Key\n"
+		"self: std::pair< size_t,size_t > *\n"
+		"first: size_t\n"
 		"\n"
 		""},
 	 { (char *)"KeyPair_first_get", _wrap_KeyPair_first_get, METH_VARARGS, (char *)"\n"
-		"KeyPair_first_get(self) -> Key\n"
+		"KeyPair_first_get(self) -> size_t\n"
 		"\n"
 		"Parameters\n"
 		"----------\n"
-		"self: std::pair< Key,Key > *\n"
+		"self: std::pair< size_t,size_t > *\n"
 		"\n"
 		""},
 	 { (char *)"KeyPair_second_set", _wrap_KeyPair_second_set, METH_VARARGS, (char *)"\n"
@@ -29813,16 +30383,16 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		"Parameters\n"
 		"----------\n"
-		"self: std::pair< Key,Key > *\n"
-		"second: Key\n"
+		"self: std::pair< size_t,size_t > *\n"
+		"second: size_t\n"
 		"\n"
 		""},
 	 { (char *)"KeyPair_second_get", _wrap_KeyPair_second_get, METH_VARARGS, (char *)"\n"
-		"KeyPair_second_get(self) -> Key\n"
+		"KeyPair_second_get(self) -> size_t\n"
 		"\n"
 		"Parameters\n"
 		"----------\n"
-		"self: std::pair< Key,Key > *\n"
+		"self: std::pair< size_t,size_t > *\n"
 		"\n"
 		""},
 	 { (char *)"delete_KeyPair", _wrap_delete_KeyPair, METH_VARARGS, (char *)"\n"
@@ -29830,7 +30400,7 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		"Parameters\n"
 		"----------\n"
-		"self: std::pair< Key,Key > *\n"
+		"self: std::pair< size_t,size_t > *\n"
 		"\n"
 		""},
 	 { (char *)"KeyPair_swigregister", KeyPair_swigregister, METH_VARARGS, NULL},
@@ -31934,7 +32504,7 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		""},
 	 { (char *)"WFA_get_states", _wrap_WFA_get_states, METH_VARARGS, (char *)"\n"
-		"WFA_get_states(self) -> std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > const &\n"
+		"WFA_get_states(self) -> KeySet\n"
 		"\n"
 		"Parameters\n"
 		"----------\n"
@@ -31942,7 +32512,7 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		""},
 	 { (char *)"WFA_get_final_states", _wrap_WFA_get_final_states, METH_VARARGS, (char *)"\n"
-		"WFA_get_final_states(self) -> std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > const &\n"
+		"WFA_get_final_states(self) -> KeySet\n"
 		"\n"
 		"Parameters\n"
 		"----------\n"
@@ -32285,7 +32855,7 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		""},
 	 { (char *)"WFA_alphabet", _wrap_WFA_alphabet, METH_VARARGS, (char *)"\n"
-		"WFA_alphabet(self) -> std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > >\n"
+		"WFA_alphabet(self) -> KeySet\n"
 		"\n"
 		"Parameters\n"
 		"----------\n"
@@ -32393,6 +32963,158 @@ static PyMethodDef SwigMethods[] = {
 		"tester: boost::function< wali::wfa::delta::DeltaResult (wali::wfa::WFA const &) >\n"
 		"\n"
 		""},
+	 { (char *)"KeySet_iterator", _wrap_KeySet_iterator, METH_VARARGS, (char *)"\n"
+		"KeySet_iterator(self) -> SwigPyIterator\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"self: std::set< size_t > *\n"
+		"\n"
+		""},
+	 { (char *)"KeySet___nonzero__", _wrap_KeySet___nonzero__, METH_VARARGS, (char *)"\n"
+		"KeySet___nonzero__(self) -> bool\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"self: std::set< size_t > const *\n"
+		"\n"
+		""},
+	 { (char *)"KeySet___bool__", _wrap_KeySet___bool__, METH_VARARGS, (char *)"\n"
+		"KeySet___bool__(self) -> bool\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"self: std::set< size_t > const *\n"
+		"\n"
+		""},
+	 { (char *)"KeySet___len__", _wrap_KeySet___len__, METH_VARARGS, (char *)"\n"
+		"KeySet___len__(self) -> std::set< size_t >::size_type\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"self: std::set< size_t > const *\n"
+		"\n"
+		""},
+	 { (char *)"KeySet_append", _wrap_KeySet_append, METH_VARARGS, (char *)"\n"
+		"KeySet_append(self, x)\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"self: std::set< size_t > *\n"
+		"x: std::set< size_t >::value_type\n"
+		"\n"
+		""},
+	 { (char *)"KeySet___contains__", _wrap_KeySet___contains__, METH_VARARGS, (char *)"\n"
+		"KeySet___contains__(self, x) -> bool\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"self: std::set< size_t > *\n"
+		"x: std::set< size_t >::value_type\n"
+		"\n"
+		""},
+	 { (char *)"KeySet___getitem__", _wrap_KeySet___getitem__, METH_VARARGS, (char *)"\n"
+		"KeySet___getitem__(self, i) -> std::set< size_t >::value_type\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"self: std::set< size_t > const *\n"
+		"i: std::set< size_t >::difference_type\n"
+		"\n"
+		""},
+	 { (char *)"KeySet_add", _wrap_KeySet_add, METH_VARARGS, (char *)"\n"
+		"KeySet_add(self, x)\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"self: std::set< size_t > *\n"
+		"x: std::set< size_t >::value_type\n"
+		"\n"
+		""},
+	 { (char *)"KeySet_discard", _wrap_KeySet_discard, METH_VARARGS, (char *)"\n"
+		"KeySet_discard(self, x)\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"self: std::set< size_t > *\n"
+		"x: std::set< size_t >::value_type\n"
+		"\n"
+		""},
+	 { (char *)"new_KeySet", _wrap_new_KeySet, METH_VARARGS, (char *)"\n"
+		"KeySet(arg2)\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"arg2: std::less< size_t > const &\n"
+		"\n"
+		"KeySet()\n"
+		"new_KeySet(arg2) -> KeySet\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"arg1: std::set< size_t > const &\n"
+		"\n"
+		""},
+	 { (char *)"KeySet_empty", _wrap_KeySet_empty, METH_VARARGS, (char *)"\n"
+		"KeySet_empty(self) -> bool\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"self: std::set< size_t > const *\n"
+		"\n"
+		""},
+	 { (char *)"KeySet_size", _wrap_KeySet_size, METH_VARARGS, (char *)"\n"
+		"KeySet_size(self) -> std::set< size_t >::size_type\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"self: std::set< size_t > const *\n"
+		"\n"
+		""},
+	 { (char *)"KeySet_clear", _wrap_KeySet_clear, METH_VARARGS, (char *)"\n"
+		"KeySet_clear(self)\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"self: std::set< size_t > *\n"
+		"\n"
+		""},
+	 { (char *)"KeySet_swap", _wrap_KeySet_swap, METH_VARARGS, (char *)"\n"
+		"KeySet_swap(self, v)\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"self: std::set< size_t > *\n"
+		"v: std::set< size_t > &\n"
+		"\n"
+		""},
+	 { (char *)"KeySet_erase", _wrap_KeySet_erase, METH_VARARGS, (char *)"\n"
+		"KeySet_erase(self, x) -> std::set< size_t >::size_type\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"self: std::set< size_t > *\n"
+		"x: std::set< size_t >::key_type const &\n"
+		"\n"
+		""},
+	 { (char *)"KeySet_count", _wrap_KeySet_count, METH_VARARGS, (char *)"\n"
+		"KeySet_count(self, x) -> std::set< size_t >::size_type\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"self: std::set< size_t > const *\n"
+		"x: std::set< size_t >::key_type const &\n"
+		"\n"
+		""},
+	 { (char *)"delete_KeySet", _wrap_delete_KeySet, METH_VARARGS, (char *)"\n"
+		"delete_KeySet(self)\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"self: std::set< size_t > *\n"
+		"\n"
+		""},
+	 { (char *)"KeySet_swigregister", KeySet_swigregister, METH_VARARGS, NULL},
 	 { (char *)"new_WPDS", _wrap_new_WPDS, METH_VARARGS, (char *)"\n"
 		"WPDS()\n"
 		"WPDS(wrapper)\n"
@@ -32619,7 +33341,7 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		""},
 	 { (char *)"WPDS_get_states", _wrap_WPDS_get_states, METH_VARARGS, (char *)"\n"
-		"WPDS_get_states(self) -> std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > const &\n"
+		"WPDS_get_states(self) -> KeySet\n"
 		"\n"
 		"Parameters\n"
 		"----------\n"
@@ -33071,7 +33793,6 @@ static swig_type_info _swigt__p_EpsilonCloseCache = {"_p_EpsilonCloseCache", "Ep
 static swig_type_info _swigt__p_ITrans = {"_p_ITrans", "std::set< ITrans *,ITransLT >::key_type|std::set< ITrans *,ITransLT >::value_type|ITrans *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_ITransLT = {"_p_ITransLT", "ITransLT *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_IncomingTransMap_t = {"_p_IncomingTransMap_t", "IncomingTransMap_t *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_Key = {"_p_Key", "Key *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_KeyPair = {"_p_KeyPair", "KeyPair *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_PredHash_t = {"_p_PredHash_t", "PredHash_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_PySemElem = {"_p_PySemElem", "PySemElem *", 0, 0, (void*)0, 0};
@@ -33116,6 +33837,7 @@ static swig_type_info _swigt__p_size_type = {"_p_size_type", "size_type *", 0, 0
 static swig_type_info _swigt__p_state_map_t = {"_p_state_map_t", "state_map_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__allocatorT_wali__wfa__Trans_p_t = {"_p_std__allocatorT_wali__wfa__Trans_p_t", "std::allocator< wali::wfa::Trans * > *|std::vector< wali::wfa::Trans * >::allocator_type *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__invalid_argument = {"_p_std__invalid_argument", "std::invalid_argument *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_std__lessT_size_t_t = {"_p_std__lessT_size_t_t", "std::less< size_t > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__mapT_size_t_domains__SemElemSet__ElementSet_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_domains__SemElemSet__ElementSet_t_t_t = {"_p_std__mapT_size_t_domains__SemElemSet__ElementSet_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_domains__SemElemSet__ElementSet_t_t_t", "std::map< size_t,domains::SemElemSet::ElementSet,std::less< size_t >,std::allocator< std::pair< size_t const,domains::SemElemSet::ElementSet > > > *|wali::wfa::WFA::AccessibleStateSetMap *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__mapT_size_t_size_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_size_t_t_t_t = {"_p_std__mapT_size_t_size_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_size_t_t_t_t", "std::map< wali::Key,wali::Key,std::less< wali::Key >,std::allocator< std::pair< wali::Key const,wali::Key > > > *|std::map< size_t,size_t,std::less< size_t >,std::allocator< std::pair< size_t const,size_t > > > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__mapT_size_t_std__mapT_size_t_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__mapT_size_t_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_t_t_t_t_t_t = {"_p_std__mapT_size_t_std__mapT_size_t_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__mapT_size_t_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_t_t_t_t_t_t", "std::map< size_t,std::map< size_t,std::set< size_t,std::less< size_t >,std::allocator< size_t > >,std::less< size_t >,std::allocator< std::pair< size_t const,std::set< size_t,std::less< size_t >,std::allocator< size_t > > > > >,std::less< size_t >,std::allocator< std::pair< size_t const,std::map< size_t,std::set< size_t,std::less< size_t >,std::allocator< size_t > >,std::less< size_t >,std::allocator< std::pair< size_t const,std::set< size_t,std::less< size_t >,std::allocator< size_t > > > > > > > > *|std::map< wali::Key,std::map< wali::Key,std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > >,std::less< wali::Key >,std::allocator< std::pair< wali::Key const,std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > > > >,std::less< wali::Key >,std::allocator< std::pair< wali::Key const,std::map< wali::Key,std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > >,std::less< wali::Key >,std::allocator< std::pair< wali::Key const,std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > > > > > > > *", 0, 0, (void*)0, 0};
@@ -33123,8 +33845,8 @@ static swig_type_info _swigt__p_std__mapT_size_t_std__mapT_size_t_wali__ref_ptrT
 static swig_type_info _swigt__p_std__mapT_size_t_wali__ref_ptrT_wali__SemElem_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_wali__ref_ptrT_wali__SemElem_t_t_t_t = {"_p_std__mapT_size_t_wali__ref_ptrT_wali__SemElem_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_wali__ref_ptrT_wali__SemElem_t_t_t_t", "std::map< size_t,wali::ref_ptr< wali::SemElem >,std::less< size_t >,std::allocator< std::pair< size_t const,wali::ref_ptr< wali::SemElem > > > > *|std::map< wali::Key,wali::sem_elem_t,std::less< wali::Key >,std::allocator< std::pair< wali::Key const,wali::sem_elem_t > > > *|wali::wfa::WFA::AccessibleStateMap *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__ostream = {"_p_std__ostream", "std::ostream *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__pairT_KeyPair_TransSet_t = {"_p_std__pairT_KeyPair_TransSet_t", "std::pair< KeyPair,TransSet > *|wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::value_type *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_std__pairT_Key_Key_t = {"_p_std__pairT_Key_Key_t", "std::pair< Key,Key > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__pairT_sem_elem_t_sem_elem_t_t = {"_p_std__pairT_sem_elem_t_sem_elem_t_t", "std::pair< sem_elem_t,sem_elem_t > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_std__pairT_size_t_size_t_t = {"_p_std__pairT_size_t_size_t_t", "std::pair< size_t,size_t > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__pairT_size_t_wali__ref_ptrT_wali__SemElem_t_t = {"_p_std__pairT_size_t_wali__ref_ptrT_wali__SemElem_t_t", "std::pair< size_t,wali::ref_ptr< wali::SemElem > > *|std::pair< wali::Key,wali::sem_elem_t > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__pairT_wali__HashMapIteratorT_KeyPair_TransSet_wali__hm_hashT_KeyPair_t_wali__hm_equalT_KeyPair_t_t_bool_t = {"_p_std__pairT_wali__HashMapIteratorT_KeyPair_TransSet_wali__hm_hashT_KeyPair_t_wali__hm_equalT_KeyPair_t_t_bool_t", "std::pair< wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::iterator,bool > *|std::pair< wali::HashMapIterator< KeyPair,TransSet,wali::hm_hash< KeyPair >,wali::hm_equal< KeyPair > >,bool > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__pairT_wali__ref_ptrT_PySemElem_t_wali__ref_ptrT_PySemElem_t_t = {"_p_std__pairT_wali__ref_ptrT_PySemElem_t_wali__ref_ptrT_PySemElem_t_t", "std::pair< wali::ref_ptr< PySemElem >,wali::ref_ptr< PySemElem > > *", 0, 0, (void*)0, 0};
@@ -33132,7 +33854,7 @@ static swig_type_info _swigt__p_std__pairT_wali__ref_ptrT_wali__SemElem_t_wali__
 static swig_type_info _swigt__p_std__setT_ITrans_p_ITransLT_std__allocatorT_ITrans_p_t_t = {"_p_std__setT_ITrans_p_ITransLT_std__allocatorT_ITrans_p_t_t", "std::set< ITrans *,ITransLT > *|std::set< ITrans *,ITransLT,std::allocator< ITrans * > > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__setT_ITrans_p_ITransLT_std__allocatorT_wali__wfa__ITrans_p_t_t__const_iterator = {"_p_std__setT_ITrans_p_ITransLT_std__allocatorT_wali__wfa__ITrans_p_t_t__const_iterator", "std::set< ITrans *,ITransLT,std::allocator< wali::wfa::ITrans * > >::const_iterator *|wali::wfa::TransSet::const_iterator *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__setT_ITrans_p_ITransLT_std__allocatorT_wali__wfa__ITrans_p_t_t__iterator = {"_p_std__setT_ITrans_p_ITransLT_std__allocatorT_wali__wfa__ITrans_p_t_t__iterator", "std::set< ITrans *,ITransLT,std::allocator< wali::wfa::ITrans * > >::iterator *|wali::wfa::TransSet::iterator *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t = {"_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t", "std::set< size_t,std::less< size_t >,std::allocator< size_t > > *|std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t = {"_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t", "std::set< size_t,std::less< size_t >,std::allocator< size_t > > *|std::set< size_t > *|std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorT_size_t_std__allocatorT_size_t_t_t = {"_p_std__vectorT_size_t_std__allocatorT_size_t_t_t", "std::vector< size_t,std::allocator< size_t > > *|wali::wfa::WFA::Word *|std::vector< wali::Key,std::allocator< wali::Key > > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorT_wali__wfa__Trans_p_std__allocatorT_wali__wfa__Trans_p_t_t = {"_p_std__vectorT_wali__wfa__Trans_p_std__allocatorT_wali__wfa__Trans_p_t_t", "std::vector< wali::wfa::Trans *,std::allocator< wali::wfa::Trans * > > *|std::vector< wali::wfa::Trans * > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_swig__SwigPyIterator = {"_p_swig__SwigPyIterator", "swig::SwigPyIterator *", 0, 0, (void*)0, 0};
@@ -33184,7 +33906,6 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_ITrans,
   &_swigt__p_ITransLT,
   &_swigt__p_IncomingTransMap_t,
-  &_swigt__p_Key,
   &_swigt__p_KeyPair,
   &_swigt__p_PredHash_t,
   &_swigt__p_PySemElem,
@@ -33229,6 +33950,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_state_map_t,
   &_swigt__p_std__allocatorT_wali__wfa__Trans_p_t,
   &_swigt__p_std__invalid_argument,
+  &_swigt__p_std__lessT_size_t_t,
   &_swigt__p_std__mapT_size_t_domains__SemElemSet__ElementSet_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_domains__SemElemSet__ElementSet_t_t_t,
   &_swigt__p_std__mapT_size_t_size_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_size_t_t_t_t,
   &_swigt__p_std__mapT_size_t_std__mapT_size_t_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__mapT_size_t_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_t_t_t_t_t_t,
@@ -33236,8 +33958,8 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_std__mapT_size_t_wali__ref_ptrT_wali__SemElem_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_wali__ref_ptrT_wali__SemElem_t_t_t_t,
   &_swigt__p_std__ostream,
   &_swigt__p_std__pairT_KeyPair_TransSet_t,
-  &_swigt__p_std__pairT_Key_Key_t,
   &_swigt__p_std__pairT_sem_elem_t_sem_elem_t_t,
+  &_swigt__p_std__pairT_size_t_size_t_t,
   &_swigt__p_std__pairT_size_t_wali__ref_ptrT_wali__SemElem_t_t,
   &_swigt__p_std__pairT_wali__HashMapIteratorT_KeyPair_TransSet_wali__hm_hashT_KeyPair_t_wali__hm_equalT_KeyPair_t_t_bool_t,
   &_swigt__p_std__pairT_wali__ref_ptrT_PySemElem_t_wali__ref_ptrT_PySemElem_t_t,
@@ -33297,7 +34019,6 @@ static swig_cast_info _swigc__p_EpsilonCloseCache[] = {  {&_swigt__p_EpsilonClos
 static swig_cast_info _swigc__p_ITrans[] = {  {&_swigt__p_ITrans, 0, 0, 0},  {&_swigt__p_wali__wfa__Trans, _p_wali__wfa__TransTo_p_ITrans, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_ITransLT[] = {  {&_swigt__p_ITransLT, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_IncomingTransMap_t[] = {  {&_swigt__p_IncomingTransMap_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_Key[] = {  {&_swigt__p_Key, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_KeyPair[] = {  {&_swigt__p_KeyPair, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_PredHash_t[] = {  {&_swigt__p_PredHash_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_PySemElem[] = {  {&_swigt__p_PySemElem, 0, 0, 0},{0, 0, 0, 0}};
@@ -33342,6 +34063,7 @@ static swig_cast_info _swigc__p_size_type[] = {  {&_swigt__p_size_type, 0, 0, 0}
 static swig_cast_info _swigc__p_state_map_t[] = {  {&_swigt__p_state_map_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__allocatorT_wali__wfa__Trans_p_t[] = {  {&_swigt__p_std__allocatorT_wali__wfa__Trans_p_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__invalid_argument[] = {  {&_swigt__p_std__invalid_argument, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_std__lessT_size_t_t[] = {  {&_swigt__p_std__lessT_size_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__mapT_size_t_domains__SemElemSet__ElementSet_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_domains__SemElemSet__ElementSet_t_t_t[] = {  {&_swigt__p_std__mapT_size_t_domains__SemElemSet__ElementSet_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_domains__SemElemSet__ElementSet_t_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__mapT_size_t_size_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_size_t_t_t_t[] = {  {&_swigt__p_std__mapT_size_t_size_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_size_t_t_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__mapT_size_t_std__mapT_size_t_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__mapT_size_t_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_t_t_t_t_t_t[] = {  {&_swigt__p_std__mapT_size_t_std__mapT_size_t_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__mapT_size_t_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_t_t_t_t_t_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -33349,8 +34071,8 @@ static swig_cast_info _swigc__p_std__mapT_size_t_std__mapT_size_t_wali__ref_ptrT
 static swig_cast_info _swigc__p_std__mapT_size_t_wali__ref_ptrT_wali__SemElem_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_wali__ref_ptrT_wali__SemElem_t_t_t_t[] = {  {&_swigt__p_std__mapT_size_t_wali__ref_ptrT_wali__SemElem_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_wali__ref_ptrT_wali__SemElem_t_t_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__ostream[] = {  {&_swigt__p_std__ostream, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__pairT_KeyPair_TransSet_t[] = {  {&_swigt__p_std__pairT_KeyPair_TransSet_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_std__pairT_Key_Key_t[] = {  {&_swigt__p_std__pairT_Key_Key_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__pairT_sem_elem_t_sem_elem_t_t[] = {  {&_swigt__p_std__pairT_sem_elem_t_sem_elem_t_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_std__pairT_size_t_size_t_t[] = {  {&_swigt__p_std__pairT_size_t_size_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__pairT_size_t_wali__ref_ptrT_wali__SemElem_t_t[] = {  {&_swigt__p_std__pairT_size_t_wali__ref_ptrT_wali__SemElem_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__pairT_wali__HashMapIteratorT_KeyPair_TransSet_wali__hm_hashT_KeyPair_t_wali__hm_equalT_KeyPair_t_t_bool_t[] = {  {&_swigt__p_std__pairT_wali__HashMapIteratorT_KeyPair_TransSet_wali__hm_hashT_KeyPair_t_wali__hm_equalT_KeyPair_t_t_bool_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__pairT_wali__ref_ptrT_PySemElem_t_wali__ref_ptrT_PySemElem_t_t[] = {  {&_swigt__p_std__pairT_wali__ref_ptrT_PySemElem_t_wali__ref_ptrT_PySemElem_t_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -33410,7 +34132,6 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_ITrans,
   _swigc__p_ITransLT,
   _swigc__p_IncomingTransMap_t,
-  _swigc__p_Key,
   _swigc__p_KeyPair,
   _swigc__p_PredHash_t,
   _swigc__p_PySemElem,
@@ -33455,6 +34176,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_state_map_t,
   _swigc__p_std__allocatorT_wali__wfa__Trans_p_t,
   _swigc__p_std__invalid_argument,
+  _swigc__p_std__lessT_size_t_t,
   _swigc__p_std__mapT_size_t_domains__SemElemSet__ElementSet_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_domains__SemElemSet__ElementSet_t_t_t,
   _swigc__p_std__mapT_size_t_size_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_size_t_t_t_t,
   _swigc__p_std__mapT_size_t_std__mapT_size_t_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__mapT_size_t_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_t_t_t_t_t_t,
@@ -33462,8 +34184,8 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_std__mapT_size_t_wali__ref_ptrT_wali__SemElem_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_wali__ref_ptrT_wali__SemElem_t_t_t_t,
   _swigc__p_std__ostream,
   _swigc__p_std__pairT_KeyPair_TransSet_t,
-  _swigc__p_std__pairT_Key_Key_t,
   _swigc__p_std__pairT_sem_elem_t_sem_elem_t_t,
+  _swigc__p_std__pairT_size_t_size_t_t,
   _swigc__p_std__pairT_size_t_wali__ref_ptrT_wali__SemElem_t_t,
   _swigc__p_std__pairT_wali__HashMapIteratorT_KeyPair_TransSet_wali__hm_hashT_KeyPair_t_wali__hm_equalT_KeyPair_t_t_bool_t,
   _swigc__p_std__pairT_wali__ref_ptrT_PySemElem_t_wali__ref_ptrT_PySemElem_t_t,

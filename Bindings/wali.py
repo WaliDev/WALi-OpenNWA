@@ -1209,7 +1209,7 @@ SemElemPtr_swigregister = _wali.SemElemPtr_swigregister
 SemElemPtr_swigregister(SemElemPtr)
 
 class KeyPair(_object):
-    """Proxy of C++ std::pair<(Key,Key)> class."""
+    """Proxy of C++ std::pair<(size_t,size_t)> class."""
 
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, KeyPair, name, value)
@@ -1224,14 +1224,14 @@ class KeyPair(_object):
 
         Parameters
         ----------
-        first: Key
-        second: Key
+        first: size_t
+        second: size_t
 
         __init__(self, p) -> KeyPair
 
         Parameters
         ----------
-        p: std::pair< Key,Key > const &
+        p: std::pair< size_t,size_t > const &
 
         """
         this = _wali.new_KeyPair(*args)
@@ -4219,7 +4219,7 @@ class WFA(Printable):
 
     def get_states(self):
         """
-        get_states(self) -> std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > const &
+        get_states(self) -> KeySet
 
         Parameters
         ----------
@@ -4231,7 +4231,7 @@ class WFA(Printable):
 
     def get_final_states(self):
         """
-        get_final_states(self) -> std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > const &
+        get_final_states(self) -> KeySet
 
         Parameters
         ----------
@@ -4683,7 +4683,7 @@ class WFA(Printable):
 
     def alphabet(self):
         """
-        alphabet(self) -> std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > >
+        alphabet(self) -> KeySet
 
         Parameters
         ----------
@@ -4860,6 +4860,223 @@ def simplify(input, tester):
 
     """
     return _wali.simplify(input, tester)
+class KeySet(_object):
+    """Proxy of C++ std::set<(size_t)> class."""
+
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, KeySet, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, KeySet, name)
+    __repr__ = _swig_repr
+
+    def iterator(self):
+        """
+        iterator(self) -> SwigPyIterator
+
+        Parameters
+        ----------
+        self: std::set< size_t > *
+
+        """
+        return _wali.KeySet_iterator(self)
+
+    def __iter__(self):
+        return self.iterator()
+
+    def __nonzero__(self):
+        """
+        __nonzero__(self) -> bool
+
+        Parameters
+        ----------
+        self: std::set< size_t > const *
+
+        """
+        return _wali.KeySet___nonzero__(self)
+
+
+    def __bool__(self):
+        """
+        __bool__(self) -> bool
+
+        Parameters
+        ----------
+        self: std::set< size_t > const *
+
+        """
+        return _wali.KeySet___bool__(self)
+
+
+    def __len__(self):
+        """
+        __len__(self) -> std::set< size_t >::size_type
+
+        Parameters
+        ----------
+        self: std::set< size_t > const *
+
+        """
+        return _wali.KeySet___len__(self)
+
+
+    def append(self, x):
+        """
+        append(self, x)
+
+        Parameters
+        ----------
+        x: std::set< size_t >::value_type
+
+        """
+        return _wali.KeySet_append(self, x)
+
+
+    def __contains__(self, x):
+        """
+        __contains__(self, x) -> bool
+
+        Parameters
+        ----------
+        x: std::set< size_t >::value_type
+
+        """
+        return _wali.KeySet___contains__(self, x)
+
+
+    def __getitem__(self, i):
+        """
+        __getitem__(self, i) -> std::set< size_t >::value_type
+
+        Parameters
+        ----------
+        i: std::set< size_t >::difference_type
+
+        """
+        return _wali.KeySet___getitem__(self, i)
+
+
+    def add(self, x):
+        """
+        add(self, x)
+
+        Parameters
+        ----------
+        x: std::set< size_t >::value_type
+
+        """
+        return _wali.KeySet_add(self, x)
+
+
+    def discard(self, x):
+        """
+        discard(self, x)
+
+        Parameters
+        ----------
+        x: std::set< size_t >::value_type
+
+        """
+        return _wali.KeySet_discard(self, x)
+
+
+    def __init__(self, *args):
+        """
+        __init__(self, arg2) -> KeySet
+
+        Parameters
+        ----------
+        arg2: std::less< size_t > const &
+
+        __init__(self) -> KeySet
+        __init__(self, arg2) -> KeySet
+
+        Parameters
+        ----------
+        arg2: std::set< size_t > const &
+
+        """
+        this = _wali.new_KeySet(*args)
+        try:
+            self.this.append(this)
+        except Exception:
+            self.this = this
+
+    def empty(self):
+        """
+        empty(self) -> bool
+
+        Parameters
+        ----------
+        self: std::set< size_t > const *
+
+        """
+        return _wali.KeySet_empty(self)
+
+
+    def size(self):
+        """
+        size(self) -> std::set< size_t >::size_type
+
+        Parameters
+        ----------
+        self: std::set< size_t > const *
+
+        """
+        return _wali.KeySet_size(self)
+
+
+    def clear(self):
+        """
+        clear(self)
+
+        Parameters
+        ----------
+        self: std::set< size_t > *
+
+        """
+        return _wali.KeySet_clear(self)
+
+
+    def swap(self, v):
+        """
+        swap(self, v)
+
+        Parameters
+        ----------
+        v: std::set< size_t > &
+
+        """
+        return _wali.KeySet_swap(self, v)
+
+
+    def erase(self, x):
+        """
+        erase(self, x) -> std::set< size_t >::size_type
+
+        Parameters
+        ----------
+        x: std::set< size_t >::key_type const &
+
+        """
+        return _wali.KeySet_erase(self, x)
+
+
+    def count(self, x):
+        """
+        count(self, x) -> std::set< size_t >::size_type
+
+        Parameters
+        ----------
+        x: std::set< size_t >::key_type const &
+
+        """
+        return _wali.KeySet_count(self, x)
+
+    __swig_destroy__ = _wali.delete_KeySet
+    __del__ = lambda self: None
+KeySet_swigregister = _wali.KeySet_swigregister
+KeySet_swigregister(KeySet)
+
 class WPDS(Printable):
     """Proxy of C++ wali::wpds::WPDS class."""
 
@@ -5146,7 +5363,7 @@ class WPDS(Printable):
 
     def get_states(self):
         """
-        get_states(self) -> std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > const &
+        get_states(self) -> KeySet
 
         Parameters
         ----------
