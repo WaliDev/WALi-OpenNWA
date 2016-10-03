@@ -265,7 +265,7 @@ namespace wali
          * @see Key
          * @see sem_elem_t
          */
-        virtual void addTrans(
+        virtual ITrans const * addTrans(
             Key p,
             Key g,
             Key q,
@@ -276,7 +276,7 @@ namespace wali
          *
          * @see wali::wfa::Trans
          */
-        virtual void addTrans( ITrans * t );
+        virtual ITrans const * addTrans( ITrans * t );
 
         /**
          * @brief erase Trans

@@ -290,13 +290,14 @@ namespace wali
     //! @brief add trans (p,g,q,se) to WFA
     //! Default creates a basic Trans object.
     //!
-    void WFA::addTrans(
+    ITrans const *
+    WFA::addTrans(
         Key p,
         Key g,
         Key q,
         sem_elem_t se )
     {
-      addTrans( new Trans(p,g,q,se) );
+      return addTrans( new Trans(p,g,q,se) );
     }
 
     //!
@@ -305,10 +306,11 @@ namespace wali
     //! method (actually insert) assumes ownership of the memory
     //! pointed to by the ITrans* t.
     //!
-    void WFA::addTrans( ITrans * t )
+    ITrans const *
+    WFA::addTrans( ITrans * t )
     {
       //t->print( *waliErr << "\tInserting Trans" ) << std::endl;
-      insert( t );
+      return insert( t );
     }
 
     //
