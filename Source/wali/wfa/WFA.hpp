@@ -288,6 +288,10 @@ namespace wali
             Key stack,
             Key to );
 
+        virtual void erase(ITrans const * t) {
+            erase(t->from(), t->stack(), t->to());
+        }
+
         /**
          * @brief erase State q and all of its incoming and outgoing
          * transitions

@@ -20391,7 +20391,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_WFA_erase(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_WFA_erase__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   wali::wfa::WFA *arg1 = (wali::wfa::WFA *) 0 ;
   wali::Key arg2 ;
@@ -20436,6 +20436,97 @@ SWIGINTERN PyObject *_wrap_WFA_erase(PyObject *SWIGUNUSEDPARM(self), PyObject *a
   return resultobj;
 fail:
   return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_WFA_erase__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::WFA *arg1 = (wali::wfa::WFA *) 0 ;
+  ITrans *arg2 = (ITrans *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:WFA_erase",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__WFA, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "WFA_erase" "', argument " "1"" of type '" "wali::wfa::WFA *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::WFA * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_ITrans, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "WFA_erase" "', argument " "2"" of type '" "ITrans const *""'"); 
+  }
+  arg2 = reinterpret_cast< ITrans * >(argp2);
+  (arg1)->erase((ITrans const *)arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_WFA_erase(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[5];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = args ? (int)PyObject_Length(args) : 0;
+  for (ii = 0; (ii < 4) && (ii < argc); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_wali__wfa__WFA, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_ITrans, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_WFA_erase__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 4) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_wali__wfa__WFA, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_size_t(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_size_t(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            return _wrap_WFA_erase__SWIG_0(self, args);
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number or type of arguments for overloaded function 'WFA_erase'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    wali::wfa::WFA::erase(wali::Key,wali::Key,wali::Key)\n"
+    "    wali::wfa::WFA::erase(ITrans const *)\n");
+  return 0;
 }
 
 
@@ -31599,13 +31690,18 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		""},
 	 { (char *)"WFA_erase", _wrap_WFA_erase, METH_VARARGS, (char *)"\n"
-		"WFA_erase(self, _from, stack, to)\n"
+		"erase(_from, stack, to)\n"
 		"\n"
 		"Parameters:\n"
-		"    self: wali::wfa::WFA *\n"
 		"    from: wali::Key\n"
 		"    stack: wali::Key\n"
 		"    to: wali::Key\n"
+		"\n"
+		"WFA_erase(self, t)\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::wfa::WFA *\n"
+		"    t: ITrans const *\n"
 		"\n"
 		""},
 	 { (char *)"WFA_erase_state", _wrap_WFA_erase_state, METH_VARARGS, (char *)"\n"

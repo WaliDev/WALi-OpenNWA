@@ -3217,6 +3217,11 @@ class WFA(Printable):
             stack: wali::Key
             to: wali::Key
 
+        erase(self, t)
+
+        Parameters:
+            t: ITrans const *
+
         """
         return _wali.WFA_erase(self, *args)
 
