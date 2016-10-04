@@ -569,9 +569,9 @@ namespace wali
         wfa::ITrans *t;
         if(addEtrans) {
           t = currentOutputWFA->insert(new ETrans(from, stack, to,
-                0, se, 0));
+                0, se, 0)).first;
         } else {
-          t = currentOutputWFA->insert(new wfa::Trans(from, stack, to, se));
+          t = currentOutputWFA->insert(new wfa::Trans(from, stack, to, se)).first;
         }
 
         t->setConfig(cfg);
@@ -599,7 +599,7 @@ namespace wali
           new ETrans(
               from, r->to_stack2(), call->to(),
               delta, wWithRule, er);
-        wfa::ITrans* t = currentOutputWFA->insert(tmp);
+        wfa::ITrans* t = currentOutputWFA->insert(tmp).first;
         return t;
       }
 

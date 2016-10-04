@@ -265,7 +265,8 @@ namespace wali
          * @see Key
          * @see sem_elem_t
          */
-        virtual ITrans const * addTrans(
+        virtual std::pair<ITrans const *, bool>
+        addTrans(
             Key p,
             Key g,
             Key q,
@@ -276,7 +277,8 @@ namespace wali
          *
          * @see wali::wfa::Trans
          */
-        virtual ITrans const * addTrans( ITrans * t );
+        virtual std::pair<ITrans const *, bool>
+        addTrans( ITrans * t );
 
         /**
          * @brief erase Trans
@@ -531,7 +533,8 @@ namespace wali
          *
          * @return pointer to real transition
          */
-        ITrans * insert( ITrans * tnew );
+        virtual std::pair<ITrans *, bool>
+        insert( ITrans * tnew );
 
         /**
          * @brief Returns a TransSet containing all 

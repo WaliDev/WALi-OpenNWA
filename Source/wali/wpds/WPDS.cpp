@@ -1120,7 +1120,7 @@ namespace wali
         Config * cfg
         )
     {
-      wfa::ITrans*t = currentOutputWFA->insert(new Trans(from,stack,to,se));
+      wfa::ITrans*t = currentOutputWFA->insert(new Trans(from,stack,to,se)).first;
       t->setConfig(cfg);
       if (t->modified()) {
         //t->print(std::cout << "Adding transition: ") << "\n";
@@ -1145,7 +1145,7 @@ namespace wali
         )
     {
       wfa::ITrans* tmp = new Trans(from,r->to_stack2(),call->to(),wWithRule);
-      wfa::ITrans* t = currentOutputWFA->insert(tmp);
+      wfa::ITrans* t = currentOutputWFA->insert(tmp).first;
       return t;
     }
 

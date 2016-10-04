@@ -192,7 +192,7 @@ namespace wali
       wfa::ITrans* tmp = new Trans(from,stack,to,se);
       tmp->print( *waliErr << "  --- [DebugWPDS::update] t_gen ==" ) << std::endl;
 
-      wfa::ITrans* t = currentOutputWFA->insert(tmp);
+      wfa::ITrans* t = currentOutputWFA->insert(tmp).first;
       t->setConfig(cfg);
       if (t->modified()) {
         worklist->put( t );
@@ -209,7 +209,7 @@ namespace wali
     {
       wfa::ITrans* tmp = new Trans(from,r->to_stack2(),call->to(),wWithRule);
       tmp->print( *waliErr << "  --- [DebugWPDS::update_prime] t_gen ==" ) << std::endl;
-      wfa::ITrans* t = currentOutputWFA->insert(tmp);
+      wfa::ITrans* t = currentOutputWFA->insert(tmp).first;
       return t;
     }
   }   // namespace wpds

@@ -564,7 +564,7 @@ void FWPDS::update(
   t->setConfig(cfg);
 
   LazyTrans * lt = new LazyTrans(t);
-  t = currentOutputWFA->insert(lt);
+  t = currentOutputWFA->insert(lt).first;
 
   if( t->modified() ) {
     //t->print(std::cout << "Adding transition: ") << "\n";
@@ -595,7 +595,7 @@ wfa::ITrans* FWPDS::update_prime(
         from, r->to_stack2(), call->to(),
         delta, wWithRule, er);
   LazyTrans* lt = new LazyTrans(et);
-  wfa::ITrans* t = currentOutputWFA->insert(lt);
+  wfa::ITrans* t = currentOutputWFA->insert(lt).first;
   return t;
 }
 

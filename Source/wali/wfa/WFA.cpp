@@ -290,7 +290,7 @@ namespace wali
     //! @brief add trans (p,g,q,se) to WFA
     //! Default creates a basic Trans object.
     //!
-    ITrans const *
+    std::pair<ITrans const *, bool>
     WFA::addTrans(
         Key p,
         Key g,
@@ -306,7 +306,7 @@ namespace wali
     //! method (actually insert) assumes ownership of the memory
     //! pointed to by the ITrans* t.
     //!
-    ITrans const *
+    std::pair<ITrans const *, bool>
     WFA::addTrans( ITrans * t )
     {
       //t->print( *waliErr << "\tInserting Trans" ) << std::endl;
@@ -1155,8 +1155,11 @@ namespace wali
     // Inserts tnew into the WFA. If a transition matching tnew
     // exists, tnew is deleted.
     //
-    ITrans* WFA::insert( ITrans* tnew )
+    std::pair<ITrans *, bool>
+    WFA::insert( ITrans* tnew )
     {
+      bool inserted = true;
+      
       ////
       // WFA::find code duplicated to keep
       // a handle on the kp_map_t::iterator
@@ -1235,13 +1238,14 @@ namespace wali
 
           told->combineTrans( tnew );
           delete tnew;
+          inserted = false;
         }
         else {
           *waliErr << "[WARNING - WFA::insert]\n";
           *waliErr << "\tAttempt to insert 'Trans' already owned by WFA.\n";
         }
       }
-      return told;
+      return std::make_pair(told, inserted);
     }
 
     TransSet WFA::match( Key p, Key y ) const {

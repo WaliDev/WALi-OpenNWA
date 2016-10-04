@@ -3192,7 +3192,7 @@ class WFA(Printable):
 
     def add_trans(self, *args):
         """
-        add_trans(self, p, g, q, se) -> ITrans const
+        add_trans(self, p, g, q, se) -> std::pair< ITrans const *,bool >
 
         Parameters:
             p: wali::Key
@@ -3200,7 +3200,7 @@ class WFA(Printable):
             q: wali::Key
             se: wali::sem_elem_t
 
-        add_trans(self, t) -> ITrans const *
+        add_trans(self, t) -> std::pair< ITrans const *,bool >
 
         Parameters:
             t: ITrans *
@@ -3468,7 +3468,7 @@ class WFA(Printable):
 
     def insert(self, *args):
         """
-        insert(self, tnew) -> ITrans *
+        insert(self, tnew) -> std::pair< ITrans *,bool >
 
         Parameters:
             tnew: ITrans *
