@@ -2714,6 +2714,9 @@ namespace wali
       Key get_key(ITrans const * trans)
       {
         return getKey(trans->from(), getKey(trans->stack(), trans->to()));
+        //std::stringstream ss;
+        //ss << "[" << /*trans->from() << "," <<*/ trans->to() << "]";
+        //return getKey(trans->stack(), trans->to()); //getKey(ss.str()));
       }
 
       struct AddTransAsState : ConstTransFunctor {
