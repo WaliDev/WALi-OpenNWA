@@ -385,7 +385,7 @@ namespace wali
 
 
       const_reference
-      representative(const_reference element) {
+      representative(const_reference element) const {
         assert(_id_mapping.left.count(element) > 0);
         Id element_id = _id_mapping.left.find(element)->second;
         Id root_id = _partition.FindSet(element_id);
