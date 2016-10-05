@@ -32,6 +32,9 @@ namespace wali
 
       Key second() const;
 
+      static Key get_first(Key k);
+      static Key get_second(Key k);
+
     private:
       const KeyPair kp;
 
