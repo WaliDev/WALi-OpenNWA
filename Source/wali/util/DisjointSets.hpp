@@ -288,6 +288,34 @@ namespace wali
       }
 
 
+      const_iterator
+      find(const_reference needle) const {
+        typename IdMapping::left_const_iterator iter = _id_mapping.left.find(needle);
+        if (iter == _id_mapping.left.end()) {
+          return end();
+        }
+
+        Id id = iter->second;
+        bool was_present = _partition.elementExists(id);
+        if (!was_present) {
+          fast_assert(false && "Element present in DisjointSets but not contained Partition");
+          return end();
+        }
+
+        update_cache();
+        std::set<Id>::const_iterator root = _cached_roots->find(id);
+        if (root == _cached_roots->end()) {
+          fast_assert(false && "Element present in DisjointSets and Partition, but not _cached_roots");
+          return end();
+        }
+
+        return const_iterator(_partition,
+                              root,
+                              _cached_roots,
+                              _id_mapping);
+      }
+
+
       std::ostream &
       output(std::ostream & os) const {
         std::stringstream ss;
