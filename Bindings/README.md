@@ -1,6 +1,8 @@
 This directory has a *beta* SWIG-generated interface for portions of WALi.
 I've only used it under Python 2.
 
+THERE ARE PROBLEMS WITH THIS! THEY MAY CHANGE!
+
 
 # Using
 
