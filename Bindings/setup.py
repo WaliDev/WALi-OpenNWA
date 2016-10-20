@@ -38,5 +38,5 @@ setup(
     maintainer_email = 'driscoll@cs.wisc.edu',
     description = 'WALi -- Weighted Automaton Library',
     ext_modules = [wali_c_module],
-    py_modules = ['wail'],
+    py_modules = ['wali'],
 )
