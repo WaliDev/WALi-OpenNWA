@@ -58,6 +58,22 @@ class PyReach(wali.PySemElem):
         return (self.getuserdata()['isreached'] == se.getuserdata()['isreached'])
 
     @wali.PySemElem.printexc
+    @wali.PySemElem.deref_ifneeded
+    def pyunder_approximates(self, se):
+        combined = self.pycombine(se).getuserdata()['isreached']
+        return combined == se.getuserdata()['isreached']
+
+    @wali.PySemElem.printexc
+    @wali.PySemElem.deref_ifneeded
+    def pydelta(self, se):
+        first = self.pycombine(se)
+        if se.pyequal(first.__deref__()):
+            second = self.pyzero()
+        else:
+            second = first
+        return wali.PySemElemPtrPair(first, second)
+
+    @wali.PySemElem.printexc
     def __str__(self):
         if self.getuserdata()["isreached"] == True:
             return "ONE"
@@ -77,12 +93,12 @@ print "One element: ", str(reachOne)
 print "Zero element: ", str(reachZero)
 
 myWpds = wali.FWPDS()
-p = wali.getKey("p")
-accept = wali.getKey("accept")
+p = wali.get_key("p")
+accept = wali.get_key("accept")
 
 n = []
 for i in range(0, 12):
-    n += [wali.getKey("n" + str(i))]
+    n += [wali.get_key("n" + str(i))]
 
 #f intraprocedural
 myWpds.add_rule(p, n[0], p, n[1], reachOnePtr)
@@ -125,7 +141,7 @@ print str(myWpds)
 
 # Perform poststar query
 query = wali.WFA()
-query.addTrans( p, n[0], accept, reachOnePtr);
+query.add_trans( p, n[0], accept, reachOnePtr);
 query.set_initial_state( p )
 query.add_final_state( accept )
 print "BEFORE poststar"
@@ -138,7 +154,7 @@ print str(answer)
 
 #Perform prestar query
 prequery = wali.WFA()
-prequery.addTrans( p, n[4], accept, reachOnePtr )
+prequery.add_trans( p, n[4], accept, reachOnePtr )
 prequery.set_initial_state( p )
 prequery.add_final_state( accept )
 print "BEFORE prestar"

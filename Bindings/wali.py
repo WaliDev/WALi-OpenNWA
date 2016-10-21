@@ -1454,6 +1454,88 @@ class PySemElem(SemElem):
         """
         return _wali.PySemElem_equal(self, *args)
 
+    def pyunder_approximates(self, *args):
+        """
+        pyunder_approximates(self, se) -> bool
+
+        Parameters:
+            se: PySemElem *
+
+        """
+        return _wali.PySemElem_pyunder_approximates(self, *args)
+
+    def under_approximates(self, *args):
+        """
+        under_approximates(self, se) -> bool
+
+        Parameters:
+            se: SemElem *
+
+        """
+        return _wali.PySemElem_under_approximates(self, *args)
+
+    def pystar(self):
+        """
+        pystar(self) -> PySemElemPtr
+
+        Parameters:
+            self: PySemElem *
+
+        """
+        return _wali.PySemElem_pystar(self)
+
+    def star(self):
+        """
+        star(self) -> sem_elem_t
+
+        Parameters:
+            self: PySemElem *
+
+        """
+        return _wali.PySemElem_star(self)
+
+    def pyextend_and_diff(self, *args):
+        """
+        pyextend_and_diff(self, next, subtrahend) -> PySemElemPtr
+
+        Parameters:
+            next: PySemElem *
+            subtrahend: PySemElem *
+
+        """
+        return _wali.PySemElem_pyextend_and_diff(self, *args)
+
+    def extend_and_diff(self, *args):
+        """
+        extend_and_diff(self, next, subtrahend) -> sem_elem_t
+
+        Parameters:
+            next: sem_elem_t
+            subtrahend: sem_elem_t
+
+        """
+        return _wali.PySemElem_extend_and_diff(self, *args)
+
+    def pydiff(self, *args):
+        """
+        pydiff(self, se) -> PySemElemPtr
+
+        Parameters:
+            se: PySemElem *
+
+        """
+        return _wali.PySemElem_pydiff(self, *args)
+
+    def diff(self, *args):
+        """
+        diff(self, se) -> sem_elem_t
+
+        Parameters:
+            se: SemElem *
+
+        """
+        return _wali.PySemElem_diff(self, *args)
+
     def pyone(self):
         """
         pyone(self) -> PySemElemPtr
@@ -1796,6 +1878,88 @@ class PySemElemPtr(_object):
         """
         return _wali.PySemElemPtr_equal(self, *args)
 
+    def pyunder_approximates(self, *args):
+        """
+        pyunder_approximates(self, se) -> bool
+
+        Parameters:
+            se: PySemElem *
+
+        """
+        return _wali.PySemElemPtr_pyunder_approximates(self, *args)
+
+    def under_approximates(self, *args):
+        """
+        under_approximates(self, se) -> bool
+
+        Parameters:
+            se: SemElem *
+
+        """
+        return _wali.PySemElemPtr_under_approximates(self, *args)
+
+    def pystar(self):
+        """
+        pystar(self) -> PySemElemPtr
+
+        Parameters:
+            self: wali::ref_ptr< PySemElem > *
+
+        """
+        return _wali.PySemElemPtr_pystar(self)
+
+    def star(self):
+        """
+        star(self) -> sem_elem_t
+
+        Parameters:
+            self: wali::ref_ptr< PySemElem > *
+
+        """
+        return _wali.PySemElemPtr_star(self)
+
+    def pyextend_and_diff(self, *args):
+        """
+        pyextend_and_diff(self, next, subtrahend) -> PySemElemPtr
+
+        Parameters:
+            next: PySemElem *
+            subtrahend: PySemElem *
+
+        """
+        return _wali.PySemElemPtr_pyextend_and_diff(self, *args)
+
+    def extend_and_diff(self, *args):
+        """
+        extend_and_diff(self, next, subtrahend) -> sem_elem_t
+
+        Parameters:
+            next: sem_elem_t
+            subtrahend: sem_elem_t
+
+        """
+        return _wali.PySemElemPtr_extend_and_diff(self, *args)
+
+    def pydiff(self, *args):
+        """
+        pydiff(self, se) -> PySemElemPtr
+
+        Parameters:
+            se: PySemElem *
+
+        """
+        return _wali.PySemElemPtr_pydiff(self, *args)
+
+    def diff(self, *args):
+        """
+        diff(self, se) -> sem_elem_t
+
+        Parameters:
+            se: SemElem *
+
+        """
+        return _wali.PySemElemPtr_diff(self, *args)
+
     def pyone(self):
         """
         pyone(self) -> PySemElemPtr
@@ -1838,21 +2002,6 @@ class PySemElemPtr(_object):
 
     __swig_getmethods__["xmltag"] = _wali.PySemElemPtr_xmltag_get
     if _newclass:xmltag = _swig_property(_wali.PySemElemPtr_xmltag_get)
-    def under_approximates(self, *args):
-        """
-        under_approximates(self, that) -> bool
-
-        Parameters:
-            that: wali::SemElem *
-
-        under_approximates(self, se) -> bool
-
-        Parameters:
-            se: wali::sem_elem_t
-
-        """
-        return _wali.PySemElemPtr_under_approximates(self, *args)
-
     def marshall_weight(self, *args):
         """
         marshall_weight(self, o) -> std::ostream &
@@ -1863,21 +2012,6 @@ class PySemElemPtr(_object):
         """
         return _wali.PySemElemPtr_marshall_weight(self, *args)
 
-    def diff(self, *args):
-        """
-        diff(self, se) -> SemElemPtr
-
-        Parameters:
-            se: wali::SemElem *
-
-        diff(self, se) -> SemElemPtr
-
-        Parameters:
-            se: wali::sem_elem_t
-
-        """
-        return _wali.PySemElemPtr_diff(self, *args)
-
     def quasi_one(self):
         """
         quasi_one(self) -> SemElemPtr
@@ -1887,27 +2021,6 @@ class PySemElemPtr(_object):
 
         """
         return _wali.PySemElemPtr_quasi_one(self)
-
-    def star(self):
-        """
-        star(self) -> SemElemPtr
-
-        Parameters:
-            self: wali::ref_ptr< PySemElem > *
-
-        """
-        return _wali.PySemElemPtr_star(self)
-
-    def extend_and_diff(self, *args):
-        """
-        extend_and_diff(self, next, subtrahend) -> SemElemPtr
-
-        Parameters:
-            next: wali::sem_elem_t
-            subtrahend: wali::sem_elem_t
-
-        """
-        return _wali.PySemElemPtr_extend_and_diff(self, *args)
 
     def container_less_than(self, *args):
         """

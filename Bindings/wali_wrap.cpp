@@ -4742,6 +4742,35 @@ class PySemElem : public wali::SemElem {
         return toret;
       }
 
+      virtual bool pyunderApproximates (PySemElem* se) const  = 0;
+      bool underApproximates( SemElem * se ) {
+          PySemElem * rhs = dynamic_cast< PySemElem* >(se);
+          bool toret = pyunderApproximates(rhs);
+          return toret;
+      }
+
+      virtual wali::ref_ptr<PySemElem> pystar () = 0;
+      sem_elem_t star() {
+          return pystar();
+      }
+
+      virtual wali::ref_ptr<PySemElem> pyextendAndDiff(
+          PySemElem * next,
+          PySemElem * subtrahend) = 0;
+      sem_elem_t extendAndDiff(sem_elem_t next,
+                               sem_elem_t subtrahend)
+      {
+          PySemElem * n = dynamic_cast< PySemElem* >(next.get_ptr());
+          PySemElem * s = dynamic_cast< PySemElem* >(subtrahend.get_ptr());
+          return pyextendAndDiff(n, s);
+      }
+
+      virtual wali::ref_ptr<PySemElem> pydiff(PySemElem * se) = 0;
+      sem_elem_t diff(SemElem * se) {
+          PySemElem * rhs = dynamic_cast< PySemElem* >(se);
+          return pydiff(rhs);
+      }
+
       virtual wali::ref_ptr<PySemElem> pyone() const = 0;
       virtual wali::ref_ptr<PySemElem> pyzero() const = 0;
       sem_elem_t one() const {
@@ -5909,141 +5938,8 @@ SwigDirector_PySemElem::SwigDirector_PySemElem(PyObject *self): PySemElem(), Swi
 SwigDirector_PySemElem::~SwigDirector_PySemElem() {
 }
 
-bool SwigDirector_PySemElem::underApproximates(wali::SemElem *that) {
-  bool c_result;
-  swig::SwigVar_PyObject obj0;
-  obj0 = SWIG_NewPointerObj(SWIG_as_voidptr(that), SWIGTYPE_p_wali__SemElem,  0 );
-  if (!swig_get_self()) {
-    Swig::DirectorException::raise("'self' uninitialized, maybe you forgot to call PySemElem.__init__.");
-  }
-#if defined(SWIG_PYTHON_DIRECTOR_VTABLE)
-  const size_t swig_method_index = 0;
-  const char * const swig_method_name = "under_approximates";
-  PyObject* method = swig_get_method(swig_method_index, swig_method_name);
-  swig::SwigVar_PyObject result = PyObject_CallFunction(method, (char *)"(O)" ,(PyObject *)obj0);
-#else
-  swig::SwigVar_PyObject result = PyObject_CallMethod(swig_get_self(), (char *)"under_approximates", (char *)"(O)" ,(PyObject *)obj0);
-#endif
-  if (!result) {
-    PyObject *error = PyErr_Occurred();
-    if (error) {
-      Swig::DirectorMethodException::raise("Error detected when calling 'PySemElem.under_approximates'");
-    }
-  }
-  bool swig_val;
-  int swig_res = SWIG_AsVal_bool(result, &swig_val);
-  if (!SWIG_IsOK(swig_res)) {
-    Swig::DirectorTypeMismatchException::raise(SWIG_ErrorType(SWIG_ArgError(swig_res)), "in output value of type '""bool""'");
-  }
-  c_result = static_cast< bool >(swig_val);
-  return (bool) c_result;
-}
-
-
 std::ostream &SwigDirector_PySemElem::marshall(std::ostream &o) const {
   return wali::SemElem::marshall(o);
-}
-
-
-wali::sem_elem_t SwigDirector_PySemElem::diff(wali::SemElem *se) {
-  void *swig_argp ;
-  int swig_res = 0 ;
-  
-  wali::sem_elem_t c_result;
-  swig::SwigVar_PyObject obj0;
-  obj0 = SWIG_NewPointerObj(SWIG_as_voidptr(se), SWIGTYPE_p_wali__SemElem,  0 );
-  if (!swig_get_self()) {
-    Swig::DirectorException::raise("'self' uninitialized, maybe you forgot to call PySemElem.__init__.");
-  }
-#if defined(SWIG_PYTHON_DIRECTOR_VTABLE)
-  const size_t swig_method_index = 1;
-  const char * const swig_method_name = "diff";
-  PyObject* method = swig_get_method(swig_method_index, swig_method_name);
-  swig::SwigVar_PyObject result = PyObject_CallFunction(method, (char *)"(O)" ,(PyObject *)obj0);
-#else
-  swig::SwigVar_PyObject result = PyObject_CallMethod(swig_get_self(), (char *)"diff", (char *)"(O)" ,(PyObject *)obj0);
-#endif
-  if (!result) {
-    PyObject *error = PyErr_Occurred();
-    if (error) {
-      Swig::DirectorMethodException::raise("Error detected when calling 'PySemElem.diff'");
-    }
-  }
-  swig_res = SWIG_ConvertPtr(result,&swig_argp,SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t,  0  | 0);
-  if (!SWIG_IsOK(swig_res)) {
-    Swig::DirectorTypeMismatchException::raise(SWIG_ErrorType(SWIG_ArgError(swig_res)), "in output value of type '""wali::sem_elem_t""'");
-  }
-  c_result = *(reinterpret_cast< wali::sem_elem_t * >(swig_argp));
-  if (SWIG_IsNewObj(swig_res)) delete reinterpret_cast< wali::sem_elem_t * >(swig_argp);
-  return (wali::sem_elem_t) c_result;
-}
-
-
-wali::sem_elem_t SwigDirector_PySemElem::star() {
-  void *swig_argp ;
-  int swig_res = 0 ;
-  
-  wali::sem_elem_t c_result;
-  if (!swig_get_self()) {
-    Swig::DirectorException::raise("'self' uninitialized, maybe you forgot to call PySemElem.__init__.");
-  }
-#if defined(SWIG_PYTHON_DIRECTOR_VTABLE)
-  const size_t swig_method_index = 2;
-  const char * const swig_method_name = "star";
-  PyObject* method = swig_get_method(swig_method_index, swig_method_name);
-  swig::SwigVar_PyObject result = PyObject_CallFunction(method, NULL, NULL);
-#else
-  swig::SwigVar_PyObject result = PyObject_CallMethod(swig_get_self(), (char *) "star", NULL);
-#endif
-  if (!result) {
-    PyObject *error = PyErr_Occurred();
-    if (error) {
-      Swig::DirectorMethodException::raise("Error detected when calling 'PySemElem.star'");
-    }
-  }
-  swig_res = SWIG_ConvertPtr(result,&swig_argp,SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t,  0  | 0);
-  if (!SWIG_IsOK(swig_res)) {
-    Swig::DirectorTypeMismatchException::raise(SWIG_ErrorType(SWIG_ArgError(swig_res)), "in output value of type '""wali::sem_elem_t""'");
-  }
-  c_result = *(reinterpret_cast< wali::sem_elem_t * >(swig_argp));
-  if (SWIG_IsNewObj(swig_res)) delete reinterpret_cast< wali::sem_elem_t * >(swig_argp);
-  return (wali::sem_elem_t) c_result;
-}
-
-
-wali::sem_elem_t SwigDirector_PySemElem::extendAndDiff(wali::sem_elem_t next, wali::sem_elem_t subtrahend) {
-  void *swig_argp ;
-  int swig_res = 0 ;
-  
-  wali::sem_elem_t c_result;
-  swig::SwigVar_PyObject obj0;
-  obj0 = SWIG_NewPointerObj(SWIG_as_voidptr(&next), SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t,  0 );
-  swig::SwigVar_PyObject obj1;
-  obj1 = SWIG_NewPointerObj(SWIG_as_voidptr(&subtrahend), SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t,  0 );
-  if (!swig_get_self()) {
-    Swig::DirectorException::raise("'self' uninitialized, maybe you forgot to call PySemElem.__init__.");
-  }
-#if defined(SWIG_PYTHON_DIRECTOR_VTABLE)
-  const size_t swig_method_index = 3;
-  const char * const swig_method_name = "extend_and_diff";
-  PyObject* method = swig_get_method(swig_method_index, swig_method_name);
-  swig::SwigVar_PyObject result = PyObject_CallFunction(method, (char *)"(OO)" ,(PyObject *)obj0,(PyObject *)obj1);
-#else
-  swig::SwigVar_PyObject result = PyObject_CallMethod(swig_get_self(), (char *)"extend_and_diff", (char *)"(OO)" ,(PyObject *)obj0,(PyObject *)obj1);
-#endif
-  if (!result) {
-    PyObject *error = PyErr_Occurred();
-    if (error) {
-      Swig::DirectorMethodException::raise("Error detected when calling 'PySemElem.extend_and_diff'");
-    }
-  }
-  swig_res = SWIG_ConvertPtr(result,&swig_argp,SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t,  0  | 0);
-  if (!SWIG_IsOK(swig_res)) {
-    Swig::DirectorTypeMismatchException::raise(SWIG_ErrorType(SWIG_ArgError(swig_res)), "in output value of type '""wali::sem_elem_t""'");
-  }
-  c_result = *(reinterpret_cast< wali::sem_elem_t * >(swig_argp));
-  if (SWIG_IsNewObj(swig_res)) delete reinterpret_cast< wali::sem_elem_t * >(swig_argp);
-  return (wali::sem_elem_t) c_result;
 }
 
 
@@ -6055,7 +5951,7 @@ bool SwigDirector_PySemElem::containerLessThan(wali::SemElem const *other) const
     Swig::DirectorException::raise("'self' uninitialized, maybe you forgot to call PySemElem.__init__.");
   }
 #if defined(SWIG_PYTHON_DIRECTOR_VTABLE)
-  const size_t swig_method_index = 4;
+  const size_t swig_method_index = 0;
   const char * const swig_method_name = "container_less_than";
   PyObject* method = swig_get_method(swig_method_index, swig_method_name);
   swig::SwigVar_PyObject result = PyObject_CallFunction(method, (char *)"(O)" ,(PyObject *)obj0);
@@ -6084,7 +5980,7 @@ size_t SwigDirector_PySemElem::hash() const {
     Swig::DirectorException::raise("'self' uninitialized, maybe you forgot to call PySemElem.__init__.");
   }
 #if defined(SWIG_PYTHON_DIRECTOR_VTABLE)
-  const size_t swig_method_index = 5;
+  const size_t swig_method_index = 1;
   const char * const swig_method_name = "hash";
   PyObject* method = swig_get_method(swig_method_index, swig_method_name);
   swig::SwigVar_PyObject result = PyObject_CallFunction(method, NULL, NULL);
@@ -6119,7 +6015,7 @@ std::ostream &SwigDirector_PySemElem::print_typename(std::ostream &os) const {
     Swig::DirectorException::raise("'self' uninitialized, maybe you forgot to call PySemElem.__init__.");
   }
 #if defined(SWIG_PYTHON_DIRECTOR_VTABLE)
-  const size_t swig_method_index = 6;
+  const size_t swig_method_index = 2;
   const char * const swig_method_name = "print_typename";
   PyObject* method = swig_get_method(swig_method_index, swig_method_name);
   swig::SwigVar_PyObject result = PyObject_CallFunction(method, (char *)"(O)" ,(PyObject *)obj0);
@@ -6151,7 +6047,7 @@ std::string SwigDirector_PySemElem::__str__() const {
     Swig::DirectorException::raise("'self' uninitialized, maybe you forgot to call PySemElem.__init__.");
   }
 #if defined(SWIG_PYTHON_DIRECTOR_VTABLE)
-  const size_t swig_method_index = 7;
+  const size_t swig_method_index = 3;
   const char * const swig_method_name = "__str__";
   PyObject* method = swig_get_method(swig_method_index, swig_method_name);
   swig::SwigVar_PyObject result = PyObject_CallFunction(method, NULL, NULL);
@@ -6186,7 +6082,7 @@ wali::ref_ptr< PySemElem > SwigDirector_PySemElem::pycombine(PySemElem *se) cons
     Swig::DirectorException::raise("'self' uninitialized, maybe you forgot to call PySemElem.__init__.");
   }
 #if defined(SWIG_PYTHON_DIRECTOR_VTABLE)
-  const size_t swig_method_index = 8;
+  const size_t swig_method_index = 4;
   const char * const swig_method_name = "pycombine";
   PyObject* method = swig_get_method(swig_method_index, swig_method_name);
   swig::SwigVar_PyObject result = PyObject_CallFunction(method, (char *)"(O)" ,(PyObject *)obj0);
@@ -6220,7 +6116,7 @@ wali::ref_ptr< PySemElem > SwigDirector_PySemElem::pyextend(PySemElem *se) const
     Swig::DirectorException::raise("'self' uninitialized, maybe you forgot to call PySemElem.__init__.");
   }
 #if defined(SWIG_PYTHON_DIRECTOR_VTABLE)
-  const size_t swig_method_index = 9;
+  const size_t swig_method_index = 5;
   const char * const swig_method_name = "pyextend";
   PyObject* method = swig_get_method(swig_method_index, swig_method_name);
   swig::SwigVar_PyObject result = PyObject_CallFunction(method, (char *)"(O)" ,(PyObject *)obj0);
@@ -6254,7 +6150,7 @@ std::pair< wali::ref_ptr< PySemElem >,wali::ref_ptr< PySemElem > > SwigDirector_
     Swig::DirectorException::raise("'self' uninitialized, maybe you forgot to call PySemElem.__init__.");
   }
 #if defined(SWIG_PYTHON_DIRECTOR_VTABLE)
-  const size_t swig_method_index = 10;
+  const size_t swig_method_index = 6;
   const char * const swig_method_name = "pydelta";
   PyObject* method = swig_get_method(swig_method_index, swig_method_name);
   swig::SwigVar_PyObject result = PyObject_CallFunction(method, (char *)"(O)" ,(PyObject *)obj0);
@@ -6285,7 +6181,7 @@ bool SwigDirector_PySemElem::pyequal(PySemElem *se) const {
     Swig::DirectorException::raise("'self' uninitialized, maybe you forgot to call PySemElem.__init__.");
   }
 #if defined(SWIG_PYTHON_DIRECTOR_VTABLE)
-  const size_t swig_method_index = 11;
+  const size_t swig_method_index = 7;
   const char * const swig_method_name = "pyequal";
   PyObject* method = swig_get_method(swig_method_index, swig_method_name);
   swig::SwigVar_PyObject result = PyObject_CallFunction(method, (char *)"(O)" ,(PyObject *)obj0);
@@ -6305,6 +6201,139 @@ bool SwigDirector_PySemElem::pyequal(PySemElem *se) const {
   }
   c_result = static_cast< bool >(swig_val);
   return (bool) c_result;
+}
+
+
+bool SwigDirector_PySemElem::pyunderApproximates(PySemElem *se) const {
+  bool c_result;
+  swig::SwigVar_PyObject obj0;
+  obj0 = SWIG_NewPointerObj(SWIG_as_voidptr(se), SWIGTYPE_p_PySemElem,  0 );
+  if (!swig_get_self()) {
+    Swig::DirectorException::raise("'self' uninitialized, maybe you forgot to call PySemElem.__init__.");
+  }
+#if defined(SWIG_PYTHON_DIRECTOR_VTABLE)
+  const size_t swig_method_index = 8;
+  const char * const swig_method_name = "pyunder_approximates";
+  PyObject* method = swig_get_method(swig_method_index, swig_method_name);
+  swig::SwigVar_PyObject result = PyObject_CallFunction(method, (char *)"(O)" ,(PyObject *)obj0);
+#else
+  swig::SwigVar_PyObject result = PyObject_CallMethod(swig_get_self(), (char *)"pyunder_approximates", (char *)"(O)" ,(PyObject *)obj0);
+#endif
+  if (!result) {
+    PyObject *error = PyErr_Occurred();
+    if (error) {
+      Swig::DirectorMethodException::raise("Error detected when calling 'PySemElem.pyunder_approximates'");
+    }
+  }
+  bool swig_val;
+  int swig_res = SWIG_AsVal_bool(result, &swig_val);
+  if (!SWIG_IsOK(swig_res)) {
+    Swig::DirectorTypeMismatchException::raise(SWIG_ErrorType(SWIG_ArgError(swig_res)), "in output value of type '""bool""'");
+  }
+  c_result = static_cast< bool >(swig_val);
+  return (bool) c_result;
+}
+
+
+wali::ref_ptr< PySemElem > SwigDirector_PySemElem::pystar() {
+  void *swig_argp ;
+  int swig_res = 0 ;
+  
+  wali::ref_ptr< PySemElem > c_result;
+  if (!swig_get_self()) {
+    Swig::DirectorException::raise("'self' uninitialized, maybe you forgot to call PySemElem.__init__.");
+  }
+#if defined(SWIG_PYTHON_DIRECTOR_VTABLE)
+  const size_t swig_method_index = 9;
+  const char * const swig_method_name = "pystar";
+  PyObject* method = swig_get_method(swig_method_index, swig_method_name);
+  swig::SwigVar_PyObject result = PyObject_CallFunction(method, NULL, NULL);
+#else
+  swig::SwigVar_PyObject result = PyObject_CallMethod(swig_get_self(), (char *) "pystar", NULL);
+#endif
+  if (!result) {
+    PyObject *error = PyErr_Occurred();
+    if (error) {
+      Swig::DirectorMethodException::raise("Error detected when calling 'PySemElem.pystar'");
+    }
+  }
+  swig_res = SWIG_ConvertPtr(result,&swig_argp,SWIGTYPE_p_wali__ref_ptrT_PySemElem_t,  0  | 0);
+  if (!SWIG_IsOK(swig_res)) {
+    Swig::DirectorTypeMismatchException::raise(SWIG_ErrorType(SWIG_ArgError(swig_res)), "in output value of type '""wali::ref_ptr< PySemElem >""'");
+  }
+  c_result = *(reinterpret_cast< wali::ref_ptr< PySemElem > * >(swig_argp));
+  if (SWIG_IsNewObj(swig_res)) delete reinterpret_cast< wali::ref_ptr< PySemElem > * >(swig_argp);
+  return (wali::ref_ptr< PySemElem >) c_result;
+}
+
+
+wali::ref_ptr< PySemElem > SwigDirector_PySemElem::pyextendAndDiff(PySemElem *next, PySemElem *subtrahend) {
+  void *swig_argp ;
+  int swig_res = 0 ;
+  
+  wali::ref_ptr< PySemElem > c_result;
+  swig::SwigVar_PyObject obj0;
+  obj0 = SWIG_NewPointerObj(SWIG_as_voidptr(next), SWIGTYPE_p_PySemElem,  0 );
+  swig::SwigVar_PyObject obj1;
+  obj1 = SWIG_NewPointerObj(SWIG_as_voidptr(subtrahend), SWIGTYPE_p_PySemElem,  0 );
+  if (!swig_get_self()) {
+    Swig::DirectorException::raise("'self' uninitialized, maybe you forgot to call PySemElem.__init__.");
+  }
+#if defined(SWIG_PYTHON_DIRECTOR_VTABLE)
+  const size_t swig_method_index = 10;
+  const char * const swig_method_name = "pyextend_and_diff";
+  PyObject* method = swig_get_method(swig_method_index, swig_method_name);
+  swig::SwigVar_PyObject result = PyObject_CallFunction(method, (char *)"(OO)" ,(PyObject *)obj0,(PyObject *)obj1);
+#else
+  swig::SwigVar_PyObject result = PyObject_CallMethod(swig_get_self(), (char *)"pyextend_and_diff", (char *)"(OO)" ,(PyObject *)obj0,(PyObject *)obj1);
+#endif
+  if (!result) {
+    PyObject *error = PyErr_Occurred();
+    if (error) {
+      Swig::DirectorMethodException::raise("Error detected when calling 'PySemElem.pyextend_and_diff'");
+    }
+  }
+  swig_res = SWIG_ConvertPtr(result,&swig_argp,SWIGTYPE_p_wali__ref_ptrT_PySemElem_t,  0  | 0);
+  if (!SWIG_IsOK(swig_res)) {
+    Swig::DirectorTypeMismatchException::raise(SWIG_ErrorType(SWIG_ArgError(swig_res)), "in output value of type '""wali::ref_ptr< PySemElem >""'");
+  }
+  c_result = *(reinterpret_cast< wali::ref_ptr< PySemElem > * >(swig_argp));
+  if (SWIG_IsNewObj(swig_res)) delete reinterpret_cast< wali::ref_ptr< PySemElem > * >(swig_argp);
+  return (wali::ref_ptr< PySemElem >) c_result;
+}
+
+
+wali::ref_ptr< PySemElem > SwigDirector_PySemElem::pydiff(PySemElem *se) {
+  void *swig_argp ;
+  int swig_res = 0 ;
+  
+  wali::ref_ptr< PySemElem > c_result;
+  swig::SwigVar_PyObject obj0;
+  obj0 = SWIG_NewPointerObj(SWIG_as_voidptr(se), SWIGTYPE_p_PySemElem,  0 );
+  if (!swig_get_self()) {
+    Swig::DirectorException::raise("'self' uninitialized, maybe you forgot to call PySemElem.__init__.");
+  }
+#if defined(SWIG_PYTHON_DIRECTOR_VTABLE)
+  const size_t swig_method_index = 11;
+  const char * const swig_method_name = "pydiff";
+  PyObject* method = swig_get_method(swig_method_index, swig_method_name);
+  swig::SwigVar_PyObject result = PyObject_CallFunction(method, (char *)"(O)" ,(PyObject *)obj0);
+#else
+  swig::SwigVar_PyObject result = PyObject_CallMethod(swig_get_self(), (char *)"pydiff", (char *)"(O)" ,(PyObject *)obj0);
+#endif
+  if (!result) {
+    PyObject *error = PyErr_Occurred();
+    if (error) {
+      Swig::DirectorMethodException::raise("Error detected when calling 'PySemElem.pydiff'");
+    }
+  }
+  swig_res = SWIG_ConvertPtr(result,&swig_argp,SWIGTYPE_p_wali__ref_ptrT_PySemElem_t,  0  | 0);
+  if (!SWIG_IsOK(swig_res)) {
+    Swig::DirectorTypeMismatchException::raise(SWIG_ErrorType(SWIG_ArgError(swig_res)), "in output value of type '""wali::ref_ptr< PySemElem >""'");
+  }
+  c_result = *(reinterpret_cast< wali::ref_ptr< PySemElem > * >(swig_argp));
+  if (SWIG_IsNewObj(swig_res)) delete reinterpret_cast< wali::ref_ptr< PySemElem > * >(swig_argp);
+  return (wali::ref_ptr< PySemElem >) c_result;
 }
 
 
@@ -12781,6 +12810,318 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_PySemElem_pyunder_approximates(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  PySemElem *arg1 = (PySemElem *) 0 ;
+  PySemElem *arg2 = (PySemElem *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  Swig::Director *director = 0;
+  bool upcall = false;
+  bool result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:PySemElem_pyunder_approximates",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_PySemElem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElem_pyunder_approximates" "', argument " "1"" of type '" "PySemElem const *""'"); 
+  }
+  arg1 = reinterpret_cast< PySemElem * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_PySemElem, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PySemElem_pyunder_approximates" "', argument " "2"" of type '" "PySemElem *""'"); 
+  }
+  arg2 = reinterpret_cast< PySemElem * >(argp2);
+  director = SWIG_DIRECTOR_CAST(arg1);
+  upcall = (director && (director->swig_get_self()==obj0));
+  try {
+    if (upcall) {
+      Swig::DirectorPureVirtualException::raise("PySemElem::pyunderApproximates");
+    } else {
+      result = (bool)((PySemElem const *)arg1)->pyunderApproximates(arg2);
+    }
+  } catch (Swig::DirectorException&) {
+    SWIG_fail;
+  }
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PySemElem_under_approximates(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  PySemElem *arg1 = (PySemElem *) 0 ;
+  SemElem *arg2 = (SemElem *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  bool result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:PySemElem_under_approximates",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_PySemElem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElem_under_approximates" "', argument " "1"" of type '" "PySemElem *""'"); 
+  }
+  arg1 = reinterpret_cast< PySemElem * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_SemElem, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PySemElem_under_approximates" "', argument " "2"" of type '" "SemElem *""'"); 
+  }
+  arg2 = reinterpret_cast< SemElem * >(argp2);
+  result = (bool)(arg1)->underApproximates(arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PySemElem_pystar(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  PySemElem *arg1 = (PySemElem *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  Swig::Director *director = 0;
+  bool upcall = false;
+  wali::ref_ptr< PySemElem > result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:PySemElem_pystar",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_PySemElem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElem_pystar" "', argument " "1"" of type '" "PySemElem *""'"); 
+  }
+  arg1 = reinterpret_cast< PySemElem * >(argp1);
+  director = SWIG_DIRECTOR_CAST(arg1);
+  upcall = (director && (director->swig_get_self()==obj0));
+  try {
+    if (upcall) {
+      Swig::DirectorPureVirtualException::raise("PySemElem::pystar");
+    } else {
+      result = (arg1)->pystar();
+    }
+  } catch (Swig::DirectorException&) {
+    SWIG_fail;
+  }
+  resultobj = SWIG_NewPointerObj((new wali::ref_ptr< PySemElem >(static_cast< const wali::ref_ptr< PySemElem >& >(result))), SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PySemElem_star(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  PySemElem *arg1 = (PySemElem *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  sem_elem_t result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:PySemElem_star",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_PySemElem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElem_star" "', argument " "1"" of type '" "PySemElem *""'"); 
+  }
+  arg1 = reinterpret_cast< PySemElem * >(argp1);
+  result = (arg1)->star();
+  resultobj = SWIG_NewPointerObj((new sem_elem_t(static_cast< const sem_elem_t& >(result))), SWIGTYPE_p_sem_elem_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PySemElem_pyextend_and_diff(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  PySemElem *arg1 = (PySemElem *) 0 ;
+  PySemElem *arg2 = (PySemElem *) 0 ;
+  PySemElem *arg3 = (PySemElem *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  Swig::Director *director = 0;
+  bool upcall = false;
+  wali::ref_ptr< PySemElem > result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:PySemElem_pyextend_and_diff",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_PySemElem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElem_pyextend_and_diff" "', argument " "1"" of type '" "PySemElem *""'"); 
+  }
+  arg1 = reinterpret_cast< PySemElem * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_PySemElem, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PySemElem_pyextend_and_diff" "', argument " "2"" of type '" "PySemElem *""'"); 
+  }
+  arg2 = reinterpret_cast< PySemElem * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_PySemElem, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "PySemElem_pyextend_and_diff" "', argument " "3"" of type '" "PySemElem *""'"); 
+  }
+  arg3 = reinterpret_cast< PySemElem * >(argp3);
+  director = SWIG_DIRECTOR_CAST(arg1);
+  upcall = (director && (director->swig_get_self()==obj0));
+  try {
+    if (upcall) {
+      Swig::DirectorPureVirtualException::raise("PySemElem::pyextendAndDiff");
+    } else {
+      result = (arg1)->pyextendAndDiff(arg2,arg3);
+    }
+  } catch (Swig::DirectorException&) {
+    SWIG_fail;
+  }
+  resultobj = SWIG_NewPointerObj((new wali::ref_ptr< PySemElem >(static_cast< const wali::ref_ptr< PySemElem >& >(result))), SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PySemElem_extend_and_diff(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  PySemElem *arg1 = (PySemElem *) 0 ;
+  sem_elem_t arg2 ;
+  sem_elem_t arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  void *argp3 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  sem_elem_t result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:PySemElem_extend_and_diff",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_PySemElem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElem_extend_and_diff" "', argument " "1"" of type '" "PySemElem *""'"); 
+  }
+  arg1 = reinterpret_cast< PySemElem * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_sem_elem_t,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PySemElem_extend_and_diff" "', argument " "2"" of type '" "sem_elem_t""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "PySemElem_extend_and_diff" "', argument " "2"" of type '" "sem_elem_t""'");
+    } else {
+      sem_elem_t * temp = reinterpret_cast< sem_elem_t * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  {
+    res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_sem_elem_t,  0  | 0);
+    if (!SWIG_IsOK(res3)) {
+      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "PySemElem_extend_and_diff" "', argument " "3"" of type '" "sem_elem_t""'"); 
+    }  
+    if (!argp3) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "PySemElem_extend_and_diff" "', argument " "3"" of type '" "sem_elem_t""'");
+    } else {
+      sem_elem_t * temp = reinterpret_cast< sem_elem_t * >(argp3);
+      arg3 = *temp;
+      if (SWIG_IsNewObj(res3)) delete temp;
+    }
+  }
+  result = (arg1)->extendAndDiff(arg2,arg3);
+  resultobj = SWIG_NewPointerObj((new sem_elem_t(static_cast< const sem_elem_t& >(result))), SWIGTYPE_p_sem_elem_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PySemElem_pydiff(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  PySemElem *arg1 = (PySemElem *) 0 ;
+  PySemElem *arg2 = (PySemElem *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  Swig::Director *director = 0;
+  bool upcall = false;
+  wali::ref_ptr< PySemElem > result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:PySemElem_pydiff",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_PySemElem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElem_pydiff" "', argument " "1"" of type '" "PySemElem *""'"); 
+  }
+  arg1 = reinterpret_cast< PySemElem * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_PySemElem, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PySemElem_pydiff" "', argument " "2"" of type '" "PySemElem *""'"); 
+  }
+  arg2 = reinterpret_cast< PySemElem * >(argp2);
+  director = SWIG_DIRECTOR_CAST(arg1);
+  upcall = (director && (director->swig_get_self()==obj0));
+  try {
+    if (upcall) {
+      Swig::DirectorPureVirtualException::raise("PySemElem::pydiff");
+    } else {
+      result = (arg1)->pydiff(arg2);
+    }
+  } catch (Swig::DirectorException&) {
+    SWIG_fail;
+  }
+  resultobj = SWIG_NewPointerObj((new wali::ref_ptr< PySemElem >(static_cast< const wali::ref_ptr< PySemElem >& >(result))), SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PySemElem_diff(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  PySemElem *arg1 = (PySemElem *) 0 ;
+  SemElem *arg2 = (SemElem *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  sem_elem_t result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:PySemElem_diff",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_PySemElem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElem_diff" "', argument " "1"" of type '" "PySemElem *""'"); 
+  }
+  arg1 = reinterpret_cast< PySemElem * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_SemElem, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PySemElem_diff" "', argument " "2"" of type '" "SemElem *""'"); 
+  }
+  arg2 = reinterpret_cast< SemElem * >(argp2);
+  result = (arg1)->diff(arg2);
+  resultobj = SWIG_NewPointerObj((new sem_elem_t(static_cast< const sem_elem_t& >(result))), SWIGTYPE_p_sem_elem_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_PySemElem_pyone(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   PySemElem *arg1 = (PySemElem *) 0 ;
@@ -13898,6 +14239,270 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_PySemElemPtr_pyunder_approximates(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::ref_ptr< PySemElem > *arg1 = (wali::ref_ptr< PySemElem > *) 0 ;
+  PySemElem *arg2 = (PySemElem *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  bool result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:PySemElemPtr_pyunder_approximates",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElemPtr_pyunder_approximates" "', argument " "1"" of type '" "wali::ref_ptr< PySemElem > const *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::ref_ptr< PySemElem > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_PySemElem, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PySemElemPtr_pyunder_approximates" "', argument " "2"" of type '" "PySemElem *""'"); 
+  }
+  arg2 = reinterpret_cast< PySemElem * >(argp2);
+  result = (bool)(*arg1)->pyunderApproximates(arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PySemElemPtr_under_approximates(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::ref_ptr< PySemElem > *arg1 = (wali::ref_ptr< PySemElem > *) 0 ;
+  SemElem *arg2 = (SemElem *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  bool result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:PySemElemPtr_under_approximates",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElemPtr_under_approximates" "', argument " "1"" of type '" "wali::ref_ptr< PySemElem > *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::ref_ptr< PySemElem > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_SemElem, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PySemElemPtr_under_approximates" "', argument " "2"" of type '" "SemElem *""'"); 
+  }
+  arg2 = reinterpret_cast< SemElem * >(argp2);
+  result = (bool)(*arg1)->underApproximates(arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PySemElemPtr_pystar(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::ref_ptr< PySemElem > *arg1 = (wali::ref_ptr< PySemElem > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  wali::ref_ptr< PySemElem > result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:PySemElemPtr_pystar",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElemPtr_pystar" "', argument " "1"" of type '" "wali::ref_ptr< PySemElem > *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::ref_ptr< PySemElem > * >(argp1);
+  result = (*arg1)->pystar();
+  resultobj = SWIG_NewPointerObj((new wali::ref_ptr< PySemElem >(static_cast< const wali::ref_ptr< PySemElem >& >(result))), SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PySemElemPtr_star(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::ref_ptr< PySemElem > *arg1 = (wali::ref_ptr< PySemElem > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  sem_elem_t result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:PySemElemPtr_star",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElemPtr_star" "', argument " "1"" of type '" "wali::ref_ptr< PySemElem > *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::ref_ptr< PySemElem > * >(argp1);
+  result = (*arg1)->star();
+  resultobj = SWIG_NewPointerObj((new sem_elem_t(static_cast< const sem_elem_t& >(result))), SWIGTYPE_p_sem_elem_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PySemElemPtr_pyextend_and_diff(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::ref_ptr< PySemElem > *arg1 = (wali::ref_ptr< PySemElem > *) 0 ;
+  PySemElem *arg2 = (PySemElem *) 0 ;
+  PySemElem *arg3 = (PySemElem *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  wali::ref_ptr< PySemElem > result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:PySemElemPtr_pyextend_and_diff",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElemPtr_pyextend_and_diff" "', argument " "1"" of type '" "wali::ref_ptr< PySemElem > *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::ref_ptr< PySemElem > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_PySemElem, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PySemElemPtr_pyextend_and_diff" "', argument " "2"" of type '" "PySemElem *""'"); 
+  }
+  arg2 = reinterpret_cast< PySemElem * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_PySemElem, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "PySemElemPtr_pyextend_and_diff" "', argument " "3"" of type '" "PySemElem *""'"); 
+  }
+  arg3 = reinterpret_cast< PySemElem * >(argp3);
+  result = (*arg1)->pyextendAndDiff(arg2,arg3);
+  resultobj = SWIG_NewPointerObj((new wali::ref_ptr< PySemElem >(static_cast< const wali::ref_ptr< PySemElem >& >(result))), SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PySemElemPtr_extend_and_diff(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::ref_ptr< PySemElem > *arg1 = (wali::ref_ptr< PySemElem > *) 0 ;
+  sem_elem_t arg2 ;
+  sem_elem_t arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  void *argp3 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  sem_elem_t result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:PySemElemPtr_extend_and_diff",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElemPtr_extend_and_diff" "', argument " "1"" of type '" "wali::ref_ptr< PySemElem > *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::ref_ptr< PySemElem > * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_sem_elem_t,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PySemElemPtr_extend_and_diff" "', argument " "2"" of type '" "sem_elem_t""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "PySemElemPtr_extend_and_diff" "', argument " "2"" of type '" "sem_elem_t""'");
+    } else {
+      sem_elem_t * temp = reinterpret_cast< sem_elem_t * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  {
+    res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_sem_elem_t,  0  | 0);
+    if (!SWIG_IsOK(res3)) {
+      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "PySemElemPtr_extend_and_diff" "', argument " "3"" of type '" "sem_elem_t""'"); 
+    }  
+    if (!argp3) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "PySemElemPtr_extend_and_diff" "', argument " "3"" of type '" "sem_elem_t""'");
+    } else {
+      sem_elem_t * temp = reinterpret_cast< sem_elem_t * >(argp3);
+      arg3 = *temp;
+      if (SWIG_IsNewObj(res3)) delete temp;
+    }
+  }
+  result = (*arg1)->extendAndDiff(arg2,arg3);
+  resultobj = SWIG_NewPointerObj((new sem_elem_t(static_cast< const sem_elem_t& >(result))), SWIGTYPE_p_sem_elem_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PySemElemPtr_pydiff(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::ref_ptr< PySemElem > *arg1 = (wali::ref_ptr< PySemElem > *) 0 ;
+  PySemElem *arg2 = (PySemElem *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  wali::ref_ptr< PySemElem > result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:PySemElemPtr_pydiff",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElemPtr_pydiff" "', argument " "1"" of type '" "wali::ref_ptr< PySemElem > *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::ref_ptr< PySemElem > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_PySemElem, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PySemElemPtr_pydiff" "', argument " "2"" of type '" "PySemElem *""'"); 
+  }
+  arg2 = reinterpret_cast< PySemElem * >(argp2);
+  result = (*arg1)->pydiff(arg2);
+  resultobj = SWIG_NewPointerObj((new wali::ref_ptr< PySemElem >(static_cast< const wali::ref_ptr< PySemElem >& >(result))), SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PySemElemPtr_diff(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::ref_ptr< PySemElem > *arg1 = (wali::ref_ptr< PySemElem > *) 0 ;
+  SemElem *arg2 = (SemElem *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  sem_elem_t result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:PySemElemPtr_diff",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElemPtr_diff" "', argument " "1"" of type '" "wali::ref_ptr< PySemElem > *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::ref_ptr< PySemElem > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_SemElem, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PySemElemPtr_diff" "', argument " "2"" of type '" "SemElem *""'"); 
+  }
+  arg2 = reinterpret_cast< SemElem * >(argp2);
+  result = (*arg1)->diff(arg2);
+  resultobj = SWIG_NewPointerObj((new sem_elem_t(static_cast< const sem_elem_t& >(result))), SWIGTYPE_p_sem_elem_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_PySemElemPtr_pyone(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   wali::ref_ptr< PySemElem > *arg1 = (wali::ref_ptr< PySemElem > *) 0 ;
@@ -14008,123 +14613,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_PySemElemPtr_under_approximates__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  wali::ref_ptr< PySemElem > *arg1 = (wali::ref_ptr< PySemElem > *) 0 ;
-  wali::SemElem *arg2 = (wali::SemElem *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  bool result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:PySemElemPtr_under_approximates",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElemPtr_under_approximates" "', argument " "1"" of type '" "wali::ref_ptr< PySemElem > *""'"); 
-  }
-  arg1 = reinterpret_cast< wali::ref_ptr< PySemElem > * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_wali__SemElem, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PySemElemPtr_under_approximates" "', argument " "2"" of type '" "wali::SemElem *""'"); 
-  }
-  arg2 = reinterpret_cast< wali::SemElem * >(argp2);
-  result = (bool)(*arg1)->underApproximates(arg2);
-  resultobj = SWIG_From_bool(static_cast< bool >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PySemElemPtr_under_approximates__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  wali::ref_ptr< PySemElem > *arg1 = (wali::ref_ptr< PySemElem > *) 0 ;
-  wali::sem_elem_t arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  bool result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:PySemElemPtr_under_approximates",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElemPtr_under_approximates" "', argument " "1"" of type '" "wali::ref_ptr< PySemElem > *""'"); 
-  }
-  arg1 = reinterpret_cast< wali::ref_ptr< PySemElem > * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PySemElemPtr_under_approximates" "', argument " "2"" of type '" "wali::sem_elem_t""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "PySemElemPtr_under_approximates" "', argument " "2"" of type '" "wali::sem_elem_t""'");
-    } else {
-      wali::sem_elem_t * temp = reinterpret_cast< wali::sem_elem_t * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
-  result = (bool)(*arg1)->underApproximates(arg2);
-  resultobj = SWIG_From_bool(static_cast< bool >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PySemElemPtr_under_approximates(PyObject *self, PyObject *args) {
-  int argc;
-  PyObject *argv[3];
-  int ii;
-  
-  if (!PyTuple_Check(args)) SWIG_fail;
-  argc = args ? (int)PyObject_Length(args) : 0;
-  for (ii = 0; (ii < 2) && (ii < argc); ii++) {
-    argv[ii] = PyTuple_GET_ITEM(args,ii);
-  }
-  if (argc == 2) {
-    int _v;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      void *vptr = 0;
-      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_wali__SemElem, 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        return _wrap_PySemElemPtr_under_approximates__SWIG_0(self, args);
-      }
-    }
-  }
-  if (argc == 2) {
-    int _v;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t, 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        return _wrap_PySemElemPtr_under_approximates__SWIG_1(self, args);
-      }
-    }
-  }
-  
-fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number or type of arguments for overloaded function 'PySemElemPtr_under_approximates'.\n"
-    "  Possible C/C++ prototypes are:\n"
-    "    wali::SemElem::underApproximates(wali::SemElem *)\n"
-    "    wali::SemElem::underApproximates(wali::sem_elem_t)\n");
-  return 0;
-}
-
-
 SWIGINTERN PyObject *_wrap_PySemElemPtr_marshall_weight(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   wali::ref_ptr< PySemElem > *arg1 = (wali::ref_ptr< PySemElem > *) 0 ;
@@ -14159,123 +14647,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_PySemElemPtr_diff__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  wali::ref_ptr< PySemElem > *arg1 = (wali::ref_ptr< PySemElem > *) 0 ;
-  wali::SemElem *arg2 = (wali::SemElem *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  wali::sem_elem_t result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:PySemElemPtr_diff",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElemPtr_diff" "', argument " "1"" of type '" "wali::ref_ptr< PySemElem > *""'"); 
-  }
-  arg1 = reinterpret_cast< wali::ref_ptr< PySemElem > * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_wali__SemElem, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PySemElemPtr_diff" "', argument " "2"" of type '" "wali::SemElem *""'"); 
-  }
-  arg2 = reinterpret_cast< wali::SemElem * >(argp2);
-  result = (*arg1)->diff(arg2);
-  resultobj = SWIG_NewPointerObj((new wali::sem_elem_t(static_cast< const wali::sem_elem_t& >(result))), SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t, SWIG_POINTER_OWN |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PySemElemPtr_diff__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  wali::ref_ptr< PySemElem > *arg1 = (wali::ref_ptr< PySemElem > *) 0 ;
-  wali::sem_elem_t arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  wali::sem_elem_t result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:PySemElemPtr_diff",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElemPtr_diff" "', argument " "1"" of type '" "wali::ref_ptr< PySemElem > *""'"); 
-  }
-  arg1 = reinterpret_cast< wali::ref_ptr< PySemElem > * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PySemElemPtr_diff" "', argument " "2"" of type '" "wali::sem_elem_t""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "PySemElemPtr_diff" "', argument " "2"" of type '" "wali::sem_elem_t""'");
-    } else {
-      wali::sem_elem_t * temp = reinterpret_cast< wali::sem_elem_t * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
-  result = (*arg1)->diff(arg2);
-  resultobj = SWIG_NewPointerObj((new wali::sem_elem_t(static_cast< const wali::sem_elem_t& >(result))), SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t, SWIG_POINTER_OWN |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PySemElemPtr_diff(PyObject *self, PyObject *args) {
-  int argc;
-  PyObject *argv[3];
-  int ii;
-  
-  if (!PyTuple_Check(args)) SWIG_fail;
-  argc = args ? (int)PyObject_Length(args) : 0;
-  for (ii = 0; (ii < 2) && (ii < argc); ii++) {
-    argv[ii] = PyTuple_GET_ITEM(args,ii);
-  }
-  if (argc == 2) {
-    int _v;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      void *vptr = 0;
-      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_wali__SemElem, 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        return _wrap_PySemElemPtr_diff__SWIG_0(self, args);
-      }
-    }
-  }
-  if (argc == 2) {
-    int _v;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t, 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        return _wrap_PySemElemPtr_diff__SWIG_1(self, args);
-      }
-    }
-  }
-  
-fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number or type of arguments for overloaded function 'PySemElemPtr_diff'.\n"
-    "  Possible C/C++ prototypes are:\n"
-    "    wali::SemElem::diff(wali::SemElem *)\n"
-    "    wali::SemElem::diff(wali::sem_elem_t)\n");
-  return 0;
-}
-
-
 SWIGINTERN PyObject *_wrap_PySemElemPtr_quasi_one(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   wali::ref_ptr< PySemElem > *arg1 = (wali::ref_ptr< PySemElem > *) 0 ;
@@ -14291,84 +14662,6 @@ SWIGINTERN PyObject *_wrap_PySemElemPtr_quasi_one(PyObject *SWIGUNUSEDPARM(self)
   }
   arg1 = reinterpret_cast< wali::ref_ptr< PySemElem > * >(argp1);
   result = (*arg1)->quasi_one();
-  resultobj = SWIG_NewPointerObj((new wali::sem_elem_t(static_cast< const wali::sem_elem_t& >(result))), SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t, SWIG_POINTER_OWN |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PySemElemPtr_star(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  wali::ref_ptr< PySemElem > *arg1 = (wali::ref_ptr< PySemElem > *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  wali::sem_elem_t result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:PySemElemPtr_star",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElemPtr_star" "', argument " "1"" of type '" "wali::ref_ptr< PySemElem > *""'"); 
-  }
-  arg1 = reinterpret_cast< wali::ref_ptr< PySemElem > * >(argp1);
-  result = (*arg1)->star();
-  resultobj = SWIG_NewPointerObj((new wali::sem_elem_t(static_cast< const wali::sem_elem_t& >(result))), SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t, SWIG_POINTER_OWN |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PySemElemPtr_extend_and_diff(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  wali::ref_ptr< PySemElem > *arg1 = (wali::ref_ptr< PySemElem > *) 0 ;
-  wali::sem_elem_t arg2 ;
-  wali::sem_elem_t arg3 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
-  void *argp3 ;
-  int res3 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  wali::sem_elem_t result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OOO:PySemElemPtr_extend_and_diff",&obj0,&obj1,&obj2)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__ref_ptrT_PySemElem_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PySemElemPtr_extend_and_diff" "', argument " "1"" of type '" "wali::ref_ptr< PySemElem > *""'"); 
-  }
-  arg1 = reinterpret_cast< wali::ref_ptr< PySemElem > * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PySemElemPtr_extend_and_diff" "', argument " "2"" of type '" "wali::sem_elem_t""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "PySemElemPtr_extend_and_diff" "', argument " "2"" of type '" "wali::sem_elem_t""'");
-    } else {
-      wali::sem_elem_t * temp = reinterpret_cast< wali::sem_elem_t * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
-  {
-    res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t,  0  | 0);
-    if (!SWIG_IsOK(res3)) {
-      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "PySemElemPtr_extend_and_diff" "', argument " "3"" of type '" "wali::sem_elem_t""'"); 
-    }  
-    if (!argp3) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "PySemElemPtr_extend_and_diff" "', argument " "3"" of type '" "wali::sem_elem_t""'");
-    } else {
-      wali::sem_elem_t * temp = reinterpret_cast< wali::sem_elem_t * >(argp3);
-      arg3 = *temp;
-      if (SWIG_IsNewObj(res3)) delete temp;
-    }
-  }
-  result = (*arg1)->extendAndDiff(arg2,arg3);
   resultobj = SWIG_NewPointerObj((new wali::sem_elem_t(static_cast< const wali::sem_elem_t& >(result))), SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
@@ -30341,6 +30634,70 @@ static PyMethodDef SwigMethods[] = {
 		"    se: SemElem *\n"
 		"\n"
 		""},
+	 { (char *)"PySemElem_pyunder_approximates", _wrap_PySemElem_pyunder_approximates, METH_VARARGS, (char *)"\n"
+		"PySemElem_pyunder_approximates(self, se) -> bool\n"
+		"\n"
+		"Parameters:\n"
+		"    self: PySemElem const *\n"
+		"    se: PySemElem *\n"
+		"\n"
+		""},
+	 { (char *)"PySemElem_under_approximates", _wrap_PySemElem_under_approximates, METH_VARARGS, (char *)"\n"
+		"PySemElem_under_approximates(self, se) -> bool\n"
+		"\n"
+		"Parameters:\n"
+		"    self: PySemElem *\n"
+		"    se: SemElem *\n"
+		"\n"
+		""},
+	 { (char *)"PySemElem_pystar", _wrap_PySemElem_pystar, METH_VARARGS, (char *)"\n"
+		"PySemElem_pystar(self) -> PySemElemPtr\n"
+		"\n"
+		"Parameters:\n"
+		"    self: PySemElem *\n"
+		"\n"
+		""},
+	 { (char *)"PySemElem_star", _wrap_PySemElem_star, METH_VARARGS, (char *)"\n"
+		"PySemElem_star(self) -> sem_elem_t\n"
+		"\n"
+		"Parameters:\n"
+		"    self: PySemElem *\n"
+		"\n"
+		""},
+	 { (char *)"PySemElem_pyextend_and_diff", _wrap_PySemElem_pyextend_and_diff, METH_VARARGS, (char *)"\n"
+		"PySemElem_pyextend_and_diff(self, next, subtrahend) -> PySemElemPtr\n"
+		"\n"
+		"Parameters:\n"
+		"    self: PySemElem *\n"
+		"    next: PySemElem *\n"
+		"    subtrahend: PySemElem *\n"
+		"\n"
+		""},
+	 { (char *)"PySemElem_extend_and_diff", _wrap_PySemElem_extend_and_diff, METH_VARARGS, (char *)"\n"
+		"PySemElem_extend_and_diff(self, next, subtrahend) -> sem_elem_t\n"
+		"\n"
+		"Parameters:\n"
+		"    self: PySemElem *\n"
+		"    next: sem_elem_t\n"
+		"    subtrahend: sem_elem_t\n"
+		"\n"
+		""},
+	 { (char *)"PySemElem_pydiff", _wrap_PySemElem_pydiff, METH_VARARGS, (char *)"\n"
+		"PySemElem_pydiff(self, se) -> PySemElemPtr\n"
+		"\n"
+		"Parameters:\n"
+		"    self: PySemElem *\n"
+		"    se: PySemElem *\n"
+		"\n"
+		""},
+	 { (char *)"PySemElem_diff", _wrap_PySemElem_diff, METH_VARARGS, (char *)"\n"
+		"PySemElem_diff(self, se) -> sem_elem_t\n"
+		"\n"
+		"Parameters:\n"
+		"    self: PySemElem *\n"
+		"    se: SemElem *\n"
+		"\n"
+		""},
 	 { (char *)"PySemElem_pyone", _wrap_PySemElem_pyone, METH_VARARGS, (char *)"\n"
 		"PySemElem_pyone(self) -> PySemElemPtr\n"
 		"\n"
@@ -30595,6 +30952,70 @@ static PyMethodDef SwigMethods[] = {
 		"    se: SemElem *\n"
 		"\n"
 		""},
+	 { (char *)"PySemElemPtr_pyunder_approximates", _wrap_PySemElemPtr_pyunder_approximates, METH_VARARGS, (char *)"\n"
+		"PySemElemPtr_pyunder_approximates(self, se) -> bool\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::ref_ptr< PySemElem > const *\n"
+		"    se: PySemElem *\n"
+		"\n"
+		""},
+	 { (char *)"PySemElemPtr_under_approximates", _wrap_PySemElemPtr_under_approximates, METH_VARARGS, (char *)"\n"
+		"PySemElemPtr_under_approximates(self, se) -> bool\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::ref_ptr< PySemElem > *\n"
+		"    se: SemElem *\n"
+		"\n"
+		""},
+	 { (char *)"PySemElemPtr_pystar", _wrap_PySemElemPtr_pystar, METH_VARARGS, (char *)"\n"
+		"PySemElemPtr_pystar(self) -> PySemElemPtr\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::ref_ptr< PySemElem > *\n"
+		"\n"
+		""},
+	 { (char *)"PySemElemPtr_star", _wrap_PySemElemPtr_star, METH_VARARGS, (char *)"\n"
+		"PySemElemPtr_star(self) -> sem_elem_t\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::ref_ptr< PySemElem > *\n"
+		"\n"
+		""},
+	 { (char *)"PySemElemPtr_pyextend_and_diff", _wrap_PySemElemPtr_pyextend_and_diff, METH_VARARGS, (char *)"\n"
+		"PySemElemPtr_pyextend_and_diff(self, next, subtrahend) -> PySemElemPtr\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::ref_ptr< PySemElem > *\n"
+		"    next: PySemElem *\n"
+		"    subtrahend: PySemElem *\n"
+		"\n"
+		""},
+	 { (char *)"PySemElemPtr_extend_and_diff", _wrap_PySemElemPtr_extend_and_diff, METH_VARARGS, (char *)"\n"
+		"PySemElemPtr_extend_and_diff(self, next, subtrahend) -> sem_elem_t\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::ref_ptr< PySemElem > *\n"
+		"    next: sem_elem_t\n"
+		"    subtrahend: sem_elem_t\n"
+		"\n"
+		""},
+	 { (char *)"PySemElemPtr_pydiff", _wrap_PySemElemPtr_pydiff, METH_VARARGS, (char *)"\n"
+		"PySemElemPtr_pydiff(self, se) -> PySemElemPtr\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::ref_ptr< PySemElem > *\n"
+		"    se: PySemElem *\n"
+		"\n"
+		""},
+	 { (char *)"PySemElemPtr_diff", _wrap_PySemElemPtr_diff, METH_VARARGS, (char *)"\n"
+		"PySemElemPtr_diff(self, se) -> sem_elem_t\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::ref_ptr< PySemElem > *\n"
+		"    se: SemElem *\n"
+		"\n"
+		""},
 	 { (char *)"PySemElemPtr_pyone", _wrap_PySemElemPtr_pyone, METH_VARARGS, (char *)"\n"
 		"PySemElemPtr_pyone(self) -> PySemElemPtr\n"
 		"\n"
@@ -30630,19 +31051,6 @@ static PyMethodDef SwigMethods[] = {
 		"    self: wali::ref_ptr< PySemElem > *\n"
 		"\n"
 		""},
-	 { (char *)"PySemElemPtr_under_approximates", _wrap_PySemElemPtr_under_approximates, METH_VARARGS, (char *)"\n"
-		"under_approximates(that) -> bool\n"
-		"\n"
-		"Parameters:\n"
-		"    that: wali::SemElem *\n"
-		"\n"
-		"PySemElemPtr_under_approximates(self, se) -> bool\n"
-		"\n"
-		"Parameters:\n"
-		"    self: wali::ref_ptr< PySemElem > *\n"
-		"    se: wali::sem_elem_t\n"
-		"\n"
-		""},
 	 { (char *)"PySemElemPtr_marshall_weight", _wrap_PySemElemPtr_marshall_weight, METH_VARARGS, (char *)"\n"
 		"PySemElemPtr_marshall_weight(self, o) -> std::ostream &\n"
 		"\n"
@@ -30651,40 +31059,11 @@ static PyMethodDef SwigMethods[] = {
 		"    o: std::ostream &\n"
 		"\n"
 		""},
-	 { (char *)"PySemElemPtr_diff", _wrap_PySemElemPtr_diff, METH_VARARGS, (char *)"\n"
-		"diff(se) -> SemElemPtr\n"
-		"\n"
-		"Parameters:\n"
-		"    se: wali::SemElem *\n"
-		"\n"
-		"PySemElemPtr_diff(self, se) -> SemElemPtr\n"
-		"\n"
-		"Parameters:\n"
-		"    self: wali::ref_ptr< PySemElem > *\n"
-		"    se: wali::sem_elem_t\n"
-		"\n"
-		""},
 	 { (char *)"PySemElemPtr_quasi_one", _wrap_PySemElemPtr_quasi_one, METH_VARARGS, (char *)"\n"
 		"PySemElemPtr_quasi_one(self) -> SemElemPtr\n"
 		"\n"
 		"Parameters:\n"
 		"    self: wali::ref_ptr< PySemElem > const *\n"
-		"\n"
-		""},
-	 { (char *)"PySemElemPtr_star", _wrap_PySemElemPtr_star, METH_VARARGS, (char *)"\n"
-		"PySemElemPtr_star(self) -> SemElemPtr\n"
-		"\n"
-		"Parameters:\n"
-		"    self: wali::ref_ptr< PySemElem > *\n"
-		"\n"
-		""},
-	 { (char *)"PySemElemPtr_extend_and_diff", _wrap_PySemElemPtr_extend_and_diff, METH_VARARGS, (char *)"\n"
-		"PySemElemPtr_extend_and_diff(self, next, subtrahend) -> SemElemPtr\n"
-		"\n"
-		"Parameters:\n"
-		"    self: wali::ref_ptr< PySemElem > *\n"
-		"    next: wali::sem_elem_t\n"
-		"    subtrahend: wali::sem_elem_t\n"
 		"\n"
 		""},
 	 { (char *)"PySemElemPtr_container_less_than", _wrap_PySemElemPtr_container_less_than, METH_VARARGS, (char *)"\n"

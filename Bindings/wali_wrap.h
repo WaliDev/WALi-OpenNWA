@@ -20,11 +20,7 @@ class SwigDirector_PySemElem : public PySemElem, public Swig::Director {
 public:
     SwigDirector_PySemElem(PyObject *self);
     virtual ~SwigDirector_PySemElem();
-    virtual bool underApproximates(wali::SemElem *that);
     virtual std::ostream &marshall(std::ostream &o) const;
-    virtual wali::sem_elem_t diff(wali::SemElem *se);
-    virtual wali::sem_elem_t star();
-    virtual wali::sem_elem_t extendAndDiff(wali::sem_elem_t next, wali::sem_elem_t subtrahend);
     virtual bool containerLessThan(wali::SemElem const *other) const;
     virtual size_t hash() const;
     virtual std::ostream &print_typename(std::ostream &os) const;
@@ -33,6 +29,10 @@ public:
     virtual wali::ref_ptr< PySemElem > pyextend(PySemElem *se) const;
     virtual std::pair< wali::ref_ptr< PySemElem >,wali::ref_ptr< PySemElem > > pydelta(PySemElem *se);
     virtual bool pyequal(PySemElem *se) const;
+    virtual bool pyunderApproximates(PySemElem *se) const;
+    virtual wali::ref_ptr< PySemElem > pystar();
+    virtual wali::ref_ptr< PySemElem > pyextendAndDiff(PySemElem *next, PySemElem *subtrahend);
+    virtual wali::ref_ptr< PySemElem > pydiff(PySemElem *se);
     virtual wali::ref_ptr< PySemElem > pyone() const;
     virtual wali::ref_ptr< PySemElem > pyzero() const;
 
