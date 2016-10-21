@@ -14,9 +14,14 @@ Wraps all of WALi, and provide means for creating SemElem's in Python
 %feature("nodirector") PySemElem::equal;
 %feature("nodirector") PySemElem::one;
 %feature("nodirector") PySemElem::zero;
+%feature("nodirector") PySemElem::star;
+%feature("nodirector") PySemElem::diff;
+%feature("nodirector") PySemElem::underApproximates;
+%feature("nodirector") PySemElem::extendAndDiff;
 
 /* crashes stuff */
 %feature("nodirector") PySemElem::quasi_one;
+
 
 /*%feature("director:except") {
     if ($error != NULL) {
@@ -145,7 +150,6 @@ def pydelta(self, se):
     return toret
 %}
 
-
 class PySemElem : public wali::SemElem {
     protected:
       PyObject* userdata;
@@ -173,6 +177,21 @@ class PySemElem : public wali::SemElem {
 
       virtual bool pyequal( PySemElem * se ) const = 0;
       bool equal( SemElem * se ) const;
+
+      virtual bool pyunderApproximates (PySemElem* se) const  = 0;
+      bool underApproximates( SemElem * se );
+
+      virtual wali::ref_ptr<PySemElem> pystar () = 0;
+      sem_elem_t star();
+
+      virtual wali::ref_ptr<PySemElem> pyextendAndDiff(
+          PySemElem * next,
+          PySemElem * subtrahend) = 0;
+      sem_elem_t extendAndDiff(sem_elem_t next,
+                               sem_elem_t subtrahend);
+
+      virtual wali::ref_ptr<PySemElem> pydiff(PySemElem * se) = 0;
+      sem_elem_t diff(SemElem * se);
 
       virtual wali::ref_ptr<PySemElem> pyone() const = 0;
       virtual wali::ref_ptr<PySemElem> pyzero() const = 0;
@@ -249,6 +268,35 @@ class PySemElem : public wali::SemElem {
         PySemElem* rhs = dynamic_cast< PySemElem* >(se);
         bool toret = pyequal(rhs);
         return toret;
+      }
+
+      virtual bool pyunderApproximates (PySemElem* se) const  = 0;
+      bool underApproximates( SemElem * se ) {
+          PySemElem * rhs = dynamic_cast< PySemElem* >(se);
+          bool toret = pyunderApproximates(rhs);
+          return toret;
+      }
+
+      virtual wali::ref_ptr<PySemElem> pystar () = 0;
+      sem_elem_t star() {
+          return pystar();
+      }
+
+      virtual wali::ref_ptr<PySemElem> pyextendAndDiff(
+          PySemElem * next,
+          PySemElem * subtrahend) = 0;
+      sem_elem_t extendAndDiff(sem_elem_t next,
+                               sem_elem_t subtrahend)
+      {
+          PySemElem * n = dynamic_cast< PySemElem* >(next.get_ptr());
+          PySemElem * s = dynamic_cast< PySemElem* >(subtrahend.get_ptr());
+          return pyextendAndDiff(n, s);
+      }
+
+      virtual wali::ref_ptr<PySemElem> pydiff(PySemElem * se) = 0;
+      sem_elem_t diff(SemElem * se) {
+          PySemElem * rhs = dynamic_cast< PySemElem* >(se);
+          return pydiff(rhs);
       }
 
       virtual wali::ref_ptr<PySemElem> pyone() const = 0;
