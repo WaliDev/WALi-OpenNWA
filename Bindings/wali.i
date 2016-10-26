@@ -18,6 +18,7 @@ Wraps all of WALi, and provide means for creating SemElem's in Python
 %feature("nodirector") PySemElem::diff;
 %feature("nodirector") PySemElem::underApproximates;
 %feature("nodirector") PySemElem::extendAndDiff;
+%feature("nodirector") PySemElem::getuserdata;
 
 /* crashes stuff */
 %feature("nodirector") PySemElem::quasi_one;
@@ -353,6 +354,7 @@ but swig is not cased for - therefore do it here */
     }
 }
 
+%include "../Source/wali/wfa/State.hpp"
 
 %include "../Source/wali/wfa/WFA.hpp"
 %extend wali::wfa::WFA {

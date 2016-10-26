@@ -27,7 +27,8 @@ and access them from Python.
 #include "../Source/wali/wfa/TransFunctor.hpp"
 /* WFA */
 #include "../Source/wali/wfa/WFA.hpp"
-
+#include "../Source/wali/wfa/State.hpp"
+  
 /* WPDS util stuff */
 #include "../Source/wali/wpds/Rule.hpp"
 #include "../Source/wali/wpds/GenKeySource.hpp"

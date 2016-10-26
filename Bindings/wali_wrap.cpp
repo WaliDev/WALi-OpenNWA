@@ -3393,107 +3393,108 @@ namespace Swig {
 #define SWIGTYPE_p_TransSet swig_types[12]
 #define SWIGTYPE_p_WeightMaker swig_types[13]
 #define SWIGTYPE_p_Word swig_types[14]
-#define SWIGTYPE_p_allocator_type swig_types[15]
-#define SWIGTYPE_p_boost__functionT_bool_fITrans_const_pF_t swig_types[16]
-#define SWIGTYPE_p_boost__functionT_void_fITrans_const_pF_t swig_types[17]
-#define SWIGTYPE_p_boost__functionT_void_fITrans_pF_t swig_types[18]
-#define SWIGTYPE_p_boost__functionT_wali__sem_elem_t_fwali__sem_elem_tF_t swig_types[19]
-#define SWIGTYPE_p_boost__functionT_wali__wfa__delta__DeltaResult_fwali__wfa__WFA_const_RF_t swig_types[20]
-#define SWIGTYPE_p_bucket_type swig_types[21]
-#define SWIGTYPE_p_char swig_types[22]
-#define SWIGTYPE_p_const_iterator swig_types[23]
-#define SWIGTYPE_p_const_reference swig_types[24]
-#define SWIGTYPE_p_count_t swig_types[25]
-#define SWIGTYPE_p_difference_type swig_types[26]
-#define SWIGTYPE_p_domains__SemElemSet__SemElemSubsumptionComputer swig_types[27]
-#define SWIGTYPE_p_element_type swig_types[28]
-#define SWIGTYPE_p_eps_map_t swig_types[29]
-#define SWIGTYPE_p_first_type swig_types[30]
-#define SWIGTYPE_p_hashmap_type swig_types[31]
-#define SWIGTYPE_p_impl_t swig_types[32]
-#define SWIGTYPE_p_iterator swig_types[33]
-#define SWIGTYPE_p_key_type swig_types[34]
-#define SWIGTYPE_p_kp_map_t swig_types[35]
-#define SWIGTYPE_p_mapped_type swig_types[36]
-#define SWIGTYPE_p_merge_fn_t swig_types[37]
-#define SWIGTYPE_p_merge_rule_hash_t swig_types[38]
-#define SWIGTYPE_p_p_PyObject swig_types[39]
-#define SWIGTYPE_p_pair_type swig_types[40]
-#define SWIGTYPE_p_progress_t swig_types[41]
-#define SWIGTYPE_p_reference swig_types[42]
-#define SWIGTYPE_p_second_type swig_types[43]
-#define SWIGTYPE_p_sem_elem_t swig_types[44]
-#define SWIGTYPE_p_size_t swig_types[45]
-#define SWIGTYPE_p_size_type swig_types[46]
-#define SWIGTYPE_p_state_map_t swig_types[47]
-#define SWIGTYPE_p_std__allocatorT_wali__wfa__Trans_p_t swig_types[48]
-#define SWIGTYPE_p_std__invalid_argument swig_types[49]
-#define SWIGTYPE_p_std__lessT_size_t_t swig_types[50]
-#define SWIGTYPE_p_std__mapT_size_t_domains__SemElemSet__ElementSet_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_domains__SemElemSet__ElementSet_t_t_t swig_types[51]
-#define SWIGTYPE_p_std__mapT_size_t_size_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_size_t_t_t_t swig_types[52]
-#define SWIGTYPE_p_std__mapT_size_t_std__mapT_size_t_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__mapT_size_t_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_t_t_t_t_t_t swig_types[53]
-#define SWIGTYPE_p_std__mapT_size_t_std__mapT_size_t_wali__ref_ptrT_wali__SemElem_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_wali__ref_ptrT_wali__SemElem_t_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__mapT_size_t_wali__ref_ptrT_wali__SemElem_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_wali__ref_ptrT_wali__SemElem_t_t_t_t_t_t_t swig_types[54]
-#define SWIGTYPE_p_std__mapT_size_t_wali__ref_ptrT_wali__SemElem_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_wali__ref_ptrT_wali__SemElem_t_t_t_t swig_types[55]
-#define SWIGTYPE_p_std__ostream swig_types[56]
-#define SWIGTYPE_p_std__pairT_ITrans_const_p_bool_t swig_types[57]
-#define SWIGTYPE_p_std__pairT_ITrans_p_bool_t swig_types[58]
-#define SWIGTYPE_p_std__pairT_KeyPair_TransSet_t swig_types[59]
-#define SWIGTYPE_p_std__pairT_sem_elem_t_sem_elem_t_t swig_types[60]
-#define SWIGTYPE_p_std__pairT_size_t_size_t_t swig_types[61]
-#define SWIGTYPE_p_std__pairT_size_t_wali__ref_ptrT_wali__SemElem_t_t swig_types[62]
-#define SWIGTYPE_p_std__pairT_wali__HashMapIteratorT_KeyPair_TransSet_wali__hm_hashT_KeyPair_t_wali__hm_equalT_KeyPair_t_t_bool_t swig_types[63]
-#define SWIGTYPE_p_std__pairT_wali__ref_ptrT_PySemElem_t_wali__ref_ptrT_PySemElem_t_t swig_types[64]
-#define SWIGTYPE_p_std__pairT_wali__ref_ptrT_wali__SemElem_t_wali__ref_ptrT_wali__SemElem_t_t swig_types[65]
-#define SWIGTYPE_p_std__setT_ITrans_p_ITransLT_std__allocatorT_ITrans_p_t_t swig_types[66]
-#define SWIGTYPE_p_std__setT_ITrans_p_ITransLT_std__allocatorT_wali__wfa__ITrans_p_t_t__const_iterator swig_types[67]
-#define SWIGTYPE_p_std__setT_ITrans_p_ITransLT_std__allocatorT_wali__wfa__ITrans_p_t_t__iterator swig_types[68]
-#define SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t swig_types[69]
-#define SWIGTYPE_p_std__vectorT__Tp_p__Alloc_t swig_types[70]
-#define SWIGTYPE_p_std__vectorT_size_t_std__allocatorT_size_t_t_t swig_types[71]
-#define SWIGTYPE_p_std__vectorT_wali__wfa__Trans_p_std__allocatorT_wali__wfa__Trans_p_t_t swig_types[72]
-#define SWIGTYPE_p_swig__SwigPyIterator swig_types[73]
-#define SWIGTYPE_p_util__WeightChanger swig_types[74]
-#define SWIGTYPE_p_value_type swig_types[75]
-#define SWIGTYPE_p_wali__HashMapConstIteratorT_KeyPair_TransSet_wali__hm_hashT_KeyPair_t_wali__hm_equalT_KeyPair_t_t swig_types[76]
-#define SWIGTYPE_p_wali__HashMapIteratorT_KeyPair_TransSet_wali__hm_hashT_KeyPair_t_wali__hm_equalT_KeyPair_t_t swig_types[77]
-#define SWIGTYPE_p_wali__HashMapT_KeyPair_TransSet_wali__hm_hashT_KeyPair_t_wali__hm_equalT_KeyPair_t_t swig_types[78]
-#define SWIGTYPE_p_wali__KeySource swig_types[79]
-#define SWIGTYPE_p_wali__KeySpace swig_types[80]
-#define SWIGTYPE_p_wali__Printable swig_types[81]
-#define SWIGTYPE_p_wali__Reach swig_types[82]
-#define SWIGTYPE_p_wali__SemElem swig_types[83]
-#define SWIGTYPE_p_wali__SemElemRefPtrContainerLessThan swig_types[84]
-#define SWIGTYPE_p_wali__SemElemRefPtrEqual swig_types[85]
-#define SWIGTYPE_p_wali__SemElemRefPtrHash swig_types[86]
-#define SWIGTYPE_p_wali__WorklistT_wali__wfa__State_t swig_types[87]
-#define SWIGTYPE_p_wali__ref_ptrT_PySemElem_t swig_types[88]
-#define SWIGTYPE_p_wali__ref_ptrT_WorklistData_t swig_types[89]
-#define SWIGTYPE_p_wali__ref_ptrT_Wrapper_t swig_types[90]
-#define SWIGTYPE_p_wali__ref_ptrT_wali__KeySource_t swig_types[91]
-#define SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t swig_types[92]
-#define SWIGTYPE_p_wali__ref_ptrT_wali__WorklistT_wali__wfa__ITrans_t_t swig_types[93]
-#define SWIGTYPE_p_wali__ref_ptrT_wali__regex__Regex_t swig_types[94]
-#define SWIGTYPE_p_wali__ref_ptrT_wali__wpds__Wrapper_t swig_types[95]
-#define SWIGTYPE_p_wali__ref_ptrT_wali__wpds__ewpds__ERule_t swig_types[96]
-#define SWIGTYPE_p_wali__wfa__ConstTransFunctor swig_types[97]
-#define SWIGTYPE_p_wali__wfa__DeterminizeWeightGen swig_types[98]
-#define SWIGTYPE_p_wali__wfa__DotAttributePrinter swig_types[99]
-#define SWIGTYPE_p_wali__wfa__ITrans swig_types[100]
-#define SWIGTYPE_p_wali__wfa__State swig_types[101]
-#define SWIGTYPE_p_wali__wfa__Trans swig_types[102]
-#define SWIGTYPE_p_wali__wfa__TransFunctor swig_types[103]
-#define SWIGTYPE_p_wali__wfa__TransSet swig_types[104]
-#define SWIGTYPE_p_wali__wfa__WFA swig_types[105]
-#define SWIGTYPE_p_wali__wpds__Config swig_types[106]
-#define SWIGTYPE_p_wali__wpds__ConstRuleFunctor swig_types[107]
-#define SWIGTYPE_p_wali__wpds__GenKeySource swig_types[108]
-#define SWIGTYPE_p_wali__wpds__RuleFunctor swig_types[109]
-#define SWIGTYPE_p_wali__wpds__WPDS swig_types[110]
-#define SWIGTYPE_p_wali__wpds__ewpds__EWPDS swig_types[111]
-#define SWIGTYPE_p_wali__wpds__fwpds__FWPDS swig_types[112]
-#define SWIGTYPE_p_wali__wpds__rule_t swig_types[113]
-static swig_type_info *swig_types[115];
-static swig_module_info swig_module = {swig_types, 114, 0, 0, 0, 0};
+#define SWIGTYPE_p__object swig_types[15]
+#define SWIGTYPE_p_allocator_type swig_types[16]
+#define SWIGTYPE_p_boost__functionT_bool_fITrans_const_pF_t swig_types[17]
+#define SWIGTYPE_p_boost__functionT_void_fITrans_const_pF_t swig_types[18]
+#define SWIGTYPE_p_boost__functionT_void_fITrans_pF_t swig_types[19]
+#define SWIGTYPE_p_boost__functionT_wali__sem_elem_t_fwali__sem_elem_tF_t swig_types[20]
+#define SWIGTYPE_p_boost__functionT_wali__wfa__delta__DeltaResult_fwali__wfa__WFA_const_RF_t swig_types[21]
+#define SWIGTYPE_p_bucket_type swig_types[22]
+#define SWIGTYPE_p_char swig_types[23]
+#define SWIGTYPE_p_const_iterator swig_types[24]
+#define SWIGTYPE_p_const_reference swig_types[25]
+#define SWIGTYPE_p_count_t swig_types[26]
+#define SWIGTYPE_p_difference_type swig_types[27]
+#define SWIGTYPE_p_domains__SemElemSet__SemElemSubsumptionComputer swig_types[28]
+#define SWIGTYPE_p_element_type swig_types[29]
+#define SWIGTYPE_p_eps_map_t swig_types[30]
+#define SWIGTYPE_p_first_type swig_types[31]
+#define SWIGTYPE_p_hashmap_type swig_types[32]
+#define SWIGTYPE_p_impl_t swig_types[33]
+#define SWIGTYPE_p_iterator swig_types[34]
+#define SWIGTYPE_p_key_type swig_types[35]
+#define SWIGTYPE_p_kp_map_t swig_types[36]
+#define SWIGTYPE_p_mapped_type swig_types[37]
+#define SWIGTYPE_p_merge_fn_t swig_types[38]
+#define SWIGTYPE_p_merge_rule_hash_t swig_types[39]
+#define SWIGTYPE_p_p__object swig_types[40]
+#define SWIGTYPE_p_pair_type swig_types[41]
+#define SWIGTYPE_p_progress_t swig_types[42]
+#define SWIGTYPE_p_reference swig_types[43]
+#define SWIGTYPE_p_second_type swig_types[44]
+#define SWIGTYPE_p_sem_elem_t swig_types[45]
+#define SWIGTYPE_p_size_t swig_types[46]
+#define SWIGTYPE_p_size_type swig_types[47]
+#define SWIGTYPE_p_state_map_t swig_types[48]
+#define SWIGTYPE_p_std__allocatorT_wali__wfa__Trans_p_t swig_types[49]
+#define SWIGTYPE_p_std__invalid_argument swig_types[50]
+#define SWIGTYPE_p_std__lessT_size_t_t swig_types[51]
+#define SWIGTYPE_p_std__mapT_size_t_domains__SemElemSet__ElementSet_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_domains__SemElemSet__ElementSet_t_t_t swig_types[52]
+#define SWIGTYPE_p_std__mapT_size_t_size_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_size_t_t_t_t swig_types[53]
+#define SWIGTYPE_p_std__mapT_size_t_std__mapT_size_t_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__mapT_size_t_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t_t_t_t_t_t_t swig_types[54]
+#define SWIGTYPE_p_std__mapT_size_t_std__mapT_size_t_wali__ref_ptrT_wali__SemElem_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_wali__ref_ptrT_wali__SemElem_t_t_t_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_std__mapT_size_t_wali__ref_ptrT_wali__SemElem_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_wali__ref_ptrT_wali__SemElem_t_t_t_t_t_t_t swig_types[55]
+#define SWIGTYPE_p_std__mapT_size_t_wali__ref_ptrT_wali__SemElem_t_std__lessT_size_t_t_std__allocatorT_std__pairT_size_t_const_wali__ref_ptrT_wali__SemElem_t_t_t_t swig_types[56]
+#define SWIGTYPE_p_std__ostream swig_types[57]
+#define SWIGTYPE_p_std__pairT_ITrans_const_p_bool_t swig_types[58]
+#define SWIGTYPE_p_std__pairT_ITrans_p_bool_t swig_types[59]
+#define SWIGTYPE_p_std__pairT_KeyPair_TransSet_t swig_types[60]
+#define SWIGTYPE_p_std__pairT_sem_elem_t_sem_elem_t_t swig_types[61]
+#define SWIGTYPE_p_std__pairT_size_t_size_t_t swig_types[62]
+#define SWIGTYPE_p_std__pairT_size_t_wali__ref_ptrT_wali__SemElem_t_t swig_types[63]
+#define SWIGTYPE_p_std__pairT_wali__HashMapIteratorT_KeyPair_TransSet_wali__hm_hashT_KeyPair_t_wali__hm_equalT_KeyPair_t_t_bool_t swig_types[64]
+#define SWIGTYPE_p_std__pairT_wali__ref_ptrT_PySemElem_t_wali__ref_ptrT_PySemElem_t_t swig_types[65]
+#define SWIGTYPE_p_std__pairT_wali__ref_ptrT_wali__SemElem_t_wali__ref_ptrT_wali__SemElem_t_t swig_types[66]
+#define SWIGTYPE_p_std__setT_ITrans_p_ITransLT_std__allocatorT_ITrans_p_t_t swig_types[67]
+#define SWIGTYPE_p_std__setT_ITrans_p_ITransLT_std__allocatorT_wali__wfa__ITrans_p_t_t__const_iterator swig_types[68]
+#define SWIGTYPE_p_std__setT_ITrans_p_ITransLT_std__allocatorT_wali__wfa__ITrans_p_t_t__iterator swig_types[69]
+#define SWIGTYPE_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t swig_types[70]
+#define SWIGTYPE_p_std__vectorT__Tp_p__Alloc_t swig_types[71]
+#define SWIGTYPE_p_std__vectorT_size_t_std__allocatorT_size_t_t_t swig_types[72]
+#define SWIGTYPE_p_std__vectorT_wali__wfa__Trans_p_std__allocatorT_wali__wfa__Trans_p_t_t swig_types[73]
+#define SWIGTYPE_p_swig__SwigPyIterator swig_types[74]
+#define SWIGTYPE_p_util__WeightChanger swig_types[75]
+#define SWIGTYPE_p_value_type swig_types[76]
+#define SWIGTYPE_p_wali__HashMapConstIteratorT_KeyPair_TransSet_wali__hm_hashT_KeyPair_t_wali__hm_equalT_KeyPair_t_t swig_types[77]
+#define SWIGTYPE_p_wali__HashMapIteratorT_KeyPair_TransSet_wali__hm_hashT_KeyPair_t_wali__hm_equalT_KeyPair_t_t swig_types[78]
+#define SWIGTYPE_p_wali__HashMapT_KeyPair_TransSet_wali__hm_hashT_KeyPair_t_wali__hm_equalT_KeyPair_t_t swig_types[79]
+#define SWIGTYPE_p_wali__KeySource swig_types[80]
+#define SWIGTYPE_p_wali__KeySpace swig_types[81]
+#define SWIGTYPE_p_wali__Printable swig_types[82]
+#define SWIGTYPE_p_wali__Reach swig_types[83]
+#define SWIGTYPE_p_wali__SemElem swig_types[84]
+#define SWIGTYPE_p_wali__SemElemRefPtrContainerLessThan swig_types[85]
+#define SWIGTYPE_p_wali__SemElemRefPtrEqual swig_types[86]
+#define SWIGTYPE_p_wali__SemElemRefPtrHash swig_types[87]
+#define SWIGTYPE_p_wali__WorklistT_wali__wfa__State_t swig_types[88]
+#define SWIGTYPE_p_wali__ref_ptrT_PySemElem_t swig_types[89]
+#define SWIGTYPE_p_wali__ref_ptrT_WorklistData_t swig_types[90]
+#define SWIGTYPE_p_wali__ref_ptrT_Wrapper_t swig_types[91]
+#define SWIGTYPE_p_wali__ref_ptrT_wali__KeySource_t swig_types[92]
+#define SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t swig_types[93]
+#define SWIGTYPE_p_wali__ref_ptrT_wali__WorklistT_wali__wfa__ITrans_t_t swig_types[94]
+#define SWIGTYPE_p_wali__ref_ptrT_wali__regex__Regex_t swig_types[95]
+#define SWIGTYPE_p_wali__ref_ptrT_wali__wpds__Wrapper_t swig_types[96]
+#define SWIGTYPE_p_wali__ref_ptrT_wali__wpds__ewpds__ERule_t swig_types[97]
+#define SWIGTYPE_p_wali__wfa__ConstTransFunctor swig_types[98]
+#define SWIGTYPE_p_wali__wfa__DeterminizeWeightGen swig_types[99]
+#define SWIGTYPE_p_wali__wfa__DotAttributePrinter swig_types[100]
+#define SWIGTYPE_p_wali__wfa__ITrans swig_types[101]
+#define SWIGTYPE_p_wali__wfa__State swig_types[102]
+#define SWIGTYPE_p_wali__wfa__Trans swig_types[103]
+#define SWIGTYPE_p_wali__wfa__TransFunctor swig_types[104]
+#define SWIGTYPE_p_wali__wfa__TransSet swig_types[105]
+#define SWIGTYPE_p_wali__wfa__WFA swig_types[106]
+#define SWIGTYPE_p_wali__wpds__Config swig_types[107]
+#define SWIGTYPE_p_wali__wpds__ConstRuleFunctor swig_types[108]
+#define SWIGTYPE_p_wali__wpds__GenKeySource swig_types[109]
+#define SWIGTYPE_p_wali__wpds__RuleFunctor swig_types[110]
+#define SWIGTYPE_p_wali__wpds__WPDS swig_types[111]
+#define SWIGTYPE_p_wali__wpds__ewpds__EWPDS swig_types[112]
+#define SWIGTYPE_p_wali__wpds__fwpds__FWPDS swig_types[113]
+#define SWIGTYPE_p_wali__wpds__rule_t swig_types[114]
+static swig_type_info *swig_types[116];
+static swig_module_info swig_module = {swig_types, 115, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -3987,7 +3988,8 @@ SWIG_AsVal_ptrdiff_t (PyObject * obj, ptrdiff_t *val)
 #include "../Source/wali/wfa/TransFunctor.hpp"
 /* WFA */
 #include "../Source/wali/wfa/WFA.hpp"
-
+#include "../Source/wali/wfa/State.hpp"
+  
 /* WPDS util stuff */
 #include "../Source/wali/wpds/Rule.hpp"
 #include "../Source/wali/wpds/GenKeySource.hpp"
@@ -9131,6 +9133,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_SemElem_getuserdata(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::SemElem *arg1 = (wali::SemElem *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:SemElem_getuserdata",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__SemElem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "SemElem_getuserdata" "', argument " "1"" of type '" "wali::SemElem *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::SemElem * >(argp1);
+  result = (PyObject *)(arg1)->getuserdata();
+  resultobj = result;
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_SemElem___str__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   wali::SemElem *arg1 = (wali::SemElem *) 0 ;
@@ -10888,6 +10912,28 @@ SWIGINTERN PyObject *_wrap_SemElemPtr_to_string_typename(PyObject *SWIGUNUSEDPAR
   arg1 = reinterpret_cast< wali::ref_ptr< SemElem > * >(argp1);
   result = (*arg1)->toStringTypename();
   resultobj = SWIG_From_std_string(static_cast< std::string >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_SemElemPtr_getuserdata(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::ref_ptr< SemElem > *arg1 = (wali::ref_ptr< SemElem > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:SemElemPtr_getuserdata",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "SemElemPtr_getuserdata" "', argument " "1"" of type '" "wali::ref_ptr< SemElem > *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::ref_ptr< SemElem > * >(argp1);
+  result = (PyObject *)(*arg1)->getuserdata();
+  resultobj = result;
   return resultobj;
 fail:
   return NULL;
@@ -19582,6 +19628,937 @@ SWIGINTERN PyObject *TransVector_swigregister(PyObject *SWIGUNUSEDPARM(self), Py
   PyObject *obj;
   if (!PyArg_ParseTuple(args,(char*)"O:swigregister", &obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_std__vectorT_wali__wfa__Trans_p_std__allocatorT_wali__wfa__Trans_p_t_t, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
+SWIGINTERN int Swig_var_State_num_states_set(PyObject *_val) {
+  {
+    int val;
+    int res = SWIG_AsVal_int(_val, &val);
+    if (!SWIG_IsOK(res)) {
+      SWIG_exception_fail(SWIG_ArgError(res), "in variable '""wali::wfa::State::numStates""' of type '""int""'");
+    }
+    wali::wfa::State::numStates = static_cast< int >(val);
+  }
+  return 0;
+fail:
+  return 1;
+}
+
+
+SWIGINTERN PyObject *Swig_var_State_num_states_get(void) {
+  PyObject *pyobj = 0;
+  
+  pyobj = SWIG_From_int(static_cast< int >(wali::wfa::State::numStates));
+  return pyobj;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_num_states_get(PyObject *SWIGUNUSEDPARM(self), PyObject *SWIGUNUSEDPARM(args)) {
+  return Swig_var_State_num_states_get();
+}
+
+
+SWIGINTERN PyObject *_wrap_State_num_states_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  int res;
+  PyObject *value;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:set",&value)) return NULL;
+  res = Swig_var_State_num_states_set(value);
+  return !res ? SWIG_Py_Void() : NULL;
+}
+
+
+SWIGINTERN int Swig_var_State_xmltag_set(PyObject *) {
+  SWIG_Error(SWIG_AttributeError,"Variable State_xmltag is read-only.");
+  return 1;
+}
+
+
+SWIGINTERN PyObject *Swig_var_State_xmltag_get(void) {
+  PyObject *pyobj = 0;
+  
+  pyobj = SWIG_From_std_string(static_cast< std::string >(wali::wfa::State::XMLTag));
+  return pyobj;
+}
+
+
+SWIGINTERN int Swig_var_State_xmlinitial_tag_set(PyObject *) {
+  SWIG_Error(SWIG_AttributeError,"Variable State_xmlinitial_tag is read-only.");
+  return 1;
+}
+
+
+SWIGINTERN PyObject *Swig_var_State_xmlinitial_tag_get(void) {
+  PyObject *pyobj = 0;
+  
+  pyobj = SWIG_From_std_string(static_cast< std::string >(wali::wfa::State::XMLInitialTag));
+  return pyobj;
+}
+
+
+SWIGINTERN int Swig_var_State_xmlfinal_tag_set(PyObject *) {
+  SWIG_Error(SWIG_AttributeError,"Variable State_xmlfinal_tag is read-only.");
+  return 1;
+}
+
+
+SWIGINTERN PyObject *Swig_var_State_xmlfinal_tag_get(void) {
+  PyObject *pyobj = 0;
+  
+  pyobj = SWIG_From_std_string(static_cast< std::string >(wali::wfa::State::XMLFinalTag));
+  return pyobj;
+}
+
+
+SWIGINTERN int Swig_var_State_xmlname_tag_set(PyObject *) {
+  SWIG_Error(SWIG_AttributeError,"Variable State_xmlname_tag is read-only.");
+  return 1;
+}
+
+
+SWIGINTERN PyObject *Swig_var_State_xmlname_tag_get(void) {
+  PyObject *pyobj = 0;
+  
+  pyobj = SWIG_From_std_string(static_cast< std::string >(wali::wfa::State::XMLNameTag));
+  return pyobj;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_State__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::State *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)":new_State")) SWIG_fail;
+  result = (wali::wfa::State *)new wali::wfa::State();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_wali__wfa__State, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_State__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::Key arg1 ;
+  wali::sem_elem_t arg2 ;
+  size_t val1 ;
+  int ecode1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  wali::wfa::State *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:new_State",&obj0,&obj1)) SWIG_fail;
+  ecode1 = SWIG_AsVal_size_t(obj0, &val1);
+  if (!SWIG_IsOK(ecode1)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_State" "', argument " "1"" of type '" "wali::Key""'");
+  } 
+  arg1 = static_cast< wali::Key >(val1);
+  {
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "new_State" "', argument " "2"" of type '" "wali::sem_elem_t""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_State" "', argument " "2"" of type '" "wali::sem_elem_t""'");
+    } else {
+      wali::sem_elem_t * temp = reinterpret_cast< wali::sem_elem_t * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  result = (wali::wfa::State *)new wali::wfa::State(arg1,arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_wali__wfa__State, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_State__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::State *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  wali::wfa::State *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:new_State",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_wali__wfa__State,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_State" "', argument " "1"" of type '" "wali::wfa::State const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_State" "', argument " "1"" of type '" "wali::wfa::State const &""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::State * >(argp1);
+  result = (wali::wfa::State *)new wali::wfa::State((wali::wfa::State const &)*arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_wali__wfa__State, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_State(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[3];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = args ? (int)PyObject_Length(args) : 0;
+  for (ii = 0; (ii < 2) && (ii < argc); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 0) {
+    return _wrap_new_State__SWIG_0(self, args);
+  }
+  if (argc == 1) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_wali__wfa__State, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_new_State__SWIG_2(self, args);
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    {
+      int res = SWIG_AsVal_size_t(argv[0], NULL);
+      _v = SWIG_CheckState(res);
+    }
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_new_State__SWIG_1(self, args);
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number or type of arguments for overloaded function 'new_State'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    wali::wfa::State::State()\n"
+    "    wali::wfa::State::State(wali::Key,wali::sem_elem_t)\n"
+    "    wali::wfa::State::State(wali::wfa::State const &)\n");
+  return 0;
+}
+
+
+SWIGINTERN PyObject *_wrap_delete_State(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::State *arg1 = (wali::wfa::State *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:delete_State",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__State, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_State" "', argument " "1"" of type '" "wali::wfa::State *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::State * >(argp1);
+  delete arg1;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_add_trans(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::State *arg1 = (wali::wfa::State *) 0 ;
+  ITrans *arg2 = (ITrans *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:State_add_trans",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__State, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "State_add_trans" "', argument " "1"" of type '" "wali::wfa::State *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::State * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_ITrans, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "State_add_trans" "', argument " "2"" of type '" "ITrans *""'"); 
+  }
+  arg2 = reinterpret_cast< ITrans * >(argp2);
+  (arg1)->addTrans(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_weight__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::State *arg1 = (wali::wfa::State *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  wali::sem_elem_t *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:State_weight",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__State, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "State_weight" "', argument " "1"" of type '" "wali::wfa::State *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::State * >(argp1);
+  result = (wali::sem_elem_t *) &(arg1)->weight();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_weight__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::State *arg1 = (wali::wfa::State *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  wali::sem_elem_t *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:State_weight",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__State, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "State_weight" "', argument " "1"" of type '" "wali::wfa::State const *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::State * >(argp1);
+  result = (wali::sem_elem_t *) &((wali::wfa::State const *)arg1)->weight();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_weight(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[2];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = args ? (int)PyObject_Length(args) : 0;
+  for (ii = 0; (ii < 1) && (ii < argc); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_wali__wfa__State, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_State_weight__SWIG_0(self, args);
+    }
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_wali__wfa__State, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_State_weight__SWIG_1(self, args);
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number or type of arguments for overloaded function 'State_weight'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    wali::wfa::State::weight()\n"
+    "    wali::wfa::State::weight() const\n");
+  return 0;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_accept_weight__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::State *arg1 = (wali::wfa::State *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  wali::sem_elem_t *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:State_accept_weight",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__State, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "State_accept_weight" "', argument " "1"" of type '" "wali::wfa::State *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::State * >(argp1);
+  result = (wali::sem_elem_t *) &(arg1)->acceptWeight();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_accept_weight__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::State *arg1 = (wali::wfa::State *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  wali::sem_elem_t *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:State_accept_weight",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__State, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "State_accept_weight" "', argument " "1"" of type '" "wali::wfa::State const *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::State * >(argp1);
+  result = (wali::sem_elem_t *) &((wali::wfa::State const *)arg1)->acceptWeight();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_accept_weight(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[2];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = args ? (int)PyObject_Length(args) : 0;
+  for (ii = 0; (ii < 1) && (ii < argc); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_wali__wfa__State, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_State_accept_weight__SWIG_0(self, args);
+    }
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_wali__wfa__State, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_State_accept_weight__SWIG_1(self, args);
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number or type of arguments for overloaded function 'State_accept_weight'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    wali::wfa::State::acceptWeight()\n"
+    "    wali::wfa::State::acceptWeight() const\n");
+  return 0;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_delta(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::State *arg1 = (wali::wfa::State *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  wali::sem_elem_t *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:State_delta",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__State, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "State_delta" "', argument " "1"" of type '" "wali::wfa::State *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::State * >(argp1);
+  result = (wali::sem_elem_t *) &(arg1)->delta();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_wali__ref_ptrT_wali__SemElem_t, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_name(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::State *arg1 = (wali::wfa::State *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  wali::Key result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:State_name",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__State, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "State_name" "', argument " "1"" of type '" "wali::wfa::State const *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::State * >(argp1);
+  result = ((wali::wfa::State const *)arg1)->name();
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_begin__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::State *arg1 = (wali::wfa::State *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  SwigValueWrapper< std::set< ITrans *,ITransLT,std::allocator< wali::wfa::ITrans * > >::iterator > result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:State_begin",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__State, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "State_begin" "', argument " "1"" of type '" "wali::wfa::State *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::State * >(argp1);
+  result = (arg1)->begin();
+  resultobj = SWIG_NewPointerObj((new wali::wfa::State::iterator(static_cast< const wali::wfa::State::iterator& >(result))), SWIGTYPE_p_std__setT_ITrans_p_ITransLT_std__allocatorT_wali__wfa__ITrans_p_t_t__iterator, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_end__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::State *arg1 = (wali::wfa::State *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  SwigValueWrapper< std::set< ITrans *,ITransLT,std::allocator< wali::wfa::ITrans * > >::iterator > result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:State_end",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__State, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "State_end" "', argument " "1"" of type '" "wali::wfa::State *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::State * >(argp1);
+  result = (arg1)->end();
+  resultobj = SWIG_NewPointerObj((new wali::wfa::State::iterator(static_cast< const wali::wfa::State::iterator& >(result))), SWIGTYPE_p_std__setT_ITrans_p_ITransLT_std__allocatorT_wali__wfa__ITrans_p_t_t__iterator, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_begin__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::State *arg1 = (wali::wfa::State *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  SwigValueWrapper< std::set< ITrans *,ITransLT,std::allocator< wali::wfa::ITrans * > >::const_iterator > result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:State_begin",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__State, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "State_begin" "', argument " "1"" of type '" "wali::wfa::State const *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::State * >(argp1);
+  result = ((wali::wfa::State const *)arg1)->begin();
+  resultobj = SWIG_NewPointerObj((new wali::wfa::State::const_iterator(static_cast< const wali::wfa::State::const_iterator& >(result))), SWIGTYPE_p_std__setT_ITrans_p_ITransLT_std__allocatorT_wali__wfa__ITrans_p_t_t__const_iterator, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_begin(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[2];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = args ? (int)PyObject_Length(args) : 0;
+  for (ii = 0; (ii < 1) && (ii < argc); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_wali__wfa__State, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_State_begin__SWIG_0(self, args);
+    }
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_wali__wfa__State, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_State_begin__SWIG_1(self, args);
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number or type of arguments for overloaded function 'State_begin'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    wali::wfa::State::begin()\n"
+    "    wali::wfa::State::begin() const\n");
+  return 0;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_end__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::State *arg1 = (wali::wfa::State *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  SwigValueWrapper< std::set< ITrans *,ITransLT,std::allocator< wali::wfa::ITrans * > >::const_iterator > result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:State_end",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__State, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "State_end" "', argument " "1"" of type '" "wali::wfa::State const *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::State * >(argp1);
+  result = ((wali::wfa::State const *)arg1)->end();
+  resultobj = SWIG_NewPointerObj((new wali::wfa::State::const_iterator(static_cast< const wali::wfa::State::const_iterator& >(result))), SWIGTYPE_p_std__setT_ITrans_p_ITransLT_std__allocatorT_wali__wfa__ITrans_p_t_t__const_iterator, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_end(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[2];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = args ? (int)PyObject_Length(args) : 0;
+  for (ii = 0; (ii < 1) && (ii < argc); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_wali__wfa__State, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_State_end__SWIG_0(self, args);
+    }
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_wali__wfa__State, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_State_end__SWIG_1(self, args);
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number or type of arguments for overloaded function 'State_end'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    wali::wfa::State::end()\n"
+    "    wali::wfa::State::end() const\n");
+  return 0;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_erase_trans__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::State *arg1 = (wali::wfa::State *) 0 ;
+  wali::Key arg2 ;
+  wali::Key arg3 ;
+  wali::Key arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  size_t val3 ;
+  int ecode3 = 0 ;
+  size_t val4 ;
+  int ecode4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  bool result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:State_erase_trans",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__State, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "State_erase_trans" "', argument " "1"" of type '" "wali::wfa::State *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::State * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "State_erase_trans" "', argument " "2"" of type '" "wali::Key""'");
+  } 
+  arg2 = static_cast< wali::Key >(val2);
+  ecode3 = SWIG_AsVal_size_t(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "State_erase_trans" "', argument " "3"" of type '" "wali::Key""'");
+  } 
+  arg3 = static_cast< wali::Key >(val3);
+  ecode4 = SWIG_AsVal_size_t(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "State_erase_trans" "', argument " "4"" of type '" "wali::Key""'");
+  } 
+  arg4 = static_cast< wali::Key >(val4);
+  result = (bool)(arg1)->eraseTrans(arg2,arg3,arg4);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_erase_trans__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::State *arg1 = (wali::wfa::State *) 0 ;
+  ITrans *arg2 = (ITrans *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  bool result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:State_erase_trans",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__State, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "State_erase_trans" "', argument " "1"" of type '" "wali::wfa::State *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::State * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_ITrans, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "State_erase_trans" "', argument " "2"" of type '" "ITrans *""'"); 
+  }
+  arg2 = reinterpret_cast< ITrans * >(argp2);
+  result = (bool)(arg1)->eraseTrans(arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_erase_trans(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[5];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = args ? (int)PyObject_Length(args) : 0;
+  for (ii = 0; (ii < 4) && (ii < argc); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_wali__wfa__State, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_ITrans, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_State_erase_trans__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 4) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_wali__wfa__State, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_size_t(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_size_t(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            return _wrap_State_erase_trans__SWIG_0(self, args);
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number or type of arguments for overloaded function 'State_erase_trans'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    wali::wfa::State::eraseTrans(wali::Key,wali::Key,wali::Key)\n"
+    "    wali::wfa::State::eraseTrans(ITrans *)\n");
+  return 0;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_clear_trans_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::State *arg1 = (wali::wfa::State *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:State_clear_trans_set",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__State, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "State_clear_trans_set" "', argument " "1"" of type '" "wali::wfa::State *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::State * >(argp1);
+  (arg1)->clearTransSet();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_State___call__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::State *arg1 = (wali::wfa::State *) 0 ;
+  wali::wfa::State *arg2 = (wali::wfa::State *) 0 ;
+  wali::wfa::State *arg3 = (wali::wfa::State *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  bool result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:State___call__",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__State, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "State___call__" "', argument " "1"" of type '" "wali::wfa::State const *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::State * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_wali__wfa__State, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "State___call__" "', argument " "2"" of type '" "wali::wfa::State const *""'"); 
+  }
+  arg2 = reinterpret_cast< wali::wfa::State * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_wali__wfa__State, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "State___call__" "', argument " "3"" of type '" "wali::wfa::State const *""'"); 
+  }
+  arg3 = reinterpret_cast< wali::wfa::State * >(argp3);
+  result = (bool)((wali::wfa::State const *)arg1)->operator ()((wali::wfa::State const *)arg2,(wali::wfa::State const *)arg3);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_get_trans_set__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::State *arg1 = (wali::wfa::State *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  wali::wfa::TransSet *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:State_get_trans_set",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__State, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "State_get_trans_set" "', argument " "1"" of type '" "wali::wfa::State *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::State * >(argp1);
+  result = (wali::wfa::TransSet *) &(arg1)->getTransSet();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_wali__wfa__TransSet, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_get_trans_set__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  wali::wfa::State *arg1 = (wali::wfa::State *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  wali::wfa::TransSet *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:State_get_trans_set",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_wali__wfa__State, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "State_get_trans_set" "', argument " "1"" of type '" "wali::wfa::State const *""'"); 
+  }
+  arg1 = reinterpret_cast< wali::wfa::State * >(argp1);
+  result = (wali::wfa::TransSet *) &((wali::wfa::State const *)arg1)->getTransSet();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_wali__wfa__TransSet, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_State_get_trans_set(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[2];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = args ? (int)PyObject_Length(args) : 0;
+  for (ii = 0; (ii < 1) && (ii < argc); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_wali__wfa__State, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_State_get_trans_set__SWIG_0(self, args);
+    }
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_wali__wfa__State, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_State_get_trans_set__SWIG_1(self, args);
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number or type of arguments for overloaded function 'State_get_trans_set'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    wali::wfa::State::getTransSet()\n"
+    "    wali::wfa::State::getTransSet() const\n");
+  return 0;
+}
+
+
+SWIGINTERN PyObject *State_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!PyArg_ParseTuple(args,(char*)"O:swigregister", &obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_wali__wfa__State, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
 
@@ -29999,6 +30976,13 @@ static PyMethodDef SwigMethods[] = {
 		"    self: wali::SemElem const *\n"
 		"\n"
 		""},
+	 { (char *)"SemElem_getuserdata", _wrap_SemElem_getuserdata, METH_VARARGS, (char *)"\n"
+		"SemElem_getuserdata(self) -> PyObject *\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::SemElem *\n"
+		"\n"
+		""},
 	 { (char *)"SemElem___str__", _wrap_SemElem___str__, METH_VARARGS, (char *)"\n"
 		"SemElem___str__(self) -> PyObject *\n"
 		"\n"
@@ -30309,6 +31293,13 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		"Parameters:\n"
 		"    self: wali::ref_ptr< SemElem > const *\n"
+		"\n"
+		""},
+	 { (char *)"SemElemPtr_getuserdata", _wrap_SemElemPtr_getuserdata, METH_VARARGS, (char *)"\n"
+		"SemElemPtr_getuserdata(self) -> PyObject *\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::ref_ptr< SemElem > *\n"
 		"\n"
 		""},
 	 { (char *)"SemElemPtr___str__", _wrap_SemElemPtr___str__, METH_VARARGS, (char *)"\n"
@@ -31891,6 +32882,123 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		""},
 	 { (char *)"TransVector_swigregister", TransVector_swigregister, METH_VARARGS, NULL},
+	 { (char *)"State_num_states_get", _wrap_State_num_states_get, METH_VARARGS, NULL},
+	 { (char *)"State_num_states_set", _wrap_State_num_states_set, METH_VARARGS, NULL},
+	 { (char *)"new_State", _wrap_new_State, METH_VARARGS, (char *)"\n"
+		"State()\n"
+		"State(name, W)\n"
+		"\n"
+		"Parameters:\n"
+		"    name: wali::Key\n"
+		"    W: wali::sem_elem_t\n"
+		"\n"
+		"new_State(st) -> State\n"
+		"\n"
+		"Parameters:\n"
+		"    st: wali::wfa::State const &\n"
+		"\n"
+		""},
+	 { (char *)"delete_State", _wrap_delete_State, METH_VARARGS, (char *)"\n"
+		"delete_State(self)\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::wfa::State *\n"
+		"\n"
+		""},
+	 { (char *)"State_add_trans", _wrap_State_add_trans, METH_VARARGS, (char *)"\n"
+		"State_add_trans(self, t)\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::wfa::State *\n"
+		"    t: ITrans *\n"
+		"\n"
+		""},
+	 { (char *)"State_weight", _wrap_State_weight, METH_VARARGS, (char *)"\n"
+		"weight() -> SemElemPtr\n"
+		"State_weight(self) -> SemElemPtr\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::wfa::State const *\n"
+		"\n"
+		""},
+	 { (char *)"State_accept_weight", _wrap_State_accept_weight, METH_VARARGS, (char *)"\n"
+		"accept_weight() -> SemElemPtr\n"
+		"State_accept_weight(self) -> SemElemPtr\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::wfa::State const *\n"
+		"\n"
+		""},
+	 { (char *)"State_delta", _wrap_State_delta, METH_VARARGS, (char *)"\n"
+		"State_delta(self) -> SemElemPtr\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::wfa::State *\n"
+		"\n"
+		""},
+	 { (char *)"State_name", _wrap_State_name, METH_VARARGS, (char *)"\n"
+		"State_name(self) -> wali::Key\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::wfa::State const *\n"
+		"\n"
+		""},
+	 { (char *)"State_begin", _wrap_State_begin, METH_VARARGS, (char *)"\n"
+		"begin() -> wali::wfa::State::iterator\n"
+		"State_begin(self) -> wali::wfa::State::const_iterator\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::wfa::State const *\n"
+		"\n"
+		""},
+	 { (char *)"State_end", _wrap_State_end, METH_VARARGS, (char *)"\n"
+		"end() -> wali::wfa::State::iterator\n"
+		"State_end(self) -> wali::wfa::State::const_iterator\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::wfa::State const *\n"
+		"\n"
+		""},
+	 { (char *)"State_erase_trans", _wrap_State_erase_trans, METH_VARARGS, (char *)"\n"
+		"erase_trans(_from, stack, to) -> bool\n"
+		"\n"
+		"Parameters:\n"
+		"    from: wali::Key\n"
+		"    stack: wali::Key\n"
+		"    to: wali::Key\n"
+		"\n"
+		"State_erase_trans(self, t) -> bool\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::wfa::State *\n"
+		"    t: ITrans *\n"
+		"\n"
+		""},
+	 { (char *)"State_clear_trans_set", _wrap_State_clear_trans_set, METH_VARARGS, (char *)"\n"
+		"State_clear_trans_set(self)\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::wfa::State *\n"
+		"\n"
+		""},
+	 { (char *)"State___call__", _wrap_State___call__, METH_VARARGS, (char *)"\n"
+		"State___call__(self, a, b) -> bool\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::wfa::State const *\n"
+		"    a: wali::wfa::State const *\n"
+		"    b: wali::wfa::State const *\n"
+		"\n"
+		""},
+	 { (char *)"State_get_trans_set", _wrap_State_get_trans_set, METH_VARARGS, (char *)"\n"
+		"get_trans_set() -> TransSet\n"
+		"State_get_trans_set(self) -> TransSet\n"
+		"\n"
+		"Parameters:\n"
+		"    self: wali::wfa::State const *\n"
+		"\n"
+		""},
+	 { (char *)"State_swigregister", State_swigregister, METH_VARARGS, NULL},
 	 { (char *)"DotAttributePrinter_print_extra_attributes", _wrap_DotAttributePrinter_print_extra_attributes, METH_VARARGS, (char *)"\n"
 		"print_extra_attributes(state, o)\n"
 		"\n"
@@ -32312,12 +33420,12 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		""},
 	 { (char *)"WFA_get_state", _wrap_WFA_get_state, METH_VARARGS, (char *)"\n"
-		"get_state(name) -> wali::wfa::State const\n"
+		"get_state(name) -> State\n"
 		"\n"
 		"Parameters:\n"
 		"    name: wali::Key\n"
 		"\n"
-		"WFA_get_state(self, name) -> wali::wfa::State *\n"
+		"WFA_get_state(self, name) -> State\n"
 		"\n"
 		"Parameters:\n"
 		"    self: wali::wfa::WFA *\n"
@@ -33438,6 +34546,9 @@ static void *_p_wali__wpds__fwpds__FWPDSTo_p_wali__wpds__WPDS(void *x, int *SWIG
 static void *_p_wali__wpds__GenKeySourceTo_p_wali__KeySource(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((wali::KeySource *)  ((wali::wpds::GenKeySource *) x));
 }
+static void *_p_wali__wfa__StateTo_p_wali__Printable(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((wali::Printable *)  ((wali::wfa::State *) x));
+}
 static void *_p_wali__wfa__WFATo_p_wali__Printable(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((wali::Printable *)  ((wali::wfa::WFA *) x));
 }
@@ -33489,6 +34600,7 @@ static swig_type_info _swigt__p_TaggedWeight = {"_p_TaggedWeight", "TaggedWeight
 static swig_type_info _swigt__p_TransSet = {"_p_TransSet", "TransSet *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_WeightMaker = {"_p_WeightMaker", "WeightMaker *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_Word = {"_p_Word", "Word *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p__object = {"_p__object", "_object *|PyObject *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_allocator_type = {"_p_allocator_type", "allocator_type *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_boost__functionT_bool_fITrans_const_pF_t = {"_p_boost__functionT_bool_fITrans_const_pF_t", "boost::function< bool (ITrans const *) > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_boost__functionT_void_fITrans_const_pF_t = {"_p_boost__functionT_void_fITrans_const_pF_t", "boost::function< void (ITrans const *) > *", 0, 0, (void*)0, 0};
@@ -33513,7 +34625,7 @@ static swig_type_info _swigt__p_kp_map_t = {"_p_kp_map_t", "kp_map_t *", 0, 0, (
 static swig_type_info _swigt__p_mapped_type = {"_p_mapped_type", "mapped_type *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_merge_fn_t = {"_p_merge_fn_t", "merge_fn_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_merge_rule_hash_t = {"_p_merge_rule_hash_t", "merge_rule_hash_t *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_p_PyObject = {"_p_p_PyObject", "PyObject **", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_p__object = {"_p_p__object", "_object **|PyObject **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_pair_type = {"_p_pair_type", "pair_type *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_progress_t = {"_p_progress_t", "progress_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_reference = {"_p_reference", "reference *", 0, 0, (void*)0, 0};
@@ -33541,8 +34653,8 @@ static swig_type_info _swigt__p_std__pairT_wali__HashMapIteratorT_KeyPair_TransS
 static swig_type_info _swigt__p_std__pairT_wali__ref_ptrT_PySemElem_t_wali__ref_ptrT_PySemElem_t_t = {"_p_std__pairT_wali__ref_ptrT_PySemElem_t_wali__ref_ptrT_PySemElem_t_t", "std::pair< wali::ref_ptr< PySemElem >,wali::ref_ptr< PySemElem > > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__pairT_wali__ref_ptrT_wali__SemElem_t_wali__ref_ptrT_wali__SemElem_t_t = {"_p_std__pairT_wali__ref_ptrT_wali__SemElem_t_wali__ref_ptrT_wali__SemElem_t_t", "std::pair< wali::sem_elem_t,wali::sem_elem_t > *|std::pair< wali::ref_ptr< wali::SemElem >,wali::ref_ptr< wali::SemElem > > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__setT_ITrans_p_ITransLT_std__allocatorT_ITrans_p_t_t = {"_p_std__setT_ITrans_p_ITransLT_std__allocatorT_ITrans_p_t_t", "std::set< ITrans *,ITransLT > *|std::set< ITrans *,ITransLT,std::allocator< ITrans * > > *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_std__setT_ITrans_p_ITransLT_std__allocatorT_wali__wfa__ITrans_p_t_t__const_iterator = {"_p_std__setT_ITrans_p_ITransLT_std__allocatorT_wali__wfa__ITrans_p_t_t__const_iterator", "std::set< ITrans *,ITransLT,std::allocator< wali::wfa::ITrans * > >::const_iterator *|wali::wfa::TransSet::const_iterator *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_std__setT_ITrans_p_ITransLT_std__allocatorT_wali__wfa__ITrans_p_t_t__iterator = {"_p_std__setT_ITrans_p_ITransLT_std__allocatorT_wali__wfa__ITrans_p_t_t__iterator", "std::set< ITrans *,ITransLT,std::allocator< wali::wfa::ITrans * > >::iterator *|wali::wfa::TransSet::iterator *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_std__setT_ITrans_p_ITransLT_std__allocatorT_wali__wfa__ITrans_p_t_t__const_iterator = {"_p_std__setT_ITrans_p_ITransLT_std__allocatorT_wali__wfa__ITrans_p_t_t__const_iterator", "std::set< ITrans *,ITransLT,std::allocator< wali::wfa::ITrans * > >::const_iterator *|wali::wfa::TransSet::const_iterator *|wali::wfa::State::const_iterator *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_std__setT_ITrans_p_ITransLT_std__allocatorT_wali__wfa__ITrans_p_t_t__iterator = {"_p_std__setT_ITrans_p_ITransLT_std__allocatorT_wali__wfa__ITrans_p_t_t__iterator", "std::set< ITrans *,ITransLT,std::allocator< wali::wfa::ITrans * > >::iterator *|wali::wfa::TransSet::iterator *|wali::wfa::State::iterator *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t = {"_p_std__setT_size_t_std__lessT_size_t_t_std__allocatorT_size_t_t_t", "std::set< size_t,std::less< size_t >,std::allocator< size_t > > *|std::set< size_t > *|std::set< wali::Key,std::less< wali::Key >,std::allocator< wali::Key > > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorT__Tp_p__Alloc_t = {"_p_std__vectorT__Tp_p__Alloc_t", "std::vector< _Tp *,_Alloc > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorT_size_t_std__allocatorT_size_t_t_t = {"_p_std__vectorT_size_t_std__allocatorT_size_t_t_t", "std::vector< size_t,std::allocator< size_t > > *|wali::wfa::WFA::Word *|std::vector< wali::Key,std::allocator< wali::Key > > *", 0, 0, (void*)0, 0};
@@ -33605,6 +34717,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_TransSet,
   &_swigt__p_WeightMaker,
   &_swigt__p_Word,
+  &_swigt__p__object,
   &_swigt__p_allocator_type,
   &_swigt__p_boost__functionT_bool_fITrans_const_pF_t,
   &_swigt__p_boost__functionT_void_fITrans_const_pF_t,
@@ -33629,7 +34742,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_mapped_type,
   &_swigt__p_merge_fn_t,
   &_swigt__p_merge_rule_hash_t,
-  &_swigt__p_p_PyObject,
+  &_swigt__p_p__object,
   &_swigt__p_pair_type,
   &_swigt__p_progress_t,
   &_swigt__p_reference,
@@ -33721,6 +34834,7 @@ static swig_cast_info _swigc__p_TaggedWeight[] = {  {&_swigt__p_TaggedWeight, 0,
 static swig_cast_info _swigc__p_TransSet[] = {  {&_swigt__p_TransSet, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_WeightMaker[] = {  {&_swigt__p_WeightMaker, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_Word[] = {  {&_swigt__p_Word, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p__object[] = {  {&_swigt__p__object, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_allocator_type[] = {  {&_swigt__p_allocator_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_boost__functionT_bool_fITrans_const_pF_t[] = {  {&_swigt__p_boost__functionT_bool_fITrans_const_pF_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_boost__functionT_void_fITrans_const_pF_t[] = {  {&_swigt__p_boost__functionT_void_fITrans_const_pF_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -33745,7 +34859,7 @@ static swig_cast_info _swigc__p_kp_map_t[] = {  {&_swigt__p_kp_map_t, 0, 0, 0},{
 static swig_cast_info _swigc__p_mapped_type[] = {  {&_swigt__p_mapped_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_merge_fn_t[] = {  {&_swigt__p_merge_fn_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_merge_rule_hash_t[] = {  {&_swigt__p_merge_rule_hash_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_p_PyObject[] = {  {&_swigt__p_p_PyObject, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_p__object[] = {  {&_swigt__p_p__object, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_pair_type[] = {  {&_swigt__p_pair_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_progress_t[] = {  {&_swigt__p_progress_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_reference[] = {  {&_swigt__p_reference, 0, 0, 0},{0, 0, 0, 0}};
@@ -33787,7 +34901,7 @@ static swig_cast_info _swigc__p_wali__HashMapIteratorT_KeyPair_TransSet_wali__hm
 static swig_cast_info _swigc__p_wali__HashMapT_KeyPair_TransSet_wali__hm_hashT_KeyPair_t_wali__hm_equalT_KeyPair_t_t[] = {  {&_swigt__p_wali__HashMapT_KeyPair_TransSet_wali__hm_hashT_KeyPair_t_wali__hm_equalT_KeyPair_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_wali__KeySource[] = {  {&_swigt__p_wali__KeySource, 0, 0, 0},  {&_swigt__p_wali__wpds__GenKeySource, _p_wali__wpds__GenKeySourceTo_p_wali__KeySource, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_wali__KeySpace[] = {  {&_swigt__p_wali__KeySpace, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_wali__Printable[] = {  {&_swigt__p_wali__wpds__WPDS, _p_wali__wpds__WPDSTo_p_wali__Printable, 0, 0},  {&_swigt__p_wali__wpds__ewpds__EWPDS, _p_wali__wpds__ewpds__EWPDSTo_p_wali__Printable, 0, 0},  {&_swigt__p_wali__Reach, _p_wali__ReachTo_p_wali__Printable, 0, 0},  {&_swigt__p_wali__Printable, 0, 0, 0},  {&_swigt__p_wali__KeySource, _p_wali__KeySourceTo_p_wali__Printable, 0, 0},  {&_swigt__p_wali__wpds__GenKeySource, _p_wali__wpds__GenKeySourceTo_p_wali__Printable, 0, 0},  {&_swigt__p_wali__wfa__WFA, _p_wali__wfa__WFATo_p_wali__Printable, 0, 0},  {&_swigt__p_wali__wpds__fwpds__FWPDS, _p_wali__wpds__fwpds__FWPDSTo_p_wali__Printable, 0, 0},  {&_swigt__p_wali__SemElem, _p_wali__SemElemTo_p_wali__Printable, 0, 0},  {&_swigt__p_PySemElem, _p_PySemElemTo_p_wali__Printable, 0, 0},  {&_swigt__p_wali__wfa__TransSet, _p_wali__wfa__TransSetTo_p_wali__Printable, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_wali__Printable[] = {  {&_swigt__p_wali__wpds__WPDS, _p_wali__wpds__WPDSTo_p_wali__Printable, 0, 0},  {&_swigt__p_wali__wpds__ewpds__EWPDS, _p_wali__wpds__ewpds__EWPDSTo_p_wali__Printable, 0, 0},  {&_swigt__p_wali__wfa__State, _p_wali__wfa__StateTo_p_wali__Printable, 0, 0},  {&_swigt__p_wali__Reach, _p_wali__ReachTo_p_wali__Printable, 0, 0},  {&_swigt__p_wali__Printable, 0, 0, 0},  {&_swigt__p_wali__KeySource, _p_wali__KeySourceTo_p_wali__Printable, 0, 0},  {&_swigt__p_wali__wpds__GenKeySource, _p_wali__wpds__GenKeySourceTo_p_wali__Printable, 0, 0},  {&_swigt__p_wali__wfa__WFA, _p_wali__wfa__WFATo_p_wali__Printable, 0, 0},  {&_swigt__p_wali__wpds__fwpds__FWPDS, _p_wali__wpds__fwpds__FWPDSTo_p_wali__Printable, 0, 0},  {&_swigt__p_wali__SemElem, _p_wali__SemElemTo_p_wali__Printable, 0, 0},  {&_swigt__p_PySemElem, _p_PySemElemTo_p_wali__Printable, 0, 0},  {&_swigt__p_wali__wfa__TransSet, _p_wali__wfa__TransSetTo_p_wali__Printable, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_wali__Reach[] = {  {&_swigt__p_wali__Reach, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_wali__SemElem[] = {  {&_swigt__p_wali__Reach, _p_wali__ReachTo_p_wali__SemElem, 0, 0},  {&_swigt__p_wali__SemElem, 0, 0, 0},  {&_swigt__p_PySemElem, _p_PySemElemTo_p_wali__SemElem, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_wali__SemElemRefPtrContainerLessThan[] = {  {&_swigt__p_wali__SemElemRefPtrContainerLessThan, 0, 0, 0},{0, 0, 0, 0}};
@@ -33837,6 +34951,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_TransSet,
   _swigc__p_WeightMaker,
   _swigc__p_Word,
+  _swigc__p__object,
   _swigc__p_allocator_type,
   _swigc__p_boost__functionT_bool_fITrans_const_pF_t,
   _swigc__p_boost__functionT_void_fITrans_const_pF_t,
@@ -33861,7 +34976,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_mapped_type,
   _swigc__p_merge_fn_t,
   _swigc__p_merge_rule_hash_t,
-  _swigc__p_p_PyObject,
+  _swigc__p_p__object,
   _swigc__p_pair_type,
   _swigc__p_progress_t,
   _swigc__p_reference,
@@ -34624,6 +35739,12 @@ SWIG_init(void) {
   SWIG_addvarlink(SWIG_globals(),(char*)"SemElem_xmltag",Swig_var_SemElem_xmltag_get, Swig_var_SemElem_xmltag_set);
   SWIG_Python_SetConstant(d, "KeyPairMap_SIZE_TYPE_MAX",SWIG_From_int(static_cast< int >(wali::HashMap< KeyPair,TransSet,hm_hash< KeyPair >,hm_equal< KeyPair > >::SIZE_TYPE_MAX)));
   SWIG_addvarlink(SWIG_globals(),(char*)"Trans_num_trans",Swig_var_Trans_num_trans_get, Swig_var_Trans_num_trans_set);
+  SWIG_Python_SetConstant(d, "wali_wfa_STATE_GUARD",SWIG_From_int(static_cast< int >(1)));
+  SWIG_addvarlink(SWIG_globals(),(char*)"State_num_states",Swig_var_State_num_states_get, Swig_var_State_num_states_set);
+  SWIG_addvarlink(SWIG_globals(),(char*)"State_xmltag",Swig_var_State_xmltag_get, Swig_var_State_xmltag_set);
+  SWIG_addvarlink(SWIG_globals(),(char*)"State_xmlinitial_tag",Swig_var_State_xmlinitial_tag_get, Swig_var_State_xmlinitial_tag_set);
+  SWIG_addvarlink(SWIG_globals(),(char*)"State_xmlfinal_tag",Swig_var_State_xmlfinal_tag_get, Swig_var_State_xmlfinal_tag_set);
+  SWIG_addvarlink(SWIG_globals(),(char*)"State_xmlname_tag",Swig_var_State_xmlname_tag_get, Swig_var_State_xmlname_tag_set);
   SWIG_Python_SetConstant(d, "WFA_INORDER",SWIG_From_int(static_cast< int >(wali::wfa::WFA::INORDER)));
   SWIG_Python_SetConstant(d, "WFA_REVERSE",SWIG_From_int(static_cast< int >(wali::wfa::WFA::REVERSE)));
   SWIG_Python_SetConstant(d, "WFA_MAX",SWIG_From_int(static_cast< int >(wali::wfa::WFA::MAX)));
