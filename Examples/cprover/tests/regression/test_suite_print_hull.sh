@@ -20,7 +20,7 @@ OUTDIR="$SUITE/outputs"
 # The input tests are copied here
 INDIR="$SUITE/inputs"
 RESULT="$OUTDIR/__PHresult.out"
-SCRIPT="$SUITE/ph.py"
+SCRIPT="$SUITE/toPrintHullHTML.py"
 
 TIMEOUT="10m"
 
