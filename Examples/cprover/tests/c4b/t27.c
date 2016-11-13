@@ -23,8 +23,8 @@ int main()
 
 	start(n, y);
 	
-	double bnd = 0.01 * ((y > n) ? (y - n) : 0) + 11 * ((n < 0) ? -n : 0);
-	assert(__cost <= bnd);
+	int bnd = ((y > n) ? (y - n) : 0) + 1100 * ((n < 0) ? -n : 0);
+	assert(100*__cost <= bnd);
 	
 	return 0;
 }

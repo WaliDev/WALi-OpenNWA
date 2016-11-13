@@ -15,6 +15,7 @@ int srch(int t[],    // object string
            k = -1;   // backjump distance (initially undefined)
         
         while (i < n) {
+	      tick(1);
               while (j >= 0 && t[i] != p[j]) {  // check for a match failure
                         tick(1);
                         // Adjust j according to the failure function

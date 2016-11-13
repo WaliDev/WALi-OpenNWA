@@ -6,11 +6,13 @@ void start(int x, int y)
 {
 	int z;
 
+	__VERIFIER_assume(y >= 0);
 	while (x > y) {
 		tick(1);
 		x -= y + 1;
-		for (z = y; z > 0; z--)
-			/* nothing */;
+		for (z = y; z > 0; z--) {
+		    tick(1);
+		}
 	}
 }
 
@@ -20,7 +22,6 @@ int main()
 
 	int x = __VERIFIER_nondet_int();
 	int y = __VERIFIER_nondet_int();
-	__VERIFIER_assume(y >= 0);
 
 	start(x, y);
 	

@@ -6,9 +6,10 @@ void start(int x, int y)
 {
 	int z;
 
-	// assert(y >= 0);
+	__VERIFIER_assume(y >= 0);
 
 	while (x > y) {
+	        tick(1);
 		x -= y + 1;
 		z = 100 + 2 * y;
 		while (z > 0) {
@@ -24,7 +25,6 @@ int main()
 
 	int x = __VERIFIER_nondet_int();
 	int y = __VERIFIER_nondet_int();
-	__VERIFIER_assume(y >= 0);
 
 	start(x, y);
 	

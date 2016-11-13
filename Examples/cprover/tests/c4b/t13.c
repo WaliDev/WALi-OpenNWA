@@ -5,9 +5,9 @@
 void start(int x, int y)
 {
 	while (x > 0) {
+		tick(1);
 		x = x - 1;
 		if (__VERIFIER_nondet_int()) {
-			tick(1);
 			y = y + 1;
 		}
 		else {
