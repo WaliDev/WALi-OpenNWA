@@ -9,6 +9,8 @@ void start(int n, int m)
 	//replaced this with the assumption in main
 	//assert(0 < m);
 
+	assume(0 < m && m < n);
+
 	while (i > 0) {
 		tick(1);
 		if (i < m)
@@ -30,7 +32,6 @@ int main()
 
 	int n = __VERIFIER_nondet_int();
 	int m = __VERIFIER_nondet_int();
-	__VERIFIER_assume(m > 0);
 		
 	run(n, m);
 	

@@ -7,11 +7,10 @@
 void start(int x, int n, int y, int m)
 {
 	while (x < n) {
-		while (y < m) {
-			if (__VERIFIER_nondet_int())
-				break;
-			y = y + 1;
+	        tick(1);
+		while (y < m && __VERIFIER_nondet_int()) {
 			tick(1);
+			y = y + 1;
 		}
 		x = x + 1;
 	}

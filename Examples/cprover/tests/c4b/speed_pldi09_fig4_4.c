@@ -8,10 +8,9 @@ void start(int n, int m)
 {
 	int i=n;
 
-	//replaced this with the assumption in main
-	//assert(0 < m);
+	__VERIFIER_assume(n > m && m > 0);
 
-	while (i > 0) {
+	while (i > 0 && __VERIFIER_nondet_int()) {
 		tick(1);
 		if (i < m)
 			i=i-1;

@@ -9,8 +9,7 @@ void start(int n, int m, int dir)
 {
 	int i;
 
-	// assert(0 < m);
-	// assert(m < n);
+	__VERIFIER_assume(0 < m && m < n);
 
 	i = m;
 
@@ -29,9 +28,7 @@ int main()
 	
 	int dir = __VERIFIER_nondet_int();
 	int m = __VERIFIER_nondet_int();
-	__VERIFIER_assume(m > 0);
 	int n = __VERIFIER_nondet_int();
-	__VERIFIER_assume(n > m);
 	
 	start(n, m, dir);
 	

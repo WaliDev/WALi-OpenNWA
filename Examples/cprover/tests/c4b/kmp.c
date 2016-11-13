@@ -17,6 +17,7 @@ int srch(int t[],    // object string
            k = -1;   // backjump distance (initially undefined)
         
         while (i < n) {
+	      tick(1);
               while (j >= 0 && t[i] != p[j]) {  // check for a match failure
                         tick(1);
                         // Adjust j according to the failure function
@@ -62,6 +63,6 @@ int main()
 
         srch(t, t_len, p, p_len, b);
 
-        __VERIFIER_assert(__cost <= t_len + p_len);
+	    __VERIFIER_assert (__cost <= 2 * t_len + 1);
         return 0;
 }

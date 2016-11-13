@@ -8,8 +8,7 @@ void start(int n)
 {
 	int x = 0;
 
-	while (x < n) {
-		if (__VERIFIER_nondet_int()) break;
+	while (x < n && __VERIFIER_nondet_int()) {
 		tick(1);
 		x = x + 1;
 	}
