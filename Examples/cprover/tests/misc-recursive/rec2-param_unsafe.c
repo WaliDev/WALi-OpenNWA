@@ -1,8 +1,9 @@
+#include "assert.h"
 void loop(int x) {
     if (x < 10) {
 	loop(x + 1);
     } else {
-	    assert(x <= 1); // unsafe
+	    __VERIFIER_assert(x <= 1); // unsafe
     }
 }
 

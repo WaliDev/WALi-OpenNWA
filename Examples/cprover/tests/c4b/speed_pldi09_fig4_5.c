@@ -1,3 +1,5 @@
+#include "assert.h"
+
 // C4B output: Not Available
 // SPEED output: mx(n,n-m)
 
@@ -34,6 +36,6 @@ int main()
 	start(n, m, dir);
 	
 	int bnd = (n > ( n - m)) ? n : (n - m);
-	assert (__cost <= bnd);
+	__VERIFIER_assert (__cost <= bnd);
 	return 0;
 }

@@ -1,3 +1,5 @@
+#include "assert.h"
+
 /* Quicksort */
 // C4B output: 1+2|[0,len]|
 
@@ -40,6 +42,6 @@ int main()
 	start (a, len);
 
 	int bnd = 1 + 2 * len;
-	assert(__cost <= bnd);	
+	__VERIFIER_assert(__cost <= bnd);	
 	return 0;
 }

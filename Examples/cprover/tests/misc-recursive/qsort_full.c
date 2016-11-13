@@ -1,16 +1,17 @@
+#include "assert.h"
 // adapted from C4B example "qsort.c"
 #define RANDOM_INCLUSIVE(L, H) __t = __VERIFIER_nondet_int(); \
                            __VERIFIER_assume(__t >= L && __t <= H)
-#define SWAP_ELEMENTS(X,Y) assert(X >= low && X < hi && Y >= low && Y < hi); \
+#define SWAP_ELEMENTS(X,Y) __VERIFIER_assert(X >= low && X < hi && Y >= low && Y < hi); \
                            __t=a[X]; a[X]=a[Y]; a[Y]=__t 
-#define ASSERT_IN_BOUNDS(X) assert(X >= low && X < hi)
+#define ASSERT_IN_BOUNDS(X) __VERIFIER_assert(X >= low && X < hi)
 int length;
 
 // Sort the subregion of a at index positions [low,hi)
 void quicksort(int *a, int low, int hi) {
     int __t, pivot, pivotIndex, i, j;
 
-    assert(0 <= low && hi <= length);
+    __VERIFIER_assert(0 <= low && hi <= length);
 
     if (hi - low < 2) return;
 

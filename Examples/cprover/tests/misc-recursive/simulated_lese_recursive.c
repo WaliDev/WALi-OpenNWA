@@ -1,3 +1,4 @@
+#include "assert.h"
 // This program is based on an example from
 //
 //   P. Saxena, P. Poosankam, S. McCamant, and D. Song,
@@ -77,7 +78,7 @@ int main(){
   // Comment out next line to simulate (2) the construction of an overapproximating path formula 
   __VERIFIER_assume(i == 20);  // Simulates (1) exploration with a concrete state in which N is 20
 
-  assert(ver_len >= 8);  // Should SUCCEED for exploration (1); should FAIL when path-formula (2) is used
+  __VERIFIER_assert(ver_len >= 8);  // Should SUCCEED for exploration (1); should FAIL when path-formula (2) is used
 
   return(0);
 }

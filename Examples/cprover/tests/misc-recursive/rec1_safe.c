@@ -1,3 +1,4 @@
+#include "assert.h"
 int x;
 void loop() {
     if (x < 10) {
@@ -9,7 +10,7 @@ void loop() {
 void main() {
     x = 0;
     loop();
-	assert(x >= 0); // safe
-	assert(x <= 10); // safe
-	assert(x == 10); // safe
+	__VERIFIER_assert(x >= 0); // safe
+	__VERIFIER_assert(x <= 10); // safe
+	__VERIFIER_assert(x == 10); // safe
 }

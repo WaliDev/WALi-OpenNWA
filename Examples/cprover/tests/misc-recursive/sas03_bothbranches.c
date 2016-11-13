@@ -1,3 +1,4 @@
+#include "assert.h"
 int x;
 
 void p(int v) {
@@ -24,5 +25,5 @@ int main() {
   x = n;
   p(v);
   
-  assert(x==n);
+  __VERIFIER_assert(x==n);
 }

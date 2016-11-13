@@ -1,3 +1,5 @@
+#include "assert.h"
+
 // C4B output: 1+2|[0,n]|
 
 #include "tick.h"
@@ -32,6 +34,6 @@ int main()
 	start(n, m);
 	
 	int bnd = 1 + 2 * (n > 0 ? n : 0);
-	assert(__cost <= bnd);
+	__VERIFIER_assert(__cost <= bnd);
 	return 0;
 }

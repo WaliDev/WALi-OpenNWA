@@ -1,3 +1,5 @@
+#include "assert.h"
+
 /* Knuth-Morris-Pratt string searching */
 // C4B output: 1+2|[0,n]|
 
@@ -60,6 +62,6 @@ int main()
 
         srch(t, t_len, p, p_len, b);
 
-        assert(__cost <= t_len + p_len);
+        __VERIFIER_assert(__cost <= t_len + p_len);
         return 0;
 }

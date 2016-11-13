@@ -1,3 +1,5 @@
+#include "assert.h"
+
 // C4B output: |[x,0]|+|[0,y]|+1002|[y,x]|
 
 #include "tick.h"
@@ -31,7 +33,7 @@ int main()
 	start(x, y);
 	
 	int bnd = ((x < 0) ? -x : 0) + ((y > 0) ? y : 0) + 1002 * ((x > y) ? (x - y) : 0);
-	assert(__cost <= bnd);
+	__VERIFIER_assert(__cost <= bnd);
 	
 	return 0;
 }

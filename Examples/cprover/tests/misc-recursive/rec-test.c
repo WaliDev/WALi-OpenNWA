@@ -1,3 +1,4 @@
+#include "assert.h"
 int i = 0;
 
 void loop() {
@@ -11,5 +12,5 @@ void loop() {
 
 void main() {
    loop();
-   assert(i==50);
+   __VERIFIER_assert(i==50);
 }

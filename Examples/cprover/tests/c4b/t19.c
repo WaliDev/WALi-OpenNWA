@@ -1,3 +1,5 @@
+#include "assert.h"
+
 // C4B output: 50+|[-1,i]|+|[0,k]|
 
 #include "tick.h"
@@ -25,7 +27,7 @@ int main()
 	start(i, k);
 	
 	int bnd = 50 + ((i > -1) ? (i + 1) : 0) + ((k > 0) ? k : 0);
-	assert(__cost <= bnd);
+	__VERIFIER_assert(__cost <= bnd);
 	
 	return 0;
 }
