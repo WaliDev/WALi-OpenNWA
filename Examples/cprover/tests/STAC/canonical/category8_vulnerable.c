@@ -23,11 +23,12 @@ void f1(int n, int m, int p) {
 
 int main(int argc, char ** argv) {
     init_tick(0);
-    if(argc != 3 || atoi(argv[0])>9 || atoi(argv[1])>9 || atoi(argv[2]>99)) return -1;
-    int n = atoi(argv[0]);
-    int m = atoi(argv[1]);
-    int p = atoi(argv[2]);
+    if(argc != 4 || atoi(argv[1])>9 || atoi(argv[2])>9 || atoi(argv[3]>99)) return -1;
+    int n = atoi(argv[1]);
+    int m = atoi(argv[2]);
+    int p = atoi(argv[3]);
     f1(n, m, p);
+    return 0;
 }
 
 /*
