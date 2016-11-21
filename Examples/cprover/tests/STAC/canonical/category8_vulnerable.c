@@ -5,6 +5,7 @@ void f3(int p) {
     for(i=0; i<p; i++) {
         tick(1);
     }
+    __VERIFIER_print_hull(__cost);
 }
 
 void f2(int m, int p) {
@@ -12,6 +13,7 @@ void f2(int m, int p) {
     for(i=0; i<m; i++) {
         f3(p);
     }
+    __VERIFIER_print_hull(__cost);
 }
 
 void f1(int n, int m, int p) {
@@ -19,6 +21,7 @@ void f1(int n, int m, int p) {
     for(i=0; i<n; i++) {
         f2(m, p);
     }
+    __VERIFIER_print_hull(__cost);
 }
 
 int main(int argc, char ** argv) {
@@ -31,6 +34,7 @@ int main(int argc, char ** argv) {
     return 0;
 }
 
+// Java source:
 /*
 
 //Only Consider a Single Dimension of Input
