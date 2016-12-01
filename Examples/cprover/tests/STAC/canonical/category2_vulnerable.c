@@ -12,8 +12,8 @@ void doProcess(int n) {
 
 int main(int argc, char ** argv) {
     init_tick(0);
-    if (argc != 1 || atoi(argv[0]) > 99) { return -1; }
-    doProcess(atoi(argv[0]));
+    if (argc != 2 || atoi(argv[1]) > 99) { return -1; }
+    doProcess(atoi(argv[1]));
     return 0;
 }
 

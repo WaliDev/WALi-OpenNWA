@@ -18,6 +18,7 @@ void checkSecret(int guess) {
             }
         }
     }
+    __VERIFIER_print_hull(__cost);
 }
 
 int main(int argc, char ** argv) {
