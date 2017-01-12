@@ -49,6 +49,7 @@ typedef CBTI BASETYPE;
 #include "wali/Key.hpp"
 #include "wali/ref_ptr.hpp"
 #include "wali/IntSource.hpp"
+#include "wali/KeyPairSource.hpp"
 // ::wali::util
 #include "wali/util/Timer.hpp"
 // ::wali::cprover
@@ -6869,6 +6870,15 @@ void * work(void *)
 
 #ifdef USE_DUET
 
+void printProcedureNameFromNode(int nodeNumber, ostream& out) {
+    CAMLparam0();
+    CAMLlocal1(sval);
+    value * proc_func = caml_named_value("procedure_of_vertex_callback");
+    sval = caml_callback(*proc_func, Val_int(nodeNumber));
+    out << String_val(sval);
+    CAMLreturn0;
+}
+
 int runBasicNewton(char **args, int runningMode)
 {
     caml_startup(args);
@@ -6891,6 +6901,13 @@ int runBasicNewton(char **args, int runningMode)
     
     pds->print(std::cout);
     
+    // Copied from elsewhere, this is supposed to produce a dotfile of the PDS
+    //fstream pds_stream("pds.dot", fstream::out);
+    //RuleDotty rd(pds_stream);
+    //pds_stream << "digraph{" << endl;
+    //pds->for_each(rd);
+    //pds_stream << "}" << endl;
+
     doWideningThisRound = false;
     inNewtonLoop = false;
 
@@ -6910,21 +6927,54 @@ int runBasicNewton(char **args, int runningMode)
     //if (exitTransitionFound) {
     //    compare_weights(t);
     //}
-
+  
+    std::cout << "================================================" << std::endl;
+    std::cout << "Procedure Summaries" << std::endl << std::endl;
+    
     // Set exit_transitions to the set of all transitions in outfaNewton
     // of the form (st1,WALI_EPSILON,<st1,e>), where e is an entry node
     wali::wfa::TransSet exit_transitions;
     exit_transitions = outfaNewton.match(st1(), WALI_EPSILON);
     for(wali::wfa::TransSet::iterator tsit = exit_transitions.begin(); tsit != exit_transitions.end(); tsit++)
     {
-        std::cout << "Procedure summary for (some as yet unidentified -- FIXME) procedure" << std::endl;
-        //std::cout << "  from=" << (*tsit)->from() << ", to=" << (*tsit)->to() << ", stack=" << (*tsit)->stack() << "." << std::endl;
+        std::cout << "------------------------------------------------" << std::endl;
+
+        // First, we want to print the procedure name; for that, we need to find
+        //   the procedure's entry vertex, so we can call printProcedureNameFromNode.
+        // After our various automaton manipulations, the following code seems to be
+        //   what's required to obtain the procedure's entry vertex key from the
+        //   exit transition whose weight is the procedure summary.
+        wali::Key toKey = (*tsit)->to();
+        wali::key_src_t ks = wali::getKeySource(toKey);
+        wali::wpds::GenKeySource * gks = dynamic_cast<wali::wpds::GenKeySource *>(ks.get_ptr());
+        if (gks != NULL) {
+            wali::Key gksk = gks->getKey();
+            wali::KeyPairSource * kps = dynamic_cast<wali::KeyPairSource *>(wali::getKeySource(gksk).get_ptr());
+            if (kps != NULL) {
+                wali::IntSource * is = dynamic_cast<wali::IntSource *>(wali::getKeySource(kps->second()).get_ptr());
+                if (is != NULL) {
+                    int entryVertex = is->getInt();
+                    std::cout << "Procedure summary for ";
+                    printProcedureNameFromNode(entryVertex, std::cout);
+                    std::cout << std::endl;
+                } else {
+                    std::cout << "Procedure summary for an unknown procedure.  This shouldn't happen.  Case 1." << std::endl;
+                }
+            } else {
+                std::cout << "Procedure summary for an unknown procedure.  This shouldn't happen.  Case 2." << std::endl;
+            }
+        } else {
+            std::cout << "Procedure summary for main (I guess!)" << std::endl;
+        }
+
+        // Finally, we can print the procedure summary itself:
+        std::cout << std::endl;
         duetrel_t nval = ((DuetRel*)((*tsit)->weight().get_ptr()));
-        //DuetRel *nval = ((DuetRel*)((*tsit)->weight().get_ptr()));
-        //DuetRel *nval = ((DuetRel*)((*tsit)->weight().get_ptr()))->getValue();
         nval->print(std::cout);
         std::cout << std::endl << std::endl;
+
     }
+
     std::cout << "================================================" << std::endl;
     std::cout << "Bounds on Variables" << std::endl << std::endl;
     
@@ -6954,7 +7004,7 @@ int runBasicNewton(char **args, int runningMode)
     }
     
     std::cout << "================================================" << std::endl;
-    std::cout << "Assertion Checkings at Error Points" << std::endl << std::endl;
+    std::cout << "Assertion Checking at Error Points" << std::endl << std::endl;
     
     //std::cout << std::endl << "outfaNewton" << std::endl;
     //outfaNewton.print(std::cout);
