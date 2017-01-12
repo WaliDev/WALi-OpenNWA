@@ -6945,13 +6945,14 @@ int runBasicNewton(char **args, int runningMode)
         //   what's required to obtain the procedure's entry vertex key from the
         //   exit transition whose weight is the procedure summary.
         wali::Key toKey = (*tsit)->to();
-        wali::key_src_t ks = wali::getKeySource(toKey);
-        wali::wpds::GenKeySource * gks = dynamic_cast<wali::wpds::GenKeySource *>(ks.get_ptr());
+        wali::ref_ptr<wali::KeySource> ks = wali::getKeySource(toKey);
+        wali::ref_ptr<wali::wpds::GenKeySource> gks = dynamic_cast<wali::wpds::GenKeySource *>(ks.get_ptr());
         if (gks != NULL) {
-            wali::Key gksk = gks->getKey();
-            wali::KeyPairSource * kps = dynamic_cast<wali::KeyPairSource *>(wali::getKeySource(gksk).get_ptr());
+            wali::ref_ptr<wali::KeySource> gksks = wali::getKeySource(gks->getKey());
+            wali::ref_ptr<wali::KeyPairSource> kps = dynamic_cast<wali::KeyPairSource *>(gksks.get_ptr());
             if (kps != NULL) {
-                wali::IntSource * is = dynamic_cast<wali::IntSource *>(wali::getKeySource(kps->second()).get_ptr());
+                wali::ref_ptr<wali::KeySource> kpsks = wali::getKeySource(kps->second());
+                wali::ref_ptr<wali::IntSource> is = dynamic_cast<wali::IntSource *>(kpsks.get_ptr());
                 if (is != NULL) {
                     int entryVertex = is->getInt();
                     std::cout << "Procedure summary for ";
