@@ -7142,6 +7142,7 @@ int main(int argc, char **argv)
         {"cra-guard",        required_argument, 0,            'G' },
 	{"z3-timeout",       required_argument, 0,            'Z' },
 	{"cra-abstract-limit",required_argument,0,            'L' },
+	{"cra-abstraction-timeout",required_argument,0,            'A' },
         {0,                  0,                 0,             0  }
     };
 
