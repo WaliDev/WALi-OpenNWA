@@ -7069,7 +7069,22 @@ int runBasicNewton(char **args, int runningMode)
             duetrel_t contextWeight = ((DuetRel*)(outfaNewton.getState((*tsit)->to())->weight().get_ptr()));  // Weight of calling context
             duetrel_t composedWeight = contextWeight->Compose(intraprocWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
             
-            std::cout << "Variable Bounds at Line: " << line << std::endl;
+            //std::cout << "Variable Bounds at Line: " << line << std::endl;
+            std::cout << "Variable bounds";
+            if (line != -1) {
+                std::cout << " at line " << line << " in ";
+            } else {
+                std::cout << " for procedure ";
+            }
+            wali::ref_ptr<wali::KeySource> ks = wali::getKeySource(key);
+            wali::ref_ptr<wali::IntSource> is = dynamic_cast<wali::IntSource *>(ks.get_ptr());
+            if (is != NULL) {
+                int vertex = is->getInt();
+                printProcedureNameFromNode(vertex, std::cout);
+                std::cout << std::endl;
+            } else {
+                std::cout << "unknown procedure" << std::endl;
+            }
             intraprocWeight->printHull(std::cout, 0, variableID);
             std::cout << std::endl;
         }
