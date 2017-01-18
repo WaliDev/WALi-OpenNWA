@@ -524,6 +524,7 @@ StarMapT oldStarValT;
 
 bool doWideningThisRound;
 bool inNewtonLoop;
+char *  globalBoundingVarName; // name of program variable for which we want to do a print_hull in main.  NULL if there is none.
 
 // FIXME: In the following functions, consider whether or not:
 //    (1) we need a separate case for the final evaluation that occurs outside
@@ -6879,6 +6880,15 @@ void printProcedureNameFromNode(int nodeNumber, ostream& out) {
     CAMLreturn0;
 }
 
+int getGlobalBoundingVarFromName(char * variableName) {
+    CAMLparam0();
+    CAMLlocal2(sval, idval);
+    sval = caml_copy_string(variableName);
+    value * proc_func = caml_named_value("get_global_var");
+    idval = caml_callback(*proc_func, sval);
+    CAMLreturnT(int, Int_val(idval));
+}
+
 int runBasicNewton(char **args, int runningMode)
 {
     caml_startup(args);
@@ -6920,6 +6930,8 @@ int runBasicNewton(char **args, int runningMode)
 
     wali::Key acc = wali::getKeySpace()->getKey("accept");
 
+    duetrel_t mainProcedureSummary = NULL;
+
     Trans t;
 
     bool exitTransitionFound = outfaNewton.find(st1(), exit_key, acc, t);
@@ -6938,6 +6950,8 @@ int runBasicNewton(char **args, int runningMode)
     for(wali::wfa::TransSet::iterator tsit = exit_transitions.begin(); tsit != exit_transitions.end(); tsit++)
     {
         std::cout << "------------------------------------------------" << std::endl;
+
+        bool foundMain = false;
 
         // First, we want to print the procedure name; for that, we need to find
         //   the procedure's entry vertex, so we can call printProcedureNameFromNode.
@@ -6966,11 +6980,13 @@ int runBasicNewton(char **args, int runningMode)
             }
         } else {
             std::cout << "Procedure summary for main (I guess!)" << std::endl;
+            foundMain = true;
         }
 
         // Finally, we can print the procedure summary itself:
         std::cout << std::endl;
         duetrel_t nval = ((DuetRel*)((*tsit)->weight().get_ptr()));
+        if (foundMain) { mainProcedureSummary = nval; }
         nval->print(std::cout);
         std::cout << std::endl << std::endl;
 
@@ -7049,6 +7065,15 @@ int runBasicNewton(char **args, int runningMode)
 
     std::cout << "================================================" << std::endl;
     std::cout << "Bounds on Variables" << std::endl << std::endl;
+    
+    if (globalBoundingVarName != NULL && mainProcedureSummary != NULL) {
+        // We've been asked to print bounds on a particular global variable
+        //   for the main procedure.
+        std::cout << "Variable bounds for main procedure: " << std::endl;
+        int variableID = getGlobalBoundingVarFromName(globalBoundingVarName);
+        mainProcedureSummary->printHull(std::cout, 0, variableID);
+        std::cout << std::endl;
+    }
     
     // Check the assertion at each error point
     for (std::vector<caml_print_hull_rule>::iterator it = printHullRuleHolder.begin(); 
@@ -7139,6 +7164,7 @@ void printHelp() {
 int main(int argc, char **argv)
 {
     int runningMode = 0;
+    globalBoundingVarName = NULL; 
 	std::vector <char *> unrecognizedArgs;
     static struct option long_options[] = {
         {"cra_newton_basic", no_argument,       &runningMode,  NEWTON_FROM_BELOW  },
@@ -7158,6 +7184,7 @@ int main(int argc, char **argv)
 	{"z3-timeout",       required_argument, 0,            'Z' },
 	{"cra-abstract-limit",required_argument,0,            'L' },
 	{"cra-abstraction-timeout",required_argument,0,            'A' },
+  	    {"bound-entry",      required_argument, 0,            'B' },
         {0,                  0,                 0,             0  }
     };
 
@@ -7186,6 +7213,10 @@ int main(int argc, char **argv)
 			case 'R':
 				maxRnds = atoi(optarg);
 				break;
+            case 'B':
+                globalBoundingVarName = optarg;
+                std::cout << "Printing variable bounds for " << optarg << std::endl;
+                break;
 			// duet options with an argument
 			case 'M':
 			case 'V':
