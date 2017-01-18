@@ -7066,16 +7066,6 @@ int runBasicNewton(char **args, int runningMode)
     std::cout << "================================================" << std::endl;
     std::cout << "Bounds on Variables" << std::endl << std::endl;
     
-    if (globalBoundingVarName != NULL && mainProcedureSummary != NULL) {
-        // We've been asked to print bounds on a particular global variable
-        //   for the main procedure.
-        std::cout << "Variable bounds for main procedure: " << std::endl;
-        int variableID = getGlobalBoundingVarFromName(globalBoundingVarName);
-        mainProcedureSummary->printHull(std::cout, 0, variableID);
-        std::cout << std::endl;
-    }
-    
-    // Check the assertion at each error point
     for (std::vector<caml_print_hull_rule>::iterator it = printHullRuleHolder.begin(); 
          it != printHullRuleHolder.end(); 
          it++)
@@ -7115,6 +7105,14 @@ int runBasicNewton(char **args, int runningMode)
         }
     }
     
+    if (globalBoundingVarName != NULL && mainProcedureSummary != NULL) {
+        // We've been asked to print bounds on a particular global variable
+        //   for the main procedure.
+        std::cout << "Variable bounds for main procedure: " << std::endl;
+        int variableID = getGlobalBoundingVarFromName(globalBoundingVarName);
+        mainProcedureSummary->printHull(std::cout, 0, variableID);
+        std::cout << std::endl;
+    }
     
   /*  if(dump){
         FWPDS * originalPds = new FWPDS();
