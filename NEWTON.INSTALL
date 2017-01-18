@@ -3,7 +3,9 @@ These instructions describe the installation of Newton-Duet.
 First, please note that Newton-Duet has only been set up on Linux; if you need
 to run it on a different platform, you will need to arrange for a non-Linux
 version of the "libtslre" library to be created.  (Alternatively, you could
-substitute a full installation of TSL.)
+substitute a full installation of TSL.)  Also, the libtslre library binary is
+not necessarily portable across GCC versions.  The system has been tested on
+Ubuntu 14.04; some problems have been reported with a later Ubuntu version.
 
 Currently, we have dependencies on:
 
@@ -36,7 +38,7 @@ The libtslre directory must be in a particular position, at:
 
 That is, you should clone that repository with a command like:
   cd WALi-OpenNWA/Examples/cprover
-  git clone https://github.com/Grammatech/libtslre.git
+  git clone -b Gaussian https://github.com/Grammatech/libtslre.git
 
 In addition to the instructions for building Duet, we place one additional
 constraint on your OCaml installation: You need an OCaml compiler with the
@@ -102,7 +104,7 @@ If that step is successful, you are ready to run Newton-Duet.
 
 You can run the tool with a command like:
 
- _build64/Examples/cprover/NewtonOcaml -cra_newton_basic Examples/cprover/tests/kmp.c
+ _build64/Examples/cprover/NewtonOcaml -cra_newton_basic Examples/cprover/tests/t07.c
 
 
 More input programs are stored in "Examples/cprover/tests".
