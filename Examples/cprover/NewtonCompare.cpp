@@ -7164,6 +7164,19 @@ int main(int argc, char **argv)
     int runningMode = 0;
     globalBoundingVarName = NULL; 
 	std::vector <char *> unrecognizedArgs;
+
+    // As a temporary measure, allow arguments to be given starting with a plus
+    bool warnAboutPlus = true;
+    for(int i = 1; i < argc; i++) {
+        if (argv[i][0] == '+') {
+            argv[i][0] =  '-';
+            if (warnAboutPlus) {
+                warnAboutPlus = false;
+                std::cerr << "Warning: ICRA is translating '+' command-line arguments to '-'" << std::endl;
+            }
+        }
+    }
+
     static struct option long_options[] = {
         {"cra_newton_basic", no_argument,       &runningMode,  NEWTON_FROM_BELOW  },
         {"cra_newton_star",  no_argument,       &runningMode,  2  },
