@@ -702,6 +702,27 @@ std::ostream& DuetRel::printAbstract( std::ostream& o ) const
   CAMLreturnT(std::ostream&, o);
 }
 
+std::ostream& DuetRel::printSmtlib( std::ostream& o ) const 
+{
+  
+  CAMLparam0();
+  CAMLlocal1(dval); 
+  
+  dval = this->getValue();
+
+  value * print_smtlib_func;
+
+  if (isTensored) {
+    print_smtlib_func = caml_named_value("tensor_print_smtlib");
+  } else {
+    print_smtlib_func = caml_named_value("print_smtlib");
+  }
+
+  o << String_val(caml_callback(*print_smtlib_func, dval)) << std::endl;
+
+  CAMLreturnT(std::ostream&, o);
+}
+
 std::ostream& DuetRel::print( std::ostream& o ) const 
 {
   return printIndented(o, 0);

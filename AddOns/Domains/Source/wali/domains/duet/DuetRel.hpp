@@ -110,6 +110,7 @@ namespace wali
           std::ostream& printIndented( std::ostream& o, unsigned int indent ) const;
 	  std::ostream& printHull( std::ostream& o, unsigned int indent, int var ) const;
           std::ostream& printAbstract( std::ostream& o ) const;
+          std::ostream& printSmtlib( std::ostream& o ) const;
 
           // ////////////////////////////////
           // SemElemTensor methods

@@ -524,6 +524,7 @@ StarMapT oldStarValT;
 
 bool doWideningThisRound;
 bool inNewtonLoop;
+bool doSmtlibOutput;
 char *  globalBoundingVarName; // name of program variable for which we want to do a print_hull in main.  NULL if there is none.
 
 // FIXME: In the following functions, consider whether or not:
@@ -6943,6 +6944,9 @@ int runBasicNewton(char **args, int runningMode)
     std::cout << "================================================" << std::endl;
     std::cout << "Procedure Summaries" << std::endl << std::endl;
     
+    ofstream smtout;
+    if (doSmtlibOutput) { smtout.open("smtlib_output.smt2"); }
+
     // Set exit_transitions to the set of all transitions in outfaNewton
     // of the form (st1,WALI_EPSILON,<st1,e>), where e is an entry node
     wali::wfa::TransSet exit_transitions;
@@ -6952,6 +6956,9 @@ int runBasicNewton(char **args, int runningMode)
         std::cout << "------------------------------------------------" << std::endl;
 
         bool foundMain = false;
+
+        std::cout << "Procedure summary for ";
+        if (doSmtlibOutput) { smtout << "; Procedure summary for "; }
 
         // First, we want to print the procedure name; for that, we need to find
         //   the procedure's entry vertex, so we can call printProcedureNameFromNode.
@@ -6969,17 +6976,20 @@ int runBasicNewton(char **args, int runningMode)
                 wali::ref_ptr<wali::IntSource> is = dynamic_cast<wali::IntSource *>(kpsks.get_ptr());
                 if (is != NULL) {
                     int entryVertex = is->getInt();
-                    std::cout << "Procedure summary for ";
                     printProcedureNameFromNode(entryVertex, std::cout);
+                    if (doSmtlibOutput) { smtout << "'"; printProcedureNameFromNode(entryVertex, smtout); smtout << "'" << std::endl; }
                     std::cout << std::endl;
                 } else {
-                    std::cout << "Procedure summary for an unknown procedure.  This shouldn't happen.  Case 1." << std::endl;
+                    std::cout << "an unknown procedure.  This shouldn't happen.  Case 1." << std::endl;
+                    if (doSmtlibOutput) { smtout << "an unknown procedure.  This shouldn't happen.  Case 1." << std::endl; }
                 }
             } else {
-                std::cout << "Procedure summary for an unknown procedure.  This shouldn't happen.  Case 2." << std::endl;
+                std::cout << "an unknown procedure.  This shouldn't happen.  Case 2." << std::endl;
+                if (doSmtlibOutput) { smtout << "an unknown procedure.  This shouldn't happen.  Case 2." << std::endl; }
             }
         } else {
-            std::cout << "Procedure summary for main (I guess!)" << std::endl;
+            std::cout << "main (I guess!)" << std::endl;
+            if (doSmtlibOutput) { smtout << "'main' (I guess!)" << std::endl; }
             foundMain = true;
         }
 
@@ -6990,7 +7000,13 @@ int runBasicNewton(char **args, int runningMode)
         nval->print(std::cout);
         std::cout << std::endl << std::endl;
 
+        if (doSmtlibOutput) {
+            nval->printSmtlib(smtout);
+            smtout << std::endl;
+        }
     }
+
+    if (doSmtlibOutput) { smtout.close(); }
 
     std::cout << "================================================" << std::endl;
     std::cout << "Assertion Checking at Error Points" << std::endl << std::endl;
@@ -7162,6 +7178,7 @@ void printHelp() {
 int main(int argc, char **argv)
 {
     int runningMode = 0;
+    doSmtlibOutput = false;
     globalBoundingVarName = NULL; 
 	std::vector <char *> unrecognizedArgs;
 
@@ -7183,7 +7200,7 @@ int main(int argc, char **argv)
         {"cra_newton_above", no_argument,       &runningMode,  NEWTON_FROM_ABOVE  },
         {"simplify",         no_argument,       0,            'S' },
         {"no_simplify_on_print",no_argument,    0,            'P' },
-        {"help",	         no_argument,       0,            'H' },
+        {"help",             no_argument,       0,            'H' },
         {"dump",             no_argument,       0,            'D' },
         {"rounds",           required_argument, 0,            'R' },
         {"test",             required_argument, 0,            'T' },
@@ -7192,10 +7209,11 @@ int main(int argc, char **argv)
         {"verbosity",        required_argument, 0,            'I' },
         {"qe",               required_argument, 0,            'Q' },
         {"cra-guard",        required_argument, 0,            'G' },
-	{"z3-timeout",       required_argument, 0,            'Z' },
-	{"cra-abstract-limit",required_argument,0,            'L' },
-	{"cra-abstraction-timeout",required_argument,0,            'A' },
-  	    {"bound-entry",      required_argument, 0,            'B' },
+        {"z3-timeout",       required_argument, 0,            'Z' },
+        {"cra-abstract-limit",required_argument,0,            'L' },
+        {"cra-abstraction-timeout",required_argument,0,       'A' },
+        {"bound-entry",      required_argument, 0,            'B' },
+        {"smtlib-output",    no_argument,       0,            'U' },
         {0,                  0,                 0,             0  }
     };
 
@@ -7223,6 +7241,9 @@ int main(int argc, char **argv)
 				break;
 			case 'R':
 				maxRnds = atoi(optarg);
+				break;
+			case 'U':
+			    doSmtlibOutput = true;	
 				break;
             case 'B':
                 globalBoundingVarName = optarg;
