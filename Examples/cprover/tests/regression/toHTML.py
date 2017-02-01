@@ -1,4 +1,4 @@
-import os
+import os, git_info
 
 fin = open('outputs/__result.out', 'r')
 fout = open('result.html', 'w')
@@ -6,6 +6,12 @@ fout = open('result.html', 'w')
 fout.write('<!DOCTYPE html>\n')
 fout.write('<html>\n')
 fout.write('<body>\n')
+
+fout.write('WALi-OpenNWA version: '+git_info.getMostRecentCommitHash("."))
+fout.write(' ('+git_info.getMostRecentCommitDate(".")+')<br>\n')
+duetPath = "../../../../../duet"
+fout.write('duet version: '+git_info.getMostRecentCommitHash(duetPath))
+fout.write(' ('+git_info.getMostRecentCommitDate(duetPath)+')<br>\n')
 
 fout.write('<table style="width:100%" border="1">\n')
 

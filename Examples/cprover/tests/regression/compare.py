@@ -1,4 +1,4 @@
-import os
+import os, git_info
 
 NEWTON_BELOW = 1
 NEWTON_ABOVE = 3
@@ -86,6 +86,13 @@ fout = open('compare.html', 'w')
 fout.write('<!DOCTYPE html>\n')
 fout.write('<html>\n')
 fout.write('<body>\n')
+
+fout.write('Most recent versions: <br>\n')
+fout.write('WALi-OpenNWA version: '+git_info.getMostRecentCommitHash("."))
+fout.write(' ('+git_info.getMostRecentCommitDate(".")+')<br>\n')
+duetPath = "../../../../../duet"
+fout.write('duet version: '+git_info.getMostRecentCommitHash(duetPath))
+fout.write(' ('+git_info.getMostRecentCommitDate(duetPath)+')<br>\n')
 
 fout.write('<table style="width:100%" border="1">\n')
 

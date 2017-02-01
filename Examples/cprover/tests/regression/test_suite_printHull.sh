@@ -6,12 +6,16 @@
 #          will be overwritten by the other.
 # Puts the result in Examples/cprover/tests/regression/print_hull.html
 
+trap "exit" INT
+
 shopt -s nullglob
 
 NEWTON_DIR="$(pwd)"
 
 SUITE="$NEWTON_DIR/Examples/cprover/tests/regression"
-TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b_print_hull )
+TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b_print_hull $NEWTON_DIR/Examples/cprover/tests/STAC/polynomial/PH $NEWTON_DIR/Examples/cprover/tests/STAC/canonical $NEWTON_DIR/Examples/cprover/tests/STAC/E3Model )
+#TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/tmp_single_printhull )
+#TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b_print_hull )
 
 NEWTON="$NEWTON_DIR/_build64/Examples/cprover/NewtonOcaml"
 

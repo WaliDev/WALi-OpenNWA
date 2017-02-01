@@ -6,6 +6,8 @@
 #          will be overwritten by the other.
 # Puts the result in Examples/cprover/tests/regression/result.html
 
+trap "exit" INT
+
 shopt -s nullglob
 
 NEWTON_DIR="$(pwd)"
