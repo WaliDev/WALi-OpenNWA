@@ -11,7 +11,8 @@ Currently, we have dependencies on:
 
   flex
   bison
-  boost (tested with version 1.55)
+  boost (tested with version 1.55, but our actual boost version requirements 
+         aren't precisely known; for one user, 1.63 triggered a crash)
 
 You will need to clone three repositories:
 
