@@ -54,17 +54,20 @@ for directory in ${TESTDIRS[@]}; do
 		
 		echo -n "Running test $i of ${#TESTS[@]} ..."
 		
-		echo -n " Below ..."
+		echo -n " ICRA ..."
+		start=$(date +%s%N)
 		cd $NEWTON_DIR
-		eval "timeout $TIMEOUT sh -c '{ $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf; } &> $below_outfile'"
+		eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf &> $below_outfile"
+		#eval "timeout $TIMEOUT sh -c '{ $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf; } &> $below_outfile'"
 		success=$?
 		if (($success==124)); then
 			echo "__TIMEOUT" >> $RESULT
-			echo -ne "\e[31mTimeout\e[0m"
+			echo -e "\e[31mTimeout\e[0m"
 		elif (($success!=0)); then
 			echo "__EXCEPTION" >> $RESULT
-			echo -ne "\e[31mException\e[0m"
+			echo -e "\e[31mException\e[0m"
 		else
+            echo "(OK)"
 			###echo -n " Duet ..."
 			###echo -n "__DUET " >> $RESULT
 			###cd $DUET_DIR
@@ -77,6 +80,9 @@ for directory in ${TESTDIRS[@]}; do
 			###	echo "" >> $RESULT
 			###fi
 		fi
+		end=$(date +%s%N)
+		len=$(expr $end - $start)
+		echo "__NTIME $len" >> $RESULT
 
 		# Here's a modified version of Ashkan's code, which is supposed to avoid ever running Duet: 
 		#echo -n " (skipping Duet) ..."
@@ -95,11 +101,11 @@ for directory in ${TESTDIRS[@]}; do
 		#len=$(expr $end - $start)
                 len=0
 		echo "__DTIME $len" >> $RESULT
-		echo -n " Above ..."
+		#echo -n " Above ..."
 		cd $NEWTON_DIR
 
 		echo "__EXCEPTION" >> $RESULT
-		echo "SKIPPING NEWTON FROM ABOVE"
+		#echo "SKIPPING NEWTON FROM ABOVE"
 
 		#eval "timeout $TIMEOUT sh -c '{ $NEWTON -cra_newton_above -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf; } &> $above_outfile'"
 		#success=$?
