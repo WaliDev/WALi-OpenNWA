@@ -127,4 +127,4 @@ done
 echo -n "Generating HTML ... "
 cd $SUITE
 python $SCRIPT || exit 1
-echo "Done. Please see result.html"
+echo "Done. Please see result_fast.html"
