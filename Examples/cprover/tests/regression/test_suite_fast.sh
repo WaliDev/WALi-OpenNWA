@@ -24,7 +24,7 @@ DUET="$DUET_DIR/duet.native"
 OUTDIR="$SUITE/outputs"
 # The input tests are copied here
 INDIR="$SUITE/inputs"
-RESULT="$OUTDIR/__result.out"
+RESULT="$OUTDIR/__result_fast.out"
 SCRIPT="$SUITE/toHTML_fast.py"
 
 TIMEOUT="5m"
@@ -52,9 +52,9 @@ for directory in ${TESTDIRS[@]}; do
 		rm -f $infile
 		cp $testf $infile
 		
-		echo -n "Running test $i of ${#TESTS[@]} ..."
+		echo -n "Running test $i of ${#TESTS[@]} ($(basename $testf))"
 		
-		echo -n " ICRA ..."
+		echo -n " ICRA "
 		start=$(date +%s%N)
 		cd $NEWTON_DIR
 		eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf &> $below_outfile"
@@ -79,6 +79,7 @@ for directory in ${TESTDIRS[@]}; do
 			###else
 			###	echo "" >> $RESULT
 			###fi
+            echo "" >> $RESULT
 		fi
 		end=$(date +%s%N)
 		len=$(expr $end - $start)
