@@ -1,3 +1,5 @@
+extern void __VERIFIER_error() __attribute__ ((__noreturn__));
+
 #ifndef _BASE_H
 #define _BASE_H
 
@@ -127,11 +129,11 @@ struct sockaddr_un
 
 
 
-static int parse_expression_list(char *str) 
+static int parse_expression_list(char *str)
 {
   int start=0, i=-1, j=-1;
   char str2[EXPRESSION_LENGTH];
-	
+
   if (!str) return -1;
 
   do {
@@ -167,9 +169,11 @@ static int parse_expression_list(char *str)
       }
       /* for the next word */
       start = i+1;
+    default:
+	;
     }
   } while (str[i] != EOS);
-	
+
   return 0;
 }
 
