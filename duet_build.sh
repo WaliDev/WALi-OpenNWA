@@ -8,11 +8,11 @@ if [ "x$WALI_ROOT" == "x" ]; then
 fi
 if [ "x$NEWTON_DUET_ROOT" == "x" ]; then
     NEWTON_DUET_ROOT=../duet
-    if [ ! -d "$NEWTON_DUET_ROOT/duet/src" ]; then
+    if [ ! -d "$NEWTON_DUET_ROOT/duet" ]; then
         NEWTON_DUET_ROOT=./duet
-        if [ ! -d "$NEWTON_DUET_ROOT/duet/src" ]; then
+        if [ ! -d "$NEWTON_DUET_ROOT/duet" ]; then
             echo "Please set NEWTON_DUET_ROOT to the base directory of Duet."
-            echo "  (We must link against NEWTON_DUET_ROOT/_build/duet/src/libduet.so)"
+            echo "  (We must link against NEWTON_DUET_ROOT/_build/duet/(src?)/libduet.so)"
             exit 1
         fi
     fi
@@ -32,5 +32,5 @@ g++ -o _build64/Examples/cprover/NewtonCompare.o -c -O0 -Wall -g -Wextra -Wforma
 #/usr/bin/g++ -o _build64/Examples/cprover/CallOcaml.o -c -O0 -Wall -g -Wextra -Wformat=2 -Winit-self -Wunused -Wfloat-equal -Wpointer-arith -Wcast-align -Wwrite-strings -Wconversion -Woverloaded-virtual -fdiagnostics-show-option -DBOOST_NO_DEFAULTED_FUNCTIONS=1 -DCHECKED_LEVEL=2 -DEXPORT_GTR_SYMBOLS=0 -DPRATHMEHS_NWA_DETENSOR=0 -DREGEXP_TEST=1 -DTSL_DETENSOR=1 -D_GLIBCXX_DEBUG=1 -D__TSL_REGEXP=1 -ISource -I$BOOST_PATH/include -IExamples/cprover -IAddOns/Domains/Source -IAddOns/Domains/ThirdParty/include -I"`ocamlc -where`" Examples/cprover/CallOcaml.cpp
 
 echo "***************** Link phase: *****************"
-g++ -g -o _build64/Examples/cprover/NewtonOcaml -Wl,-rpath=$BOOST_PATH/lib -Wl,-rpath=$NEWTON_DUET_ROOT/_build/duet/src -Wl,-rpath=$WALI_ROOT -Wl,-rpath=$WALI_ROOT/lib64 -Wl,--start-group _build64/Examples/cprover/NewtonCompare.o -L$BOOST_PATH/lib -Llib64 -L"`ocamlc -where`" -L$NEWTON_DUET_ROOT/_build/duet/src -L$WALI_ROOT -L$TSLRE_LIB_PATH -ltslre -lboost_filesystem -lboost_system -lboost_serialization -lrt -lduet -locamlinterface -lwali -lbpparser -lwalidomains -lglog -lbdd -Wl,--end-group || exit 1
+g++ -g -o _build64/Examples/cprover/NewtonOcaml -Wl,-rpath=$BOOST_PATH/lib -Wl,-rpath=$NEWTON_DUET_ROOT/_build/duet -Wl,-rpath=$NEWTON_DUET_ROOT/_build/src/duet -Wl,-rpath=$WALI_ROOT -Wl,-rpath=$WALI_ROOT/lib64 -Wl,--start-group _build64/Examples/cprover/NewtonCompare.o -L$BOOST_PATH/lib -Llib64 -L"`ocamlc -where`" -L$NEWTON_DUET_ROOT/_build/duet -L$WALI_ROOT -Wl,-rpath=$TSLRE_LIB_PATH -L$TSLRE_LIB_PATH  -ltslre -lboost_filesystem -lboost_system -lboost_serialization -lrt -lduet -locamlinterface -lwali -lbpparser -lwalidomains -lglog -lbdd -Wl,--end-group || exit 1
 echo "******* Successful end of duet_build.sh *******"
