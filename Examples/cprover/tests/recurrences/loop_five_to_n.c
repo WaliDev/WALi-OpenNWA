@@ -6,7 +6,7 @@ DECLARE_POW(5);
 
 int x = 1;
 void func(int n) {
-    while(n>=0){      
+    while(n>0){      
         n = n - 1;
         x = 5*x + 3;
     }
