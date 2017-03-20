@@ -11,13 +11,13 @@ void func(int n)
         return;
     }
     func(n-1);
-    int i;
+    //int i;
     //int b = 2*(n-1)*(n-1) + 3*(n-1)+4;
     //for (i=0; i<b;i++){
-    for (i=0; i<2*(n-1)*(n-1) + 3*(n-1)+4;i++){
-      tick(1);
-    }
-    //tick(2*(n-1)*(n-1) + 3*(n-1) + 4);
+    //for (i=0; i<2*(n-1)*(n-1) + 3*(n-1)+4;i++){
+    //  tick(1);
+    //}
+    tick(2*(n-1)*(n-1) + 3*(n-1) + 4);
 }
 
 int main()
