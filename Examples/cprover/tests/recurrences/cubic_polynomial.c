@@ -11,7 +11,13 @@ void func(int n)
         return;
     }
     func(n-1);
-    tick(2*(n-1)*(n-1) + 3*(n-1) + 4);
+    int i;
+    //int b = 2*(n-1)*(n-1) + 3*(n-1)+4;
+    //for (i=0; i<b;i++){
+    for (i=0; i<2*(n-1)*(n-1) + 3*(n-1)+4;i++){
+      tick(1);
+    }
+    //tick(2*(n-1)*(n-1) + 3*(n-1) + 4);
 }
 
 int main()
@@ -19,6 +25,7 @@ int main()
     init_tick(0);
     
     func(15);
+     __VERIFIER_print_hull(__cost);
     assert(__cost == 2406);
     return 0;
 }
