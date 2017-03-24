@@ -454,8 +454,6 @@ std::ostream & operator << (std::ostream& o, const CONC_EXTERN_PHYLA::sem_elem_w
 // ----------------------------------------------------------------
 
 
-//namespace goals {
-
 // Stack frames needed by the non-recursive versions of convertToTSL and Eval and EvalT
 
 //A Stack frame which takes a regexp_t and has pointers to it's left and right children, used from
@@ -504,21 +502,19 @@ string testFileName;
 int maxRnds = -1;  //maximum number of rounds of newton loop
 
 /*
-*  A non recursive version of the Differential function that uses a stack
-*  It takes in a TSL regular expression and returns a Tensored differential
-*
-*  This is based on the recursive TDifferential in regExp.tsl and uses that function's hashtable
-*
-*  @param:  RTG::regExpRefPtr exp - The top level regular expression to be differentiated
-*  @return:  RTG::regExpTListRefPtr - A list of the tensored differentials with respect to
-*                                     all the variables in exp
-*
-*  Author: Emma Turetsky
-*/
+ *  A non recursive version of the Differential function that uses a stack
+ *  It takes in a TSL regular expression and returns a Tensored differential
+ *
+ *  This is based on the recursive TDifferential in regExp.tsl and uses that function's hashtable
+ *
+ *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be differentiated
+ *  @return:  RTG::regExpTListRefPtr - A list of the tensored differentials with respect to
+ *                                     all the variables in exp
+ *
+ *  Author: Emma Turetsky
+ */
 RTG::regExpTListRefPtr nonRecTDiff(RTG::regExpRefPtr exp)
-//RTG::regExpTListRefPtr TDifferential(RTG::regExpRefPtr exp)
 {
-    //return CIR::TDifferential(exp);
     //This stack represents the worklist, as long as it's not empty, there are still
     //TSL regular expressions to be differentiated
     std::stack<dFrame> todo;
@@ -778,22 +774,19 @@ RTG::regExpTListRefPtr nonRecTDiff(RTG::regExpRefPtr exp)
 }
 
 /*
-*  A non recursive version of the Differential function that uses a stack
-*  It takes in a TSL regular expression and returns a non-tensored differential
-*
-*  This is based on the recursive Differential in regExp.tsl and uses that function's hashtable
-*
-*  @param:  RTG::regExpRefPtr exp - The top level regular expression to be differentiated
-*  @return:  RTG::regExpListRefPtr - A list of the non-tensored differentials with respect to
-*                                     all the variables in exp
-*
-*  Author: Emma Turetsky
-*/
+ *  A non recursive version of the Differential function that uses a stack
+ *  It takes in a TSL regular expression and returns a non-tensored differential
+ *
+ *  This is based on the recursive Differential in regExp.tsl and uses that function's hashtable
+ *
+ *  @param:  RTG::regExpRefPtr exp - The top level regular expression to be differentiated
+ *  @return:  RTG::regExpListRefPtr - A list of the non-tensored differentials with respect to
+ *                                     all the variables in exp
+ *
+ *  Author: Emma Turetsky
+ */
 RTG::regExpListRefPtr nonRecUntensoredDiff(RTG::regExpRefPtr exp)
-//RTG::regExpListRefPtr Differential(RTG::regExpRefPtr exp)
 {
-    //return CIR::Differential(exp);
-    //std::cout << hits << std::endl;
     //This stack represents the worklist, as long as it's not empty, there are still
     //TSL regular expressions to be differentiated
     std::stack<dFrame> todo;
@@ -801,7 +794,6 @@ RTG::regExpListRefPtr nonRecUntensoredDiff(RTG::regExpRefPtr exp)
 
     //Push the top frame onto the stack
     todo.push(dFrame(exp));
-
 
     while (!todo.empty())
     {
@@ -1292,38 +1284,38 @@ void tarjansSCCs(std::map<int, std::set<int> > &stratificationGraph,
 //}
 
 /*
-*  Compute the number of successive rounds meeting the "simple termination
-*    condition" that we need to observe in the Newton loop before we can soundly
-*    terminate that loop.  (A round meets the "simple termination condition"
-*    if the abstract values of all its star bodies are equal to the values of
-*    star bodies on the previous round.)
-*
-*  We do this by building the "stratification graph" and returning the length 
-*    of the longest path through this graph.  Roughly, one round of the Newton 
-*    loop propagates changes in the value of a variable to the values of any 
-*    variables whose tensored regular expressions (directly) contain it.  
-*    Therefore, if there is a path of length K in this graph, then K rounds 
-*    may be required before a value is fully propagated to all downstream 
-*    variables.
-*
-*  If there is a cycle in the stratification graph, we abort immediately, 
-*    because our Newton loop cannot soundly process the equation system in
-*    that case.
-*
-*  An edge of the stratification graph exists from Xi to Xj just when 
-*    j \in free(i), using the definition of the free() function from 
-*    section 4.1 of the POPL 2016 submission.
-*
-*  Note that the smallest possible return value is 0, which should be
-*    interpreted to mean that no variable occurs free in any other 
-*    variable's regular expression.
-*
-*  @param:  tslRegExpTMap &tensoredRegExpMap - a map from reID to tensored regular expression
-*
-*  @return: int - the height of the stratification graph
-*         
-*  Author: Jason Breck
-*/
+ *  Compute the number of successive rounds meeting the "simple termination
+ *    condition" that we need to observe in the Newton loop before we can soundly
+ *    terminate that loop.  (A round meets the "simple termination condition"
+ *    if the abstract values of all its star bodies are equal to the values of
+ *    star bodies on the previous round.)
+ *
+ *  We do this by building the "stratification graph" and returning the length 
+ *    of the longest path through this graph.  Roughly, one round of the Newton 
+ *    loop propagates changes in the value of a variable to the values of any 
+ *    variables whose tensored regular expressions (directly) contain it.  
+ *    Therefore, if there is a path of length K in this graph, then K rounds 
+ *    may be required before a value is fully propagated to all downstream 
+ *    variables.
+ *
+ *  If there is a cycle in the stratification graph, we abort immediately, 
+ *    because our Newton loop cannot soundly process the equation system in
+ *    that case.
+ *
+ *  An edge of the stratification graph exists from Xi to Xj just when 
+ *    j \in free(i), using the definition of the free() function from 
+ *    section 4.1 of the POPL 2016 submission.
+ *
+ *  Note that the smallest possible return value is 0, which should be
+ *    interpreted to mean that no variable occurs free in any other 
+ *    variable's regular expression.
+ *
+ *  @param:  tslRegExpTMap &tensoredRegExpMap - a map from reID to tensored regular expression
+ *
+ *  @return: int - the height of the stratification graph
+ *         
+ *  Author: Jason Breck
+ */
 int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 {
     std::map<int, std::set<int> > stratificationGraph;
@@ -1374,13 +1366,13 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 }
 
 /*
-*  A non recursive test to check the linearity of the untensored portiona of a differential
-*
-*  @param:  RTG::regExpRefPtr rExp - The top level regular expression to be looked at
-*  @return:  bool linear - returns true if the elements of tList pass the test
-*
-*  Author: Emma Turetsky
-*/
+ *  A non recursive test to check the linearity of the untensored portiona of a differential
+ *
+ *  @param:  RTG::regExpRefPtr rExp - The top level regular expression to be looked at
+ *  @return:  bool linear - returns true if the elements of tList pass the test
+ *
+ *  Author: Emma Turetsky
+ */
 bool checkLinearityHelperUntensored(RTG::regExpRefPtr rExp)
 {
     std::stack<RTG::regExpRefPtr> workList;
@@ -1425,13 +1417,13 @@ bool checkLinearityHelperUntensored(RTG::regExpRefPtr rExp)
 }
 
 /*
-*  A non recursive test to check the linearity of tensored partial differential
-*
-*  @param:  RTG::regExpTRefPtr rExpT - The top level regular expression to be looked at
-*  @return:  bool linear - returns true if the elements of tList pass the test
-*
-*  Author: Emma Turetsky
-*/
+ *  A non recursive test to check the linearity of tensored partial differential
+ *
+ *  @param:  RTG::regExpTRefPtr rExpT - The top level regular expression to be looked at
+ *  @return:  bool linear - returns true if the elements of tList pass the test
+ *
+ *  Author: Emma Turetsky
+ */
 bool checkLinearityHelper(RTG::regExpTRefPtr rExpT)
 {
     std::stack<RTG::regExpTRefPtr> workList;
@@ -1485,13 +1477,13 @@ bool checkLinearityHelper(RTG::regExpTRefPtr rExpT)
 }
 
 /*
-*  A non recursive test to check the linearity of tensored differential
-*
-*  @param:  RTG::regExpTListRefPtr tList - The top level regularexpression list to be looked at
-*  @return:  bool linear - returns true if the elements of tList pass the test
-*
-*  Author: Emma Turetsky
-*/
+ *  A non recursive test to check the linearity of tensored differential
+ *
+ *  @param:  RTG::regExpTListRefPtr tList - The top level regularexpression list to be looked at
+ *  @return:  bool linear - returns true if the elements of tList pass the test
+ *
+ *  Author: Emma Turetsky
+ */
 bool checkLinearity(RTG::regExpTListRefPtr tList)
 {
     RTG::regExpTListRefPtr nextTList = tList;
@@ -1515,15 +1507,15 @@ bool checkLinearity(RTG::regExpTListRefPtr tList)
 }
 
 /*
-* Create the tensored differentials from the regular expressions of nodes
-* with epsilon transitions and populate the map differentialMap.
-*
-* @params:  tslRegExpMap &diffMap - (reference to) a map from varID to its corresponding TSLRegExp
-*        tslDiffMap &differentialMap - (reference to) a map from
-*                                      varID to its list of TSL tensoredDifferentials
-*
-* @author:  Emma Turetsky 
-*/
+ * Create the tensored differentials from the regular expressions of nodes
+ * with epsilon transitions and populate the map differentialMap.
+ *
+ * @params:  tslRegExpMap &diffMap - (reference to) a map from varID to its corresponding TSLRegExp
+ *        tslDiffMap &differentialMap - (reference to) a map from
+ *                                      varID to its list of TSL tensoredDifferentials
+ *
+ * @author:  Emma Turetsky 
+ */
 bool createDifferentials(tslRegExpMap &diffMap, tslDiffMap &differentialMap){
     bool linear = true;
     for (tslRegExpMap::iterator it = diffMap.begin(); it != diffMap.end(); ++it)
@@ -1546,54 +1538,54 @@ bool createDifferentials(tslRegExpMap &diffMap, tslDiffMap &differentialMap){
 
 
 /*
-*  convertToRegExpT
-*
-*  Convert a WALi NameWeight regexp to a tensored regular expression
-*
-*  This procedure implements Step (5) of Algorithm NPA-TP from TR-1825 (page 33)
-*  http://research.cs.wisc.edu/wpis/papers/tr1825.pdf
-*
-*  In the terms of that paper, this procedure is used to create the
-*  set of regular expressions that are used to evaluate the
-*  variables Z_i in the left-linear equation system over the vector
-*  of variables Z:
-*
-*    Z = (1^t tensor f(0)) combine_T D_T f|_nu(Z).       (*)
-*
-*  At top-level, the value of parameter "exp" is a WALi regular
-*  expression over constants of type NameWeight (for some variable
-*  Z_i). It will be converted into a tensored regular expression
-*  that expresses how to compute the solution for Z_i on a given
-*  Newton round.
-*
-*  Method. Recursively traverse exp:
-*
-*   o convert each regular-expression operator into the analogous
-*     tensored operator
-*
-*   o convert each leaf NameWeight(j,i) into the tensored regular
-*     expression RE_T[j,i], where RE_T[j,i] is the tensored regular
-*     expression in the i-th equation of equation-system (*)
-*
-*       Z_i = (1^t tensor f_i(0)) combine_T ... combine_T (Z_j *_T RE_T[j,i]) combine_T ...
-*
-*  params: reg_exp_t exp - a WALi NameWeight regular expression
-*          tslRegExpMap & regExpMap - map from varId to the TSL regExp representing it
-*          tslDiffMap & differentialMap - map from varId to list of partial differentials
-*                                         representing varId differentiated with
-*                                         respect to different variables
-*          mapBack - a map for associating different variables with the
-*                    appropriate variableID, needed because of the different node names
-*                    in the fwpds IGR - should try to eliminate this need if possible
-*
-*  return: RTG::regExpTRefPtr - the tensored TSLRegexp that
-*           represents exp converted in the manner described
-*           above. The return value at top-level expresses how to
-*           compute the solution for some variable Z_i on a given
-*           Newton round.
-*
-*  Author:  Emma Turetsky
-*/
+ *  convertToRegExpT
+ *
+ *  Convert a WALi NameWeight regexp to a tensored regular expression
+ *
+ *  This procedure implements Step (5) of Algorithm NPA-TP from TR-1825 (page 33)
+ *  http://research.cs.wisc.edu/wpis/papers/tr1825.pdf
+ *
+ *  In the terms of that paper, this procedure is used to create the
+ *  set of regular expressions that are used to evaluate the
+ *  variables Z_i in the left-linear equation system over the vector
+ *  of variables Z:
+ *
+ *    Z = (1^t tensor f(0)) combine_T D_T f|_nu(Z).       (*)
+ *
+ *  At top-level, the value of parameter "exp" is a WALi regular
+ *  expression over constants of type NameWeight (for some variable
+ *  Z_i). It will be converted into a tensored regular expression
+ *  that expresses how to compute the solution for Z_i on a given
+ *  Newton round.
+ *
+ *  Method. Recursively traverse exp:
+ *
+ *   o convert each regular-expression operator into the analogous
+ *     tensored operator
+ *
+ *   o convert each leaf NameWeight(j,i) into the tensored regular
+ *     expression RE_T[j,i], where RE_T[j,i] is the tensored regular
+ *     expression in the i-th equation of equation-system (*)
+ *
+ *       Z_i = (1^t tensor f_i(0)) combine_T ... combine_T (Z_j *_T RE_T[j,i]) combine_T ...
+ *
+ *  params: reg_exp_t exp - a WALi NameWeight regular expression
+ *          tslRegExpMap & regExpMap - map from varId to the TSL regExp representing it
+ *          tslDiffMap & differentialMap - map from varId to list of partial differentials
+ *                                         representing varId differentiated with
+ *                                         respect to different variables
+ *          mapBack - a map for associating different variables with the
+ *                    appropriate variableID, needed because of the different node names
+ *                    in the fwpds IGR - should try to eliminate this need if possible
+ *
+ *  return: RTG::regExpTRefPtr - the tensored TSLRegexp that
+ *           represents exp converted in the manner described
+ *           above. The return value at top-level expresses how to
+ *           compute the solution for some variable Z_i on a given
+ *           Newton round.
+ *
+ *  Author:  Emma Turetsky
+ */
 RTG::regExpTRefPtr convertToRegExpT(reg_exp_t exp, tslRegExpMap & regExpMap, tslDiffMap & differentialMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, map<std::pair<int, int>, std::pair<int, int> >  & mergeSrcMap)
 {
     if (exp->isConstant()) // Encountered a NameWeight
@@ -1681,21 +1673,21 @@ RTG::regExpTRefPtr convertToRegExpT(reg_exp_t exp, tslRegExpMap & regExpMap, tsl
 std::map<reg_exp_t, RTG::regExpRefPtr> regExpConversionMap; // This was formerly called "seen" and was local to convertToRegExp --JTB
 
 /*
-*  convertToRegExp
-*
-*  Convert regular expression reID to a TSL regular expression (RTG::regExpRefPtr)
-*
-*  @param: reID - the varID of the regular expressiosn
-*          exp - the expression to be converted
-*          varDependencies - a map from reID to the set of variabels it depends on that will be populated as we convert, used for the newton round later
-*          updateableMap - a map from updateable node to the intergraph node number it depends on (that node number is still associated with the inter graph)
-*          oMap - a map from the intergraph node number to the correct unique number for the tsl regexps
-*          mapBack - a map for associating different variables with the appropriate variableID, needed because of the different node names
-*                             in the fwpds IGR - should try to eliminate this need if possible]
-*          elapsedTime - Total time done on possible calculations in the conversion (due to simplification in MkDot
-*
-*   Author: Emma Turetsky
-*/
+ *  convertToRegExp
+ *
+ *  Convert regular expression reID to a TSL regular expression (RTG::regExpRefPtr)
+ *
+ *  @param: reID - the varID of the regular expressiosn
+ *          exp - the expression to be converted
+ *          varDependencies - a map from reID to the set of variabels it depends on that will be populated as we convert, used for the newton round later
+ *          updateableMap - a map from updateable node to the intergraph node number it depends on (that node number is still associated with the inter graph)
+ *          oMap - a map from the intergraph node number to the correct unique number for the tsl regexps
+ *          mapBack - a map for associating different variables with the appropriate variableID, needed because of the different node names
+ *                             in the fwpds IGR - should try to eliminate this need if possible]
+ *          elapsedTime - Total time done on possible calculations in the conversion (due to simplification in MkDot
+ *
+ *   Author: Emma Turetsky
+ */
 RTG::regExpRefPtr convertToRegExp(int reID, reg_exp_t exp, std::map<int, reg_exp_t> & outNodeRegExpsMap, std::map<int, std::set<int> > & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, std::map<std::pair<int, int>, std::pair<int, int> > & mergeSrcMap, std::vector<int> & wl, std::set<int> & vl, double * elapsedTime, bool insertProjects = true)
 {
     std::stack<cFrame> todo;
@@ -1890,24 +1882,24 @@ RTG::regExpRefPtr convertToRegExp(int reID, reg_exp_t exp, std::map<int, reg_exp
 }
     
 /*
-*  computeVarDependenciesAndWorklists
-*
-*  Add to varDependencies[reID] the IDs of any variables that appear in the regular expression for reID; also, add them to wl and vl.
-*
-*  This function was created by copying convertToRegExp and removing all of the code that creates
-*    TSL regular expressions, only keeping the code that updates varDependencies and wl and vl.
-*    This function was needed after we changed the function cache (called regExpConversionMap now)
-*    for convertToRegExp so that that function cache was shared across calls; after that change,
-*    convertToRegExp cannot update varDependencies anymore.
-*
-*  @param: reID - the varID of the regular expressiosn
-*          exp - the expression to be converted
-*          varDependencies - a map from reID to the set of variabels it depends on that will be populated as we convert, used for the newton round later
-*          updateableMap - a map from updateable node to the intergraph node number it depends on (that node number is still associated with the inter graph)
-*          oMap - a map from the intergraph node number to the correct unique number for the tsl regexps
-*
-*   Author: Jason Breck
-*/
+ *  computeVarDependenciesAndWorklists
+ *
+ *  Add to varDependencies[reID] the IDs of any variables that appear in the regular expression for reID; also, add them to wl and vl.
+ *
+ *  This function was created by copying convertToRegExp and removing all of the code that creates
+ *    TSL regular expressions, only keeping the code that updates varDependencies and wl and vl.
+ *    This function was needed after we changed the function cache (called regExpConversionMap now)
+ *    for convertToRegExp so that that function cache was shared across calls; after that change,
+ *    convertToRegExp cannot update varDependencies anymore.
+ *
+ *  @param: reID - the varID of the regular expressiosn
+ *          exp - the expression to be converted
+ *          varDependencies - a map from reID to the set of variabels it depends on that will be populated as we convert, used for the newton round later
+ *          updateableMap - a map from updateable node to the intergraph node number it depends on (that node number is still associated with the inter graph)
+ *          oMap - a map from the intergraph node number to the correct unique number for the tsl regexps
+ *
+ *   Author: Jason Breck
+ */
 void computeVarDependenciesAndWorklists(int reID, reg_exp_t exp, std::map<int, std::set<int> > & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::vector<int> & wl, std::set<int> & vl)
 {
     //void computeVarDependencies(int reID, reg_exp_t exp, std::map<int, reg_exp_t> & outNodeRegExpsMap, std::map<int, std::set<int> > & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, std::map<std::pair<int, int>, std::pair<int, int> > & mergeSrcMap, std::vector<int> & wl, std::set<int> & vl, double * elapsedTime, bool insertProjects = true)
@@ -2031,20 +2023,20 @@ void computeVarDependenciesAndWorklists(int reID, reg_exp_t exp, std::map<int, s
 }
     
 /*
-*  convertToTSLRegExps
-*
-*  Convert regular expression reg to a TSL regular expression, and
-*  put it in the map regExpMap, which maps from RegExp IDs to TSL
-*  regular expressions
-*
-*  outNodeRegExpMap - A map from reID to the wali reg_exp_t that represents it
-*  updateableMap - A map of updateable node numbers to the intergraph node they depend on
-*  oMap - a map of intergraph nodes to the ReID that represents them
-*  varDependencies - a map from reID to the set of variabels it depends on that will be populated as we convert, used for the newton round later
-*  mapBack - a map for associating different variables with the appropriate variableID, needed because of the different node names
-*
-*  Author:  Emma Turetsky
-*/
+ *  convertToTSLRegExps
+ *
+ *  Convert regular expression reg to a TSL regular expression, and
+ *  put it in the map regExpMap, which maps from RegExp IDs to TSL
+ *  regular expressions
+ *
+ *  outNodeRegExpMap - A map from reID to the wali reg_exp_t that represents it
+ *  updateableMap - A map of updateable node numbers to the intergraph node they depend on
+ *  oMap - a map of intergraph nodes to the ReID that represents them
+ *  varDependencies - a map from reID to the set of variabels it depends on that will be populated as we convert, used for the newton round later
+ *  mapBack - a map for associating different variables with the appropriate variableID, needed because of the different node names
+ *
+ *  Author:  Emma Turetsky
+ */
 double convertToTSLRegExps(int reg, std::map<int, reg_exp_t> & outNodeRegExpMap, tslRegExpMap & regExpMap, std::map<int, std::set<int> > & varDependencies, std::map<int, int> & updateableMap, std::map<int, int> & oMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, std::map<std::pair<int, int>, std::pair<int, int > >  & mergeSrcMap, std::vector<int> & wl, std::set<int> & vl
 , bool insertProjects = true)
 {
@@ -2062,24 +2054,24 @@ double convertToTSLRegExps(int reg, std::map<int, reg_exp_t> & outNodeRegExpMap,
 
 
 /*
-*  convertToTSLRegExpsT
-*
-*  For each WALi NameWeight regexp in rList, convert it to a tensored regular expression
-*
-*  The wali regexp represents a differentiated value.  The weight represents a regexp in eMap
-*  differentiated with respect to a given variable (or not differentiated, depending) or is
-*  the representation of "one"
-*
-*
-*  params:  rList -  a map from reID to the appropriate NameWeight regExp
-*           tslRegExpMap & regExpMap - map from varId to the TSL regExpRepresenting it
-*           tslDiffMap & differentialMap - map from varId to list of partial differentials representing varId
-*           differentiated with respect to different variables
-*        mapBack - a map for associating different variables with the appropriate variableID, needed because of the different node names
-*                     in the fwpds IGR - should try to eliminate this need if possible
-*
-*  Author:  Emma Turetsky
-*/
+ *  convertToTSLRegExpsT
+ *
+ *  For each WALi NameWeight regexp in rList, convert it to a tensored regular expression
+ *
+ *  The wali regexp represents a differentiated value.  The weight represents a regexp in eMap
+ *  differentiated with respect to a given variable (or not differentiated, depending) or is
+ *  the representation of "one"
+ *
+ *
+ *  params:  rList -  a map from reID to the appropriate NameWeight regExp
+ *           tslRegExpMap & regExpMap - map from varId to the TSL regExpRepresenting it
+ *           tslDiffMap & differentialMap - map from varId to list of partial differentials representing varId
+ *           differentiated with respect to different variables
+ *        mapBack - a map for associating different variables with the appropriate variableID, needed because of the different node names
+ *                     in the fwpds IGR - should try to eliminate this need if possible
+ *
+ *  Author:  Emma Turetsky
+ */
 void convertToTSLRegExpsT(std::map<int, reg_exp_t> & rList, tslRegExpMap & regExpMap, tslRegExpTMap & tensoredRegExpMap, tslDiffMap & differentialMap, std::map<int, std::pair<std::pair<int, int>, int> > & mapBack, std::map<std::pair<int, int>, std::pair<int, int > >  & mergeSrcMap)
 {
     for (std::map<int, reg_exp_t>::iterator it = rList.begin(); it != rList.end(); ++it)
@@ -2096,8 +2088,8 @@ void convertToTSLRegExpsT(std::map<int, reg_exp_t> & rList, tslRegExpMap & regEx
 }
 
 /*
-*  A method to print TSL RegExps
-*/
+ *  A method to print TSL RegExps
+ */
 void printTSLRegExps(tslRegExpMap rMap)
 {
   for (tslRegExpMap::iterator it = rMap.begin(); it!=rMap.end(); ++it)
@@ -2109,8 +2101,8 @@ void printTSLRegExps(tslRegExpMap rMap)
 }
 
 /*
-*  A method to print TSL Differentials
-*/
+ *  A method to print TSL Differentials
+ */
 void printTSLDifferentials(tslDiffMap dMap)
 {
   for (tslDiffMap::iterator it = dMap.begin(); it!=dMap.end(); ++it)
@@ -2122,8 +2114,8 @@ void printTSLDifferentials(tslDiffMap dMap)
 }
 
 /*
-*  A method to print TSL tensored RegExps
-*/
+ *  A method to print TSL tensored RegExps
+ */
 void printTSLTExp(tslRegExpTMap tMap)
 {
   for (tslRegExpTMap::iterator it = tMap.begin(); it!=tMap.end(); ++it)
@@ -2135,8 +2127,8 @@ void printTSLTExp(tslRegExpTMap tMap)
 }
 
 /*
-*  Functions to generate stack and state names
-*/
+ *  Functions to generate stack and state names
+ */
 static wali::Key st1()
 {
   return getKey("Unique State Name");
@@ -2148,68 +2140,68 @@ static wali::Key stk(int k)
 }
 
 /*
-*  fwpdsFromDifferential
-*
-*  pds - the new fwpds that is being generated
-*  differentialMap - a map of differentials
-*  varDependencies - a map from an reID (a variable) to the set of
-*                    variables it depends on
-*
-*  This procedure implements Step (3) of Algorithm NPA-TP from TR-1825 (page 33)
-*  http://research.cs.wisc.edu/wpis/papers/tr1825.pdf
-*
-*  In the terms of that paper, we are creating the dependence graph
-*  G for the left-linear equation system over the vector Z:
-*
-*    Z = (1^t tensor f(0)) combine_T D_T f|_nu(Z).       (*)
-*
-*  In terms of the implementation, the procedure is really taking
-*  one encoding of G (namely, varDependencies + differentialMap),
-*  and converting it into another encoding of G. Procedure
-*  fwpdsFromDifferential returns an encoding of G as an FWPDS, which
-*  allows us to use the FWPDS operations that implement Tarjan's
-*  path-expression method to create an appropriate set of tensored
-*  regular expressions for the nodes of G (i.e., for the variables
-*  {Z_i}, where each Z_i corresponds to some procedure i).
-*
-*  However, the encoding is slightly indirect because we have not
-*  yet actually created the tensored regular expressions of the
-*  Z-equations.  (We have various auxiliary maps from which the
-*  appropriate tensored regular expressions will be created later.)
-*  Instead, we just create an FWPDS that represents the dependences
-*  of the Z system, along with "NameWeights" that stand for the
-*  (so-far still missing) tensored regular expressions.  (The
-*  NameWeights have enough information in them so that, using the
-*  aforementioned auxiliary data structures, the correct tensored
-*  regular expressions can be constructed later; see procedure
-*  convertToRegExpT.)
-*
-*  Because the Z system is left-linear, and hence regular,
-*  dependence graph G is a normal graph, and hence we only use
-*  Delta-1 rules.  In particular, if the equation system contains
-*  Z_i = ... combine_T (Z_j *_T RE_T[j,i]) combine_T ...,
-*
-*   o variable Z_i (corresponding to some procedure i) is represented by i
-*
-*   o the dependence of i on j is encoded by the Delta-1 rule
-*     (st1, j) -> (st1, i)
-*
-*   o the weight on such a rule is NameWeight(j,i), which stands
-*     for the tensored regular expression RE_T[j,i] that contributes
-*     to the i-th equation of equation-system (*)
-*
-*  In addition, G has additional Delta-1 rules of the form
-*
-*     (st1, dummy) -> (st1, i), with weight NameWeight(dummy,i).
-*
-*  Such a rule represents the equation with the constant right-hand side
-*
-*     Z_i = (1^t tensor f_i(0))
-*
-*  that appears in the i-th component of equation-system (*).
-*  
-*  Author: Emma Turetsky
-*/
+ *  fwpdsFromDifferential
+ *
+ *  pds - the new fwpds that is being generated
+ *  differentialMap - a map of differentials
+ *  varDependencies - a map from an reID (a variable) to the set of
+ *                    variables it depends on
+ *
+ *  This procedure implements Step (3) of Algorithm NPA-TP from TR-1825 (page 33)
+ *  http://research.cs.wisc.edu/wpis/papers/tr1825.pdf
+ *
+ *  In the terms of that paper, we are creating the dependence graph
+ *  G for the left-linear equation system over the vector Z:
+ *
+ *    Z = (1^t tensor f(0)) combine_T D_T f|_nu(Z).       (*)
+ *
+ *  In terms of the implementation, the procedure is really taking
+ *  one encoding of G (namely, varDependencies + differentialMap),
+ *  and converting it into another encoding of G. Procedure
+ *  fwpdsFromDifferential returns an encoding of G as an FWPDS, which
+ *  allows us to use the FWPDS operations that implement Tarjan's
+ *  path-expression method to create an appropriate set of tensored
+ *  regular expressions for the nodes of G (i.e., for the variables
+ *  {Z_i}, where each Z_i corresponds to some procedure i).
+ *
+ *  However, the encoding is slightly indirect because we have not
+ *  yet actually created the tensored regular expressions of the
+ *  Z-equations.  (We have various auxiliary maps from which the
+ *  appropriate tensored regular expressions will be created later.)
+ *  Instead, we just create an FWPDS that represents the dependences
+ *  of the Z system, along with "NameWeights" that stand for the
+ *  (so-far still missing) tensored regular expressions.  (The
+ *  NameWeights have enough information in them so that, using the
+ *  aforementioned auxiliary data structures, the correct tensored
+ *  regular expressions can be constructed later; see procedure
+ *  convertToRegExpT.)
+ *
+ *  Because the Z system is left-linear, and hence regular,
+ *  dependence graph G is a normal graph, and hence we only use
+ *  Delta-1 rules.  In particular, if the equation system contains
+ *  Z_i = ... combine_T (Z_j *_T RE_T[j,i]) combine_T ...,
+ *
+ *   o variable Z_i (corresponding to some procedure i) is represented by i
+ *
+ *   o the dependence of i on j is encoded by the Delta-1 rule
+ *     (st1, j) -> (st1, i)
+ *
+ *   o the weight on such a rule is NameWeight(j,i), which stands
+ *     for the tensored regular expression RE_T[j,i] that contributes
+ *     to the i-th equation of equation-system (*)
+ *
+ *  In addition, G has additional Delta-1 rules of the form
+ *
+ *     (st1, dummy) -> (st1, i), with weight NameWeight(dummy,i).
+ *
+ *  Such a rule represents the equation with the constant right-hand side
+ *
+ *     Z_i = (1^t tensor f_i(0))
+ *
+ *  that appears in the i-th component of equation-system (*).
+ *  
+ *  Author: Emma Turetsky
+ */
 void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies)
 {
     // For each component of the equation system
@@ -2233,42 +2225,42 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 }
 
 /*
-*  newtonLoop_NPATP
-*
-*  This procedure implements Steps (6)-(8) of Algorithm NPA-TP from TR-1825 (page 33)
-*  http://research.cs.wisc.edu/wpis/papers/tr1825.pdf
-*
-*  Perform Newton rounds until a fixed-point is reached
-*
-*  differentialMap - a map of differentials
-*  aList - an initial assignment for the variables
-*  varDependencies - a map from a variable (an reID) to the set of variables it depends on
-*  tensoredRegExpMap - a map from a variable (an reID) to the tensored regular expression
-*                      that defines its value
-*
-*  Author:  Emma Turetsky
-*  
-*  
-*  
-*  newVal = lambda var.bottom
-*  newStarval = empty map
-*  while true {
-*     NEWROUND:
-* oldval = newval
-* clear (newval)
-* oldstarval = newstarval
-* clear (newstarval)
-* 
-* for each variable v { 
-*     evaluete tensored re for v with the side effect of tabulating in newstarval the linear abstraction of each star body
-* }
-* for each star location s {
-*     if oldstarval(s) != newstarval(s)
-*         goto NEWROUND
-* }
-* break
-*  }
-*/
+ *  newtonLoop_NPATP
+ *
+ *  This procedure implements Steps (6)-(8) of Algorithm NPA-TP from TR-1825 (page 33)
+ *  http://research.cs.wisc.edu/wpis/papers/tr1825.pdf
+ *
+ *  Perform Newton rounds until a fixed-point is reached
+ *
+ *  differentialMap - a map of differentials
+ *  aList - an initial assignment for the variables
+ *  varDependencies - a map from a variable (an reID) to the set of variables it depends on
+ *  tensoredRegExpMap - a map from a variable (an reID) to the tensored regular expression
+ *                      that defines its value
+ *
+ *  Author:  Emma Turetsky
+ *  
+ *  
+ *  
+ *  newVal = lambda var.bottom
+ *  newStarval = empty map
+ *  while true {
+ *     NEWROUND:
+ * oldval = newval
+ * clear (newval)
+ * oldstarval = newstarval
+ * clear (newstarval)
+ * 
+ * for each variable v { 
+ *     evaluete tensored re for v with the side effect of tabulating in newstarval the linear abstraction of each star body
+ * }
+ * for each star location s {
+ *     if oldstarval(s) != newstarval(s)
+ *         goto NEWROUND
+ * }
+ * break
+ *  }
+ */
 #define WIDENING_DELAY 6
 // Default values:
 #define MAX_ROUNDS_FROM_BELOW 50
@@ -2676,78 +2668,78 @@ NEWROUND:
 }
 
 /*
-*  doNewtonSteps_NPATP
-*
-*  This procedure implements Algorithm NPA-TP from TR-1825 (page 33)
-*  http://research.cs.wisc.edu/wpis/papers/tr1825.pdf
-*
-*  Step 1 - Convert the program 'pg' into an fpds, whose rules
-*           encode the edges of the program's ICFG in the standard manner, e.g., see
-*           Fig. 3 of http://research.cs.wisc.edu/wpis/papers/fsttcs07.invited.pdf.
-*           A rule's weight represents the abstract transformer (in some abstract domain)
-*           of the corresponding ICFG edge.  The merge function on a call-rule (a.k.a.
-*           Delta-2 rule) must obey the properties given in Section 8 of TR-1825.
-*
-*  Step 2 - Apply Tarjan's path-expression algorithm to the CFG of each procedure of pg.
-*           Method: Perform poststar on the fpds to obtain the regular expressions associated with
-*           the outgoing nodes in the intra_graph associated with the fwpds.
-*           Each such node represents one procedure of pg.  Taken together, the
-*           regular expressions represent the equation system E = {Xj = Rhs_j(vec{X}) | Xj in vec{X}}.
-*
-*  Step 3 - Convert these regexps into TSL regular expressions and obtain the differentials
-*           with respect to the variables
-*
-*  Step 4 - Create a new fwpds using these differentials - run poststar on the fwpds in
-*           order to get new regular expressions representing the return points for Newton
-*
-*  Step 5 - Use the reg exps representing the differentials, the partial differentials, and the original
-*           tsl regular expressions to get the tensored regular expressions we need to run the newton rounds
-*
-*  Step 6 - Perform Newton rounds until a fixed-point is reached
-*
-*  Step 7 - Insert the new weights into the original outfa and perform the iterative path summary
-*           to determine if the error weight is reachable [Vestigial/optional]
-*
-*  Notes on the handling of Project and ProjectT:
-*  ---------------------------------------------
-*  The implementation plays a bit fast and loose with Project and ProjectT:
-*  o The original WALi regular expressions have no occurrences of Project
-*  o In Step 3
-*    - When the original WALi regular expressions are converted to TSL
-*      regular expressions, occurrences of Project are inserted (search
-*      for "Project::make")
-*    - However, when the differentials of the TSL regular expressions are created,
-*      all occurrences of Project are eliminated
-*  o In Step 5, we have a new set of regular expressions over nameWeights.
-*    A nameWeight corresponds to a right-hand-side constant in the Z equation system;
-*    it represents a regular expression over nu^(i) variables, and thus is a
-*    constant for a given round i, but varies from round to round. When these
-*    regular expressions are converted into tensored TSL regular expressions
-*    (convertToRegExpT), each regular expression r for a given nameWeight is
-*    turned into ProjectT(r) (search for "ProjectT::make").
-*
-*  Step 5 is justified because Lemma 8.9(2) allows all right-hand-side
-*  occurrences of ProjectT in the Z system of equations to be pushed down to the
-*  "constants" (see Eqn. (74)). The lemma ensures that the value computed for
-*  each Z_k is the same as it would have if ProjectT were applied to the
-*  entire right-hand side of Z_k's defining equation. By Theorems 8.5 and 8.14
-*  (also 8.13), the values correspond to the solution that we want.
-*  
-*  It may be worrisome that we have left out the occurrences of Project
-*  at occurrences of nu^(i) -- that is, because occurrences of Project
-*  were filtered out in Step 3, we have occurrences of nu^(i) instead of Project(nu^(i)).
-*  However, because the solution computed on each round for the Z equation system
-*  is equivalent to one with Project_T applied to each right-hand side, after
-*  we apply TDeTensor to obtain nu^(i+1), we have values equal to ones
-*  on which Project has been applied. (The paper does not have the following lemma
-*
-*     for all a in S_T, Project(TDeTensor(a)) = TDeTensor(Project_T(a)),
-*
-*  however, there is a proof of this lemma in TWR's notebook from 12/3/2015,
-*  orange notebook, p. 91.)
-*
-*  Author:  Emma Turetsky
-*/
+ *  doNewtonSteps_NPATP
+ *
+ *  This procedure implements Algorithm NPA-TP from TR-1825 (page 33)
+ *  http://research.cs.wisc.edu/wpis/papers/tr1825.pdf
+ *
+ *  Step 1 - Convert the program 'pg' into an fpds, whose rules
+ *           encode the edges of the program's ICFG in the standard manner, e.g., see
+ *           Fig. 3 of http://research.cs.wisc.edu/wpis/papers/fsttcs07.invited.pdf.
+ *           A rule's weight represents the abstract transformer (in some abstract domain)
+ *           of the corresponding ICFG edge.  The merge function on a call-rule (a.k.a.
+ *           Delta-2 rule) must obey the properties given in Section 8 of TR-1825.
+ *
+ *  Step 2 - Apply Tarjan's path-expression algorithm to the CFG of each procedure of pg.
+ *           Method: Perform poststar on the fpds to obtain the regular expressions associated with
+ *           the outgoing nodes in the intra_graph associated with the fwpds.
+ *           Each such node represents one procedure of pg.  Taken together, the
+ *           regular expressions represent the equation system E = {Xj = Rhs_j(vec{X}) | Xj in vec{X}}.
+ *
+ *  Step 3 - Convert these regexps into TSL regular expressions and obtain the differentials
+ *           with respect to the variables
+ *
+ *  Step 4 - Create a new fwpds using these differentials - run poststar on the fwpds in
+ *           order to get new regular expressions representing the return points for Newton
+ *
+ *  Step 5 - Use the reg exps representing the differentials, the partial differentials, and the original
+ *           tsl regular expressions to get the tensored regular expressions we need to run the newton rounds
+ *
+ *  Step 6 - Perform Newton rounds until a fixed-point is reached
+ *
+ *  Step 7 - Insert the new weights into the original outfa and perform the iterative path summary
+ *           to determine if the error weight is reachable [Vestigial/optional]
+ *
+ *  Notes on the handling of Project and ProjectT:
+ *  ---------------------------------------------
+ *  The implementation plays a bit fast and loose with Project and ProjectT:
+ *  o The original WALi regular expressions have no occurrences of Project
+ *  o In Step 3
+ *    - When the original WALi regular expressions are converted to TSL
+ *      regular expressions, occurrences of Project are inserted (search
+ *      for "Project::make")
+ *    - However, when the differentials of the TSL regular expressions are created,
+ *      all occurrences of Project are eliminated
+ *  o In Step 5, we have a new set of regular expressions over nameWeights.
+ *    A nameWeight corresponds to a right-hand-side constant in the Z equation system;
+ *    it represents a regular expression over nu^(i) variables, and thus is a
+ *    constant for a given round i, but varies from round to round. When these
+ *    regular expressions are converted into tensored TSL regular expressions
+ *    (convertToRegExpT), each regular expression r for a given nameWeight is
+ *    turned into ProjectT(r) (search for "ProjectT::make").
+ *
+ *  Step 5 is justified because Lemma 8.9(2) allows all right-hand-side
+ *  occurrences of ProjectT in the Z system of equations to be pushed down to the
+ *  "constants" (see Eqn. (74)). The lemma ensures that the value computed for
+ *  each Z_k is the same as it would have if ProjectT were applied to the
+ *  entire right-hand side of Z_k's defining equation. By Theorems 8.5 and 8.14
+ *  (also 8.13), the values correspond to the solution that we want.
+ *  
+ *  It may be worrisome that we have left out the occurrences of Project
+ *  at occurrences of nu^(i) -- that is, because occurrences of Project
+ *  were filtered out in Step 3, we have occurrences of nu^(i) instead of Project(nu^(i)).
+ *  However, because the solution computed on each round for the Z equation system
+ *  is equivalent to one with Project_T applied to each right-hand side, after
+ *  we apply TDeTensor to obtain nu^(i+1), we have values equal to ones
+ *  on which Project has been applied. (The paper does not have the following lemma
+ *
+ *     for all a in S_T, Project(TDeTensor(a)) = TDeTensor(Project_T(a)),
+ *
+ *  however, there is a proof of this lemma in TWR's notebook from 12/3/2015,
+ *  orange notebook, p. 91.)
+ *
+ *  Author:  Emma Turetsky
+ */
 
 double doNewtonSteps_NPATP(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWPDS * originalPds = NULL, bool canPrune = true)
 { 
@@ -3651,10 +3643,6 @@ void set_vertices_wfa(wali::Key entry, wali::Key exit) {
     exit_key = exit;
 }
     
-//} // end of namespace goals
-
-//using namespace goals;
-
 void printProcedureNameFromNode(int nodeNumber, ostream& out) {
     CAMLparam0();
     CAMLlocal1(sval);
