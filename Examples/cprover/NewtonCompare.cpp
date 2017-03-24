@@ -1,17 +1,17 @@
 #include "gtr/src/lang/gtr_config.h"
+
 #include "tsl/cir/regexp/conc.1level.cir.hpp"
 #include "tsl/analysis_components/src/reinterps/emul/conc_extern_phyla.hpp"
 #include "tsl/analysis_components/src/reinterps/emul/conc_externs.hpp"
-////// The following includes of CPP files were removed by Jason Breck
-//////
-//////   #include "tsl/analysis_components/src/reinterps/emul/conc_extern_types.cpp"
-//////   #include "tsl/analysis_components/src/reinterps/emul/conc_externs.cpp"
 #include "tsl/analysis_components/src/reinterps/emul/concrete_base_type_interp.hpp"
+
+////// The following LIBTSLRE files were originally included directly in NewtonCompare.cpp:
+//////
+//////   #include "tsl/analysis_components/src/reinterps/emul/conc_extern_types.cpp" // now conc_extern_phyla.cpp
+//////   #include "tsl/analysis_components/src/reinterps/emul/conc_externs.cpp"
 //////   #include "tsl/analysis_components/src/reinterps/emul/concrete_base_type_interp.cpp"
 //////   #include "tsl/cir/regexp/conc.1level.cir.cpp"
-//
-//
-////// Jason Breck added the following lines (up to //////////////////////////)
+
 typedef CBTI BASETYPE;
 #include "tsl/analysis_components/src/utils/prettyprint/RegExpPrettyPrint.hpp"
 /////////////////////////////////////////
@@ -95,7 +95,45 @@ typedef std::map<int, RTG::regExpListRefPtr> tslUntensoredDiffMap;
 #define NEWTON_FROM_BELOW   1
 #define NEWTON_FROM_ABOVE   3
 
-bool nonRec, pNonLin;
+// ----------------------------------------------------------------------------
+//   The incoming program is encoded in the following variables,
+//     whose types are defined in NewtonOcamlInterface.hpp, and 
+//     which are set in NewtonOcamlInterface.cpp:
+
+std::vector<caml_rule> ruleHolder;
+std::vector<caml_call_rule> callRuleHolder;
+std::vector<caml_epsilon_rule> epsilonRuleHolder;
+std::vector<caml_error_rule> errorRuleHolder;
+std::vector<caml_print_hull_rule> printHullRuleHolder;
+wali::Key entry_key;
+wali::Key exit_key;
+relation_t compareWeight; // No longer used
+
+void push_rule(caml_rule rule) {
+    ruleHolder.push_back(rule);
+}
+void push_call_rule(caml_call_rule rule) {
+    callRuleHolder.push_back(rule);
+}
+void push_epsilon_rule(caml_epsilon_rule rule) {
+    epsilonRuleHolder.push_back(rule);
+}
+void push_error_rule(caml_error_rule rule) {
+    errorRuleHolder.push_back(rule);
+}
+void push_print_hull_rule(caml_print_hull_rule rule) {
+    printHullRuleHolder.push_back(rule);
+}
+void set_compare_weight(relation_t compare) {
+    compareWeight = compare;
+}
+void set_vertices_wfa(wali::Key entry, wali::Key exit) {
+    entry_key = entry;
+    exit_key = exit;
+}
+
+// ----------------------------------------------------------------------------
+//   Global map variables and their types:
 
 typedef boost::unordered_map<
     MemoCacheKey1<RTG::regExpRefPtr >,
@@ -168,10 +206,86 @@ StarMapT newStarValT;
 StarMap oldStarVal;
 StarMapT oldStarValT;
 
+// I'm using these maps as sets; the value in every map entry is "true".
+// One could also use boost::unordered_set for this purpose, but that
+//   would add another dependency.
+typedef boost::unordered_map<
+  MemoCacheKey1<RTG::regExpRefPtr >,
+  bool,
+  boost::hash<MemoCacheKey1<RTG::regExpRefPtr > >,
+  std::equal_to<MemoCacheKey1<RTG::regExpRefPtr > >,
+  std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, bool > > >
+  VisitedMap;
+
+typedef boost::unordered_map<
+  MemoCacheKey1<RTG::regExpTRefPtr >,
+  bool,
+  boost::hash<MemoCacheKey1<RTG::regExpTRefPtr > >,
+  std::equal_to<MemoCacheKey1<RTG::regExpTRefPtr > >,
+  std::allocator<std::pair<const MemoCacheKey1<RTG::regExpTRefPtr >, bool > > >
+  VisitedMapT;
+
+//map of regExps that have already been seen (should change to an unordered_map for speedup)
+std::map<reg_exp_t, RTG::regExpRefPtr> regExpConversionMap; // This was formerly called "seen" and was local to convertToRegExp --JTB
+
+// ----------------------------------------------------------------------------
+// Stack frames needed by the non-recursive versions of convertToTSL and Eval and EvalT:
+
+// A Stack frame which takes a regexp_t and has pointers to it's left and right children, used from
+// Converting to a TSLRegExp
+struct cFrame
+{
+    cFrame(reg_exp_t & e) : is_new(true), e(e), op(), left(), right() {}
+
+    bool is_new;
+    reg_exp_t e;
+    int op;
+    reg_exp_t left;
+    reg_exp_t right;
+};
+
+// A Stack frame which takes a TSL regExpRefPtr and has pointers to it's left and right children
+// Used for the differential function and evalRegExpAt0 and evalRegExp
+struct dFrame
+{
+    dFrame(RTG::regExpRefPtr & e) : is_new(true), e(e), op(), left(), right(){}
+    bool is_new;
+    RTG::regExpRefPtr e;
+    int op;
+    RTG::regExpRefPtr left;
+    RTG::regExpRefPtr right;
+};
+
+// A Stack frame which takes a TSL regExpTRefPtr and has pointers to it's left and right children, used for evalT
+struct sFrame
+{
+    sFrame(RTG::regExpTRefPtr & e) : is_new(true), e(e), op(), left(), right(){}
+    bool is_new;
+    RTG::regExpTRefPtr e;
+    int op;
+    RTG::regExpTRefPtr left;
+    RTG::regExpTRefPtr right;
+};
+
+// ----------------------------------------------------------------------------
+//   Global flag variables and similar:
+
 bool doWideningThisRound;
 bool inNewtonLoop;
 bool doSmtlibOutput;
 char *  globalBoundingVarName; // name of program variable for which we want to do a print_hull in main.  NULL if there is none.
+
+short dump = false;
+
+//this is used for the testing suite
+bool testMode = false;
+string testFileName;
+
+int maxRnds = -1;  //maximum number of rounds of newton loop
+
+RTG::assignmentRefPtr globalAssignment;
+
+// ----------------------------------------------------------------------------
 
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr mkSemElemWrapper(relation_t d) {
     wali::sem_elem_tensor_t s(d.get_ptr());
@@ -186,6 +300,11 @@ relation_t mkRelation(CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr s) {
     relation_t d(r);
     return d;
 }
+
+// ----------------------------------------------------------------------------
+// Implementations of LIBTSL functions:
+
+// PART I: ORIGINALLY FROM conc_externs.cpp:
 
 // FIXME: In the following functions, consider whether or not:
 //    (1) we need a separate case for the final evaluation that occurs outside
@@ -263,8 +382,6 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElem(
     }
 }
 
-RTG::assignmentRefPtr globalAssignment;
-
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::evalVarSemElem(const CBTI_INT32 & v)
 {
     return CIR::getAssignment(v, globalAssignment);
@@ -275,11 +392,6 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::evalVarSemElemT(const CB
     assert(false && "Attempted to evaluate a tensored variable.");
     //return CIR::getAssignment(v, globalAssignment);
 }
-
-// ----------------------------------------------------------------
-// Implementations of LIBTSL functions:
-
-// PART I: ORIGINALLY FROM conc_externs.cpp:
 
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalPlusSemElemT(
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
@@ -451,55 +563,7 @@ std::ostream & operator << (std::ostream& o, const CONC_EXTERN_PHYLA::sem_elem_w
 }
 
 // End of implementations of LIBTSL functions.
-// ----------------------------------------------------------------
-
-
-// Stack frames needed by the non-recursive versions of convertToTSL and Eval and EvalT
-
-//A Stack frame which takes a regexp_t and has pointers to it's left and right children, used from
-//Converting to a TSLRegExp
-struct cFrame
-{
-    cFrame(reg_exp_t & e) : is_new(true), e(e), op(), left(), right() {}
-
-    bool is_new;
-    reg_exp_t e;
-    int op;
-    reg_exp_t left;
-    reg_exp_t right;
-};
-
-//A Stack frame which takes a TSL regExpRefPtr and has pointers to it's left and right children
-//Used for the differential function and evalRegExpAt0 and evalRegExp
-struct dFrame
-{
-    dFrame(RTG::regExpRefPtr & e) : is_new(true), e(e), op(), left(), right(){}
-    bool is_new;
-    RTG::regExpRefPtr e;
-    int op;
-    RTG::regExpRefPtr left;
-    RTG::regExpRefPtr right;
-};
-
-//A Stack frame which takes a TSL regExpTRefPtr and has pointers to it's left and right children, used for evalT
-struct sFrame
-{
-    sFrame(RTG::regExpTRefPtr & e) : is_new(true), e(e), op(), left(), right(){}
-    bool is_new;
-    RTG::regExpTRefPtr e;
-    int op;
-    RTG::regExpTRefPtr left;
-    RTG::regExpTRefPtr right;
-};
-
-
-short dump = false;
-
-//this is used for the testing suite
-bool testMode = false;
-string testFileName;
-
-int maxRnds = -1;  //maximum number of rounds of newton loop
+// ----------------------------------------------------------------------------
 
 /*
  *  A non recursive version of the Differential function that uses a stack
@@ -1045,24 +1109,6 @@ RTG::regExpListRefPtr nonRecUntensoredDiff(RTG::regExpRefPtr exp)
     MemoCacheKey1<RTG::regExpRefPtr > fin(exp);
     return diffHMap[fin];
 }
-
-// I'm using these maps as sets; the value in every map entry is "true".
-// One could also use boost::unordered_set for this purpose, but that
-//   would add another dependency.
-typedef boost::unordered_map<
-  MemoCacheKey1<RTG::regExpRefPtr >,
-  bool,
-  boost::hash<MemoCacheKey1<RTG::regExpRefPtr > >,
-  std::equal_to<MemoCacheKey1<RTG::regExpRefPtr > >,
-  std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, bool > > >
-  VisitedMap;
-typedef boost::unordered_map<
-  MemoCacheKey1<RTG::regExpTRefPtr >,
-  bool,
-  boost::hash<MemoCacheKey1<RTG::regExpTRefPtr > >,
-  std::equal_to<MemoCacheKey1<RTG::regExpTRefPtr > >,
-  std::allocator<std::pair<const MemoCacheKey1<RTG::regExpTRefPtr >, bool > > >
-  VisitedMapT;
 
 void findFreeVariablesInRegExp(RTG::regExpRefPtr outerExpression,
                                std::set<int> &freeVariables,
@@ -1667,10 +1713,6 @@ RTG::regExpTRefPtr convertToRegExpT(reg_exp_t exp, tslRegExpMap & regExpMap, tsl
         return CIR::mkPlusT(lch, rch);
     }
 } 
-
-
-//map of regExps that have already been seen (should change to an unordered_map for speedup)
-std::map<reg_exp_t, RTG::regExpRefPtr> regExpConversionMap; // This was formerly called "seen" and was local to convertToRegExp --JTB
 
 /*
  *  convertToRegExp
@@ -2748,9 +2790,6 @@ double doNewtonSteps_NPATP(int aboveBelowMode, WFA& outfa, wali::Key entry_key, 
 
   globalAssignment = CIR::initializeAssignment(); // Create an assignment in which all variables are map to zero
   
-  nonRec = false;
-  pNonLin = false;
-  
   cout << "Step 1: =========================================================" << endl;
   //Step 1 - Convert the program 'pg' into an fpds where the weights are nwaobdds.
   FWPDS * fpds;
@@ -3030,7 +3069,6 @@ double doNewtonSteps_NPATP(int aboveBelowMode, WFA& outfa, wali::Key entry_key, 
       }
       else  //There are no variables to be differentiated
       {
-          nonRec = true;
           std::cout << "NonRec";
           std::cout << std::endl;
           aList = CIR::initializeAssignment();
@@ -3129,9 +3167,6 @@ double doNewtonSteps_GJ(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWP
   cout << "#################################################" << endl;
 
   globalAssignment = CIR::initializeAssignment(); // Create an assignment in which all variables are map to zero
-  
-  nonRec = false;
-  pNonLin = false;
   
   cout << "Step 1: =========================================================" << endl;
   //Step 1 - Convert the program 'pg' into an fpds where the weights are nwaobdds.
@@ -3610,39 +3645,6 @@ double doNewtonSteps_GJ(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWP
   }
 }
 
-
-std::vector<caml_rule> ruleHolder;
-std::vector<caml_call_rule> callRuleHolder;
-std::vector<caml_epsilon_rule> epsilonRuleHolder;
-std::vector<caml_error_rule> errorRuleHolder;
-std::vector<caml_print_hull_rule> printHullRuleHolder;
-wali::Key entry_key;
-wali::Key exit_key;
-relation_t compareWeight;
-
-void push_rule(caml_rule rule) {
-    ruleHolder.push_back(rule);
-}
-void push_call_rule(caml_call_rule rule) {
-    callRuleHolder.push_back(rule);
-}
-void push_epsilon_rule(caml_epsilon_rule rule) {
-    epsilonRuleHolder.push_back(rule);
-}
-void push_error_rule(caml_error_rule rule) {
-    errorRuleHolder.push_back(rule);
-}
-void push_print_hull_rule(caml_print_hull_rule rule) {
-    printHullRuleHolder.push_back(rule);
-}
-void set_compare_weight(duetrel_t compare) {
-    compareWeight = compare;
-}
-void set_vertices_wfa(wali::Key entry, wali::Key exit) {
-    entry_key = entry;
-    exit_key = exit;
-}
-    
 void printProcedureNameFromNode(int nodeNumber, ostream& out) {
     CAMLparam0();
     CAMLlocal1(sval);
