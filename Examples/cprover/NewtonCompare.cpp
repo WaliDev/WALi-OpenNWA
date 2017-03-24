@@ -3802,10 +3802,6 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
 
     WFA outfaNewton;
     if (aboveBelowMode == NEWTON_FROM_ABOVE || gaussJordanMode == false) {
-        if (aboveBelowMode == NEWTON_FROM_BELOW) {
-            std::cout << "Warning: Running NEWTON_FROM_BELOW in NPA-TP mode." << std::endl
-                      << "  This mode has not been extensively tested." << std::endl;
-        }
         goals::doNewtonSteps_NPATP(aboveBelowMode, outfaNewton, entry_key, pds, false);
     } else if (aboveBelowMode == NEWTON_FROM_BELOW) {
         goals::doNewtonSteps_GJ(aboveBelowMode, outfaNewton, entry_key, pds, false);
@@ -4182,6 +4178,12 @@ int main(int argc, char **argv)
 				ocamlArgs[3 + unrecognizedArgs.size() + i] = argv[optind + i + 1];
 			}
 
+            if (aboveBelowMode == NEWTON_FROM_BELOW && gaussJordanMode == false) {
+                std::cout << "**************************************************" << std::endl
+                          << "Warning: Running NEWTON_FROM_BELOW in NPA-TP mode." << std::endl
+                          << "  This mode has not been extensively tested." << std::endl
+                          << "**************************************************" << std::endl;
+            }
 			runBasicNewton(ocamlArgs, aboveBelowMode, gaussJordanMode);
     	}
     	else if (aboveBelowMode == 2) {
