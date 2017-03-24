@@ -52,7 +52,7 @@ namespace wali
       
       class DuetRel : public wali::SemElemTensor
       {
-	public:
+        public:
           static void reset();
         public:
           /** @see DuetRel::Compose */
@@ -69,19 +69,19 @@ namespace wali
           static duetrel_t getBaseZero();
           static duetrel_t getBaseTop();
           static duetrel_t getTensorOne();
-	  static duetrel_t getTensorZero();
+          static duetrel_t getTensorZero();
           duetrel_t Compose( duetrel_t that ) const;
           duetrel_t Union( duetrel_t that ) const;
           duetrel_t Intersect( duetrel_t that ) const;
-	  duetrel_t Normalize() const;
+          duetrel_t Normalize() const;
           bool Equal(duetrel_t se) const;
-		  bool IsSat() const;
+          bool IsSat() const;
           duetrel_t Transpose() const;
           duetrel_t Kronecker( duetrel_t that) const;
-		  duetrel_t Merge(int c, int v) const;
-		  duetrel_t TensorMerge(int c, int v) const;
+          duetrel_t Merge(int c, int v) const;
+          duetrel_t TensorMerge(int c, int v) const;
         public: 
-	  // ////////////////////////////////
+          // ////////////////////////////////
           // SemElem methods
           sem_elem_t one() const;
           sem_elem_t zero() const;
@@ -108,7 +108,7 @@ namespace wali
 
           std::ostream& print( std::ostream& o ) const;
           std::ostream& printIndented( std::ostream& o, unsigned int indent ) const;
-	  std::ostream& printHull( std::ostream& o, unsigned int indent, int var ) const;
+          std::ostream& printHull( std::ostream& o, unsigned int indent, int var ) const;
           std::ostream& printAbstract( std::ostream& o ) const;
           std::ostream& printSmtlib( std::ostream& o ) const;
 
@@ -135,30 +135,30 @@ namespace wali
             //return 0;
           }
 
-	  bool isWTensored()
-	  {
-	    return isTensored;
-	  }
+          bool isWTensored()
+          {
+            return isTensored;
+          }
 
-	  void setTensored(bool tens)
-	  {
-	    isTensored = tens;
-	  }
-	  // ////////////////////////////////
+          void setTensored(bool tens)
+          {
+            isTensored = tens;
+          }
+
+          // ////////////////////////////////
           // Printing functions
           //static void printHandler(FILE *o, int var);
           int relId;
           static bool simplify;
           static bool simplifyOnPrint;
         protected:
-	  bool isTensored;
+          bool isTensored;
           static int wCnt;
           static value caml_weights[MAX_WEIGHT_COUNT];
-	private:
-	  DuetRel(const DuetRel& that);
+        private:
+          DuetRel(const DuetRel& that);
           DuetRel(int d, bool is_tensored=false);
       };
-
 
     } // namespace duetrel
 
