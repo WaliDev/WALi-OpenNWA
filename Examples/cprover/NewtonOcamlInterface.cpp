@@ -15,7 +15,7 @@ extern "C" {
     ref_ptr<DuetRel> w1 = DuetRel::MkDuetRel(weight);
     wali::Key k1 = stk(Int_val(v1));
     wali::Key k2 = stk(Int_val(v2));
-    goals::push_rule(std::make_pair(std::make_pair(k1,k2),w1));
+    push_rule(std::make_pair(std::make_pair(k1,k2),w1));
     //fpds->add_rule(st1(), k1, st1(), k2, w1);
     //pass_fwpds = (value) fpds;
     //CAMLreturn(pass_fwpds);
@@ -30,7 +30,7 @@ extern "C" {
     wali::Key ks = stk(Int_val(s1));
     wali::Key kt = stk(Int_val(t1));
     wali::Key kt2 = stk(Int_val(t2));
-    goals::push_call_rule(std::make_pair(std::make_pair(ks, std::make_pair(kt, kt2)), w));
+    push_call_rule(std::make_pair(std::make_pair(ks, std::make_pair(kt, kt2)), w));
     CAMLreturn(Val_unit);
   }
 }
@@ -40,7 +40,7 @@ extern "C" {
     CAMLparam2(weight, key);
     ref_ptr<DuetRel> w = DuetRel::MkDuetRel(weight);
     wali::Key k = stk(Int_val(key));
-    goals::push_epsilon_rule(std::make_pair(k,w));
+    push_epsilon_rule(std::make_pair(k,w));
     CAMLreturn(Val_unit);
   }
 }
@@ -51,7 +51,7 @@ extern "C" {
     ref_ptr<DuetRel> w = DuetRel::MkDuetRel(weight);
     wali::Key k = stk(Int_val(key));
     int line = Int_val(lineno);
-    goals::push_error_rule(std::make_pair(k,std::make_pair(w,line)));
+    push_error_rule(std::make_pair(k,std::make_pair(w,line)));
     CAMLreturn(Val_unit);
   }
 }
@@ -61,10 +61,11 @@ extern "C" {
     CAMLparam2(entry, exit);
     //FWPDS * fpds = (FWPDS*) pds;
     //WFA outfa;
-    goals::set_vertices_wfa(stk(Int_val(entry)), stk(Int_val(exit)));
+    set_vertices_wfa(stk(Int_val(entry)), stk(Int_val(exit)));
 
-    //goals::entry_key = stk(Int_val(entry));
-    //goals::exit_key = stk(Int_val(exit));
+    //entry_key = stk(Int_val(entry));
+    //exit_key = stk(Int_val(exit));
+
     //doPostStar();
     //outfa.path_summary_tarjan_fwpds(true);
     //sem_elem_t wt = outfa.getState(outfa.getInitialState())->weight();
@@ -76,8 +77,9 @@ extern "C" {
   CAMLprim value set_compare_weight(value cWeight){
     CAMLparam1(cWeight);
     //CAMLlocal1(sval);
-    //goals::compareWeight = DuetRel::MkDuetRel(cWeight);
-    goals::set_compare_weight(DuetRel::MkDuetRel(cWeight));
+    //compareWeight = DuetRel::MkDuetRel(cWeight);
+    set_compare_weight(DuetRel::MkDuetRel(cWeight));
+
     //assert(0 && "The function set_compare_weight should no longer be called.");
     std::cout << "Note: The function set_compare_weight no longer needs to be called." << std::endl;
     CAMLreturn(Val_unit);
@@ -90,7 +92,7 @@ extern "C" {
     wali::Key key = stk(Int_val(vertex));
     int lineno = Int_val(line);
     int varno = Int_val(var);
-    goals::push_print_hull_rule(std::make_pair(key,std::make_pair(lineno,varno)));
+    push_print_hull_rule(std::make_pair(key,std::make_pair(lineno,varno)));
     CAMLreturn(Val_unit);
   }
 }

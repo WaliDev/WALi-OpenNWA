@@ -28,7 +28,7 @@ using namespace wali::wpds::fwpds;
 using namespace wali::wpds::ewpds;
 using namespace wali::domains::reach;
 
-namespace goals {
+//namespace goals {
 
 typedef std::pair<std::pair<wali::Key,wali::Key>, relation_t >  caml_rule;
 typedef std::pair<std::pair<wali::Key,std::pair<wali::Key,wali::Key> >, relation_t > caml_call_rule;
@@ -43,6 +43,6 @@ extern void push_print_hull_rule(caml_print_hull_rule);
 extern void push_rule(caml_rule);
 extern void set_compare_weight(relation_t);
 extern void set_vertices_wfa(wali::Key, wali::Key);
-}
+//}
 
 #endif
