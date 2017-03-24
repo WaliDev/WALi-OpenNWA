@@ -518,17 +518,17 @@ bool inNewtonLoop;
 bool doSmtlibOutput;
 char *  globalBoundingVarName; // name of program variable for which we want to do a print_hull in main.  NULL if there is none.
 
-CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr mkSemElemWrapper(domain_t d) {
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr mkSemElemWrapper(relation_t d) {
     wali::sem_elem_tensor_t s(d.get_ptr());
     return s;
 }
 
-domain_t mkRelation(CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr s) {
+relation_t mkRelation(CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr s) {
     Relation * r = dynamic_cast<Relation*>(s.v.get_ptr());
     if (r == 0) {
         assert(0 && "Failed to cast a sem_elem_wrapper to a Relation.");
     }
-    domain_t d(r);
+    relation_t d(r);
     return d;
 }
 
@@ -551,7 +551,7 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElemT(
     //tsl_regexp::regExpTPrettyPrint(child, std::cout); 
     //std::cout << std::endl;
     
-    domain_t previousValue = 0;
+    relation_t previousValue = 0;
     if (doWideningThisRound) {
         EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
         if (previousValueIterator != oldStarValT.end()) {
@@ -586,7 +586,7 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElem(
     //tsl_regexp::regExpPrettyPrint(child, std::cout); 
     //std::cout << std::endl;
     
-    domain_t previousValue = 0;
+    relation_t previousValue = 0;
     if (doWideningThisRound) {
         EvalRMap::const_iterator previousValueIterator = oldStarVal.find(lookupKeyForStar);
         if (previousValueIterator != oldStarVal.end()) {
@@ -635,10 +635,10 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalPlusSemElemT(
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
 {
     CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-    domain_t at = mkRelation(a);//dynamic_cast<Relation*>(a.get_ptr());
-    domain_t bt = mkRelation(b);
+    relation_t ar = mkRelation(a);//dynamic_cast<Relation*>(a.get_ptr());
+    relation_t br = mkRelation(b);
 
-    ans.v = at->Union(bt);
+    ans.v = ar->Union(br);
     return ans;
 }
 
@@ -650,12 +650,12 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::evalProjectSemElemT(
 #if USE_DUET
 	//ans.v = t2->getBaseOne()->Kronecker(t2);
 	CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-    domain_t ct = mkRelation(c);
-	ans.v = ct->Merge(a.get_data(), b.get_data());
+    relation_t cr = mkRelation(c);
+	ans.v = cr->Merge(a.get_data(), b.get_data());
 #else
 	CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-	domain_t t = dynamic_cast<Relation*>(c.v->detensorTranspose().get_ptr());
-	domain_t t2 = t->Merge(a.get_data(), b.get_data()); // t2 = t->Merge(a.get_data(), b.get_data());
+	relation_t t = dynamic_cast<Relation*>(c.v->detensorTranspose().get_ptr());
+	relation_t t2 = t->Merge(a.get_data(), b.get_data()); // t2 = t->Merge(a.get_data(), b.get_data());
 	ans.v = con->getBaseOne()->Kronecker(t2);
 #endif
 	return ans;
@@ -665,8 +665,8 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::evalProjectSemElem(
 	const CBTI_INT32 & a, const CBTI_INT32 & b, const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & c)
 {
 	CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-    domain_t ct = mkRelation(c);
-	ans.v = ct->Merge(a.get_data(), b.get_data());
+    relation_t cr = mkRelation(c);
+	ans.v = cr->Merge(a.get_data(), b.get_data());
 	return ans;
 }
 
@@ -675,10 +675,10 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalTensorTranspose(
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
 {
     CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-    domain_t at = mkRelation(a);
-    domain_t bt = mkRelation(b);
-    domain_t updatedAv = at->Transpose();
-    ans.v = updatedAv->Kronecker(bt);
+    relation_t ar = mkRelation(a);
+    relation_t br = mkRelation(b);
+    relation_t updatedAv = ar->Transpose();
+    ans.v = updatedAv->Kronecker(br);
     return ans;
 }
 
@@ -688,9 +688,9 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalDotSemElemT(
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
 {
     CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-    domain_t at = mkRelation(a);
-    domain_t bt = mkRelation(b);
-    ans.v = at->Compose(bt);
+    relation_t ar = mkRelation(a);
+    relation_t br = mkRelation(b);
+    ans.v = ar->Compose(br);
     return ans;
 }
 
@@ -698,10 +698,10 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalPlusSemElem(
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
 {
-    domain_t at = mkRelation(a);
-    domain_t bt = mkRelation(b);
+    relation_t ar = mkRelation(a);
+    relation_t br = mkRelation(b);
     CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-    ans.v = at->Union(bt);
+    ans.v = ar->Union(br);
     return ans;
 }
 
@@ -709,10 +709,10 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalDotSemElem(
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
 {
-    domain_t at = mkRelation(a);
-    domain_t bt = mkRelation(b);
+    relation_t ar = mkRelation(a);
+    relation_t br = mkRelation(b);
     CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-    ans.v = at->Compose(bt);
+    ans.v = ar->Compose(br);
     return ans;
 }
 
@@ -778,9 +778,9 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::detensorTranspose(const 
   //ans.v = dynamic_cast<Relation*>(a.v->detensorTranspose().get_ptr());
   //ans.v->setTensored(false);
   //return ans;
-  domain_t at = mkRelation(a);
-  return at->detensorTranspose();
-  //return mkSemElemWrapper(at->detensorTranspose());
+  relation_t ar = mkRelation(a);
+  return ar->detensorTranspose();
+  //return mkSemElemWrapper(ar->detensorTranspose());
 }
 
 #endif // end if REGEXP_TEST
@@ -808,9 +808,9 @@ CONC_EXTERN_PHYLA::sem_elem_wrapper::operator==(const sem_elem_wrapper & a) cons
   //return v->get_ptr() == a.v->get_ptr();
   //return (v->Equal(a.v));
   //bool retVal = (v.get_ptr() == a.v.get_ptr());
-  domain_t at = mkRelation(a);
-  domain_t vt = mkRelation(v);
-  bool retVal = vt->Equal(at);
+  relation_t ar = mkRelation(a);
+  relation_t vr = mkRelation(v);
+  bool retVal = vr->Equal(ar);
 
   //in_operator_equals = false;
 
@@ -842,7 +842,7 @@ std::ostream & CONC_EXTERN_PHYLA::sem_elem_wrapper::print(std::ostream & o) cons
 
 std::ostream & CONC_EXTERN_PHYLA::sem_elem_wrapper::printIndented(std::ostream & o, unsigned int indent) const
 {
-  domain_t vt = mkRelation(v);
+  relation_t vt = mkRelation(v);
   return vt->printIndented(o, indent);
 }
 
@@ -1077,7 +1077,7 @@ namespace goals {
 
   double duetTest(Relation* a, Relation * b)
 {
-  domain_t c = a->Compose(b);    // FIXME: Compose badly named: Compose should be Extend
+  relation_t c = a->Compose(b);    // FIXME: Compose badly named: Compose should be Extend
   c->print(std::cout);
   return 0;
 }
@@ -2371,7 +2371,7 @@ namespace goals {
 ////////
 ////////				      MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(child);
 ////////
-////////                      domain_t previousValue = 0;
+////////                      relation_t previousValue = 0;
 ////////                      if (doWideningThisRound) {
 ////////                          EvalRMap::const_iterator previousValueIterator = oldStarVal.find(lookupKeyForStar);
 ////////                          if (previousValueIterator != oldStarVal.end()) {
@@ -2546,7 +2546,7 @@ namespace goals {
 ////////				  
 ////////                  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(frame.e);
 ////////
-////////                  domain_t previousValue = 0;
+////////                  relation_t previousValue = 0;
 ////////                  if (doWideningThisRound) {
 ////////                      EvalRMap::const_iterator previousValueIterator = oldStarVal.find(lookupKeyForStar);
 ////////                      if (previousValueIterator != oldStarVal.end()) {
@@ -2659,7 +2659,7 @@ namespace goals {
 ////////                      
 ////////				  	  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(child);
 ////////
-////////                      domain_t previousValue = 0;
+////////                      relation_t previousValue = 0;
 ////////                      if (doWideningThisRound) {
 ////////                          EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
 ////////                          if (previousValueIterator != oldStarValT.end()) {
@@ -2889,7 +2889,7 @@ namespace goals {
 ////////				  duetrelpair_t ret;
 ////////				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(frame.e); // FIXME this variable is now redundant with lookupKeyForevalTHash
 ////////
-////////                  domain_t previousValue = 0;
+////////                  relation_t previousValue = 0;
 ////////                  if (doWideningThisRound) {
 ////////			          EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
 ////////                      if (previousValueIterator != oldStarValT.end()) {
@@ -3451,7 +3451,7 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////
 ////                      // If we want to do widening, fetch the abstract value of this loop
 ////                      //   body from the previous round of the Newton loop.
-////                      domain_t previousValue = NULL;
+////                      relation_t previousValue = NULL;
 ////                      if (doWideningThisRound) {
 ////                          EvalRMapRC::const_iterator previousValueIterator = oldStarValRC.find(lookupKeyForStar);
 ////                          if (previousValueIterator != oldStarValRC.end()) {
@@ -3685,7 +3685,7 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////
 ////                      // If we want to do widening, fetch the abstract value of this loop
 ////                      //   body from the previous round of the Newton loop.
-////                      domain_t previousValue = NULL;
+////                      relation_t previousValue = NULL;
 ////                      if (doWideningThisRound) {
 ////                          EvalRMapLC::const_iterator previousValueIterator = oldStarValLC.find(lookupKeyForStar);
 ////                          if (previousValueIterator != oldStarValLC.end()) {
@@ -3932,7 +3932,7 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////
 ////                      // If we want to do widening, fetch the abstract value of this loop
 ////                      //   body from the previous round of the Newton loop.
-////                      domain_t previousValue = NULL;
+////                      relation_t previousValue = NULL;
 ////                      if (doWideningThisRound) {
 ////                          EvalTMapRC::const_iterator previousValueIterator = oldStarValTRC.find(lookupKeyForStar);
 ////                          if (previousValueIterator != oldStarValTRC.end()) {
@@ -4401,7 +4401,7 @@ std::map<reg_exp_t, RTG::regExpRefPtr> regExpConversionMap; // This was formerly
 				  else if (frame.e->isZero())
 					  regExpConversionMap[frame.e] = RTG::Zero::make();
 				  else {  //If the expresssion isn't a simple constant, make an external TSL wrapper around the constant and create a TSL weight
-					  domain_t w = dynamic_cast<Relation*>(frame.e->get_weight().get_ptr());
+					  relation_t w = dynamic_cast<Relation*>(frame.e->get_weight().get_ptr());
 					  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr wt = w;
 					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr wt = CONC_EXTERN_PHYLA::sem_elem_wrapper(w);
 					  //regExpConversionMap[frame.e] = RTG::Weight::make(wt);
@@ -5126,8 +5126,8 @@ NEWROUND:
 				propagationRounds = 0;
                 goto NEWROUND;
 			}
-            domain_t oldStarRelation = mkRelation(oldStarValue->second.v);
-            domain_t newStarRelation = mkRelation(newStar_it->second.v);
+            relation_t oldStarRelation = mkRelation(oldStarValue->second.v);
+            relation_t newStarRelation = mkRelation(newStar_it->second.v);
 			if (!newStarRelation->Equivalent(oldStarRelation)) {
 				// std::cout << "    Inequivalent: continuing loop." << std::endl;
 				propagationRounds = 0;
@@ -5145,8 +5145,8 @@ NEWROUND:
 				propagationRounds = 0;
 				goto NEWROUND;
 			}
-            domain_t oldStarRelation = mkRelation(oldStarValue->second.v);
-            domain_t newStarRelation = mkRelation(newStar_it->second.v);
+            relation_t oldStarRelation = mkRelation(oldStarValue->second.v);
+            relation_t newStarRelation = mkRelation(newStar_it->second.v);
 			if (!newStarRelation->Equivalent(oldStarRelation)) {
 				// std::cout << "    Inequivalent: continuing loop." << std::endl;
 				propagationRounds = 0;
@@ -5362,8 +5362,8 @@ NEWROUND:
 				propagationRounds = 0;
                 goto NEWROUND;
 			}
-            domain_t oldStarRelation = mkRelation(oldStarValue->second.v);
-            domain_t newStarRelation = mkRelation(newStar_it->second.v);
+            relation_t oldStarRelation = mkRelation(oldStarValue->second.v);
+            relation_t newStarRelation = mkRelation(newStar_it->second.v);
 			if (!newStarRelation->Equivalent(oldStarRelation)) {
 				// std::cout << "    Inequivalent: continuing loop." << std::endl;
 				propagationRounds = 0;
@@ -5386,8 +5386,8 @@ NEWROUND:
 			}
             //std::cout << "\n  Its old value was: " << std::endl;
             //oldStarValue->second.v->printAbstract(std::cout);
-            domain_t oldStarRelation = mkRelation(oldStarValue->second.v);
-            domain_t newStarRelation = mkRelation(newStar_it->second.v);
+            relation_t oldStarRelation = mkRelation(oldStarValue->second.v);
+            relation_t newStarRelation = mkRelation(newStar_it->second.v);
 			if (!newStarRelation->Equivalent(oldStarRelation)) {
 				//std::cout << "\n    Inequivalent: continuing loop." << std::endl;
 				propagationRounds = 0;
@@ -5555,7 +5555,7 @@ NEWROUND:
 	tslRegExpMap diffMap;  //The map of tsl regular expressions to be differentiated (the program return points)
 	tslDiffMap differentialMap;  //This is a map from regexp ids to the partial differentials assoicated with them
 	tslRegExpTMap tensoredRegExpMap;  //A map from the regexpId to the tsl tensored differential representing it
-	map<int, domain_t> finWeights;  //The map from node id to the final relational weights
+	map<int, relation_t> finWeights;  //The map from node id to the final relational weights
 	map<std::pair<int, int>, std::pair<int, int> > mergeSrcMap; //The map that keeps track of the src of calls on call instructions
 	std::vector<int> wl;
 	std::set<int> vl;
@@ -5939,7 +5939,7 @@ NEWROUND:
 	tslRegExpMap diffMap;  //The map of tsl regular expressions to be differentiated (the program return points)
 	tslDiffMap differentialMap;  //This is a map from regexp ids to the partial differentials assoicated with them
 	tslRegExpTMap tensoredRegExpMap;  //A map from the regexpId to the tsl tensored differential representing it
-	map<int, domain_t> finWeights;  //The map from node id to the final relational weights
+	map<int, relation_t> finWeights;  //The map from node id to the final relational weights
 	map<std::pair<int, int>, std::pair<int, int> > mergeSrcMap; //The map that keeps track of the src of calls on call instructions
 	std::vector<int> wl;
 	std::set<int> vl;
@@ -6435,7 +6435,7 @@ NEWROUND:
 ////	  tslRegExpMap regExpMap;  //The map of all tsl regular expression
 ////	  tslRegExpMap diffMap;  //The map of tsl regular expressions to be differentiated (the program return points)
 ////	  tslUntensoredDiffMap untensoredDifferentialMap;
-////	  map<int, domain_t> finWeights;  //The map from node id to the final relational weights
+////	  map<int, relation_t> finWeights;  //The map from node id to the final relational weights
 ////	  map<std::pair<int, int>, std::pair<int, int> > mergeSrcMap; //The map that keeps track of the src of calls on call instructions
 ////	  std::vector<int> wl;
 ////	  std::set<int> vl;
@@ -6687,7 +6687,7 @@ NEWROUND:
 ////
 ////			  //THIS IS THE FIRST NEWTON ROUND
 ////			  FWPDS * domainFWPDS = new FWPDS();
-////			  //For each pds rule - create a domain_t rule (evaluate the rule with respect to the assignment list and create a new pds
+////			  //For each pds rule - create a relation_t rule (evaluate the rule with respect to the assignment list and create a new pds
 ////			  WpdsRules rules;
 ////			  tslFwpds->for_each(rules);
 ////			  std::set< Rule >::iterator ruleIt;
@@ -6730,7 +6730,7 @@ NEWROUND:
 ////			  //std::cout << std::endl;
 ////			  //domainFWPDS->print(std::cout);
 ////
-////			  //Create an automata and perform poststar on the domain_t pds
+////			  //Create an automata and perform poststar on the relation_t pds
 ////			  ostringstream keyStringEntry;
 ////			  keyStringEntry << entry << "_entry";
 ////			  Key WFAEntry = ks->getKey(keyStringEntry.str());
@@ -6777,7 +6777,7 @@ NEWROUND:
 ////					  int rId = exitIt->first;
 ////					  changedVars.insert(rId);
 ////					  //std::cout << rId << std::endl;
-////					  domain_t w = dynamic_cast<Relation*>(wt.get_ptr());
+////					  relation_t w = dynamic_cast<Relation*>(wt.get_ptr());
 ////					  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = w;
 ////					  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = CONC_EXTERN_PHYLA::sem_elem_wrapper(w);
 ////					  aList = CIR::updateAssignment(aList, CBTI_INT32(rId), rep);
@@ -6861,8 +6861,8 @@ NEWROUND:
 ////					  //wt->print(std::cout) << std::endl;
 ////					  //std::cout << "OldWeight: ";
 ////					  //oldVal.v->print(std::cout) << std::endl;
-////					  domain_t w = dynamic_cast<Relation*>(wt.get_ptr());
-////					  domain_t oldV = oldVal.v;
+////					  relation_t w = dynamic_cast<Relation*>(wt.get_ptr());
+////					  relation_t oldV = oldVal.v;
 ////					  if (!(w.get_ptr()->equal(oldV.get_ptr())))
 ////					  {
 ////						  int rId = exitIt->first;
@@ -6961,7 +6961,7 @@ NEWROUND:
 ////	  //This is the actual workhorse of the Newton Rounds
 ////
 ////	  //FOR EACH Zi that depends on the changed variables
-////	  //RE-EVALUATE THE tslFPDS RULE and create a new weight of the domain_t pds rule*/
+////	  //RE-EVALUATE THE tslFPDS RULE and create a new weight of the relation_t pds rule*/
 ////  }
 
 #ifdef USE_DUET
@@ -6972,7 +6972,7 @@ std::vector<caml_error_rule> errorRuleHolder;
 std::vector<caml_print_hull_rule> printHullRuleHolder;
 wali::Key entry_key;
 wali::Key exit_key;
-domain_t compareWeight;
+relation_t compareWeight;
 
 void push_rule(caml_rule rule) {
     ruleHolder.push_back(rule);
@@ -7211,7 +7211,7 @@ int runBasicNewton(char **args, int runningMode)
 
     wali::Key acc = wali::getKeySpace()->getKey("accept");
 
-    domain_t mainProcedureSummary = NULL;
+    relation_t mainProcedureSummary = NULL;
 
     Trans t;
 
@@ -7275,7 +7275,7 @@ int runBasicNewton(char **args, int runningMode)
 
         // Finally, we can print the procedure summary itself:
         std::cout << std::endl;
-        domain_t nval = ((Relation*)((*tsit)->weight().get_ptr()));
+        relation_t nval = ((Relation*)((*tsit)->weight().get_ptr()));
         if (foundMain) { mainProcedureSummary = nval; }
         nval->print(std::cout);
         std::cout << std::endl << std::endl;
@@ -7314,15 +7314,15 @@ int runBasicNewton(char **args, int runningMode)
 
 			// Check if is_sat ( (it->second) extend (*tsit)->weight() )
 
-            domain_t negatedAssertionWeight = ((Relation*)(it->second.first.get_ptr()));   // Negated assertion condition
+            relation_t negatedAssertionWeight = ((Relation*)(it->second.first.get_ptr()));   // Negated assertion condition
             negatedAssertionWeight->print(std::cout);
             std::cout << std::endl << std::endl;
             
-            domain_t intraprocWeight = ((Relation*)((*tsit)->weight().get_ptr()));  // Weight from containing procedure's entry to assertion pt
-            domain_t contextWeight = ((Relation*)(outfaNewton.getState((*tsit)->to())->weight().get_ptr()));  // Weight of calling context
+            relation_t intraprocWeight = ((Relation*)((*tsit)->weight().get_ptr()));  // Weight from containing procedure's entry to assertion pt
+            relation_t contextWeight = ((Relation*)(outfaNewton.getState((*tsit)->to())->weight().get_ptr()));  // Weight of calling context
 
-            domain_t composedWeight = contextWeight->Compose(intraprocWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
-            domain_t finalWeight = composedWeight->Compose(negatedAssertionWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
+            relation_t composedWeight = contextWeight->Compose(intraprocWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
+            relation_t finalWeight = composedWeight->Compose(negatedAssertionWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
 
             std::cout << std::endl << "contextWeight = " << std::endl;
             contextWeight->print(std::cout);
@@ -7376,9 +7376,9 @@ int runBasicNewton(char **args, int runningMode)
             tsit != print_hull_transitions.end(); 
             tsit++)
         {
-            domain_t intraprocWeight = ((Relation*)((*tsit)->weight().get_ptr()));  // Weight from containing procedure's entry to print-hull pt
-            domain_t contextWeight = ((Relation*)(outfaNewton.getState((*tsit)->to())->weight().get_ptr()));  // Weight of calling context
-            domain_t composedWeight = contextWeight->Compose(intraprocWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
+            relation_t intraprocWeight = ((Relation*)((*tsit)->weight().get_ptr()));  // Weight from containing procedure's entry to print-hull pt
+            relation_t contextWeight = ((Relation*)(outfaNewton.getState((*tsit)->to())->weight().get_ptr()));  // Weight of calling context
+            relation_t composedWeight = contextWeight->Compose(intraprocWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
             
             //std::cout << "Variable Bounds at Line: " << line << std::endl;
             std::cout << "Variable bounds";

@@ -5,20 +5,20 @@
 #include "../turetsky/svn-repository/NWAOBDDRel.hpp"
 using namespace wali::domains::nwaobddrel;
 extern NWAOBDDContext * con;
-typedef nwaobdd_t domain_t;
+typedef nwaobdd_t relation_t;
 typedef NWAOBDDRel Relation;
 
 #elif USE_BINREL
 #include "wali/domains/binrel/BinRel.hpp"
 using namespace wali::domains::binrel;
 extern BddContext * con;
-typedef binrel_t domain_t;
+typedef binrel_t relation_t;
 typedef BinRel Relation;
 
 #elif USE_DUET
 #include "wali/domains/duet/DuetRel.hpp"
 using namespace wali::domains::duetrel;
-typedef duetrel_t domain_t;
+typedef duetrel_t relation_t;
 typedef DuetRel Relation;
 
 #else 

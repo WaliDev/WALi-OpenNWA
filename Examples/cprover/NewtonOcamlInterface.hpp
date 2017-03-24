@@ -30,10 +30,10 @@ using namespace wali::domains::reach;
 
 namespace goals {
 
-typedef std::pair<std::pair<wali::Key,wali::Key>, domain_t >  caml_rule;
-typedef std::pair<std::pair<wali::Key,std::pair<wali::Key,wali::Key> >, domain_t > caml_call_rule;
-typedef std::pair<wali::Key, domain_t > caml_epsilon_rule;
-typedef std::pair<wali::Key, std::pair<domain_t,int> > caml_error_rule;
+typedef std::pair<std::pair<wali::Key,wali::Key>, relation_t >  caml_rule;
+typedef std::pair<std::pair<wali::Key,std::pair<wali::Key,wali::Key> >, relation_t > caml_call_rule;
+typedef std::pair<wali::Key, relation_t > caml_epsilon_rule;
+typedef std::pair<wali::Key, std::pair<relation_t,int> > caml_error_rule;
 typedef std::pair<wali::Key, std::pair<int,int> > caml_print_hull_rule;
 
 extern void push_call_rule(caml_call_rule);
