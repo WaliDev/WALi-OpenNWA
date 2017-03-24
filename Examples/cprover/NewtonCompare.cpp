@@ -196,71 +196,71 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElemT(
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a, 
   const RTG::regExpTRefPtr & child)
 {
-  if (inNewtonLoop) {
-    duetrelpair_t ret;
-    
-    MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(child);
+    if (inNewtonLoop) {
+        duetrelpair_t ret;
+        
+        MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(child);
 
-    //std::cout << "*** Loop body regular expression is:" << std::endl;
-    //tsl_regexp::regExpTPrettyPrint(child, std::cout); 
-    //std::cout << std::endl;
-    
-    relation_t previousValue = 0;
-    if (doWideningThisRound) {
-        EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
-        if (previousValueIterator != oldStarValT.end()) {
-            previousValue = mkRelation(previousValueIterator->second.v);
+        //std::cout << "*** Loop body regular expression is:" << std::endl;
+        //tsl_regexp::regExpTPrettyPrint(child, std::cout); 
+        //std::cout << std::endl;
+        
+        relation_t previousValue = 0;
+        if (doWideningThisRound) {
+            EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
+            if (previousValueIterator != oldStarValT.end()) {
+                previousValue = mkRelation(previousValueIterator->second.v);
+            }
         }
+        
+        //ret = ((evalT___it->second.v))->alphaHatStar(previousValue);
+        ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar(previousValue);
+        
+        newStarValT.insert(std::make_pair(lookupKeyForStar, ret->first));
+        return mkSemElemWrapper(ret->second);
+    } else {
+        CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+        duetrelpair_t ret;
+        ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar();
+        ans.v = ret->second.get_ptr();
+        return ans;
     }
-    
-    //ret = ((evalT___it->second.v))->alphaHatStar(previousValue);
-    ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar(previousValue);
-    
-    newStarValT.insert(std::make_pair(lookupKeyForStar, ret->first));
-    return mkSemElemWrapper(ret->second);
-  } else {
-    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-    duetrelpair_t ret;
-    ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar();
-    ans.v = ret->second.get_ptr();
-    return ans;
-  }
 }
 
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElem(
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
   const RTG::regExpRefPtr & child)
 {
-  if (inNewtonLoop) {
-    duetrelpair_t ret;
-    
-    MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(child);
-    
-    //std::cout << "*** Loop body regular expression is:" << std::endl;
-    //tsl_regexp::regExpPrettyPrint(child, std::cout); 
-    //std::cout << std::endl;
-    
-    relation_t previousValue = 0;
-    if (doWideningThisRound) {
-        EvalRMap::const_iterator previousValueIterator = oldStarVal.find(lookupKeyForStar);
-        if (previousValueIterator != oldStarVal.end()) {
-            previousValue = mkRelation(previousValueIterator->second.v);
+    if (inNewtonLoop) {
+        duetrelpair_t ret;
+        
+        MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(child);
+        
+        //std::cout << "*** Loop body regular expression is:" << std::endl;
+        //tsl_regexp::regExpPrettyPrint(child, std::cout); 
+        //std::cout << std::endl;
+        
+        relation_t previousValue = 0;
+        if (doWideningThisRound) {
+            EvalRMap::const_iterator previousValueIterator = oldStarVal.find(lookupKeyForStar);
+            if (previousValueIterator != oldStarVal.end()) {
+                previousValue = mkRelation(previousValueIterator->second.v);
+            }
         }
-    }
-    
-    //ret = ((evalRegExp___it->second.v))->alphaHatStar(previousValue);
-    ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar(previousValue);
-    
-    newStarVal.insert(std::make_pair(lookupKeyForStar, ret->first));
+        
+        //ret = ((evalRegExp___it->second.v))->alphaHatStar(previousValue);
+        ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar(previousValue);
+        
+        newStarVal.insert(std::make_pair(lookupKeyForStar, ret->first));
 
-    return mkSemElemWrapper(ret->second);
-  } else {
-    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-    duetrelpair_t ret;
-    ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar();
-    ans.v = ret->second.get_ptr();
-    return ans;
-  }
+        return mkSemElemWrapper(ret->second);
+    } else {
+        CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+        duetrelpair_t ret;
+        ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar();
+        ans.v = ret->second.get_ptr();
+        return ans;
+    }
 }
 
 RTG::assignmentRefPtr globalAssignment;
@@ -415,7 +415,6 @@ CONC_EXTERN_PHYLA::sem_elem_wrapper::operator>(const sem_elem_wrapper & a) const
 {
     return a.v<v;
 }
-
 
 unsigned long CONC_EXTERN_PHYLA::sem_elem_wrapper::hashValue() const
 {
@@ -3133,9 +3132,6 @@ NEWROUND:
     }
   }
 
-
-
-
   double doNewtonSteps_GJ(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWPDS * originalPds = NULL, bool canPrune = true)
   { 
     cout << "#################################################" << endl;
@@ -3921,7 +3917,6 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
     //    pds_stream << "}" << endl;
     //    delete(originalPds);
     //}
-
 
     #undef flush
     std::cout << "================================================" << std::endl;
