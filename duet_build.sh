@@ -23,7 +23,7 @@ fi
 
 scons addons || exit 1
 
-g++ -o newton_interface.os -c -Wall -g -O0 -Wextra -fdiagnostics-show-option -fPIC -DBOOST_NO_DEFAULTED_FUNCTIONS=1 -DCHECKED_LEVEL=1 -DEXPORT_GTR_SYMBOLS=0 -DPRATHMEHS_NWA_DETENSOR=0 -DREGEXP_TEST=1 -DTSL_DETENSOR=1 -D__TSL_REGEXP=1 -ISource -I$BOOST_PATH/include -IAddOns/Domains/ThirdParty/include -IAddOns/Domains/Source -IThirdParty/include -I"`ocamlc -where`" Examples/cprover/NewtonOcamlInterface.cpp || exit 1
+g++ -o newton_interface.os -c -Wall -g -O0 -Wextra -fdiagnostics-show-option -fPIC -DBOOST_NO_DEFAULTED_FUNCTIONS=1 -DCHECKED_LEVEL=1 -DEXPORT_GTR_SYMBOLS=0 -DPRATHMEHS_NWA_DETENSOR=0 -DREGEXP_TEST=1 -DTSL_DETENSOR=1 -D__TSL_REGEXP=1 -DUSE_DUET=1 -ISource -I$BOOST_PATH/include -IAddOns/Domains/ThirdParty/include -IAddOns/Domains/Source -IThirdParty/include -I"`ocamlc -where`" Examples/cprover/NewtonOcamlInterface.cpp || exit 1
 
 g++ -o libocamlinterface.so -rdynamic -shared -Wl,-rpath=$BOOST_PATH/lib -Wl,-rpath=/home/turetsky/OCamlTest newton_interface.os -L$BOOST_PATH/lib -L/home/turetsky/OCamlTest -lboost_filesystem -lboost_system -lboost_serialization -lrt || exit 1
 

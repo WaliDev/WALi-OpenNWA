@@ -102,17 +102,6 @@ typedef std::map<int,RTG::regExpTRefPtr> tslRegExpTMap;
 typedef std::map<int,RTG::regExpTListRefPtr> tslDiffMap;
 typedef std::map<int, RTG::regExpListRefPtr> tslUntensoredDiffMap;
 
-#ifdef USE_NWAOBDD
-typedef nwaobdd_t domain_t;
-typedef NWAOBDDRel Relation;
-#elif USE_DUET
-typedef duetrel_t domain_t;
-typedef DuetRel Relation;
-#else
-typedef binrel_t domain_t;
-typedef BinRel Relation;
-#endif
-
 //#include <signal.h>
 #include <boost/cast.hpp>
 
@@ -131,6 +120,8 @@ bool nonRec, pNonLin;
 NWAOBDDContext * con = NULL;
 NWAOBDDContext * dCon = con;
 #else
+#include "wali/domains/binrel/BinRel.hpp"
+using namespace wali::domains::binrel;
 BddContext * con = NULL;
 BddContext * dCon = con;
 #endif
@@ -527,6 +518,20 @@ bool inNewtonLoop;
 bool doSmtlibOutput;
 char *  globalBoundingVarName; // name of program variable for which we want to do a print_hull in main.  NULL if there is none.
 
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr mkSemElemWrapper(domain_t d) {
+    wali::sem_elem_tensor_t s(d.get_ptr());
+    return s;
+}
+
+domain_t mkRelation(CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr s) {
+    Relation * r = dynamic_cast<Relation*>(s.v.get_ptr());
+    if (r == 0) {
+        assert(0 && "Failed to cast a sem_elem_wrapper to a Relation.");
+    }
+    domain_t d(r);
+    return d;
+}
+
 // FIXME: In the following functions, consider whether or not:
 //    (1) we need a separate case for the final evaluation that occurs outside
 //       of the Newton loop
@@ -546,11 +551,11 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElemT(
     //tsl_regexp::regExpTPrettyPrint(child, std::cout); 
     //std::cout << std::endl;
     
-    duetrel_t previousValue = 0;
+    domain_t previousValue = 0;
     if (doWideningThisRound) {
         EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
         if (previousValueIterator != oldStarValT.end()) {
-            previousValue = previousValueIterator->second.v;
+            previousValue = mkRelation(previousValueIterator->second.v);
         }
     }
     
@@ -558,7 +563,7 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElemT(
     ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar(previousValue);
     
     newStarValT.insert(std::make_pair(lookupKeyForStar, ret->first));
-    return ret->second;
+    return mkSemElemWrapper(ret->second);
   } else {
     CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
     duetrelpair_t ret;
@@ -581,11 +586,11 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElem(
     //tsl_regexp::regExpPrettyPrint(child, std::cout); 
     //std::cout << std::endl;
     
-    duetrel_t previousValue = 0;
+    domain_t previousValue = 0;
     if (doWideningThisRound) {
         EvalRMap::const_iterator previousValueIterator = oldStarVal.find(lookupKeyForStar);
         if (previousValueIterator != oldStarVal.end()) {
-            previousValue = previousValueIterator->second.v;
+            previousValue = mkRelation(previousValueIterator->second.v);
         }
     }
     
@@ -594,7 +599,7 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElem(
     
     newStarVal.insert(std::make_pair(lookupKeyForStar, ret->first));
 
-    return ret->second;
+    return mkSemElemWrapper(ret->second);
   } else {
     CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
     duetrelpair_t ret;
@@ -616,6 +621,250 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::evalVarSemElemT(const CB
     assert(false && "Attempted to evaluate a tensored variable.");
     //return CIR::getAssignment(v, globalAssignment);
 }
+
+// -----------------------------------------------
+// --------   PASTED FROM CONC_EXTERNS    ---------
+
+#if defined(REGEXP_TEST)
+//
+// Implementations of functions available in TSL for evaluating
+// WALi sem_elem_t values.
+//
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalPlusSemElemT(
+  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
+  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
+{
+    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+    domain_t at = mkRelation(a);//dynamic_cast<Relation*>(a.get_ptr());
+    domain_t bt = mkRelation(b);
+
+    ans.v = at->Union(bt);
+    return ans;
+}
+
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::evalProjectSemElemT(
+	const CBTI_INT32 & a, const CBTI_INT32 & b, const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & c)
+{
+	// Changed by Jason Breck on 2016_03_11 to only call Merge (as opposed to
+	//   first calling detensor transpose) in the USE_DUET case
+#if USE_DUET
+	//ans.v = t2->getBaseOne()->Kronecker(t2);
+	CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+    domain_t ct = mkRelation(c);
+	ans.v = ct->Merge(a.get_data(), b.get_data());
+#else
+	CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+	domain_t t = dynamic_cast<Relation*>(c.v->detensorTranspose().get_ptr());
+	domain_t t2 = t->Merge(a.get_data(), b.get_data()); // t2 = t->Merge(a.get_data(), b.get_data());
+	ans.v = con->getBaseOne()->Kronecker(t2);
+#endif
+	return ans;
+}
+
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::evalProjectSemElem(
+	const CBTI_INT32 & a, const CBTI_INT32 & b, const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & c)
+{
+	CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+    domain_t ct = mkRelation(c);
+	ans.v = ct->Merge(a.get_data(), b.get_data());
+	return ans;
+}
+
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalTensorTranspose(
+  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
+  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
+{
+    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+    domain_t at = mkRelation(a);
+    domain_t bt = mkRelation(b);
+    domain_t updatedAv = at->Transpose();
+    ans.v = updatedAv->Kronecker(bt);
+    return ans;
+}
+
+
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalDotSemElemT(
+  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
+  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
+{
+    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+    domain_t at = mkRelation(a);
+    domain_t bt = mkRelation(b);
+    ans.v = at->Compose(bt);
+    return ans;
+}
+
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalPlusSemElem(
+  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
+  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
+{
+    domain_t at = mkRelation(a);
+    domain_t bt = mkRelation(b);
+    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+    ans.v = at->Union(bt);
+    return ans;
+}
+
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalDotSemElem(
+  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
+  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
+{
+    domain_t at = mkRelation(a);
+    domain_t bt = mkRelation(b);
+    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+    ans.v = at->Compose(bt);
+    return ans;
+}
+
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::getOneWt()
+{
+//  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+//#if USE_DUET
+//  //ans.v = ans.v->getBaseOne();
+//#else
+//  ans.v = con->getBaseOne();
+//#endif
+//  ans.v->setTensored(false);
+  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans(Relation::getBaseOne());
+  //return ans;
+  return mkSemElemWrapper(Relation::getBaseOne());
+}
+
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::getZeroWt()
+{
+//  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+//#if USE_DUET
+//  ans.v = ans.v->getBaseZero();
+//#else
+//  ans.v = con->getBaseZero();
+//#endif
+//  ans.v->setTensored(false);
+  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans(Relation::getBaseZero());
+  //return ans;
+  return mkSemElemWrapper(Relation::getBaseZero());
+}
+
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::getOneTWt()
+{
+//  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+//#if USE_DUET
+//  ans.v = ans.v->getTensorOne();
+//#else
+//  ans.v = con->getTensorOne();
+//#endif
+//  ans.v->setTensored(true);
+  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans(Relation::getTensorOne());
+  //return ans;
+  return mkSemElemWrapper(Relation::getTensorOne());
+}
+
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::getZeroTWt()
+{
+//  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+//#if USE_DUET
+//  ans.v = ans.v->getTensorZero();
+//#else
+//  ans.v = con->getTensorZero();
+//#endif
+//  ans.v->setTensored(true);
+  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans(Relation::getTensorZero());
+  //return ans;
+  return mkSemElemWrapper(Relation::getTensorZero());
+}
+
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::detensorTranspose(const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a)
+{
+  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+  //ans.v = dynamic_cast<Relation*>(a.v->detensorTranspose().get_ptr());
+  //ans.v->setTensored(false);
+  //return ans;
+  domain_t at = mkRelation(a);
+  return at->detensorTranspose();
+  //return mkSemElemWrapper(at->detensorTranspose());
+}
+
+#endif // end if REGEXP_TEST
+
+// -----------------------------------------------
+
+// -----------------------------------------------
+// -----    PASTED FROM CONC_EXTERN_PHYLA    -----
+
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr 
+CONC_EXTERN_PHYLA::sem_elem_wrapper::random()
+{
+  // TODO: This may not be needed for regexp; random is only called from CreateRandomState
+  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+  return ans;
+}
+
+//bool in_operator_equals = false;
+bool 
+CONC_EXTERN_PHYLA::sem_elem_wrapper::operator==(const sem_elem_wrapper & a) const
+{
+  //in_operator_equals = true;
+  
+  //return v->getValue() == a.v->getValue();
+  //return v->get_ptr() == a.v->get_ptr();
+  //return (v->Equal(a.v));
+  //bool retVal = (v.get_ptr() == a.v.get_ptr());
+  domain_t at = mkRelation(a);
+  domain_t vt = mkRelation(v);
+  bool retVal = vt->Equal(at);
+
+  //in_operator_equals = false;
+
+  return retVal;
+}
+
+bool
+CONC_EXTERN_PHYLA::sem_elem_wrapper::operator<(const sem_elem_wrapper & a) const
+{
+  return v<a.v;
+}
+
+bool
+CONC_EXTERN_PHYLA::sem_elem_wrapper::operator>(const sem_elem_wrapper & a) const
+{
+  return a.v<v;
+}
+
+
+unsigned long CONC_EXTERN_PHYLA::sem_elem_wrapper::hashValue() const
+{
+  return v->hash();
+}
+
+std::ostream & CONC_EXTERN_PHYLA::sem_elem_wrapper::print(std::ostream & o) const
+{
+  return v->print(o);
+}
+
+std::ostream & CONC_EXTERN_PHYLA::sem_elem_wrapper::printIndented(std::ostream & o, unsigned int indent) const
+{
+  domain_t vt = mkRelation(v);
+  return vt->printIndented(o, indent);
+}
+
+std::ostream & CONC_EXTERN_PHYLA::sem_elem_wrapper::concatName(std::ostream& o) {
+  // TODO: This may not be needed for regexp; 
+  return o;
+}
+std::ostream & CONC_EXTERN_PHYLA::sem_elem_wrapper::print_nodename(std::ostream & o) const {
+  // TODO: This may not be needed for regexp; 
+  return o;
+}
+std::ostream & CONC_EXTERN_PHYLA::sem_elem_wrapper::print_dag(std::ostream& o) const {
+  // TODO: This may not be needed for regexp; 
+  return o;
+}
+
+std::ostream & operator << (std::ostream& o, const CONC_EXTERN_PHYLA::sem_elem_wrapper & b)
+{
+  return b.print(o);
+}
+
+// -----------------------------------------------
 
 namespace goals {
 
@@ -826,9 +1075,9 @@ namespace goals {
 *
 */
 
-  double duetTest(DuetRel* a, DuetRel * b)
+  double duetTest(Relation* a, Relation * b)
 {
-  duetrel_t c = a->Compose(b);    // FIXME: Compose badly named: Compose should be Extend
+  domain_t c = a->Compose(b);    // FIXME: Compose badly named: Compose should be Extend
   c->print(std::cout);
   return 0;
 }
@@ -2122,7 +2371,7 @@ namespace goals {
 ////////
 ////////				      MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(child);
 ////////
-////////                      duetrel_t previousValue = 0;
+////////                      domain_t previousValue = 0;
 ////////                      if (doWideningThisRound) {
 ////////                          EvalRMap::const_iterator previousValueIterator = oldStarVal.find(lookupKeyForStar);
 ////////                          if (previousValueIterator != oldStarVal.end()) {
@@ -2297,7 +2546,7 @@ namespace goals {
 ////////				  
 ////////                  MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(frame.e);
 ////////
-////////                  duetrel_t previousValue = 0;
+////////                  domain_t previousValue = 0;
 ////////                  if (doWideningThisRound) {
 ////////                      EvalRMap::const_iterator previousValueIterator = oldStarVal.find(lookupKeyForStar);
 ////////                      if (previousValueIterator != oldStarVal.end()) {
@@ -2410,7 +2659,7 @@ namespace goals {
 ////////                      
 ////////				  	  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(child);
 ////////
-////////                      duetrel_t previousValue = 0;
+////////                      domain_t previousValue = 0;
 ////////                      if (doWideningThisRound) {
 ////////                          EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
 ////////                          if (previousValueIterator != oldStarValT.end()) {
@@ -2640,7 +2889,7 @@ namespace goals {
 ////////				  duetrelpair_t ret;
 ////////				  MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(frame.e); // FIXME this variable is now redundant with lookupKeyForevalTHash
 ////////
-////////                  duetrel_t previousValue = 0;
+////////                  domain_t previousValue = 0;
 ////////                  if (doWideningThisRound) {
 ////////			          EvalTMap::const_iterator previousValueIterator = oldStarValT.find(lookupKeyForStar);
 ////////                      if (previousValueIterator != oldStarValT.end()) {
@@ -3202,7 +3451,7 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////
 ////                      // If we want to do widening, fetch the abstract value of this loop
 ////                      //   body from the previous round of the Newton loop.
-////                      duetrel_t previousValue = NULL;
+////                      domain_t previousValue = NULL;
 ////                      if (doWideningThisRound) {
 ////                          EvalRMapRC::const_iterator previousValueIterator = oldStarValRC.find(lookupKeyForStar);
 ////                          if (previousValueIterator != oldStarValRC.end()) {
@@ -3436,7 +3685,7 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////
 ////                      // If we want to do widening, fetch the abstract value of this loop
 ////                      //   body from the previous round of the Newton loop.
-////                      duetrel_t previousValue = NULL;
+////                      domain_t previousValue = NULL;
 ////                      if (doWideningThisRound) {
 ////                          EvalRMapLC::const_iterator previousValueIterator = oldStarValLC.find(lookupKeyForStar);
 ////                          if (previousValueIterator != oldStarValLC.end()) {
@@ -3683,7 +3932,7 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 ////
 ////                      // If we want to do widening, fetch the abstract value of this loop
 ////                      //   body from the previous round of the Newton loop.
-////                      duetrel_t previousValue = NULL;
+////                      domain_t previousValue = NULL;
 ////                      if (doWideningThisRound) {
 ////                          EvalTMapRC::const_iterator previousValueIterator = oldStarValTRC.find(lookupKeyForStar);
 ////                          if (previousValueIterator != oldStarValTRC.end()) {
@@ -4877,7 +5126,9 @@ NEWROUND:
 				propagationRounds = 0;
                 goto NEWROUND;
 			}
-			if (!newStar_it->second.v->Equivalent(oldStarValue->second.v)) {
+            domain_t oldStarRelation = mkRelation(oldStarValue->second.v);
+            domain_t newStarRelation = mkRelation(newStar_it->second.v);
+			if (!newStarRelation->Equivalent(oldStarRelation)) {
 				// std::cout << "    Inequivalent: continuing loop." << std::endl;
 				propagationRounds = 0;
 				goto NEWROUND;
@@ -4894,7 +5145,9 @@ NEWROUND:
 				propagationRounds = 0;
 				goto NEWROUND;
 			}
-			if (!newStar_it->second.v->Equivalent(oldStarValue->second.v)) {
+            domain_t oldStarRelation = mkRelation(oldStarValue->second.v);
+            domain_t newStarRelation = mkRelation(newStar_it->second.v);
+			if (!newStarRelation->Equivalent(oldStarRelation)) {
 				// std::cout << "    Inequivalent: continuing loop." << std::endl;
 				propagationRounds = 0;
 				goto NEWROUND;
@@ -5109,7 +5362,9 @@ NEWROUND:
 				propagationRounds = 0;
                 goto NEWROUND;
 			}
-			if (!newStar_it->second.v->Equivalent(oldStarValue->second.v)) {
+            domain_t oldStarRelation = mkRelation(oldStarValue->second.v);
+            domain_t newStarRelation = mkRelation(newStar_it->second.v);
+			if (!newStarRelation->Equivalent(oldStarRelation)) {
 				// std::cout << "    Inequivalent: continuing loop." << std::endl;
 				propagationRounds = 0;
 				goto NEWROUND;
@@ -5118,9 +5373,9 @@ NEWROUND:
 		}
 		for(StarMapT::const_iterator newStar_it = newStarValT.begin(); newStar_it != newStarValT.end(); ++newStar_it) 
 		{
-			std::cout << "  Checking a tensored Kleene star." << std::endl;
-            std::cout << "  Its new value is: " << std::endl;
-            newStar_it->second.v->printAbstract(std::cout);
+			//std::cout << "  Checking a tensored Kleene star." << std::endl;
+            //std::cout << "  Its new value is: " << std::endl;
+            //newStar_it->second.v->printAbstract(std::cout);
 
 			StarMapT::const_iterator oldStarValue = oldStarValT.find(newStar_it->first);
 			if (oldStarValue == oldStarValT.end()) {
@@ -5129,17 +5384,19 @@ NEWROUND:
 				propagationRounds = 0;
 				goto NEWROUND;
 			}
-            std::cout << "\n  Its old value was: " << std::endl;
-            oldStarValue->second.v->printAbstract(std::cout);
-			if (!newStar_it->second.v->Equivalent(oldStarValue->second.v)) {
-				std::cout << "\n    Inequivalent: continuing loop." << std::endl;
+            //std::cout << "\n  Its old value was: " << std::endl;
+            //oldStarValue->second.v->printAbstract(std::cout);
+            domain_t oldStarRelation = mkRelation(oldStarValue->second.v);
+            domain_t newStarRelation = mkRelation(newStar_it->second.v);
+			if (!newStarRelation->Equivalent(oldStarRelation)) {
+				//std::cout << "\n    Inequivalent: continuing loop." << std::endl;
 				propagationRounds = 0;
 				goto NEWROUND;
 			}
-			std::cout << "\n  Equivalent." << std::endl;
+			//std::cout << "\n  Equivalent." << std::endl;
 		}
         if (propagationRounds >= stratificationHeight) {
-            std::cout << "\n  All stars are equivalent: exiting loop." << std::endl;
+            //std::cout << "\n  All stars are equivalent: exiting loop." << std::endl;
   		    break; // Exit the Newton loop because all abstracted Kleene star bodies have converged
         } else {
             propagationRounds++;
@@ -5530,7 +5787,7 @@ NEWROUND:
                     aList = CIR::updateAssignment(aList, CBTI_INT32(it->first), newVal);
                 }
             } else if (runningMode == NEWTON_FROM_ABOVE) {
-                CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr topVal = DuetRel::getBaseTop();
+                CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr topVal = mkSemElemWrapper(Relation::getBaseTop());
                 aList = CIR::mkConstantAssignment(topVal);
             } else {
                 assert(false && "Unrecognized running mode.");
@@ -6014,7 +6271,7 @@ NEWROUND:
                 //}
             } else if (runningMode == NEWTON_FROM_ABOVE) {
                 assert(false && "We should not use runningMode NEWTON_FROM_ABOVE in runNewton_GaussianElimination");
-                CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr topVal = DuetRel::getBaseTop();
+                CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr topVal = mkSemElemWrapper(Relation::getBaseTop());
                 aList = CIR::mkConstantAssignment(topVal);
             } 
             // else {
@@ -6715,7 +6972,7 @@ std::vector<caml_error_rule> errorRuleHolder;
 std::vector<caml_print_hull_rule> printHullRuleHolder;
 wali::Key entry_key;
 wali::Key exit_key;
-duetrel_t compareWeight;
+domain_t compareWeight;
 
 void push_rule(caml_rule rule) {
     ruleHolder.push_back(rule);
@@ -6748,7 +7005,7 @@ CAMLprim value compare_weights(Trans t) {
     value * n_func = caml_named_value("normalize_callback");
     
     // not normalized (WALI value)
-    nval = ((DuetRel*)(t.weight().get_ptr()))->getValue();	
+    nval = ((Relation*)(t.weight().get_ptr()))->getValue();	
     sval = caml_callback(*p_func, nval);
     std::cout << std::endl << "WALI Weight (Not Normalized): " << std::endl;
     std::cout << String_val(sval) << std::endl;
@@ -6954,7 +7211,7 @@ int runBasicNewton(char **args, int runningMode)
 
     wali::Key acc = wali::getKeySpace()->getKey("accept");
 
-    duetrel_t mainProcedureSummary = NULL;
+    domain_t mainProcedureSummary = NULL;
 
     Trans t;
 
@@ -7018,7 +7275,7 @@ int runBasicNewton(char **args, int runningMode)
 
         // Finally, we can print the procedure summary itself:
         std::cout << std::endl;
-        duetrel_t nval = ((DuetRel*)((*tsit)->weight().get_ptr()));
+        domain_t nval = ((Relation*)((*tsit)->weight().get_ptr()));
         if (foundMain) { mainProcedureSummary = nval; }
         nval->print(std::cout);
         std::cout << std::endl << std::endl;
@@ -7057,15 +7314,15 @@ int runBasicNewton(char **args, int runningMode)
 
 			// Check if is_sat ( (it->second) extend (*tsit)->weight() )
 
-            duetrel_t negatedAssertionWeight = ((DuetRel*)(it->second.first.get_ptr()));   // Negated assertion condition
+            domain_t negatedAssertionWeight = ((Relation*)(it->second.first.get_ptr()));   // Negated assertion condition
             negatedAssertionWeight->print(std::cout);
             std::cout << std::endl << std::endl;
             
-            duetrel_t intraprocWeight = ((DuetRel*)((*tsit)->weight().get_ptr()));  // Weight from containing procedure's entry to assertion pt
-            duetrel_t contextWeight = ((DuetRel*)(outfaNewton.getState((*tsit)->to())->weight().get_ptr()));  // Weight of calling context
+            domain_t intraprocWeight = ((Relation*)((*tsit)->weight().get_ptr()));  // Weight from containing procedure's entry to assertion pt
+            domain_t contextWeight = ((Relation*)(outfaNewton.getState((*tsit)->to())->weight().get_ptr()));  // Weight of calling context
 
-            duetrel_t composedWeight = contextWeight->Compose(intraprocWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
-            duetrel_t finalWeight = composedWeight->Compose(negatedAssertionWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
+            domain_t composedWeight = contextWeight->Compose(intraprocWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
+            domain_t finalWeight = composedWeight->Compose(negatedAssertionWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
 
             std::cout << std::endl << "contextWeight = " << std::endl;
             contextWeight->print(std::cout);
@@ -7119,9 +7376,9 @@ int runBasicNewton(char **args, int runningMode)
             tsit != print_hull_transitions.end(); 
             tsit++)
         {
-            duetrel_t intraprocWeight = ((DuetRel*)((*tsit)->weight().get_ptr()));  // Weight from containing procedure's entry to print-hull pt
-            duetrel_t contextWeight = ((DuetRel*)(outfaNewton.getState((*tsit)->to())->weight().get_ptr()));  // Weight of calling context
-            duetrel_t composedWeight = contextWeight->Compose(intraprocWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
+            domain_t intraprocWeight = ((Relation*)((*tsit)->weight().get_ptr()));  // Weight from containing procedure's entry to print-hull pt
+            domain_t contextWeight = ((Relation*)(outfaNewton.getState((*tsit)->to())->weight().get_ptr()));  // Weight of calling context
+            domain_t composedWeight = contextWeight->Compose(intraprocWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
             
             //std::cout << "Variable Bounds at Line: " << line << std::endl;
             std::cout << "Variable bounds";
@@ -7247,10 +7504,10 @@ int main(int argc, char **argv)
 			case 0:
 				break;
     		case 'P':
-    			DuetRel::simplifyOnPrint = false;
+    			Relation::simplifyOnPrint = false;
     			break;
     		case 'S':
-    			DuetRel::simplify = true;
+    			Relation::simplify = true;
     			break;
     		case 'D':
     			dump = true;
