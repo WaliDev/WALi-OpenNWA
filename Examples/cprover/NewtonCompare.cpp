@@ -102,24 +102,17 @@ typedef std::map<int,RTG::regExpTRefPtr> tslRegExpTMap;
 typedef std::map<int,RTG::regExpTListRefPtr> tslDiffMap;
 typedef std::map<int, RTG::regExpListRefPtr> tslUntensoredDiffMap;
 
-//#include <signal.h>
 #include <boost/cast.hpp>
-
-/*
-static pthread_t worker;
-
-extern "C" 
-*/
 
 #define NEWTON_FROM_BELOW   1
 #define NEWTON_FROM_ABOVE   3
 
 bool nonRec, pNonLin;
 
-#include "wali/domains/binrel/BinRel.hpp"
-using namespace wali::domains::binrel;
-BddContext * con = NULL;
-BddContext * dCon = con;
+//#include "wali/domains/binrel/BinRel.hpp"
+//using namespace wali::domains::binrel;
+//BddContext * con = NULL;
+//BddContext * dCon = con;
 
 typedef boost::unordered_map<
     MemoCacheKey1<RTG::regExpRefPtr >,
@@ -312,7 +305,7 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalPlusSemElemT(
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
 {
     CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-    relation_t ar = mkRelation(a);//dynamic_cast<Relation*>(a.get_ptr());
+    relation_t ar = mkRelation(a);
     relation_t br = mkRelation(b);
 
     ans.v = ar->Union(br);
@@ -324,17 +317,9 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::evalProjectSemElemT(
 {
     // Changed by Jason Breck on 2016_03_11 to only call Merge (as opposed to
     //   first calling detensor transpose) in the USE_DUET case
-#if USE_DUET
-    //ans.v = t2->getBaseOne()->Kronecker(t2);
     CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
     relation_t cr = mkRelation(c);
     ans.v = cr->Merge(a.get_data(), b.get_data());
-#else
-    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-    relation_t t = dynamic_cast<Relation*>(c.v->detensorTranspose().get_ptr());
-    relation_t t2 = t->Merge(a.get_data(), b.get_data()); // t2 = t->Merge(a.get_data(), b.get_data());
-    ans.v = con->getBaseOne()->Kronecker(t2);
-#endif
     return ans;
 }
 
@@ -2818,8 +2803,9 @@ NEWROUND:
     if(originalPds != NULL)
       fpds = new FWPDS(*originalPds);
     else{
-      fpds = new FWPDS();
-      con = pds_from_prog_with_newton_merge(fpds, pg);// ncon = pds_from_prog_nwa(fpds, pg);
+      assert(0 && "doNewtonSteps should not be called with originalPds == NULL");
+      //fpds = new FWPDS();
+      //con = pds_from_prog_with_newton_merge(fpds, pg);// ncon = pds_from_prog_nwa(fpds, pg);
     }
 
     //freopen("newtonMinTest.txt", "w", stdout);
@@ -3202,8 +3188,9 @@ NEWROUND:
     if(originalPds != NULL)
       fpds = new FWPDS(*originalPds);
     else{
-      fpds = new FWPDS();
-      con = pds_from_prog_with_newton_merge(fpds, pg);// ncon = pds_from_prog_nwa(fpds, pg);
+      assert(0 && "doNewtonSteps should not be called with originalPds == NULL");
+      //fpds = new FWPDS();
+      //con = pds_from_prog_with_newton_merge(fpds, pg);// ncon = pds_from_prog_nwa(fpds, pg);
     }
 
     //freopen("newtonMinTest.txt", "w", stdout);
