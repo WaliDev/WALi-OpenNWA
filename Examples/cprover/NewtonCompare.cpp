@@ -2367,7 +2367,7 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 #define WIDENING_DELAY 6
 #define MAX_ROUNDS_FROM_BELOW 50
 #define MAX_ROUNDS_FROM_ABOVE 4
-  void newtonLoop_NPATP(RTG::assignmentRefPtr & newVal, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies, tslRegExpTMap & tensoredRegExpMap, bool linear, int runningMode)
+  void newtonLoop_NPATP(RTG::assignmentRefPtr & newVal, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies, tslRegExpTMap & tensoredRegExpMap, bool linear, int aboveBelowMode)
   {
 	int rnd = 0;
         bool newton = true;
@@ -2384,9 +2384,9 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
     RTG::_evalTHash().clear();
 
 	if (maxRnds < 0) {		//maxRnds is not set yet
-		if (runningMode == NEWTON_FROM_BELOW)
+		if (aboveBelowMode == NEWTON_FROM_BELOW)
 			maxRnds = MAX_ROUNDS_FROM_BELOW;
-		else if (runningMode == NEWTON_FROM_ABOVE)
+		else if (aboveBelowMode == NEWTON_FROM_ABOVE)
 			maxRnds = MAX_ROUNDS_FROM_ABOVE;
 	}
     
@@ -2401,7 +2401,7 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 
     int stratificationHeight = 1;
     int propagationRounds = 0;
-    if (runningMode == NEWTON_FROM_BELOW) {
+    if (aboveBelowMode == NEWTON_FROM_BELOW) {
         stratificationHeight = computeStratificationHeight(tensoredRegExpMap);
     }
 
@@ -2413,7 +2413,7 @@ NEWROUND:
 		if (rnd >= maxRnds) {
 			std::cout << "Maximum number of rounds reached. ------------------------------------------" << std::endl;
 
-            if (runningMode == NEWTON_FROM_BELOW) {
+            if (aboveBelowMode == NEWTON_FROM_BELOW) {
                 assert(false && "In Newton-from-below mode, we must abort if we reach the maximum number of rounds.");
             }
 
@@ -2485,7 +2485,7 @@ NEWROUND:
         RTG::_evalRegExpHash().clear();
         RTG::_evalTHash().clear();
 
-        if (runningMode == NEWTON_FROM_ABOVE) 
+        if (aboveBelowMode == NEWTON_FROM_ABOVE) 
             goto NEWROUND;
 
 		// std::cout << "Beginning main-loop exit test:" << std::endl;
@@ -2560,7 +2560,7 @@ NEWROUND:
     inNewtonLoop = false;
   }
 
-  void newtonLoop_GJ(RTG::assignmentRefPtr & newVal, tslRegExpMap & regExpsAfterIsolation, int runningMode)
+  void newtonLoop_GJ(RTG::assignmentRefPtr & newVal, tslRegExpMap & regExpsAfterIsolation, int aboveBelowMode)
   {
 	int rnd = 0;
 	tslRegExpMap::iterator assignIt;
@@ -2572,9 +2572,9 @@ NEWROUND:
     RTG::_evalTHash().clear();
 
 	if (maxRnds < 0) {		//maxRnds is not set yet
-		if (runningMode == NEWTON_FROM_BELOW)
+		if (aboveBelowMode == NEWTON_FROM_BELOW)
 			maxRnds = MAX_ROUNDS_FROM_BELOW;
-		else if (runningMode == NEWTON_FROM_ABOVE)
+		else if (aboveBelowMode == NEWTON_FROM_ABOVE)
 			maxRnds = MAX_ROUNDS_FROM_ABOVE;
 	}
     
@@ -2589,7 +2589,7 @@ NEWROUND:
 
     int stratificationHeight = 0;
     int propagationRounds = 0;
-    //if (runningMode == NEWTON_FROM_BELOW) {
+    //if (aboveBelowMode == NEWTON_FROM_BELOW) {
     //    stratificationHeight = computeStratificationHeight(tensoredRegExpMap);
     //}
 
@@ -2601,7 +2601,7 @@ NEWROUND:
 		if (rnd >= maxRnds) {
 			std::cout << "Maximum number of rounds reached. ------------------------------------------" << std::endl;
 
-            if (runningMode == NEWTON_FROM_BELOW) {
+            if (aboveBelowMode == NEWTON_FROM_BELOW) {
                 assert(false && "In Newton-from-below mode, we must abort if we reach the maximum number of rounds.");
             }
 
@@ -2689,7 +2689,7 @@ NEWROUND:
         RTG::_evalRegExpHash().clear();
         RTG::_evalTHash().clear();
 
-        if (runningMode == NEWTON_FROM_ABOVE) 
+        if (aboveBelowMode == NEWTON_FROM_ABOVE) 
             goto NEWROUND;
 
 		// std::cout << "Beginning main-loop exit test:" << std::endl;
@@ -2843,7 +2843,7 @@ NEWROUND:
   *  Author:  Emma Turetsky
   */
   
-  double doNewtonSteps_NPATP(int runningMode, WFA& outfa, wali::Key entry_key, FWPDS * originalPds = NULL, bool canPrune = true)
+  double doNewtonSteps_NPATP(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWPDS * originalPds = NULL, bool canPrune = true)
   { 
     cout << "#################################################" << endl;
     //cout << "[Newton Compare] Goal VIII: end-to-end newton_merge_notensor_fwpds run" << endl;
@@ -3097,7 +3097,7 @@ NEWROUND:
 			*/
 			convertToTSLRegExpsT(rNew, regExpMap, tensoredRegExpMap, differentialMap, mapBack, mergeSrcMap);
 			
-            if (runningMode == NEWTON_FROM_BELOW) {
+            if (aboveBelowMode == NEWTON_FROM_BELOW) {
                 aList = CIR::initializeAssignment();
                 
                 for (tslRegExpMap::iterator it = regExpMap.begin(); it != regExpMap.end(); ++it)
@@ -3109,7 +3109,7 @@ NEWROUND:
                     // Insert <it->first,newVal> into aList
                     aList = CIR::updateAssignment(aList, CBTI_INT32(it->first), newVal);
                 }
-            } else if (runningMode == NEWTON_FROM_ABOVE) {
+            } else if (aboveBelowMode == NEWTON_FROM_ABOVE) {
                 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr topVal = mkSemElemWrapper(Relation::getBaseTop());
                 aList = CIR::mkConstantAssignment(topVal);
             } else {
@@ -3119,7 +3119,7 @@ NEWROUND:
             cout << "Step 6: =========================================================" << endl;
 			/* Step 6 - Perform Newton rounds until a fixed-point is reached */
 			cout << "[Newton Compare] Running Newton" << endl;
-			newtonLoop_NPATP(aList, differentialMap, varDependencies, tensoredRegExpMap,linear,runningMode);
+			newtonLoop_NPATP(aList, differentialMap, varDependencies, tensoredRegExpMap,linear,aboveBelowMode);
 
 			//Using the final weights from Newton, evaluate the tslRegExps to get the final weights
 			//evalRegExps(aList);
@@ -3228,7 +3228,7 @@ NEWROUND:
 
 
 
-  double doNewtonSteps_GJ(int runningMode, WFA& outfa, wali::Key entry_key, FWPDS * originalPds = NULL, bool canPrune = true)
+  double doNewtonSteps_GJ(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWPDS * originalPds = NULL, bool canPrune = true)
   { 
     cout << "#################################################" << endl;
 
@@ -3581,7 +3581,7 @@ NEWROUND:
             
 			//convertToTSLRegExpsT(rNew, regExpMap, tensoredRegExpMap, differentialMap, mapBack, mergeSrcMap);
 			
-            if (runningMode == NEWTON_FROM_BELOW) {
+            if (aboveBelowMode == NEWTON_FROM_BELOW) {
                 aList = CIR::initializeAssignment(); 
                 //for (tslRegExpMap::iterator it = regExpMap.begin(); it != regExpMap.end(); ++it)
                 //{
@@ -3592,8 +3592,8 @@ NEWROUND:
                 //    // Insert <it->first,newVal> into aList
                 //    aList = CIR::updateAssignment(aList, CBTI_INT32(it->first), newVal);
                 //}
-            } else if (runningMode == NEWTON_FROM_ABOVE) {
-                assert(false && "We should not use runningMode NEWTON_FROM_ABOVE in newtonLoop_GJ");
+            } else if (aboveBelowMode == NEWTON_FROM_ABOVE) {
+                assert(false && "We should not use aboveBelowMode NEWTON_FROM_ABOVE in newtonLoop_GJ");
                 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr topVal = mkSemElemWrapper(Relation::getBaseTop());
                 aList = CIR::mkConstantAssignment(topVal);
             } 
@@ -3604,7 +3604,7 @@ NEWROUND:
             cout << "Step 5: =========================================================" << endl;
 			/* Step 6 - Perform Newton rounds until a fixed-point is reached */
 			cout << "[Newton Compare] Running Newton" << endl;
-			newtonLoop_GJ(aList, regExpsAfterIsolation, runningMode);
+			newtonLoop_GJ(aList, regExpsAfterIsolation, aboveBelowMode);
 
             //assert(false && "The rest of this function is not yet implemented!"); 
 
@@ -3768,7 +3768,7 @@ int getGlobalBoundingVarFromName(char * variableName) {
     CAMLreturnT(int, Int_val(idval));
 }
 
-int runBasicNewton(char **args, int runningMode)
+int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
 {
     caml_startup(args);
     FWPDS * pds = new FWPDS();
@@ -3801,10 +3801,16 @@ int runBasicNewton(char **args, int runningMode)
     inNewtonLoop = false;
 
     WFA outfaNewton;
-    if (runningMode == NEWTON_FROM_ABOVE) {
-        goals::doNewtonSteps_NPATP(runningMode, outfaNewton, entry_key, pds, false);
-    } else if (runningMode == NEWTON_FROM_BELOW) {
-        goals::doNewtonSteps_GJ(runningMode, outfaNewton, entry_key, pds, false);
+    if (aboveBelowMode == NEWTON_FROM_ABOVE || gaussJordanMode == false) {
+        if (aboveBelowMode == NEWTON_FROM_BELOW) {
+            std::cout << "Warning: Running NEWTON_FROM_BELOW in NPA-TP mode." << std::endl
+                      << "  This mode has not been extensively tested." << std::endl;
+        }
+        goals::doNewtonSteps_NPATP(aboveBelowMode, outfaNewton, entry_key, pds, false);
+    } else if (aboveBelowMode == NEWTON_FROM_BELOW) {
+        goals::doNewtonSteps_GJ(aboveBelowMode, outfaNewton, entry_key, pds, false);
+    } else {
+        assert(false && "Unrecognized running mode.");
     }
 
     wali::Key acc = wali::getKeySpace()->getKey("accept");
@@ -4051,7 +4057,8 @@ void printHelp() {
 
 int main(int argc, char **argv)
 {
-    int runningMode = 0;
+    int aboveBelowMode = 0;
+    int gaussJordanMode = 1; // 0 means NPA-TP (use "--npa-tp"); 1 means NPA-TP-GJ.
     doSmtlibOutput = false;
     globalBoundingVarName = NULL; 
 	std::vector <char *> unrecognizedArgs;
@@ -4069,13 +4076,14 @@ int main(int argc, char **argv)
     }
 
     static struct option long_options[] = {
-        {"cra_newton_basic", no_argument,       &runningMode,  NEWTON_FROM_BELOW  },
-        {"cra_newton_star",  no_argument,       &runningMode,  2  },
-        {"cra_newton_above", no_argument,       &runningMode,  NEWTON_FROM_ABOVE  },
+        {"cra_newton_basic", no_argument,       &aboveBelowMode,  NEWTON_FROM_BELOW  },
+        {"cra_newton_star",  no_argument,       &aboveBelowMode,  2  },
+        {"cra_newton_above", no_argument,       &aboveBelowMode,  NEWTON_FROM_ABOVE  },
         {"simplify",         no_argument,       0,            'S' },
         {"no_simplify_on_print",no_argument,    0,            'P' },
         {"help",             no_argument,       0,            'H' },
         {"dump",             no_argument,       0,            'D' },
+        {"npa-tp",           no_argument,       &gaussJordanMode, 0 },
         {"rounds",           required_argument, 0,            'R' },
         {"test",             required_argument, 0,            'T' },
         {"domain",           required_argument, 0,            'M' },
@@ -4142,7 +4150,7 @@ int main(int argc, char **argv)
 				break;	
 		}	
     }
-    if (runningMode == 0) {
+    if (aboveBelowMode == 0) {
         std::cerr << "Error : Running mode not set!" << std::endl;
 		printUsageInstr();
     }
@@ -4152,13 +4160,13 @@ int main(int argc, char **argv)
     }
 	
     else {
-    	//if (runningMode == NEWTON_FROM_ABOVE) {
+    	//if (aboveBelowMode == NEWTON_FROM_ABOVE) {
         //    assert(false && "Newton-from-above is not supported in this version of NewtonOcaml.");
         //}
-    	if (runningMode == NEWTON_FROM_BELOW || runningMode == NEWTON_FROM_ABOVE) {
+    	if (aboveBelowMode == NEWTON_FROM_BELOW || aboveBelowMode == NEWTON_FROM_ABOVE) {
 			if (testMode) {
 				std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
-				testFile << "__FILENAME " << argv[optind] << " " << runningMode << std::endl;
+				testFile << "__FILENAME " << argv[optind] << " " << aboveBelowMode << std::endl;
 				testFile.close();
 			}
 			char **ocamlArgs = new char *[3 + unrecognizedArgs.size() + argc - optind];
@@ -4174,9 +4182,9 @@ int main(int argc, char **argv)
 				ocamlArgs[3 + unrecognizedArgs.size() + i] = argv[optind + i + 1];
 			}
 
-			runBasicNewton(ocamlArgs, runningMode);
+			runBasicNewton(ocamlArgs, aboveBelowMode, gaussJordanMode);
     	}
-    	else if (runningMode == 2) {
+    	else if (aboveBelowMode == 2) {
     	    std::cout << "Newton from below, with equivalence checks extracted from Kleene stars" << std::endl;
     	    std::cout << "Not implemented yet." << std::endl;
     	}
