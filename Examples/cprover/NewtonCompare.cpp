@@ -543,44 +543,43 @@ std::ostream & operator << (std::ostream& o, const CONC_EXTERN_PHYLA::sem_elem_w
 
 namespace goals {
 
-
-	// Stack frames needed by the non-recursive versions of convertToTSL and Eval and EvalT
-
-	//A Stack frame which takes a regexp_t and has pointers to it's left and right children, used from
-	//Converting to a TSLRegExp
-	struct cFrame
-	{
-		cFrame(reg_exp_t & e) : is_new(true), e(e), op(), left(), right() {}
-
-		bool is_new;
-		reg_exp_t e;
-		int op;
-		reg_exp_t left;
-		reg_exp_t right;
-	};
-
-	//A Stack frame which takes a TSL regExpRefPtr and has pointers to it's left and right children
-	//Used for the differential function and evalRegExpAt0 and evalRegExp
-	struct dFrame
-	{
-		dFrame(RTG::regExpRefPtr & e) : is_new(true), e(e), op(), left(), right(){}
-		bool is_new;
-		RTG::regExpRefPtr e;
-		int op;
-		RTG::regExpRefPtr left;
-		RTG::regExpRefPtr right;
-	};
-
-	//A Stack frame which takes a TSL regExpTRefPtr and has pointers to it's left and right children, used for evalT
-	struct sFrame
-	{
-		sFrame(RTG::regExpTRefPtr & e) : is_new(true), e(e), op(), left(), right(){}
-		bool is_new;
-		RTG::regExpTRefPtr e;
-		int op;
-		RTG::regExpTRefPtr left;
-		RTG::regExpTRefPtr right;
-	};
+  // Stack frames needed by the non-recursive versions of convertToTSL and Eval and EvalT
+  
+  //A Stack frame which takes a regexp_t and has pointers to it's left and right children, used from
+  //Converting to a TSLRegExp
+  struct cFrame
+  {
+      cFrame(reg_exp_t & e) : is_new(true), e(e), op(), left(), right() {}
+  
+      bool is_new;
+      reg_exp_t e;
+      int op;
+      reg_exp_t left;
+      reg_exp_t right;
+  };
+  
+  //A Stack frame which takes a TSL regExpRefPtr and has pointers to it's left and right children
+  //Used for the differential function and evalRegExpAt0 and evalRegExp
+  struct dFrame
+  {
+      dFrame(RTG::regExpRefPtr & e) : is_new(true), e(e), op(), left(), right(){}
+      bool is_new;
+      RTG::regExpRefPtr e;
+      int op;
+      RTG::regExpRefPtr left;
+      RTG::regExpRefPtr right;
+  };
+  
+  //A Stack frame which takes a TSL regExpTRefPtr and has pointers to it's left and right children, used for evalT
+  struct sFrame
+  {
+      sFrame(RTG::regExpTRefPtr & e) : is_new(true), e(e), op(), left(), right(){}
+      bool is_new;
+      RTG::regExpTRefPtr e;
+      int op;
+      RTG::regExpTRefPtr left;
+      RTG::regExpTRefPtr right;
+  };
 
 
   short dump = false;
@@ -597,7 +596,7 @@ namespace goals {
   int maxRnds = -1;
   
 
-// NONREC: Non-recursive functions:
+  // NONREC: Non-recursive functions:
 
   /*
   *  A non recursive version of the Differential function that uses a stack
@@ -1150,324 +1149,324 @@ namespace goals {
 	  return diffHMap[fin];
   }
 
-// I'm using these maps as sets; the value in every map entry is "true".
-// One could also use boost::unordered_set for this purpose, but that
-//   would add another dependency.
-typedef boost::unordered_map<
-	MemoCacheKey1<RTG::regExpRefPtr >,
-	bool,
-	boost::hash<MemoCacheKey1<RTG::regExpRefPtr > >,
-	std::equal_to<MemoCacheKey1<RTG::regExpRefPtr > >,
-	std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, bool > > >
-	VisitedMap;
-typedef boost::unordered_map<
-	MemoCacheKey1<RTG::regExpTRefPtr >,
-	bool,
-	boost::hash<MemoCacheKey1<RTG::regExpTRefPtr > >,
-	std::equal_to<MemoCacheKey1<RTG::regExpTRefPtr > >,
-	std::allocator<std::pair<const MemoCacheKey1<RTG::regExpTRefPtr >, bool > > >
-	VisitedMapT;
-
-void findFreeVariablesInRegExp(RTG::regExpRefPtr outerExpression,
-                               std::set<int> &freeVariables,
-                               bool verbose)
-{
-    std::stack<RTG::regExpRefPtr> todo;
-    VisitedMap visited;
-    todo.push(outerExpression);
-
-    while (!todo.empty())
-    {
-        RTG::regExpRefPtr expr = todo.top(); 
-        todo.pop();
-        MemoCacheKey1<RTG::regExpRefPtr > lookupKey(expr);
-        if (visited.find(lookupKey) != visited.end()) continue;
-        visited.insert(std::make_pair(lookupKey, true));
-
-        switch (expr->GetClassId()) 
-        {
-            // Note: We ignore variables under a Kleene star
-
-            case RTG::TSL_ID_Var: {
-                RTG::VarRefPtr t_T_c1_scast__1 = static_cast<RTG::Var*>(expr.get_ptr());
-                int var = t_T_c1_scast__1->Get_V().get_data();
-                if (verbose && freeVariables.find(var) == freeVariables.end()) { 
-                    std::cout << var << ";  "; 
-                }
-                freeVariables.insert(var);
-                break; }
-
-            case RTG::TSL_ID_Project: {
-                RTG::ProjectRefPtr t_T_b1_scast__1 = static_cast<RTG::Project*>(expr.get_ptr());
-                todo.push(t_T_b1_scast__1->Get_child());
-                break; }
-
-            case RTG::TSL_ID_Dot: 
-            case RTG::TSL_ID_Plus:
-                todo.push(CIR::getRChild(expr));
-                todo.push(CIR::getLChild(expr));
-                break;
-        }
-    } 
-}
-
-void findFreeVariablesInRegExpT(RTG::regExpTRefPtr outerExpression,
-                                std::set<int> &freeVariables,
-                                bool verbose)
-{
-    std::stack<RTG::regExpTRefPtr> todo;
-    VisitedMapT visited;
-    todo.push(outerExpression);
-
-    while (!todo.empty())
-    {
-        RTG::regExpTRefPtr expr = todo.top(); 
-        todo.pop();
-        MemoCacheKey1<RTG::regExpTRefPtr > lookupKey(expr);
-        if (visited.find(lookupKey) != visited.end()) continue;
-        visited.insert(std::make_pair(lookupKey, true));
-
-        switch (expr->GetClassId()) 
-        {
-            // Note: We ignore variables under a Kleene star
-
-            case RTG::TSL_ID_TensorTranspose: { 
-                RTG::TensorTransposeRefPtr t_T_c1_scast__1 = 
-                           static_cast<RTG::TensorTranspose*>(expr.get_ptr());
-                findFreeVariablesInRegExp(t_T_c1_scast__1->Get_lChild(), freeVariables, verbose);
-                findFreeVariablesInRegExp(t_T_c1_scast__1->Get_rChild(), freeVariables, verbose);
-                break; }
-
-            case RTG::TSL_ID_ProjectT: {
-                RTG::ProjectTRefPtr t_T_b1_scast__1 = static_cast<RTG::ProjectT*>(expr.get_ptr());
-                todo.push(t_T_b1_scast__1->Get_child());
-                break; }
-
-            case RTG::TSL_ID_DotT: 
-            case RTG::TSL_ID_PlusT:
-                todo.push(CIR::getRChildT(expr));
-                todo.push(CIR::getLChildT(expr));
-                break;
-        }
-    } 
-}
-
-//void topologicalSortAux(std::map<int, std::set<int> > &stratificationGraph,
-//                        int node, 
-//                        std::set<int> &visited, 
-//                        std::set<int> &locallyVisited, 
-//                        std::stack<int> &topologicalOrder,
-//                        bool verbose) 
-//{
-//    visited.insert(node);
-//    locallyVisited.insert(node);
-//
-//    std::set<int> &successors = stratificationGraph[node];
-//
-//    for(std::set<int>::iterator it = successors.begin(); 
-//        it != successors.end(); ++it) 
-//    {
-//        if (locallyVisited.find(*it) != locallyVisited.end()) {
-//            if (verbose) { 
-//                std::cout << " CYCLE involving " << node << std::endl; 
-//            }
-//            assert(false && "Cyclic stratification graph.");
-//        }
-//        if (visited.find(*it) == visited.end()) {
-//            topologicalSortAux(stratificationGraph, *it, visited, locallyVisited, topologicalOrder, verbose);
-//        }
-//    }
-//
-//    if (verbose) { std::cout << node << ";  "; }
-//    topologicalOrder.push(node);
-//    locallyVisited.erase(node);
-//}
-//
-//void topologicalSort(std::map<int, std::set<int> > &stratificationGraph,
-//                     std::stack<int> &topologicalOrder, bool verbose) 
-//{
-//    std::set<int> visited;
-//    for(std::map<int, std::set<int> >::iterator it = stratificationGraph.begin();
-//        it != stratificationGraph.end(); ++it)
-//    {
-//        std::set<int> locallyVisited;
-//        if (visited.find(it->first) == visited.end()) {
-//            topologicalSortAux(stratificationGraph, it->first, visited, locallyVisited, topologicalOrder, verbose);
-//        }
-//    }
-//}
-
-void tarjansSCCsAux(int var,
-                    int &currentIndex,
-                    std::map<int, int> &index,
-                    std::map<int, int> &lowlink,
-                    std::set<int> &onStack,
-                    std::stack<int> &ancestors,
-                    std::map<int, std::set<int> > &stratificationGraph,
-                    std::stack<int> &topologicalOrder, 
-                    bool verbose)
-{
-    index[var] = currentIndex;
-    lowlink[var] = currentIndex;
-    currentIndex++;
-    ancestors.push(var);
-    onStack.insert(var);
-
-    std::set<int> &successors = stratificationGraph[var];
-
-    for(std::set<int>::iterator it = successors.begin(); 
-        it != successors.end(); ++it) 
-    {
-        int successor = *it;
-        if (index.find(successor) == index.end()) {
-            tarjansSCCsAux(successor, currentIndex, index, lowlink, onStack, ancestors,
-                           stratificationGraph, topologicalOrder, verbose);
-            lowlink[var] = min(lowlink[var], lowlink[successor]);
-        } else if (onStack.find(successor) != onStack.end()) {
-            lowlink[var] = min(lowlink[var], lowlink[successor]);
-        }
-        if (successor==var) {
-            std::cout << std::endl << " *** CYCLE DETECTED: SELF-LOOP AT " 
-                << var << " *** " << std::endl;
-            assert(false && "Cyclic stratification graph.");
-        }
-    }
-
-    if (lowlink[var] == index[var]) {
-        if (var != ancestors.top()) {
-            std::cout << std::endl << " *** CYCLE DETECTED: " << var;
-            int ancestor; 
-            do {
-                ancestor = ancestors.top();
-                ancestors.pop();
-                std::cout << " <-- " << ancestor;
-            } while(ancestor != var);
-
-            std::cout << " *** " << std::endl << std::endl;
-            assert(false && "Cyclic stratification graph.");
-        }
-        ancestors.pop();
-        onStack.erase(var);
-    }
-
-    if (verbose) { std::cout << var << ";  "; }
-    topologicalOrder.push(var);
-}
-
-void tarjansSCCs(std::map<int, std::set<int> > &stratificationGraph,
-                 std::stack<int> &topologicalOrder, 
-                 bool verbose)
-{
-    int currentIndex = 0;
-    std::map<int, int> index;
-    std::map<int, int> lowlink;
-    std::set<int> onStack;
-    std::stack<int> ancestors;
-    for(std::map<int, std::set<int> >::iterator it = stratificationGraph.begin();
-        it != stratificationGraph.end(); ++it)
-    {
-        int var = it->first;
-        if (index.find(var) == index.end()) {
-            tarjansSCCsAux(var, currentIndex, index, lowlink, onStack, ancestors,
-                           stratificationGraph, topologicalOrder, verbose);
-        }
-    }
-}
-
-//void testStratificationGraphRoutines() {
-//
-//    std::map<int, std::set<int> > G;
-//    std::stack<int> T;
-//
-//    std::cout << "TESTING Topological Order:" << std::endl;
-//    { std::set<int> S; S.insert(45); S.insert(13); G[21] = S; }
-//    { std::set<int> S; S.insert(21); S.insert(45); G[10] = S; }
-//    { std::set<int> S; S.insert(21); S.insert(11); G[45] = S; }
-//    topologicalSort(G, T, true);
-//    std::cout << std::endl;
-//}
-
-/*
-*  Compute the number of successive rounds meeting the "simple termination
-*    condition" that we need to observe in the Newton loop before we can soundly
-*    terminate that loop.  (A round meets the "simple termination condition"
-*    if the abstract values of all its star bodies are equal to the values of
-*    star bodies on the previous round.)
-*
-*  We do this by building the "stratification graph" and returning the length 
-*    of the longest path through this graph.  Roughly, one round of the Newton 
-*    loop propagates changes in the value of a variable to the values of any 
-*    variables whose tensored regular expressions (directly) contain it.  
-*    Therefore, if there is a path of length K in this graph, then K rounds 
-*    may be required before a value is fully propagated to all downstream 
-*    variables.
-*
-*  If there is a cycle in the stratification graph, we abort immediately, 
-*    because our Newton loop cannot soundly process the equation system in
-*    that case.
-*
-*  An edge of the stratification graph exists from Xi to Xj just when 
-*    j \in free(i), using the definition of the free() function from 
-*    section 4.1 of the POPL 2016 submission.
-*
-*  Note that the smallest possible return value is 0, which should be
-*    interpreted to mean that no variable occurs free in any other 
-*    variable's regular expression.
-*
-*  @param:  tslRegExpTMap &tensoredRegExpMap - a map from reID to tensored regular expression
-*
-*  @return: int - the height of the stratification graph
-*         
-*  Author: Jason Breck
-*/
-int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
-{
-    std::map<int, std::set<int> > stratificationGraph;
-    bool verbose = true;
-    int var;
-
-    if (verbose) { std::cout << std::endl << "Variable Stratification Graph:" << std::endl << std::endl; }
-
-    for (tslRegExpTMap::iterator varIt = tensoredRegExpMap.begin(); varIt != tensoredRegExpMap.end(); varIt++)
-    {
-        var = varIt->first;
-        if (verbose) { std::cout << var << "-->" << std::endl << "  "; }
-        std::set<int> &edges = stratificationGraph[var] = std::set<int>();
-        findFreeVariablesInRegExpT(varIt->second, edges, verbose); 
-        if (verbose) { std::cout << std::endl; }
-    }
-
-    if (tensoredRegExpMap.size() == 0) { return 1; }
-
-    if (verbose) { std::cout << std::endl << "Reverse Topological Order:" << std::endl << "  "; }
-    std::stack<int> topologicalOrder;
-    //topologicalSort(stratificationGraph, topologicalOrder, verbose); 
-    tarjansSCCs(stratificationGraph, topologicalOrder, verbose); 
-    if (verbose) { std::cout << std::endl << std::endl; }
-
-    int stratificationHeight = 0;
-    std::map<int, int> longestPathTo;
-    while(topologicalOrder.size()) {
-        int v = topologicalOrder.top(); 
-        topologicalOrder.pop();
-        int longestPathToV = longestPathTo[v];
-        std::set<int> &successors = stratificationGraph[v];
-        for(std::set<int>::iterator w = successors.begin(); w != successors.end(); ++w) 
-        {
-            // Remember, the default value of the longestPathTo map is 0!
-            if (longestPathTo[*w] < longestPathToV + 1) {
-                longestPathTo[*w] = longestPathToV + 1;
-                if (stratificationHeight < longestPathToV + 1) {
-                    stratificationHeight = longestPathToV + 1;
-                }
-            }
-        }
-    }
-
-    if (verbose) { std::cout << "Stratification Height: " << stratificationHeight << std::endl; }
-
-    return stratificationHeight;
-}
+  // I'm using these maps as sets; the value in every map entry is "true".
+  // One could also use boost::unordered_set for this purpose, but that
+  //   would add another dependency.
+  typedef boost::unordered_map<
+  	MemoCacheKey1<RTG::regExpRefPtr >,
+  	bool,
+  	boost::hash<MemoCacheKey1<RTG::regExpRefPtr > >,
+  	std::equal_to<MemoCacheKey1<RTG::regExpRefPtr > >,
+  	std::allocator<std::pair<const MemoCacheKey1<RTG::regExpRefPtr >, bool > > >
+  	VisitedMap;
+  typedef boost::unordered_map<
+  	MemoCacheKey1<RTG::regExpTRefPtr >,
+  	bool,
+  	boost::hash<MemoCacheKey1<RTG::regExpTRefPtr > >,
+  	std::equal_to<MemoCacheKey1<RTG::regExpTRefPtr > >,
+  	std::allocator<std::pair<const MemoCacheKey1<RTG::regExpTRefPtr >, bool > > >
+  	VisitedMapT;
+  
+  void findFreeVariablesInRegExp(RTG::regExpRefPtr outerExpression,
+                                 std::set<int> &freeVariables,
+                                 bool verbose)
+  {
+      std::stack<RTG::regExpRefPtr> todo;
+      VisitedMap visited;
+      todo.push(outerExpression);
+  
+      while (!todo.empty())
+      {
+          RTG::regExpRefPtr expr = todo.top(); 
+          todo.pop();
+          MemoCacheKey1<RTG::regExpRefPtr > lookupKey(expr);
+          if (visited.find(lookupKey) != visited.end()) continue;
+          visited.insert(std::make_pair(lookupKey, true));
+  
+          switch (expr->GetClassId()) 
+          {
+              // Note: We ignore variables under a Kleene star
+  
+              case RTG::TSL_ID_Var: {
+                  RTG::VarRefPtr t_T_c1_scast__1 = static_cast<RTG::Var*>(expr.get_ptr());
+                  int var = t_T_c1_scast__1->Get_V().get_data();
+                  if (verbose && freeVariables.find(var) == freeVariables.end()) { 
+                      std::cout << var << ";  "; 
+                  }
+                  freeVariables.insert(var);
+                  break; }
+  
+              case RTG::TSL_ID_Project: {
+                  RTG::ProjectRefPtr t_T_b1_scast__1 = static_cast<RTG::Project*>(expr.get_ptr());
+                  todo.push(t_T_b1_scast__1->Get_child());
+                  break; }
+  
+              case RTG::TSL_ID_Dot: 
+              case RTG::TSL_ID_Plus:
+                  todo.push(CIR::getRChild(expr));
+                  todo.push(CIR::getLChild(expr));
+                  break;
+          }
+      } 
+  }
+  
+  void findFreeVariablesInRegExpT(RTG::regExpTRefPtr outerExpression,
+                                  std::set<int> &freeVariables,
+                                  bool verbose)
+  {
+      std::stack<RTG::regExpTRefPtr> todo;
+      VisitedMapT visited;
+      todo.push(outerExpression);
+  
+      while (!todo.empty())
+      {
+          RTG::regExpTRefPtr expr = todo.top(); 
+          todo.pop();
+          MemoCacheKey1<RTG::regExpTRefPtr > lookupKey(expr);
+          if (visited.find(lookupKey) != visited.end()) continue;
+          visited.insert(std::make_pair(lookupKey, true));
+  
+          switch (expr->GetClassId()) 
+          {
+              // Note: We ignore variables under a Kleene star
+  
+              case RTG::TSL_ID_TensorTranspose: { 
+                  RTG::TensorTransposeRefPtr t_T_c1_scast__1 = 
+                             static_cast<RTG::TensorTranspose*>(expr.get_ptr());
+                  findFreeVariablesInRegExp(t_T_c1_scast__1->Get_lChild(), freeVariables, verbose);
+                  findFreeVariablesInRegExp(t_T_c1_scast__1->Get_rChild(), freeVariables, verbose);
+                  break; }
+  
+              case RTG::TSL_ID_ProjectT: {
+                  RTG::ProjectTRefPtr t_T_b1_scast__1 = static_cast<RTG::ProjectT*>(expr.get_ptr());
+                  todo.push(t_T_b1_scast__1->Get_child());
+                  break; }
+  
+              case RTG::TSL_ID_DotT: 
+              case RTG::TSL_ID_PlusT:
+                  todo.push(CIR::getRChildT(expr));
+                  todo.push(CIR::getLChildT(expr));
+                  break;
+          }
+      } 
+  }
+  
+  //void topologicalSortAux(std::map<int, std::set<int> > &stratificationGraph,
+  //                        int node, 
+  //                        std::set<int> &visited, 
+  //                        std::set<int> &locallyVisited, 
+  //                        std::stack<int> &topologicalOrder,
+  //                        bool verbose) 
+  //{
+  //    visited.insert(node);
+  //    locallyVisited.insert(node);
+  //
+  //    std::set<int> &successors = stratificationGraph[node];
+  //
+  //    for(std::set<int>::iterator it = successors.begin(); 
+  //        it != successors.end(); ++it) 
+  //    {
+  //        if (locallyVisited.find(*it) != locallyVisited.end()) {
+  //            if (verbose) { 
+  //                std::cout << " CYCLE involving " << node << std::endl; 
+  //            }
+  //            assert(false && "Cyclic stratification graph.");
+  //        }
+  //        if (visited.find(*it) == visited.end()) {
+  //            topologicalSortAux(stratificationGraph, *it, visited, locallyVisited, topologicalOrder, verbose);
+  //        }
+  //    }
+  //
+  //    if (verbose) { std::cout << node << ";  "; }
+  //    topologicalOrder.push(node);
+  //    locallyVisited.erase(node);
+  //}
+  //
+  //void topologicalSort(std::map<int, std::set<int> > &stratificationGraph,
+  //                     std::stack<int> &topologicalOrder, bool verbose) 
+  //{
+  //    std::set<int> visited;
+  //    for(std::map<int, std::set<int> >::iterator it = stratificationGraph.begin();
+  //        it != stratificationGraph.end(); ++it)
+  //    {
+  //        std::set<int> locallyVisited;
+  //        if (visited.find(it->first) == visited.end()) {
+  //            topologicalSortAux(stratificationGraph, it->first, visited, locallyVisited, topologicalOrder, verbose);
+  //        }
+  //    }
+  //}
+  
+  void tarjansSCCsAux(int var,
+                      int &currentIndex,
+                      std::map<int, int> &index,
+                      std::map<int, int> &lowlink,
+                      std::set<int> &onStack,
+                      std::stack<int> &ancestors,
+                      std::map<int, std::set<int> > &stratificationGraph,
+                      std::stack<int> &topologicalOrder, 
+                      bool verbose)
+  {
+      index[var] = currentIndex;
+      lowlink[var] = currentIndex;
+      currentIndex++;
+      ancestors.push(var);
+      onStack.insert(var);
+  
+      std::set<int> &successors = stratificationGraph[var];
+  
+      for(std::set<int>::iterator it = successors.begin(); 
+          it != successors.end(); ++it) 
+      {
+          int successor = *it;
+          if (index.find(successor) == index.end()) {
+              tarjansSCCsAux(successor, currentIndex, index, lowlink, onStack, ancestors,
+                             stratificationGraph, topologicalOrder, verbose);
+              lowlink[var] = min(lowlink[var], lowlink[successor]);
+          } else if (onStack.find(successor) != onStack.end()) {
+              lowlink[var] = min(lowlink[var], lowlink[successor]);
+          }
+          if (successor==var) {
+              std::cout << std::endl << " *** CYCLE DETECTED: SELF-LOOP AT " 
+                  << var << " *** " << std::endl;
+              assert(false && "Cyclic stratification graph.");
+          }
+      }
+  
+      if (lowlink[var] == index[var]) {
+          if (var != ancestors.top()) {
+              std::cout << std::endl << " *** CYCLE DETECTED: " << var;
+              int ancestor; 
+              do {
+                  ancestor = ancestors.top();
+                  ancestors.pop();
+                  std::cout << " <-- " << ancestor;
+              } while(ancestor != var);
+  
+              std::cout << " *** " << std::endl << std::endl;
+              assert(false && "Cyclic stratification graph.");
+          }
+          ancestors.pop();
+          onStack.erase(var);
+      }
+  
+      if (verbose) { std::cout << var << ";  "; }
+      topologicalOrder.push(var);
+  }
+  
+  void tarjansSCCs(std::map<int, std::set<int> > &stratificationGraph,
+                   std::stack<int> &topologicalOrder, 
+                   bool verbose)
+  {
+      int currentIndex = 0;
+      std::map<int, int> index;
+      std::map<int, int> lowlink;
+      std::set<int> onStack;
+      std::stack<int> ancestors;
+      for(std::map<int, std::set<int> >::iterator it = stratificationGraph.begin();
+          it != stratificationGraph.end(); ++it)
+      {
+          int var = it->first;
+          if (index.find(var) == index.end()) {
+              tarjansSCCsAux(var, currentIndex, index, lowlink, onStack, ancestors,
+                             stratificationGraph, topologicalOrder, verbose);
+          }
+      }
+  }
+  
+  //void testStratificationGraphRoutines() {
+  //
+  //    std::map<int, std::set<int> > G;
+  //    std::stack<int> T;
+  //
+  //    std::cout << "TESTING Topological Order:" << std::endl;
+  //    { std::set<int> S; S.insert(45); S.insert(13); G[21] = S; }
+  //    { std::set<int> S; S.insert(21); S.insert(45); G[10] = S; }
+  //    { std::set<int> S; S.insert(21); S.insert(11); G[45] = S; }
+  //    topologicalSort(G, T, true);
+  //    std::cout << std::endl;
+  //}
+  
+  /*
+  *  Compute the number of successive rounds meeting the "simple termination
+  *    condition" that we need to observe in the Newton loop before we can soundly
+  *    terminate that loop.  (A round meets the "simple termination condition"
+  *    if the abstract values of all its star bodies are equal to the values of
+  *    star bodies on the previous round.)
+  *
+  *  We do this by building the "stratification graph" and returning the length 
+  *    of the longest path through this graph.  Roughly, one round of the Newton 
+  *    loop propagates changes in the value of a variable to the values of any 
+  *    variables whose tensored regular expressions (directly) contain it.  
+  *    Therefore, if there is a path of length K in this graph, then K rounds 
+  *    may be required before a value is fully propagated to all downstream 
+  *    variables.
+  *
+  *  If there is a cycle in the stratification graph, we abort immediately, 
+  *    because our Newton loop cannot soundly process the equation system in
+  *    that case.
+  *
+  *  An edge of the stratification graph exists from Xi to Xj just when 
+  *    j \in free(i), using the definition of the free() function from 
+  *    section 4.1 of the POPL 2016 submission.
+  *
+  *  Note that the smallest possible return value is 0, which should be
+  *    interpreted to mean that no variable occurs free in any other 
+  *    variable's regular expression.
+  *
+  *  @param:  tslRegExpTMap &tensoredRegExpMap - a map from reID to tensored regular expression
+  *
+  *  @return: int - the height of the stratification graph
+  *         
+  *  Author: Jason Breck
+  */
+  int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
+  {
+      std::map<int, std::set<int> > stratificationGraph;
+      bool verbose = true;
+      int var;
+  
+      if (verbose) { std::cout << std::endl << "Variable Stratification Graph:" << std::endl << std::endl; }
+  
+      for (tslRegExpTMap::iterator varIt = tensoredRegExpMap.begin(); varIt != tensoredRegExpMap.end(); varIt++)
+      {
+          var = varIt->first;
+          if (verbose) { std::cout << var << "-->" << std::endl << "  "; }
+          std::set<int> &edges = stratificationGraph[var] = std::set<int>();
+          findFreeVariablesInRegExpT(varIt->second, edges, verbose); 
+          if (verbose) { std::cout << std::endl; }
+      }
+  
+      if (tensoredRegExpMap.size() == 0) { return 1; }
+  
+      if (verbose) { std::cout << std::endl << "Reverse Topological Order:" << std::endl << "  "; }
+      std::stack<int> topologicalOrder;
+      //topologicalSort(stratificationGraph, topologicalOrder, verbose); 
+      tarjansSCCs(stratificationGraph, topologicalOrder, verbose); 
+      if (verbose) { std::cout << std::endl << std::endl; }
+  
+      int stratificationHeight = 0;
+      std::map<int, int> longestPathTo;
+      while(topologicalOrder.size()) {
+          int v = topologicalOrder.top(); 
+          topologicalOrder.pop();
+          int longestPathToV = longestPathTo[v];
+          std::set<int> &successors = stratificationGraph[v];
+          for(std::set<int>::iterator w = successors.begin(); w != successors.end(); ++w) 
+          {
+              // Remember, the default value of the longestPathTo map is 0!
+              if (longestPathTo[*w] < longestPathToV + 1) {
+                  longestPathTo[*w] = longestPathToV + 1;
+                  if (stratificationHeight < longestPathToV + 1) {
+                      stratificationHeight = longestPathToV + 1;
+                  }
+              }
+          }
+      }
+  
+      if (verbose) { std::cout << "Stratification Height: " << stratificationHeight << std::endl; }
+  
+      return stratificationHeight;
+  }
 
   /*
   *  A non recursive test to check the linearity of the untensored portiona of a differential
@@ -1609,10 +1608,6 @@ int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 	  
 	  return linearity;
   }
-
-
-
-
 
   /*
   * Create the tensored differentials from the regular expressions of nodes
@@ -2562,38 +2557,6 @@ NEWROUND:
 		testFile.close();
 	}
 	
-	/*else
-	{
-		rnd++;
-		for (assignIt = tensoredRegExpMap.begin(); assignIt != tensoredRegExpMap.end(); assignIt++)
-		{
-			    int var = assignIt->first;
-				//v = Tdetensor(evalT(Mmap[p],oldVal))
-				//The variable representing the regexp is potentially dirty, so reevaluate it using the
-				//new assignment in oldVal
-				//std::cout << "Eval: " << assignIt->first << std::endl;
-				//assignIt->second.print(std::cout);
-				//std::cout << std::endl;
-				CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal);
-				//DetensorTranspose the new value
-				//std::cout << std::endl << "Result: ";
-				//newVal.v->print(std::cout);
-				CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = CONC_EXTERNS::detensorTranspose(newVal);
-				//std::cout << std::endl << "Detensored Val: ";
-				//rep.v->print(std::cout);
-				//Perform the computation needed for merge functions by computing rep = M(1,rep)
-				//FIXME - what is applied here has to be a global merge function that applies at all procedure exits
-				//		- we don't have the information to perform exit-specific merge functions
-				//Check to see if the new value is the same as the previous one
-				//if A'[p] != v`
-				//Add v' to the changedVar set and updated the assignmentList
-				newVal = CIR::updateAssignment(newVal, CBTI_INT32(var), rep);
-		}
-		EvalMap2.clear();
-		EvalMapT.clear();
-	std::cout << std::endl << "NumRnds: " << rnd << std::endl;
-	}*/
-
     inNewtonLoop = false;
   }
 
@@ -2803,38 +2766,6 @@ NEWROUND:
 		testFile.close();
 	}
 	
-	/*else
-	{
-		rnd++;
-		for (assignIt = tensoredRegExpMap.begin(); assignIt != tensoredRegExpMap.end(); assignIt++)
-		{
-			    int var = assignIt->first;
-				//v = Tdetensor(evalT(Mmap[p],oldVal))
-				//The variable representing the regexp is potentially dirty, so reevaluate it using the
-				//new assignment in oldVal
-				//std::cout << "Eval: " << assignIt->first << std::endl;
-				//assignIt->second.print(std::cout);
-				//std::cout << std::endl;
-				CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal);
-				//DetensorTranspose the new value
-				//std::cout << std::endl << "Result: ";
-				//newVal.v->print(std::cout);
-				CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = CONC_EXTERNS::detensorTranspose(newVal);
-				//std::cout << std::endl << "Detensored Val: ";
-				//rep.v->print(std::cout);
-				//Perform the computation needed for merge functions by computing rep = M(1,rep)
-				//FIXME - what is applied here has to be a global merge function that applies at all procedure exits
-				//		- we don't have the information to perform exit-specific merge functions
-				//Check to see if the new value is the same as the previous one
-				//if A'[p] != v`
-				//Add v' to the changedVar set and updated the assignmentList
-				newVal = CIR::updateAssignment(newVal, CBTI_INT32(var), rep);
-		}
-		EvalMap2.clear();
-		EvalMapT.clear();
-	std::cout << std::endl << "NumRnds: " << rnd << std::endl;
-	}*/
-
     inNewtonLoop = false;
   }
 
@@ -3783,38 +3714,37 @@ NEWROUND:
   }
 
 
+  std::vector<caml_rule> ruleHolder;
+  std::vector<caml_call_rule> callRuleHolder;
+  std::vector<caml_epsilon_rule> epsilonRuleHolder;
+  std::vector<caml_error_rule> errorRuleHolder;
+  std::vector<caml_print_hull_rule> printHullRuleHolder;
+  wali::Key entry_key;
+  wali::Key exit_key;
+  relation_t compareWeight;
 
-std::vector<caml_rule> ruleHolder;
-std::vector<caml_call_rule> callRuleHolder;
-std::vector<caml_epsilon_rule> epsilonRuleHolder;
-std::vector<caml_error_rule> errorRuleHolder;
-std::vector<caml_print_hull_rule> printHullRuleHolder;
-wali::Key entry_key;
-wali::Key exit_key;
-relation_t compareWeight;
-
-void push_rule(caml_rule rule) {
-    ruleHolder.push_back(rule);
-}
-void push_call_rule(caml_call_rule rule) {
-    callRuleHolder.push_back(rule);
-}
-void push_epsilon_rule(caml_epsilon_rule rule) {
-    epsilonRuleHolder.push_back(rule);
-}
-void push_error_rule(caml_error_rule rule) {
-    errorRuleHolder.push_back(rule);
-}
-void push_print_hull_rule(caml_print_hull_rule rule) {
-    printHullRuleHolder.push_back(rule);
-}
-void set_compare_weight(duetrel_t compare) {
-    compareWeight = compare;
-}
-void set_vertices_wfa(wali::Key entry, wali::Key exit) {
-    entry_key = entry;
-    exit_key = exit;
-}
+  void push_rule(caml_rule rule) {
+      ruleHolder.push_back(rule);
+  }
+  void push_call_rule(caml_call_rule rule) {
+      callRuleHolder.push_back(rule);
+  }
+  void push_epsilon_rule(caml_epsilon_rule rule) {
+      epsilonRuleHolder.push_back(rule);
+  }
+  void push_error_rule(caml_error_rule rule) {
+      errorRuleHolder.push_back(rule);
+  }
+  void push_print_hull_rule(caml_print_hull_rule rule) {
+      printHullRuleHolder.push_back(rule);
+  }
+  void set_compare_weight(duetrel_t compare) {
+      compareWeight = compare;
+  }
+  void set_vertices_wfa(wali::Key entry, wali::Key exit) {
+      entry_key = entry;
+      exit_key = exit;
+  }
     
 }
 
