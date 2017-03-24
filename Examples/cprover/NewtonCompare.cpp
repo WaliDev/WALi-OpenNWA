@@ -395,69 +395,28 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalDotSemElem(
 
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::getOneWt()
 {
-//  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-//#if USE_DUET
-//  //ans.v = ans.v->getBaseOne();
-//#else
-//  ans.v = con->getBaseOne();
-//#endif
-//  ans.v->setTensored(false);
-  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans(Relation::getBaseOne());
-  //return ans;
-  return mkSemElemWrapper(Relation::getBaseOne());
+    return mkSemElemWrapper(Relation::getBaseOne());
 }
 
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::getZeroWt()
 {
-//  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-//#if USE_DUET
-//  ans.v = ans.v->getBaseZero();
-//#else
-//  ans.v = con->getBaseZero();
-//#endif
-//  ans.v->setTensored(false);
-  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans(Relation::getBaseZero());
-  //return ans;
-  return mkSemElemWrapper(Relation::getBaseZero());
+    return mkSemElemWrapper(Relation::getBaseZero());
 }
 
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::getOneTWt()
 {
-//  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-//#if USE_DUET
-//  ans.v = ans.v->getTensorOne();
-//#else
-//  ans.v = con->getTensorOne();
-//#endif
-//  ans.v->setTensored(true);
-  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans(Relation::getTensorOne());
-  //return ans;
-  return mkSemElemWrapper(Relation::getTensorOne());
+    return mkSemElemWrapper(Relation::getTensorOne());
 }
 
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::getZeroTWt()
 {
-//  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-//#if USE_DUET
-//  ans.v = ans.v->getTensorZero();
-//#else
-//  ans.v = con->getTensorZero();
-//#endif
-//  ans.v->setTensored(true);
-  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans(Relation::getTensorZero());
-  //return ans;
-  return mkSemElemWrapper(Relation::getTensorZero());
+    return mkSemElemWrapper(Relation::getTensorZero());
 }
 
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::detensorTranspose(const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a)
 {
-  //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-  //ans.v = dynamic_cast<Relation*>(a.v->detensorTranspose().get_ptr());
-  //ans.v->setTensored(false);
-  //return ans;
-  relation_t ar = mkRelation(a);
-  return ar->detensorTranspose();
-  //return mkSemElemWrapper(ar->detensorTranspose());
+    relation_t ar = mkRelation(a);
+    return ar->detensorTranspose();
 }
 
 // -----------------------------------------------
@@ -468,70 +427,70 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::detensorTranspose(const 
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr 
 CONC_EXTERN_PHYLA::sem_elem_wrapper::random()
 {
-  // TODO: This may not be needed for regexp; random is only called from CreateRandomState
-  CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-  return ans;
+    // TODO: This may not be needed for regexp; random is only called from CreateRandomState
+    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+    return ans;
 }
 
 //bool in_operator_equals = false;
 bool 
 CONC_EXTERN_PHYLA::sem_elem_wrapper::operator==(const sem_elem_wrapper & a) const
 {
-  //in_operator_equals = true;
-  
-  //return v->getValue() == a.v->getValue();
-  //return v->get_ptr() == a.v->get_ptr();
-  //return (v->Equal(a.v));
-  //bool retVal = (v.get_ptr() == a.v.get_ptr());
-  relation_t ar = mkRelation(a);
-  relation_t vr = mkRelation(v);
-  bool retVal = vr->Equal(ar);
+    //in_operator_equals = true;
+    
+    //return v->getValue() == a.v->getValue();
+    //return v->get_ptr() == a.v->get_ptr();
+    //return (v->Equal(a.v));
+    //bool retVal = (v.get_ptr() == a.v.get_ptr());
+    relation_t ar = mkRelation(a);
+    relation_t vr = mkRelation(v);
+    bool retVal = vr->Equal(ar);
 
-  //in_operator_equals = false;
+    //in_operator_equals = false;
 
-  return retVal;
+    return retVal;
 }
 
 bool
 CONC_EXTERN_PHYLA::sem_elem_wrapper::operator<(const sem_elem_wrapper & a) const
 {
-  return v<a.v;
+    return v<a.v;
 }
 
 bool
 CONC_EXTERN_PHYLA::sem_elem_wrapper::operator>(const sem_elem_wrapper & a) const
 {
-  return a.v<v;
+    return a.v<v;
 }
 
 
 unsigned long CONC_EXTERN_PHYLA::sem_elem_wrapper::hashValue() const
 {
-  return v->hash();
+    return v->hash();
 }
 
 std::ostream & CONC_EXTERN_PHYLA::sem_elem_wrapper::print(std::ostream & o) const
 {
-  return v->print(o);
+    return v->print(o);
 }
 
 std::ostream & CONC_EXTERN_PHYLA::sem_elem_wrapper::printIndented(std::ostream & o, unsigned int indent) const
 {
-  relation_t vt = mkRelation(v);
-  return vt->printIndented(o, indent);
+    relation_t vt = mkRelation(v);
+    return vt->printIndented(o, indent);
 }
 
 std::ostream & CONC_EXTERN_PHYLA::sem_elem_wrapper::concatName(std::ostream& o) {
-  // TODO: This may not be needed for regexp; 
-  return o;
+    // TODO: This may not be needed for regexp; 
+    return o;
 }
 std::ostream & CONC_EXTERN_PHYLA::sem_elem_wrapper::print_nodename(std::ostream & o) const {
-  // TODO: This may not be needed for regexp; 
-  return o;
+    // TODO: This may not be needed for regexp; 
+    return o;
 }
 std::ostream & CONC_EXTERN_PHYLA::sem_elem_wrapper::print_dag(std::ostream& o) const {
-  // TODO: This may not be needed for regexp; 
-  return o;
+    // TODO: This may not be needed for regexp; 
+    return o;
 }
 
 std::ostream & operator << (std::ostream& o, const CONC_EXTERN_PHYLA::sem_elem_wrapper & b)
