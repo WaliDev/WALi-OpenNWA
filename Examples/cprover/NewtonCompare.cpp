@@ -276,13 +276,11 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::evalVarSemElemT(const CB
     //return CIR::getAssignment(v, globalAssignment);
 }
 
-// -----------------------------------------------
-// --------   PASTED FROM CONC_EXTERNS    ---------
+// ----------------------------------------------------------------
+// Implementations of LIBTSL functions:
 
-//
-// Implementations of functions available in TSL for evaluating
-// WALi sem_elem_t values.
-//
+// PART I: ORIGINALLY FROM conc_externs.cpp:
+
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalPlusSemElemT(
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
@@ -326,7 +324,6 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalTensorTranspose(
     ans.v = updatedAv->Kronecker(br);
     return ans;
 }
-
 
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalDotSemElemT(
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
@@ -387,10 +384,7 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::detensorTranspose(const 
     return ar->detensorTranspose();
 }
 
-// -----------------------------------------------
-
-// -----------------------------------------------
-// -----    PASTED FROM CONC_EXTERN_PHYLA    -----
+// PART II: ORIGINALLY FROM conc_extern_phyla.cpp:
 
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr 
 CONC_EXTERN_PHYLA::sem_elem_wrapper::random()
@@ -400,21 +394,12 @@ CONC_EXTERN_PHYLA::sem_elem_wrapper::random()
     return ans;
 }
 
-//bool in_operator_equals = false;
 bool 
 CONC_EXTERN_PHYLA::sem_elem_wrapper::operator==(const sem_elem_wrapper & a) const
 {
-    //in_operator_equals = true;
-    
-    //return v->getValue() == a.v->getValue();
-    //return v->get_ptr() == a.v->get_ptr();
-    //return (v->Equal(a.v));
-    //bool retVal = (v.get_ptr() == a.v.get_ptr());
     relation_t ar = mkRelation(a);
     relation_t vr = mkRelation(v);
     bool retVal = vr->Equal(ar);
-
-    //in_operator_equals = false;
 
     return retVal;
 }
@@ -466,7 +451,9 @@ std::ostream & operator << (std::ostream& o, const CONC_EXTERN_PHYLA::sem_elem_w
   return b.print(o);
 }
 
-// -----------------------------------------------
+// End of implementations of LIBTSL functions.
+// ----------------------------------------------------------------
+
 
 namespace goals {
 
@@ -517,9 +504,6 @@ namespace goals {
   
   int maxRnds = -1;  //maximum number of rounds of newton loop
   
-
-  // NONREC: Non-recursive functions:
-
   /*
   *  A non recursive version of the Differential function that uses a stack
   *  It takes in a TSL regular expression and returns a Tensored differential
@@ -2227,27 +2211,27 @@ std::map<reg_exp_t, RTG::regExpRefPtr> regExpConversionMap; // This was formerly
   *  
   *  Author: Emma Turetsky
   */
-void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies)
-{
-    // For each component of the equation system
-    for(tslDiffMap::iterator it = differentialMap.begin(); it!=differentialMap.end(); ++it)
-    {
-        int dummy = -1;
-        int tgt = it->first;
-        // Get the list of variable IDs on which this component of the equation system depends
-        set<int> srcList = varDependencies[it->first];
-
-        // For each variable src in srcList, create a Delta-1 rule (st1, src) -> (st1, tgt)
-        // with weight NameWeight(src,tgt)
-        for(set<int>::iterator i = srcList.begin(); i != srcList.end(); i++)
-        {
-            int src = *i;
-            pds->add_rule(st1(), stk(src),st1(),stk(tgt), new NameWeight(src,tgt));
-        }
-        // Add the Delta-1 rule (st1, dummy) -> (st1, tgt), with weight NameWeight(dummy,tgt)
-        pds->add_rule(st1(), stk(dummy), st1(), stk(tgt), new NameWeight(dummy,tgt));
-    }
-}
+  void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies)
+  {
+      // For each component of the equation system
+      for(tslDiffMap::iterator it = differentialMap.begin(); it!=differentialMap.end(); ++it)
+      {
+          int dummy = -1;
+          int tgt = it->first;
+          // Get the list of variable IDs on which this component of the equation system depends
+          set<int> srcList = varDependencies[it->first];
+  
+          // For each variable src in srcList, create a Delta-1 rule (st1, src) -> (st1, tgt)
+          // with weight NameWeight(src,tgt)
+          for(set<int>::iterator i = srcList.begin(); i != srcList.end(); i++)
+          {
+              int src = *i;
+              pds->add_rule(st1(), stk(src),st1(),stk(tgt), new NameWeight(src,tgt));
+          }
+          // Add the Delta-1 rule (st1, dummy) -> (st1, tgt), with weight NameWeight(dummy,tgt)
+          pds->add_rule(st1(), stk(dummy), st1(), stk(tgt), new NameWeight(dummy,tgt));
+      }
+  }
 
  /*
   *  newtonLoop_NPATP
@@ -2287,6 +2271,7 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
   *  }
   */
 #define WIDENING_DELAY 6
+// Default values:
 #define MAX_ROUNDS_FROM_BELOW 50
 #define MAX_ROUNDS_FROM_ABOVE 4
   void newtonLoop_NPATP(RTG::assignmentRefPtr & newVal, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies, tslRegExpTMap & tensoredRegExpMap, bool linear, int aboveBelowMode)
@@ -3699,17 +3684,17 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
 
     for (std::vector<caml_rule>::iterator it = ruleHolder.begin(); it != ruleHolder.end(); it++)
     {
-    pds->add_rule(st1(), it->first.first, st1(), it->first.second, it->second);
+        pds->add_rule(st1(), it->first.first, st1(), it->first.second, it->second);
     }
 
     for (std::vector<caml_call_rule>::iterator itc = callRuleHolder.begin(); itc != callRuleHolder.end(); itc++)
     {
-    pds->add_rule(st1(), itc->first.first, st1(), itc->first.second.first, itc->first.second.second, itc->second);
+        pds->add_rule(st1(), itc->first.first, st1(), itc->first.second.first, itc->first.second.second, itc->second);
     }
 
     for (std::vector<caml_epsilon_rule>::iterator ite = epsilonRuleHolder.begin(); ite != epsilonRuleHolder.end(); ite++)
     {
-    pds->add_rule(st1(), ite->first, st1(), ite->second);
+        pds->add_rule(st1(), ite->first, st1(), ite->second);
     }
     
     pds->print(std::cout);
@@ -3860,12 +3845,7 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
 
             if (isSat) {
                 std::cout << "Is SAT! (Assertion on line " << it->second.second << " FAILED)" << std::endl ;    
-            
-                // This print statement causes seg fault (not sure why) -Ashkan     
-                //extval->print(std::cout);
-                //std::cout << std::endl;
-            }
-            else {
+            } else {
                 std::cout << "Is not SAT! (Assertion on line " << it->second.second << " PASSED)" << std::endl;
             }
 
@@ -3930,17 +3910,17 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
         std::cout << std::endl;
     }
     
-  /*  if(dump){
-        FWPDS * originalPds = new FWPDS();
-    con = pds_from_prog(originalPds, pg);
-    cout << "[Newton Compare] Dumping PDS to pds.dot..." << endl;
-    fstream pds_stream("pds.dot", fstream::out);
-    RuleDotty rd(pds_stream);
-    pds_stream << "digraph{" << endl;
-    originalPds->for_each(rd);
-    pds_stream << "}" << endl;
-    delete(originalPds);
-    }*/
+    //if(dump){
+    //    FWPDS * originalPds = new FWPDS();
+    //    con = pds_from_prog(originalPds, pg);
+    //    cout << "[Newton Compare] Dumping PDS to pds.dot..." << endl;
+    //    fstream pds_stream("pds.dot", fstream::out);
+    //    RuleDotty rd(pds_stream);
+    //    pds_stream << "digraph{" << endl;
+    //    originalPds->for_each(rd);
+    //    pds_stream << "}" << endl;
+    //    delete(originalPds);
+    //}
 
 
     #undef flush
