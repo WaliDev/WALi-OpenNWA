@@ -3788,9 +3788,9 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
 
     // Check the assertion at each error point
     if (testMode) {
-    std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
-    testFile << "__ASSERTION ";
-    testFile.close();
+        std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
+        testFile << "__ASSERTION ";
+        testFile.close();
     }
 
     for (std::vector<caml_error_rule>::iterator it = errorRuleHolder.begin(); it != errorRuleHolder.end(); it++)
