@@ -151,6 +151,7 @@ namespace wali
           int relId;
           static bool simplify;
           static bool simplifyOnPrint;
+          static bool printOnAlphaHatStar;
         protected:
           bool isTensored;
           static int wCnt;

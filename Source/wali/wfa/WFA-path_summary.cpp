@@ -31,6 +31,8 @@ namespace wali
 {
   namespace wfa
   {
+    bool automaticallyPrintOutput = true;
+
     WFA::PathSummaryImplementation
       WFA::globalDefaultPathSummaryImplementation
       = wali::util::ConfigurationVar<WFA::PathSummaryImplementation>(
@@ -383,13 +385,15 @@ namespace wali
           this->toWpds(pkey, &pds, trans_accept, true);
       }
 
-      std::cout << "##### Question automaton as FWPDS" << std::endl;
-      pds.print(std::cout);
+      if (automaticallyPrintOutput) {
+          std::cout << "##### Question automaton as FWPDS" << std::endl;
+          pds.print(std::cout);
 
 #ifdef JAMDEBUG
-      std::cerr << "##### FWPDS" << std::endl;
-      pds.print(std::cerr);
+          std::cerr << "##### FWPDS" << std::endl;
+          pds.print(std::cerr);
 #endif
+      }
 
       WFA query;
       query.addState(pkey, wt->zero());
@@ -410,18 +414,22 @@ namespace wali
         query.addTrans(pkey, fkey, fin, one);
       }
 
-      std::cout << "##### QUERY2" << std::endl;
-      query.print(std::cout);
+      if (automaticallyPrintOutput) {
+          std::cout << "##### QUERY2" << std::endl;
+          query.print(std::cout);
 #ifdef JAMDEBUG
-      std::cerr << "##### QUERY2" << std::endl;
-      query.print(std::cerr);
+          std::cerr << "##### QUERY2" << std::endl;
+          query.print(std::cerr);
 #endif
+      }
 
       WFA ans;
       pds.poststar(query, ans);
 
-      std::cout << "##### ANS" << std::endl;
-      ans.print(std::cout);
+      if (automaticallyPrintOutput) {
+          std::cout << "##### ANS" << std::endl;
+          ans.print(std::cout);
+      }
 #ifdef JAMDEBUG
       fstream foo;
       foo.open("regexp_prestar.dot", fstream::out);
@@ -437,8 +445,10 @@ namespace wali
       foo << "}\n";
       foo.close();
       
-      std::cerr << "##### ANS" << std::endl;
-      ans.print(std::cerr);
+      if (automaticallyPrintOutput) {
+          std::cerr << "##### ANS" << std::endl;
+          ans.print(std::cerr);
+      }
 #endif
 
 

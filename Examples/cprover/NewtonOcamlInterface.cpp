@@ -81,7 +81,7 @@ extern "C" {
     set_compare_weight(DuetRel::MkDuetRel(cWeight));
 
     //assert(0 && "The function set_compare_weight should no longer be called.");
-    std::cout << "Note: The function set_compare_weight no longer needs to be called." << std::endl;
+    //std::cout << "Note: The function set_compare_weight no longer needs to be called." << std::endl;
     CAMLreturn(Val_unit);
   }
 }

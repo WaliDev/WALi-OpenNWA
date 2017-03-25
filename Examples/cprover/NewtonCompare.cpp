@@ -270,6 +270,25 @@ struct sFrame
 // ----------------------------------------------------------------------------
 //   Global flag variables and similar:
 
+// newtonVerbosity levels
+#define NV_ZERO 0
+#define NV_SUMMARIES 1
+#define NV_STANDARD_WARNINGS 2
+#define NV_NEWTON_LOOP 3
+#define NV_NEWTON_STEPS 4
+#define NV_ALPHA_HAT_STAR 5
+#define NV_PDS 6
+#define NV_GAUSS 7
+#define NV_EVERYTHING 8
+
+int newtonVerbosity = NV_EVERYTHING;
+
+namespace wali {
+  namespace wfa {
+    extern bool automaticallyPrintOutput;
+  }
+}
+
 bool doWideningThisRound;
 bool inNewtonLoop;
 bool doSmtlibOutput;
@@ -1365,7 +1384,7 @@ void tarjansSCCs(std::map<int, std::set<int> > &stratificationGraph,
 int computeStratificationHeight(tslRegExpTMap &tensoredRegExpMap)
 {
     std::map<int, std::set<int> > stratificationGraph;
-    bool verbose = true;
+    bool verbose = (newtonVerbosity >= NV_NEWTON_LOOP);
     int var;
 
     if (verbose) { std::cout << std::endl << "Variable Stratification Graph:" << std::endl << std::endl; }
@@ -2330,13 +2349,15 @@ void newtonLoop_NPATP(RTG::assignmentRefPtr & newVal, tslDiffMap & differentialM
           maxRnds = MAX_ROUNDS_FROM_ABOVE;
   }
   
-  // For debugging purposes, print all regular expressions before the first Newton round 
-  std::cout << std::endl;
-  for (assignIt = tensoredRegExpMap.begin(); assignIt != tensoredRegExpMap.end(); assignIt++)
-  {
-      std::cout << "Tensored regular expression for reID=" << assignIt->first << ": " << std::endl;
-      tsl_regexp::regExpTPrettyPrint(assignIt->second, std::cout); 
-      std::cout << std::endl << std::endl;
+  if (newtonVerbosity >= NV_NEWTON_LOOP) {
+      // For debugging purposes, print all regular expressions before the first Newton round 
+      std::cout << std::endl;
+      for (assignIt = tensoredRegExpMap.begin(); assignIt != tensoredRegExpMap.end(); assignIt++)
+      {
+          std::cout << "Tensored regular expression for reID=" << assignIt->first << ": " << std::endl;
+          tsl_regexp::regExpTPrettyPrint(assignIt->second, std::cout); 
+          std::cout << std::endl << std::endl;
+      }
   }
 
   int stratificationHeight = 1;
@@ -2351,7 +2372,9 @@ void newtonLoop_NPATP(RTG::assignmentRefPtr & newVal, tslDiffMap & differentialM
   while (true){
 NEWROUND:
       if (rnd >= maxRnds) {
-          std::cout << "Maximum number of rounds reached. ------------------------------------------" << std::endl;
+          if (newtonVerbosity >= NV_NEWTON_LOOP) {
+              std::cout << "Maximum number of rounds reached. ------------------------------------------" << std::endl;
+          }
 
           if (aboveBelowMode == NEWTON_FROM_BELOW) {
               assert(false && "In Newton-from-below mode, we must abort if we reach the maximum number of rounds.");
@@ -2360,8 +2383,10 @@ NEWROUND:
           break;
       }
 
-      std::cout << "-------------------------------------------------------------------------------" << std::endl;
-      std::cout << "Round " << rnd << ":" << std::endl;
+      if (newtonVerbosity >= NV_NEWTON_LOOP) {
+          std::cout << "-------------------------------------------------------------------------------" << std::endl;
+          std::cout << "Round " << rnd << ":" << std::endl;
+      }
       rnd++;
           
       //oldVal = newVal;
@@ -2375,7 +2400,9 @@ NEWROUND:
 
       inNewtonLoop = true;
       if (rnd >= WIDENING_DELAY) {
-          std::cout << "Widening will be applied on this round." << std::endl;
+          if (newtonVerbosity >= NV_NEWTON_LOOP) {
+              std::cout << "Widening will be applied on this round." << std::endl;
+          }
           doWideningThisRound = true;
       } else {
           doWideningThisRound = false;
@@ -2391,7 +2418,9 @@ NEWROUND:
           //    apply detensorTranspose
           //v = Tdetensor(evalT(Mmap[p],oldVal))
           
-          std::cout << "Eval: " << assignIt->first << std::endl;
+          if (newtonVerbosity >= NV_NEWTON_LOOP) {
+              std::cout << "Eval: " << assignIt->first << std::endl;
+          }
           //assignIt->second.print(std::cout);
           //tsl_regexp::regExpTPrettyPrint(assignIt->second, std::cout);
           //std::cout << std::endl;
@@ -2399,14 +2428,18 @@ NEWROUND:
           //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newValue = evalTNonRec(assignIt->second, oldVal);
           CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr newValue = CIR::evalT(assignIt->second);
           
-          std::cout << std::endl << "Tensored Value: ";
-          newValue.v->print(std::cout);
+          if (newtonVerbosity >= NV_NEWTON_LOOP) {
+              std::cout << std::endl << "Tensored Value: ";
+              newValue.v->print(std::cout);
+          }
           
           CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = CONC_EXTERNS::detensorTranspose(newValue);
           
-          std::cout << std::endl << "Detensored Val: ";
-          rep.v->print(std::cout);
-          std::cout << std::endl;
+          if (newtonVerbosity >= NV_NEWTON_LOOP) {
+              std::cout << std::endl << "Detensored Val: ";
+              rep.v->print(std::cout);
+              std::cout << std::endl;
+          }
           
           /*CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
           
@@ -2489,7 +2522,9 @@ NEWROUND:
       }
   }
       
-  std::cout << std::endl << "NumRnds: " << rnd << std::endl;
+  if (newtonVerbosity >= NV_NEWTON_LOOP) {
+      std::cout << std::endl << "NumRnds: " << rnd << std::endl;
+  }
 
   if (testMode) {
       std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
@@ -2518,13 +2553,15 @@ void newtonLoop_GJ(RTG::assignmentRefPtr & newVal, tslRegExpMap & regExpsAfterIs
           maxRnds = MAX_ROUNDS_FROM_ABOVE;
   }
   
-  // For debugging purposes, print all regular expressions before the first Newton round 
-  std::cout << std::endl;
-  for (assignIt = regExpsAfterIsolation.begin(); assignIt != regExpsAfterIsolation.end(); assignIt++)
-  {
-      std::cout << "Tensored regular expression for reID=" << assignIt->first << ": " << std::endl;
-      tsl_regexp::regExpPrettyPrint(assignIt->second, std::cout); 
-      std::cout << std::endl << std::endl;
+  if (newtonVerbosity >= NV_NEWTON_LOOP) {
+      // For debugging purposes, print all regular expressions before the first Newton round 
+      std::cout << std::endl;
+      for (assignIt = regExpsAfterIsolation.begin(); assignIt != regExpsAfterIsolation.end(); assignIt++)
+      {
+          std::cout << "Tensored regular expression for reID=" << assignIt->first << ": " << std::endl;
+          tsl_regexp::regExpPrettyPrint(assignIt->second, std::cout); 
+          std::cout << std::endl << std::endl;
+      }
   }
 
   int stratificationHeight = 0;
@@ -2539,7 +2576,9 @@ void newtonLoop_GJ(RTG::assignmentRefPtr & newVal, tslRegExpMap & regExpsAfterIs
   while (true){
 NEWROUND:
       if (rnd >= maxRnds) {
-          std::cout << "Maximum number of rounds reached. ------------------------------------------" << std::endl;
+          if (newtonVerbosity >= NV_NEWTON_LOOP) {
+              std::cout << "Maximum number of rounds reached. ------------------------------------------" << std::endl;
+          }
 
           if (aboveBelowMode == NEWTON_FROM_BELOW) {
               assert(false && "In Newton-from-below mode, we must abort if we reach the maximum number of rounds.");
@@ -2548,8 +2587,10 @@ NEWROUND:
           break;
       }
 
-      std::cout << "-------------------------------------------------------------------------------" << std::endl;
-      std::cout << "Round " << rnd << ":" << std::endl;
+      if (newtonVerbosity >= NV_NEWTON_LOOP) {
+          std::cout << "-------------------------------------------------------------------------------" << std::endl;
+          std::cout << "Round " << rnd << ":" << std::endl;
+      }
       rnd++;
           
           
@@ -2564,21 +2605,25 @@ NEWROUND:
 
       inNewtonLoop = true;
       if (rnd >= WIDENING_DELAY) {
-          std::cout << "Widening will be applied on this round." << std::endl;
+          if (newtonVerbosity >= NV_NEWTON_LOOP) {
+              std::cout << "Widening will be applied on this round." << std::endl;
+          }
           doWideningThisRound = true;
       } else {
           doWideningThisRound = false;
       }
 
-      std::cout << std::endl << "Here is the current assignment of values to variables:" << std::endl;
-      for (assignIt = regExpsAfterIsolation.begin(); assignIt != regExpsAfterIsolation.end(); assignIt++)
-      {
-          int var = assignIt->first;
-          std::cout << "Value of variable " << assignIt->first << " is: " << std::endl;
-          CIR::getAssignment(var, globalAssignment).print(std::cout);
-          std::cout << std::endl << std::endl;
+      if (newtonVerbosity >= NV_NEWTON_LOOP) {
+          std::cout << std::endl << "Here is the current assignment of values to variables:" << std::endl;
+          for (assignIt = regExpsAfterIsolation.begin(); assignIt != regExpsAfterIsolation.end(); assignIt++)
+          {
+              int var = assignIt->first;
+              std::cout << "Value of variable " << assignIt->first << " is: " << std::endl;
+              CIR::getAssignment(var, globalAssignment).print(std::cout);
+              std::cout << std::endl << std::endl;
+          }
+          std::cout << std::endl;
       }
-      std::cout << std::endl;
 
       // For each variable in the equation system, evaluate its tensored regular expression
       for (assignIt = regExpsAfterIsolation.begin(); assignIt != regExpsAfterIsolation.end(); assignIt++)
@@ -2590,7 +2635,9 @@ NEWROUND:
           //    apply detensorTranspose
           //v = Tdetensor(evalT(Mmap[p],oldVal))
           
-          std::cout << "Eval: " << assignIt->first << std::endl;
+          if (newtonVerbosity >= NV_NEWTON_LOOP) {
+              std::cout << "Eval: " << assignIt->first << std::endl;
+          }
           //assignIt->second.print(std::cout);
           
           //std::cout << "\n  The regular expression for " << assignIt->first << " is: \n" << std::endl;
@@ -2607,9 +2654,11 @@ NEWROUND:
           ////////CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr rep = CONC_EXTERNS::detensorTranspose(newValue);
           ////////
           ////////std::cout << std::endl << "Detensored Val: ";
-          std::cout << "\n  The value on this round is: \n\n";
-          newValue.v->print(std::cout);
-          std::cout << std::endl << std::endl;
+          if (newtonVerbosity >= NV_NEWTON_LOOP) {
+              std::cout << "\n  The value on this round is: \n\n";
+              newValue.v->print(std::cout);
+              std::cout << std::endl << std::endl;
+          }
           
           /*CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ret;
           
@@ -2698,7 +2747,9 @@ NEWROUND:
       }
   }
       
-  std::cout << std::endl << "NumRnds: " << rnd << std::endl;
+  if (newtonVerbosity >= NV_NEWTON_LOOP) {
+      std::cout << std::endl << "NumRnds: " << rnd << std::endl;
+  }
 
   if (testMode) {
       std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
@@ -2785,12 +2836,12 @@ NEWROUND:
 
 double doNewtonSteps_NPATP(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWPDS * originalPds = NULL, bool canPrune = true)
 { 
-  cout << "#################################################" << endl;
-  //cout << "[Newton Compare] Goal VIII: end-to-end newton_merge_notensor_fwpds run" << endl;
+  if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "#################################################" << endl;
+  //cout << "[Newton] Goal VIII: end-to-end newton_merge_notensor_fwpds run" << endl;
 
   globalAssignment = CIR::initializeAssignment(); // Create an assignment in which all variables are map to zero
   
-  cout << "Step 1: =========================================================" << endl;
+  if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "Step 1: =========================================================" << endl;
   //Step 1 - Convert the program 'pg' into an fpds where the weights are nwaobdds.
   FWPDS * fpds;
   if(originalPds != NULL)
@@ -2853,7 +2904,7 @@ double doNewtonSteps_NPATP(int aboveBelowMode, WFA& outfa, wali::Key entry_key, 
       outfile.close();
   }
 
-  cout << "Step 2: =========================================================" << endl;
+  if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "Step 2: =========================================================" << endl;
   /* Step 2 - Perform poststar on the fpds get the regular expressions associated with
   *           the outgoing nodes in the intra_graph associated with the fwpds
   */
@@ -2910,23 +2961,23 @@ double doNewtonSteps_NPATP(int aboveBelowMode, WFA& outfa, wali::Key entry_key, 
           }
       }
       if (dump){
-          cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
+          cout << "[Newton] Dumping the output automaton in dot format to outfa.dot" << endl;
           fstream outfile("inter_outfa.dot", fstream::out);
           outfa.print_dot(outfile, true);
           outfile.close();
       } if (dump){
-          cout << "[Newton Compare] Dumping the output automaton to final_outfa.txt" << endl;
+          cout << "[Newton] Dumping the output automaton to final_outfa.txt" << endl;
           fstream outfile("inter_outfa.txt", fstream::out);
           outfa.print(outfile);
           outfile.close();
       }
 
-      cout << "Step 3: =========================================================" << endl;
+      if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "Step 3: =========================================================" << endl;
       /*Step 3 - Convert these regexps into TSL regular expressions and get the partial differentials
       *          with respect their variables
       */
 
-      cout << "[Newton Compare] converting to TSL" << endl;
+      if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "[Newton] converting to TSL" << endl;
       while (!wl.empty())
       {
           int wlSzie = wl.size();
@@ -2967,7 +3018,7 @@ double doNewtonSteps_NPATP(int aboveBelowMode, WFA& outfa, wali::Key entry_key, 
       }
       t->start();
 
-      cout << std::endl << "[Newton Compare] Creating Differentials" << std::endl;
+      if (newtonVerbosity >= NV_NEWTON_STEPS) cout << std::endl << "[Newton] Creating Differentials" << std::endl;
       //Created the differentials
       double t2 = 0;
       if (diffMap.size() != 0)
@@ -2985,7 +3036,7 @@ double doNewtonSteps_NPATP(int aboveBelowMode, WFA& outfa, wali::Key entry_key, 
           }
           tslDiffMap::iterator it3;
 
-          cout << "Step 4: =========================================================" << endl;
+          if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "Step 4: =========================================================" << endl;
           /* Step 4 - Create a new fwpds using these partial differentials - run poststar on the fwpds in
           *           order to get the full differentials representing the values of the program return points
           */
@@ -3006,30 +3057,30 @@ double doNewtonSteps_NPATP(int aboveBelowMode, WFA& outfa, wali::Key entry_key, 
           t2 = fnew->getOutRegExpsSimple(fa2, outfa2, rNew);
           t->start();
           if (dump){
-              cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
+              cout << "[Newton] Dumping the output automaton in dot format to outfa.dot" << endl;
               fstream outfile("inter_outfa2.dot", fstream::out);
               outfa2.print_dot(outfile, true);
               outfile.close();
           } if (dump){
-              cout << "[Newton Compare] Dumping the output automaton to final_outfa.txt" << endl;
+              cout << "[Newton] Dumping the output automaton to final_outfa.txt" << endl;
               fstream outfile("inter_outfa2.txt", fstream::out);
               outfa2.print(outfile);
               outfile.close();
           }
 
           if (dump){
-              cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
+              cout << "[Newton] Dumping the output automaton in dot format to outfa.dot" << endl;
               fstream outfile("fa2.dot", fstream::out);
               fa2.print_dot(outfile, true);
               outfile.close();
           } if (dump){
-              cout << "[Newton Compare] Dumping the output automaton to final_outfa.txt" << endl;
+              cout << "[Newton] Dumping the output automaton to final_outfa.txt" << endl;
               fstream outfile("fa2.txt", fstream::out);
               fa2.print(outfile);
               outfile.close();
           }
 
-          cout << "Step 5: =========================================================" << endl;
+          if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "Step 5: =========================================================" << endl;
           /* Step 5 - Use the reg exps representing the differentials, the partial differentials, and the original
           *           tsl regular expressions to get the tensored regular expressions we need to run the newton rounds
           */
@@ -3054,9 +3105,9 @@ double doNewtonSteps_NPATP(int aboveBelowMode, WFA& outfa, wali::Key entry_key, 
               assert(false && "Unrecognized running mode.");
           }
 
-          cout << "Step 6: =========================================================" << endl;
+          if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "Step 6: =========================================================" << endl;
           /* Step 6 - Perform Newton rounds until a fixed-point is reached */
-          cout << "[Newton Compare] Running Newton" << endl;
+          if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "[Newton] Running Newton" << endl;
           newtonLoop_NPATP(aList, differentialMap, varDependencies, tensoredRegExpMap,linear,aboveBelowMode);
 
           //Using the final weights from Newton, evaluate the tslRegExps to get the final weights
@@ -3082,7 +3133,7 @@ double doNewtonSteps_NPATP(int aboveBelowMode, WFA& outfa, wali::Key entry_key, 
       }
       t->stop();
 
-      cout << "Step 7: =========================================================" << endl;
+      if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "Step 7: =========================================================" << endl;
       globalAssignment = aList;
       //Map the evaluated weights back to the transitions the regexps came from
       for (stateIter = faStates.begin(); stateIter != faStates.end(); stateIter++)
@@ -3105,7 +3156,7 @@ double doNewtonSteps_NPATP(int aboveBelowMode, WFA& outfa, wali::Key entry_key, 
               tt->setWeight(w.v);
           }
       }
-      /*cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
+      /*cout << "[Newton] Dumping the output automaton in dot format to outfa.dot" << endl;
       fstream outfile("newton_outfa.dot", fstream::out);
       outfa.print_dot(outfile, true);
       outfile.close();*/
@@ -3116,24 +3167,26 @@ double doNewtonSteps_NPATP(int aboveBelowMode, WFA& outfa, wali::Key entry_key, 
       //State * initS = outfa.getState(outfa.getInitialState());
       //if (initS == NULL)
       //{
-      //  cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
+      //  cout << "[Newton] FWPDS ==> error not reachable" << endl;
       //}
       //else
       //{
       //  sem_elem_t fWt = outfa.getState(outfa.getInitialState())->weight();
       //  if (fWt->equal(fWt->zero()))
       //  {
-      //      cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
+      //      cout << "[Newton] FWPDS ==> error not reachable" << endl;
       //  }
       //  else{
-      //      cout << "[Newton Compare] FWPDS ==> error reachable" << endl;
+      //      cout << "[Newton] FWPDS ==> error reachable" << endl;
       //  }
       //}
 
       t->stop();
       double tTime = t->total_time() + t1 + t2 + baseEvalTime;
-      std::cout << std::endl << "[Newton Compare] Time taken by: Newton: " << std::endl << std::endl;
-      cout << tTime << endl;
+      if (newtonVerbosity >= NV_NEWTON_STEPS) {
+          std::cout << std::endl << "[Newton] Time taken by: Newton: " << std::endl << std::endl;
+          cout << tTime << endl;
+      }
       
       if (testMode) {
           std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
@@ -3145,9 +3198,9 @@ double doNewtonSteps_NPATP(int aboveBelowMode, WFA& outfa, wali::Key entry_key, 
   }
   else  //There is no error state
   {
-      cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
+      cout << "[Newton] FWPDS ==> error not reachable" << endl;
       double tTime = t->total_time() + t1;;
-      std::cout << "[Newton Compare] Time taken by: Newton: ";
+      std::cout << "[Newton] Time taken by: Newton: ";
       cout << tTime << endl;
       std::cout << "NonRec";
       std::cout << std::endl;
@@ -3164,11 +3217,11 @@ double doNewtonSteps_NPATP(int aboveBelowMode, WFA& outfa, wali::Key entry_key, 
 
 double doNewtonSteps_GJ(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWPDS * originalPds = NULL, bool canPrune = true)
 { 
-  cout << "#################################################" << endl;
+  if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "#################################################" << endl;
 
   globalAssignment = CIR::initializeAssignment(); // Create an assignment in which all variables are map to zero
   
-  cout << "Step 1: =========================================================" << endl;
+  if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "Step 1: =========================================================" << endl;
   //Step 1 - Convert the program 'pg' into an fpds where the weights are nwaobdds.
   FWPDS * fpds;
   if(originalPds != NULL)
@@ -3231,7 +3284,7 @@ double doNewtonSteps_GJ(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWP
       outfile.close();
   }
 
-  cout << "Step 2: =========================================================" << endl;
+  if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "Step 2: =========================================================" << endl;
   /* Step 2 - Perform poststar on the fpds get the regular expressions associated with
   *           the outgoing nodes in the intra_graph associated with the fwpds
   */
@@ -3288,23 +3341,23 @@ double doNewtonSteps_GJ(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWP
           }
       }
       //if (dump){
-      //  cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
+      //  cout << "[Newton] Dumping the output automaton in dot format to outfa.dot" << endl;
       //  fstream outfile("inter_outfa.dot", fstream::out);
       //  outfa.print_dot(outfile, true);
       //  outfile.close();
       //} if (dump){
-      //  cout << "[Newton Compare] Dumping the output automaton to final_outfa.txt" << endl;
+      //  cout << "[Newton] Dumping the output automaton to final_outfa.txt" << endl;
       //  fstream outfile("inter_outfa.txt", fstream::out);
       //  outfa.print(outfile);
       //  outfile.close();
       //}
 
-      cout << "Step 3: =========================================================" << endl;
+      if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "Step 3: =========================================================" << endl;
       /*Step 3 - Convert these regexps into TSL regular expressions and get the partial differentials
       *          with respect their variables
       */
 
-      cout << "[Newton Compare] converting to TSL" << endl;
+      if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "[Newton] converting to TSL" << endl;
       while (!wl.empty())
       {
           int wlSzie = wl.size();
@@ -3319,7 +3372,9 @@ double doNewtonSteps_GJ(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWP
           //bool insertProjects = true;
           bool insertProjects = false;
           baseEvalTime += convertToTSLRegExps(rToConvert, outNodeRegExpMap, regExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl, insertProjects);
-          cout << "  There are " << wl.size() << " regular expressions remaining to be converted." << endl;
+          if (newtonVerbosity >= NV_EVERYTHING) {
+              cout << "  There are " << wl.size() << " regular expressions remaining to be converted." << endl;
+          }
       }
       //std::cout << "ESIZE: " << E.size() << std::endl;
       //std::cout << "DSIZE: " << variableIDs.size() << std::endl;
@@ -3350,7 +3405,7 @@ double doNewtonSteps_GJ(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWP
       //}
       //t->start();
 
-      //cout << std::endl << "[Newton Compare] Creating Differentials" << std::endl;
+      //cout << std::endl << "[Newton] Creating Differentials" << std::endl;
       ////Created the differentials
       //double t2 = 0;
       //if (diffMap.size() != 0)
@@ -3389,49 +3444,51 @@ double doNewtonSteps_GJ(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWP
       //  t2 = fnew->getOutRegExpsSimple(fa2, outfa2, rNew);
       t->start();
       //  if (dump){
-      //      cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
+      //      cout << "[Newton] Dumping the output automaton in dot format to outfa.dot" << endl;
       //      fstream outfile("inter_outfa2.dot", fstream::out);
       //      outfa2.print_dot(outfile, true);
       //      outfile.close();
       //  } if (dump){
-      //      cout << "[Newton Compare] Dumping the output automaton to final_outfa.txt" << endl;
+      //      cout << "[Newton] Dumping the output automaton to final_outfa.txt" << endl;
       //      fstream outfile("inter_outfa2.txt", fstream::out);
       //      outfa2.print(outfile);
       //      outfile.close();
       //  }
 
       //  if (dump){
-      //      cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
+      //      cout << "[Newton] Dumping the output automaton in dot format to outfa.dot" << endl;
       //      fstream outfile("fa2.dot", fstream::out);
       //      fa2.print_dot(outfile, true);
       //      outfile.close();
       //  } if (dump){
-      //      cout << "[Newton Compare] Dumping the output automaton to final_outfa.txt" << endl;
+      //      cout << "[Newton] Dumping the output automaton to final_outfa.txt" << endl;
       //      fstream outfile("fa2.txt", fstream::out);
       //      fa2.print(outfile);
       //      outfile.close();
       //  }
 
-      cout << "Step 4: =========================================================" << endl;
+      if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "Step 4: =========================================================" << endl;
       // Perform Gaussian elimination
 
-      std::cout << "Contents of variableIDs: " << std::endl;
-      for (vector<int>::iterator eit = variableIDs.begin(); eit != variableIDs.end(); eit++)
-      {
-          std::cout << *eit << "  "; 
-      }
-      std::cout << std::endl;
-      std::cout << "Keys of regExpMap: " << std::endl;
-      for (tslRegExpMap::iterator it = regExpMap.begin(); it != regExpMap.end(); ++it)
-      {
-          std::cout << it->first << "  "; 
-      }
-      std::cout << std::endl << std::endl;
-      for (vector<int>::iterator eit = variableIDs.begin(); eit != variableIDs.end(); eit++)
-      {
-          std::cout << "Regular expression in regExpMap for reID=" << *eit << ": " << std::endl;
-          tsl_regexp::regExpPrettyPrint(regExpMap[*eit], std::cout); 
+      if (newtonVerbosity >= NV_GAUSS) {
+          std::cout << "Contents of variableIDs: " << std::endl;
+          for (vector<int>::iterator eit = variableIDs.begin(); eit != variableIDs.end(); eit++)
+          {
+              std::cout << *eit << "  "; 
+          }
+          std::cout << std::endl;
+          std::cout << "Keys of regExpMap: " << std::endl;
+          for (tslRegExpMap::iterator it = regExpMap.begin(); it != regExpMap.end(); ++it)
+          {
+              std::cout << it->first << "  "; 
+          }
           std::cout << std::endl << std::endl;
+          for (vector<int>::iterator eit = variableIDs.begin(); eit != variableIDs.end(); eit++)
+          {
+              std::cout << "Regular expression in regExpMap for reID=" << *eit << ": " << std::endl;
+              tsl_regexp::regExpPrettyPrint(regExpMap[*eit], std::cout); 
+              std::cout << std::endl << std::endl;
+          }
       }
 
       std::sort(variableIDs.begin(), variableIDs.end());
@@ -3441,7 +3498,9 @@ double doNewtonSteps_GJ(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWP
       tslRegExpMap regExpsBeforeIsolation;
       tslRegExpMap regExpsAfterIsolation;
 
-      std::cout << std::endl << "Performing Gaussian Elimination." << std::endl << std::endl;
+      if (newtonVerbosity >= NV_GAUSS) {
+          std::cout << std::endl << "Performing Gaussian Elimination." << std::endl << std::endl;
+      }
 
       for (vector<int>::iterator varIt = variableIDs.begin(); varIt != variableIDs.end(); varIt++)
       {
@@ -3454,17 +3513,21 @@ double doNewtonSteps_GJ(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWP
       {
           int i = *varIt;
 
-          std::cout << std::endl << "  ------------------------------ " << std::endl;
-          std::cout << "Working on variable " << i << std::endl;
-          std::cout << "  The regexp for " << i << " just before isolating it:" << std::endl << std::endl;
-          tsl_regexp::regExpPrettyPrint(regExpsBeforeIsolation[i], std::cout); 
+          if (newtonVerbosity >= NV_GAUSS) {
+              std::cout << std::endl << "  ------------------------------ " << std::endl;
+              std::cout << "Working on variable " << i << std::endl;
+              std::cout << "  The regexp for " << i << " just before isolating it:" << std::endl << std::endl;
+              tsl_regexp::regExpPrettyPrint(regExpsBeforeIsolation[i], std::cout); 
+          }
 
           RTG::regExpRefPtr iRHS = CIR::isolate(i, regExpsBeforeIsolation[i]);
 
-          std::cout << std::endl << std::endl << "  The regexp for " << i << " just after isolating it:" << std::endl << std::endl;
-          tsl_regexp::regExpPrettyPrint(iRHS, std::cout); 
-          std::cout << std::endl;
-          std::cout << std::endl << "  ------------------------------ " << std::endl;
+          if (newtonVerbosity >= NV_GAUSS) {
+              std::cout << std::endl << std::endl << "  The regexp for " << i << " just after isolating it:" << std::endl << std::endl;
+              tsl_regexp::regExpPrettyPrint(iRHS, std::cout); 
+              std::cout << std::endl;
+              std::cout << std::endl << "  ------------------------------ " << std::endl;
+          }
 
           regExpsAfterIsolation[i] = iRHS;
 
@@ -3473,42 +3536,51 @@ double doNewtonSteps_GJ(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWP
               int j = *varIt2;
 
               if (j < i) {
-                  std::cout << std::endl << "  ''''''''''''''''''''''''''''''''''(A) " << std::endl;
-                  std::cout << " Substituting in for " << i << " in the RHS for variable " << j << std::endl;
-                  std::cout << "  The regexp for " << j << " just before substituting in for " << i << ":\n" << std::endl;
-                  tsl_regexp::regExpPrettyPrint(regExpsAfterIsolation[j], std::cout); 
+                  if (newtonVerbosity >= NV_GAUSS) {
+                      std::cout << std::endl << "  ''''''''''''''''''''''''''''''''''(A) " << std::endl;
+                      std::cout << " Substituting in for " << i << " in the RHS for variable " << j << std::endl;
+                      std::cout << "  The regexp for " << j << " just before substituting in for " << i << ":\n" << std::endl;
+                      tsl_regexp::regExpPrettyPrint(regExpsAfterIsolation[j], std::cout); 
+                  }
 
                   regExpsAfterIsolation[j] = CIR::substFree(iRHS, i, regExpsAfterIsolation[j]);
 
-                  std::cout << std::endl << "  The regexp for " << j << " just after substituting in for " << i << ":\n" << std::endl;
-                  tsl_regexp::regExpPrettyPrint(regExpsAfterIsolation[j], std::cout); 
-                  std::cout << std::endl << "  '''''''''''''''''''''''''''''''''' " << std::endl;
+                  if (newtonVerbosity >= NV_GAUSS) {
+                      std::cout << std::endl << "  The regexp for " << j << " just after substituting in for " << i << ":\n" << std::endl;
+                      tsl_regexp::regExpPrettyPrint(regExpsAfterIsolation[j], std::cout); 
+                      std::cout << std::endl << "  '''''''''''''''''''''''''''''''''' " << std::endl;
+                  }
               } else if (j > i) {
-                  std::cout << std::endl << "  ''''''''''''''''''''''''''''''''''(B) " << std::endl;
-                  std::cout << " Substituting in for " << i << " in the RHS for variable " << j << std::endl;
-                  std::cout << "  The regexp for " << j << " just before substituting in for " << i << ":\n" << std::endl;
-                  tsl_regexp::regExpPrettyPrint(regExpsBeforeIsolation[j], std::cout); 
+                  if (newtonVerbosity >= NV_GAUSS) {
+                      std::cout << std::endl << "  ''''''''''''''''''''''''''''''''''(B) " << std::endl;
+                      std::cout << " Substituting in for " << i << " in the RHS for variable " << j << std::endl;
+                      std::cout << "  The regexp for " << j << " just before substituting in for " << i << ":\n" << std::endl;
+                      tsl_regexp::regExpPrettyPrint(regExpsBeforeIsolation[j], std::cout); 
+                  }
 
                   regExpsBeforeIsolation[j] = CIR::substFree(iRHS, i, regExpsBeforeIsolation[j]);
 
-                  std::cout << std::endl << "  The regexp for " << j << " just after substituting in for " << i << ":\n" << std::endl;
-                  tsl_regexp::regExpPrettyPrint(regExpsBeforeIsolation[j], std::cout); 
-                  std::cout << std::endl;
-                  std::cout << std::endl << "  '''''''''''''''''''''''''''''''''' " << std::endl;
+                  if (newtonVerbosity >= NV_GAUSS) {
+                      std::cout << std::endl << "  The regexp for " << j << " just after substituting in for " << i << ":\n" << std::endl;
+                      tsl_regexp::regExpPrettyPrint(regExpsBeforeIsolation[j], std::cout); 
+                      std::cout << std::endl;
+                      std::cout << std::endl << "  '''''''''''''''''''''''''''''''''' " << std::endl;
+                  }
               }
 
           }
 
       }
-      std::cout << std::endl << " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  " << std::endl << std::endl;
 
-      std::cout << std::endl << "Finished Gaussian Elimination." << std::endl << std::endl;
-
-      for (vector<int>::iterator eit = variableIDs.begin(); eit != variableIDs.end(); eit++)
-      {
-          std::cout << "Regular expression in regExpsAfterIsolation for reID=" << *eit << ": " << std::endl;
-          tsl_regexp::regExpPrettyPrint(regExpsAfterIsolation[*eit], std::cout); 
-          std::cout << std::endl << std::endl;
+      if (newtonVerbosity >= NV_GAUSS) {
+          std::cout << std::endl << " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  " << std::endl << std::endl;
+          std::cout << std::endl << "Finished Gaussian Elimination." << std::endl << std::endl;
+          for (vector<int>::iterator eit = variableIDs.begin(); eit != variableIDs.end(); eit++)
+          {
+              std::cout << "Regular expression in regExpsAfterIsolation for reID=" << *eit << ": " << std::endl;
+              tsl_regexp::regExpPrettyPrint(regExpsAfterIsolation[*eit], std::cout); 
+              std::cout << std::endl << std::endl;
+          }
       }
       
       //convertToTSLRegExpsT(rNew, regExpMap, tensoredRegExpMap, differentialMap, mapBack, mergeSrcMap);
@@ -3533,9 +3605,9 @@ double doNewtonSteps_GJ(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWP
       //    assert(false && "Unrecognized running mode.");
       //}
 
-      cout << "Step 5: =========================================================" << endl;
+      if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "Step 5: =========================================================" << endl;
       /* Step 6 - Perform Newton rounds until a fixed-point is reached */
-      cout << "[Newton Compare] Running Newton" << endl;
+      if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "[Newton] Running Newton" << endl;
       newtonLoop_GJ(aList, regExpsAfterIsolation, aboveBelowMode);
 
       //assert(false && "The rest of this function is not yet implemented!"); 
@@ -3564,7 +3636,7 @@ double doNewtonSteps_GJ(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWP
       //}
       t->stop();
 
-      cout << "\nStep 6: =========================================================" << endl;
+      if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "\nStep 6: =========================================================" << endl;
       globalAssignment = aList;
       //Map the evaluated weights back to the transitions the regexps came from
       for (stateIter = faStates.begin(); stateIter != faStates.end(); stateIter++)
@@ -3587,7 +3659,7 @@ double doNewtonSteps_GJ(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWP
               tt->setWeight(w.v);
           }
       }
-      /*cout << "[Newton Compare] Dumping the output automaton in dot format to outfa.dot" << endl;
+      /*cout << "[Newton] Dumping the output automaton in dot format to outfa.dot" << endl;
       fstream outfile("newton_outfa.dot", fstream::out);
       outfa.print_dot(outfile, true);
       outfile.close();*/
@@ -3598,25 +3670,27 @@ double doNewtonSteps_GJ(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWP
       //State * initS = outfa.getState(outfa.getInitialState());
       //if (initS == NULL)
       //{
-      //  cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
+      //  cout << "[Newton] FWPDS ==> error not reachable" << endl;
       //}
       //else
       //{
       //  sem_elem_t fWt = outfa.getState(outfa.getInitialState())->weight();
       //  if (fWt->equal(fWt->zero()))
       //  {
-      //      cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
+      //      cout << "[Newton] FWPDS ==> error not reachable" << endl;
       //  }
       //  else{
-      //      cout << "[Newton Compare] FWPDS ==> error reachable" << endl;
+      //      cout << "[Newton] FWPDS ==> error reachable" << endl;
       //  }
       //}
 
       t->stop();
       double tTime = t->total_time() + t1 + baseEvalTime;
       //double tTime = t->total_time() + t1 + t2 + baseEvalTime;
-      std::cout << "\n[Newton Compare] Time taken by: Newton: " << std::endl;
-      cout << tTime << "\n" << endl;
+      if (newtonVerbosity >= NV_NEWTON_STEPS) { 
+          std::cout << "\n[Newton] Time taken by: Newton: " << std::endl;
+          cout << tTime << "\n" << endl;
+      }
       
       if (testMode) {
           std::fstream testFile(testFileName.c_str(), std::fstream::out | std::fstream::app);
@@ -3628,9 +3702,9 @@ double doNewtonSteps_GJ(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWP
   }
   else  //There is no error state
   {
-      cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
+      cout << "[Newton] FWPDS ==> error not reachable" << endl;
       double tTime = t->total_time() + t1;;
-      std::cout << "\n[Newton Compare] Time taken by: Newton: \n";
+      std::cout << "\n[Newton] Time taken by: Newton: \n";
       cout << tTime << endl;
       std::cout << "NonRec";
       std::cout << std::endl;
@@ -3683,7 +3757,9 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
         pds->add_rule(st1(), ite->first, st1(), ite->second);
     }
     
-    pds->print(std::cout);
+    if (newtonVerbosity >= NV_PDS) {
+        pds->print(std::cout);
+    }
     
     // Copied from elsewhere, this is supposed to produce a dotfile of the PDS
     //fstream pds_stream("pds.dot", fstream::out);
@@ -3712,8 +3788,10 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
 
     bool exitTransitionFound = outfaNewton.find(st1(), exit_key, acc, t);
 
-    std::cout << "================================================" << std::endl;
-    std::cout << "Procedure Summaries" << std::endl << std::endl;
+    if (newtonVerbosity >= NV_SUMMARIES) {
+        std::cout << "================================================" << std::endl;
+        std::cout << "Procedure Summaries" << std::endl << std::endl;
+    }
     
     ofstream smtout;
     if (doSmtlibOutput) { smtout.open("smtlib_output.smt2"); }
@@ -3724,11 +3802,11 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
     exit_transitions = outfaNewton.match(st1(), WALI_EPSILON);
     for(wali::wfa::TransSet::iterator tsit = exit_transitions.begin(); tsit != exit_transitions.end(); tsit++)
     {
-        std::cout << "------------------------------------------------" << std::endl;
+        if (newtonVerbosity >= NV_SUMMARIES) { std::cout << "------------------------------------------------" << std::endl; }
 
         bool foundMain = false;
 
-        std::cout << "Procedure summary for ";
+        if (newtonVerbosity >= NV_SUMMARIES) std::cout << "Procedure summary for ";
         if (doSmtlibOutput) { smtout << "; Procedure summary for "; }
 
         // First, we want to print the procedure name; for that, we need to find
@@ -3747,29 +3825,31 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
                 wali::ref_ptr<wali::IntSource> is = dynamic_cast<wali::IntSource *>(kpsks.get_ptr());
                 if (is != NULL) {
                     int entryVertex = is->getInt();
-                    printProcedureNameFromNode(entryVertex, std::cout);
+                    if (newtonVerbosity >= NV_SUMMARIES) printProcedureNameFromNode(entryVertex, std::cout);
                     if (doSmtlibOutput) { smtout << "'"; printProcedureNameFromNode(entryVertex, smtout); smtout << "'" << std::endl; }
-                    std::cout << std::endl;
+                    if (newtonVerbosity >= NV_SUMMARIES) std::cout << std::endl;
                 } else {
-                    std::cout << "an unknown procedure.  This shouldn't happen.  Case 1." << std::endl;
+                    if (newtonVerbosity >= NV_SUMMARIES) std::cout << "an unknown procedure.  This shouldn't happen.  Case 1." << std::endl;
                     if (doSmtlibOutput) { smtout << "an unknown procedure.  This shouldn't happen.  Case 1." << std::endl; }
                 }
             } else {
-                std::cout << "an unknown procedure.  This shouldn't happen.  Case 2." << std::endl;
+                if (newtonVerbosity >= NV_SUMMARIES) std::cout << "an unknown procedure.  This shouldn't happen.  Case 2." << std::endl;
                 if (doSmtlibOutput) { smtout << "an unknown procedure.  This shouldn't happen.  Case 2." << std::endl; }
             }
         } else {
-            std::cout << "main (I guess!)" << std::endl;
+            if (newtonVerbosity >= NV_SUMMARIES) std::cout << "main (I guess!)" << std::endl;
             if (doSmtlibOutput) { smtout << "'main' (I guess!)" << std::endl; }
             foundMain = true;
         }
 
         // Finally, we can print the procedure summary itself:
-        std::cout << std::endl;
+        if (newtonVerbosity >= NV_SUMMARIES) std::cout << std::endl;
         relation_t nval = ((Relation*)((*tsit)->weight().get_ptr()));
         if (foundMain) { mainProcedureSummary = nval; }
-        nval->print(std::cout);
-        std::cout << std::endl << std::endl;
+        if (newtonVerbosity >= NV_SUMMARIES) {
+            nval->print(std::cout);
+            std::cout << std::endl << std::endl;
+        }
 
         if (doSmtlibOutput) {
             nval->printSmtlib(smtout);
@@ -3806,8 +3886,10 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
             // Check if is_sat ( (it->second) extend (*tsit)->weight() )
 
             relation_t negatedAssertionWeight = ((Relation*)(it->second.first.get_ptr()));   // Negated assertion condition
-            negatedAssertionWeight->print(std::cout);
-            std::cout << std::endl << std::endl;
+            if (newtonVerbosity >= NV_EVERYTHING) {
+                negatedAssertionWeight->print(std::cout);
+                std::cout << std::endl << std::endl;
+            }
             
             relation_t intraprocWeight = ((Relation*)((*tsit)->weight().get_ptr()));  // Weight from containing procedure's entry to assertion pt
             relation_t contextWeight = ((Relation*)(outfaNewton.getState((*tsit)->to())->weight().get_ptr()));  // Weight of calling context
@@ -3815,17 +3897,19 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
             relation_t composedWeight = contextWeight->Compose(intraprocWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
             relation_t finalWeight = composedWeight->Compose(negatedAssertionWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
 
-            std::cout << std::endl << "contextWeight = " << std::endl;
-            contextWeight->print(std::cout);
-            std::cout << std::endl << std::endl;
+            if (newtonVerbosity >= NV_EVERYTHING) {
+                std::cout << std::endl << "contextWeight = " << std::endl;
+                contextWeight->print(std::cout);
+                std::cout << std::endl << std::endl;
 
-            std::cout << std::endl << "intraproceduralWeight = " << std::endl;
-            intraprocWeight->print(std::cout);
-            std::cout << std::endl << std::endl;
+                std::cout << std::endl << "intraproceduralWeight = " << std::endl;
+                intraprocWeight->print(std::cout);
+                std::cout << std::endl << std::endl;
 
-            std::cout << std::endl << "contextWeight extend intraproceduralWeight = " << std::endl;
-            composedWeight->print(std::cout);
-            std::cout << std::endl << std::endl;
+                std::cout << std::endl << "contextWeight extend intraproceduralWeight = " << std::endl;
+                composedWeight->print(std::cout);
+                std::cout << std::endl << std::endl;
+            }
     
             bool isSat = finalWeight->IsSat();
 
@@ -3899,7 +3983,7 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
     //if(dump){
     //    FWPDS * originalPds = new FWPDS();
     //    con = pds_from_prog(originalPds, pg);
-    //    cout << "[Newton Compare] Dumping PDS to pds.dot..." << endl;
+    //    cout << "[Newton] Dumping PDS to pds.dot..." << endl;
     //    fstream pds_stream("pds.dot", fstream::out);
     //    RuleDotty rd(pds_stream);
     //    pds_stream << "digraph{" << endl;
@@ -3910,7 +3994,7 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
 
     #undef flush
     std::cout << "================================================" << std::endl;
-    std::cout << "Finished Printing" << std::endl << std::flush;
+    if (newtonVerbosity >= NV_SUMMARIES) { std::cout << "[Newton] Finished " << std::endl << std::flush; }
 
     return 0;
 }   
@@ -3970,6 +4054,7 @@ int main(int argc, char **argv)
         {"dump",             no_argument,       0,            'D' },
         {"npa-tp",           no_argument,       &gaussJordanMode, 0 },
         {"rounds",           required_argument, 0,            'R' },
+        {"newton-verbosity", required_argument, 0,            'N' },
         {"test",             required_argument, 0,            'T' },
         {"domain",           required_argument, 0,            'M' },
         {"verbose",          required_argument, 0,            'V' },
@@ -4009,6 +4094,12 @@ int main(int argc, char **argv)
             case 'R':
                 maxRnds = atoi(optarg);
                 break;
+            case 'N':
+                newtonVerbosity = atoi(optarg);
+                if (newtonVerbosity < NV_PDS) { wali::wfa::automaticallyPrintOutput = false; }
+                if (newtonVerbosity < NV_ALPHA_HAT_STAR) { Relation::printOnAlphaHatStar = false; }
+                if (newtonVerbosity < NV_STANDARD_WARNINGS) { opterr = 0; }
+                break;
             case 'U':
                 doSmtlibOutput = true;  
                 break;
@@ -4024,13 +4115,17 @@ int main(int argc, char **argv)
             case 'G':
             case 'Z':
             case 'L':
-                std::cout << "Passing command-line option " <<  argv[optind - 2] << " " << optarg << " to duet." << std::endl;
+                if (newtonVerbosity >= NV_STANDARD_WARNINGS) {
+                    std::cout << "Passing command-line option " <<  argv[optind - 2] << " " << optarg << " to duet." << std::endl;
+                }
                 unrecognizedArgs.push_back(argv[optind - 2]);
                 unrecognizedArgs.push_back(optarg);
                 break;  
             // unrecognized option, currently we just pass it to duet
             case '?':                       
-                std::cout << "Passing command-line option " <<  argv[optind - 1] << " to duet." << std::endl;
+                if (newtonVerbosity >= NV_STANDARD_WARNINGS) {
+                    std::cout << "Passing command-line option " <<  argv[optind - 1] << " to duet." << std::endl;
+                }
                 unrecognizedArgs.push_back(argv[optind - 1]);
                 break;  
         }   
