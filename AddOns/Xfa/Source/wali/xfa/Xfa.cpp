@@ -143,7 +143,7 @@ namespace wali {
             FILE* image_data_stream = popen(command.str().c_str(), "r");
 
             if (image_data_stream == NULL) {
-                std::cerr << "Error opening pipe to " << command << ": ";
+                std::cerr << "Error opening pipe to " << command.str() << ": ";
                 perror(NULL);
             }
 

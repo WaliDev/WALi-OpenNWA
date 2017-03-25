@@ -6717,6 +6717,29 @@ wali::Key entry_key;
 wali::Key exit_key;
 duetrel_t compareWeight;
 
+void push_rule(caml_rule rule) {
+    ruleHolder.push_back(rule);
+}
+void push_call_rule(caml_call_rule rule) {
+    callRuleHolder.push_back(rule);
+}
+void push_epsilon_rule(caml_epsilon_rule rule) {
+    epsilonRuleHolder.push_back(rule);
+}
+void push_error_rule(caml_error_rule rule) {
+    errorRuleHolder.push_back(rule);
+}
+void push_print_hull_rule(caml_print_hull_rule rule) {
+    printHullRuleHolder.push_back(rule);
+}
+void set_compare_weight(duetrel_t compare) {
+    compareWeight = compare;
+}
+void set_vertices_wfa(wali::Key entry, wali::Key exit) {
+    entry_key = entry;
+    exit_key = exit;
+}
+    
 CAMLprim value compare_weights(Trans t) {
     CAMLparam0();
     CAMLlocal4(bval, nval, nCVal, sval);

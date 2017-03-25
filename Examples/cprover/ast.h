@@ -174,57 +174,57 @@ typedef struct prog_struct
 } prog;
 
 // //////////////////////////////CONSTRUCTORS//////////////////////////////////
-inline expr * make_clean_expr();
-inline expr * make_schoose_expr(expr * l, expr * r);
-inline expr * make_non_det_expr();
-inline expr * make_var_expr(char * v);
-inline expr * make_constant_expr(constant c);
-inline expr * make_not_expr(expr * l);
-inline expr * make_or_expr(expr * l, expr * r);
-inline expr * make_xor_expr(expr * l, expr * r);
-inline expr * make_and_expr(expr * l, expr * r);
-inline expr * make_eq_expr(expr * l, expr * r);
-inline expr * make_neq_expr(expr * l, expr * r);
-inline expr * make_imp_expr(expr * l, expr * r);
+expr * make_clean_expr();
+expr * make_schoose_expr(expr * l, expr * r);
+expr * make_non_det_expr();
+expr * make_var_expr(char * v);
+expr * make_constant_expr(constant c);
+expr * make_not_expr(expr * l);
+expr * make_or_expr(expr * l, expr * r);
+expr * make_xor_expr(expr * l, expr * r);
+expr * make_and_expr(expr * l, expr * r);
+expr * make_eq_expr(expr * l, expr * r);
+expr * make_neq_expr(expr * l, expr * r);
+expr * make_imp_expr(expr * l, expr * r);
 
-inline expr * make_post_expr(expr * l);
-inline expr * make_deep_copy_expr(expr const * e);
+expr * make_post_expr(expr * l);
+expr * make_deep_copy_expr(expr const * e);
 
-inline stmt * make_clean_stmt();
+stmt * make_clean_stmt();
 
-inline str_list * make_str_list_item(char * v);
-inline expr_list * make_expr_list_item(expr * e);
-inline stmt_list * make_stmt_list_item(stmt * s);
+str_list * make_str_list_item(char * v);
+expr_list * make_expr_list_item(expr * e);
+stmt_list * make_stmt_list_item(stmt * s);
 
-inline str_list * add_str_right(str_list * vl, char * v);
-inline str_list * add_str_left(str_list * vl, char * v);
-inline str_list * splice_str(str_list * vll, str_list * vlr);
-inline expr_list * add_expr_right(expr_list * el, expr * e);
-inline expr_list * add_expr_left(expr_list * el, expr * e);
-inline expr_list * splice_expr(expr_list * ell, expr_list * elr);
-inline stmt_list * add_stmt_right(stmt_list * sl, stmt * s);
-inline stmt_list * add_stmt_left(stmt_list * sl, stmt * s);
-inline stmt_list * splice_stmt(stmt_list * sll, stmt_list * slr);
+str_list * add_str_right(str_list * vl, char * v);
+str_list * add_str_left(str_list * vl, char * v);
+str_list * splice_str(str_list * vll, str_list * vlr);
+expr_list * add_expr_right(expr_list * el, expr * e);
+expr_list * add_expr_left(expr_list * el, expr * e);
+expr_list * splice_expr(expr_list * ell, expr_list * elr);
+stmt_list * add_stmt_right(stmt_list * sl, stmt * s);
+stmt_list * add_stmt_left(stmt_list * sl, stmt * s);
+stmt_list * splice_stmt(stmt_list * sll, stmt_list * slr);
 
-inline stmt * make_call_stmt(char * f, str_list * vl, expr_list * el);
-inline stmt * make_assume_stmt(expr * e);
-inline stmt * make_assert_stmt(expr * e);
-inline stmt * make_ite_stmt(expr * e, stmt_list * slt, stmt_list * sle);
-inline stmt * make_while_stmt(expr * e, stmt_list * sl);
-inline stmt * make_assign_stmt(str_list * vl, expr_list * el, expr * e);
-inline stmt * make_return_stmt(expr_list * el);
-inline stmt * make_goto_stmt(str_list * vl);
-inline stmt * make_skip_stmt();
-inline stmt * add_labels(stmt * s, str_list * ll);
+stmt * make_call_stmt(char * f, str_list * vl, expr_list * el);
+stmt * make_assume_stmt(expr * e);
+stmt * make_assert_stmt(expr * e);
+stmt * make_ite_stmt(expr * e, stmt_list * slt, stmt_list * sle);
+stmt * make_while_stmt(expr * e, stmt_list * sl);
+stmt * make_assign_stmt(str_list * vl, expr_list * el, expr * e);
+stmt * make_return_stmt(expr_list * el);
+stmt * make_goto_stmt(str_list * vl);
+stmt * make_skip_stmt();
+stmt * add_labels(stmt * s, str_list * ll);
 
-inline proc * make_clean_proc();
-inline proc * make_proc(unsigned r, char * f, str_list * al, str_list * vl, expr * e, stmt_list * sl);
-inline proc_list * make_proc_list_item(proc * p);
-inline proc_list * add_proc_right(proc_list * pl, proc * p);
-inline proc_list * add_proc_left(proc_list * pl, proc * p);
+proc * make_clean_proc();
+proc * make_proc(unsigned r, char * f, str_list * al, str_list * vl, expr * e, stmt_list * sl);
+proc_list * make_proc_list_item(proc * p);
+proc_list * add_proc_right(proc_list * pl, proc * p);
+proc_list * add_proc_left(proc_list * pl, proc * p);
 
-inline prog * make_clean_prog();
-inline prog * make_prog(str_list * vl, proc_list * pl);
+prog * make_clean_prog();
+prog * make_prog(str_list * vl, proc_list * pl);
 
 // ////////////////////// Clean up ////////////////////////////////////////////
 void deep_erase_expr(expr ** e);

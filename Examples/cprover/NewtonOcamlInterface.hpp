@@ -36,15 +36,14 @@ typedef std::pair<std::pair<wali::Key,std::pair<wali::Key,wali::Key> >, duetrel_
 typedef std::pair<wali::Key, duetrel_t > caml_epsilon_rule;
 typedef std::pair<wali::Key, std::pair<duetrel_t,int> > caml_error_rule;
 typedef std::pair<wali::Key, std::pair<int,int> > caml_print_hull_rule;
-extern std::vector<caml_epsilon_rule> epsilonRuleHolder;
-extern std::vector<caml_rule> ruleHolder;
-extern std::vector<caml_call_rule> callRuleHolder;
-extern std::vector<caml_error_rule> errorRuleHolder;
-extern std::vector<caml_print_hull_rule> printHullRuleHolder;
-extern wali::Key entry_key;
-extern wali::Key exit_key;
-extern duetrel_t compareWeight;
 
+extern void push_call_rule(caml_call_rule);
+extern void push_error_rule(caml_error_rule);
+extern void push_epsilon_rule(caml_epsilon_rule);
+extern void push_print_hull_rule(caml_print_hull_rule);
+extern void push_rule(caml_rule);
+extern void set_compare_weight(duetrel_t);
+extern void set_vertices_wfa(wali::Key, wali::Key);
 }
 
 #endif

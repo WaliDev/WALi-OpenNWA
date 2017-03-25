@@ -2,7 +2,7 @@
 #include "ast.h"
 
 
-inline expr * make_clean_expr()
+expr * make_clean_expr()
 {
   expr * e = (expr *) malloc(sizeof(expr));
   e->l = NULL;
@@ -10,7 +10,7 @@ inline expr * make_clean_expr()
   e->v = NULL;
   return e;
 }
-inline expr * make_schoose_expr(expr * l, expr * r)
+expr * make_schoose_expr(expr * l, expr * r)
 {
   expr * e = NULL;
   if(!l || !r)
@@ -21,13 +21,13 @@ inline expr * make_schoose_expr(expr * l, expr * r)
   e->r = r;
   return e;
 }
-inline expr * make_non_det_expr()
+expr * make_non_det_expr()
 {
   expr * e = make_clean_expr();
   e->op = AST_NONDET;
   return e;
 }
-inline expr * make_var_expr(char * v)
+expr * make_var_expr(char * v)
 {
   expr * e = NULL;
   if(!v)
@@ -37,7 +37,7 @@ inline expr * make_var_expr(char * v)
   e->v = v;
   return e;
 }
-inline expr * make_constant_expr(constant c)
+expr * make_constant_expr(constant c)
 {
   expr * e = NULL;
   if(c != ZERO && c != ONE)
@@ -47,7 +47,7 @@ inline expr * make_constant_expr(constant c)
   e->c = c;
   return e;
 }
-inline expr * make_not_expr(expr * l)
+expr * make_not_expr(expr * l)
 {
 	expr * e = NULL;
   if(!l)
@@ -57,7 +57,7 @@ inline expr * make_not_expr(expr * l)
   e->l = l;
   return e;
 }
-inline expr * make_or_expr(expr * l, expr * r)
+expr * make_or_expr(expr * l, expr * r)
 {
   expr * e = NULL;
   if(!l || !r)
@@ -68,7 +68,7 @@ inline expr * make_or_expr(expr * l, expr * r)
   e->r = r;
   return e;
 }
-inline expr * make_xor_expr(expr * l, expr * r)
+expr * make_xor_expr(expr * l, expr * r)
 {
   expr * e = NULL;
   if(!l || !r)
@@ -79,7 +79,7 @@ inline expr * make_xor_expr(expr * l, expr * r)
   e->r = r;
   return r;
 }
-inline expr * make_and_expr(expr * l, expr * r)
+expr * make_and_expr(expr * l, expr * r)
 {
   expr * e = NULL;
   if(!l || !r)
@@ -90,7 +90,7 @@ inline expr * make_and_expr(expr * l, expr * r)
   e->r = r;
   return e;
 }
-inline expr * make_eq_expr(expr * l, expr * r)
+expr * make_eq_expr(expr * l, expr * r)
 {
   expr * e = NULL;
   if(!l || !r)
@@ -101,7 +101,7 @@ inline expr * make_eq_expr(expr * l, expr * r)
   e->r = r;
   return e;
 }
-inline expr * make_neq_expr(expr * l, expr * r)
+expr * make_neq_expr(expr * l, expr * r)
 {
 	expr * e = NULL;
   if(!l || !r)
@@ -112,7 +112,7 @@ inline expr * make_neq_expr(expr * l, expr * r)
   e->r = r;
   return e;
 }
-inline expr * make_imp_expr(expr * l, expr * r)
+expr * make_imp_expr(expr * l, expr * r)
 {
 	expr * e = NULL;
   if(!l || !r)
@@ -123,7 +123,7 @@ inline expr * make_imp_expr(expr * l, expr * r)
   e->r = r;
   return e;
 }
-inline expr * make_post_expr(expr *l)
+expr * make_post_expr(expr *l)
 {
   if(!l)
     assert(0 && "make_post_expr");
@@ -132,7 +132,7 @@ inline expr * make_post_expr(expr *l)
   l->op = AST_VAR_POST;
   return l;
 }
-inline expr * make_deep_copy_expr(expr const * e)
+expr * make_deep_copy_expr(expr const * e)
 {
   expr * res  = NULL;
   if(!e) return NULL;
@@ -146,7 +146,7 @@ inline expr * make_deep_copy_expr(expr const * e)
   return res;
 }
 
-inline stmt * make_clean_stmt()
+stmt * make_clean_stmt()
 {
   stmt * s = (stmt *) malloc(sizeof(stmt));
   s->ll = NULL;
@@ -159,7 +159,7 @@ inline stmt * make_clean_stmt()
   return s;
 }
 
-inline str_list * make_str_list_item(char * v)
+str_list * make_str_list_item(char * v)
 {
 	str_list * sl = NULL;
   if(!v)
@@ -170,7 +170,7 @@ inline str_list * make_str_list_item(char * v)
   sl->v = v;
   return sl;
 }
-inline expr_list * make_expr_list_item(expr * e)
+expr_list * make_expr_list_item(expr * e)
 {
 	expr_list * el = NULL;
   if(!e)
@@ -181,7 +181,7 @@ inline expr_list * make_expr_list_item(expr * e)
   el->e = e;
   return el;
 }
-inline stmt_list * make_stmt_list_item(stmt * s)
+stmt_list * make_stmt_list_item(stmt * s)
 {
 	stmt_list * sl = NULL;
   if(!s)
@@ -193,7 +193,7 @@ inline stmt_list * make_stmt_list_item(stmt * s)
   return sl;
 }
 
-inline str_list * add_str_right(str_list * vl, char * v)
+str_list * add_str_right(str_list * vl, char * v)
 {
 	str_list * t = NULL;
   if(!vl || !v)
@@ -203,7 +203,7 @@ inline str_list * add_str_right(str_list * vl, char * v)
   vl->t = t;
   return vl;
 }
-inline str_list * add_str_left(str_list * vl, char * v)
+str_list * add_str_left(str_list * vl, char * v)
 {
 	str_list * h = NULL;
   if(!vl || !v)
@@ -213,7 +213,7 @@ inline str_list * add_str_left(str_list * vl, char * v)
   h->t = vl->t;
   return h;
 }
-inline str_list * splice_str(str_list * vll, str_list * vlr)
+str_list * splice_str(str_list * vll, str_list * vlr)
 {
   if(!vll)
     return vlr;
@@ -223,7 +223,7 @@ inline str_list * splice_str(str_list * vll, str_list * vlr)
   vll->t = vlr->t;
   return vll;
 }
-inline expr_list * add_expr_right(expr_list * el, expr * e)
+expr_list * add_expr_right(expr_list * el, expr * e)
 {
 	expr_list * t = NULL;
   if(!el || !e)
@@ -233,7 +233,7 @@ inline expr_list * add_expr_right(expr_list * el, expr * e)
   el->t = t;
   return el;
 }
-inline expr_list * add_expr_left(expr_list * el, expr * e)
+expr_list * add_expr_left(expr_list * el, expr * e)
 {
 	expr_list * h = NULL;
   if(!el || !e)
@@ -243,7 +243,7 @@ inline expr_list * add_expr_left(expr_list * el, expr * e)
   h->t = el->t;
   return h;
 }
-inline expr_list * splice_expr(expr_list * ell, expr_list * elr)
+expr_list * splice_expr(expr_list * ell, expr_list * elr)
 {
   if(!ell)
     return elr;
@@ -253,7 +253,7 @@ inline expr_list * splice_expr(expr_list * ell, expr_list * elr)
   ell->t = elr->t;
   return ell;
 }
-inline stmt_list * add_stmt_right(stmt_list * sl, stmt * s)
+stmt_list * add_stmt_right(stmt_list * sl, stmt * s)
 {
 	stmt_list * t = NULL;
   if(!sl || !s)
@@ -263,7 +263,7 @@ inline stmt_list * add_stmt_right(stmt_list * sl, stmt * s)
   sl->t = t;
   return sl;
 }
-inline stmt_list * add_stmt_left(stmt_list * sl, stmt * s)
+stmt_list * add_stmt_left(stmt_list * sl, stmt * s)
 {
 	stmt_list * h = NULL;
   if(!sl || !s)
@@ -273,7 +273,7 @@ inline stmt_list * add_stmt_left(stmt_list * sl, stmt * s)
   h->t = sl->t;
   return h;
 }
-inline stmt_list * splice_stmt(stmt_list * sll, stmt_list * slr)
+stmt_list * splice_stmt(stmt_list * sll, stmt_list * slr)
 {
   if(!sll)
     return slr;
@@ -284,7 +284,7 @@ inline stmt_list * splice_stmt(stmt_list * sll, stmt_list * slr)
   return sll;
 }
 
-inline stmt * make_call_stmt(char * f, str_list * vl, expr_list * el)
+stmt * make_call_stmt(char * f, str_list * vl, expr_list * el)
 {
 	stmt * s = NULL;
   if(!f)
@@ -296,7 +296,7 @@ inline stmt * make_call_stmt(char * f, str_list * vl, expr_list * el)
   s->el = el;
   return s;
 }
-inline stmt * make_assume_stmt(expr * e)
+stmt * make_assume_stmt(expr * e)
 {
 	stmt * s = NULL;
   if(!e)
@@ -306,7 +306,7 @@ inline stmt * make_assume_stmt(expr * e)
   s->e = e;
   return s;
 }
-inline stmt * make_assert_stmt(expr * e)
+stmt * make_assert_stmt(expr * e)
 {
 	stmt * s = NULL;
   if(!e)
@@ -316,7 +316,7 @@ inline stmt * make_assert_stmt(expr * e)
   s->e = e;
   return s;
 }
-inline stmt * make_ite_stmt(expr * e, stmt_list * slt, stmt_list * sle)
+stmt * make_ite_stmt(expr * e, stmt_list * slt, stmt_list * sle)
 {
 	stmt * s = NULL;
   // The else branch might not have any statements
@@ -329,7 +329,7 @@ inline stmt * make_ite_stmt(expr * e, stmt_list * slt, stmt_list * sle)
   s->sl2 = sle;
   return s;
 }
-inline stmt * make_while_stmt(expr * e, stmt_list * sl)
+stmt * make_while_stmt(expr * e, stmt_list * sl)
 {
 	stmt * s = NULL;
   if(!e || !sl)
@@ -340,7 +340,7 @@ inline stmt * make_while_stmt(expr * e, stmt_list * sl)
   s->sl1 = sl;
   return s;
 }
-inline stmt * make_assign_stmt(str_list * vl, expr_list * el, expr * e)
+stmt * make_assign_stmt(str_list * vl, expr_list * el, expr * e)
 {
 	stmt * s = NULL;
   if(!vl || !el)
@@ -352,7 +352,7 @@ inline stmt * make_assign_stmt(str_list * vl, expr_list * el, expr * e)
   s->e = e;
   return s;
 }
-inline stmt * make_return_stmt(expr_list * el)
+stmt * make_return_stmt(expr_list * el)
 {
   // The expression list might be empty
   stmt * s = make_clean_stmt();
@@ -360,7 +360,7 @@ inline stmt * make_return_stmt(expr_list * el)
   s->el = el;
   return s;
 }
-inline stmt * make_goto_stmt(str_list * vl)
+stmt * make_goto_stmt(str_list * vl)
 {
 	stmt * s = NULL;
   if(!vl)
@@ -370,13 +370,13 @@ inline stmt * make_goto_stmt(str_list * vl)
   s->vl = vl;
   return s;
 }
-inline stmt * make_skip_stmt()
+stmt * make_skip_stmt()
 {
   stmt * s = make_clean_stmt();
   s->op = AST_SKIP;
   return s;
 }
-inline stmt * add_labels(stmt * s, str_list * ll)
+stmt * add_labels(stmt * s, str_list * ll)
 {
   if(!s || !ll)
     assert(0 && "add_labels");
@@ -384,7 +384,7 @@ inline stmt * add_labels(stmt * s, str_list * ll)
   return s;
 }
 
-inline proc * make_clean_proc()
+proc * make_clean_proc()
 {
   proc * p = (proc *) malloc(sizeof(proc));
   p->f = NULL;
@@ -393,7 +393,7 @@ inline proc * make_clean_proc()
   p->sl = NULL;
   return p;
 }
-inline proc * make_proc(unsigned r, char * f, str_list * al, str_list * vl, expr * e, stmt_list * sl)
+proc * make_proc(unsigned r, char * f, str_list * al, str_list * vl, expr * e, stmt_list * sl)
 {
   // The return list being empty mean the function is void
   // The statement list, arguments, and the enforce may also be empty
@@ -409,7 +409,7 @@ inline proc * make_proc(unsigned r, char * f, str_list * al, str_list * vl, expr
   p->sl = sl;
   return p;
 }
-inline proc_list * make_proc_list_item(proc * p)
+proc_list * make_proc_list_item(proc * p)
 {
 	proc_list * pl = NULL;
   if(!p)
@@ -420,7 +420,7 @@ inline proc_list * make_proc_list_item(proc * p)
   pl->t = pl;
   return pl;
 }
-inline proc_list * add_proc_right(proc_list * pl, proc * p)
+proc_list * add_proc_right(proc_list * pl, proc * p)
 {
 	proc_list * t = NULL;
   if(!pl || !p)
@@ -430,7 +430,7 @@ inline proc_list * add_proc_right(proc_list * pl, proc * p)
   pl->t = t;
   return pl;
 }
-inline proc_list * add_proc_left(proc_list * pl, proc * p)
+proc_list * add_proc_left(proc_list * pl, proc * p)
 {
 	proc_list * h = NULL;
   if(!pl || !p)
@@ -441,7 +441,7 @@ inline proc_list * add_proc_left(proc_list * pl, proc * p)
   return h;
 }
 
-inline prog * make_clean_prog()
+prog * make_clean_prog()
 {
   prog * p = (prog *) malloc(sizeof(prog));
   p->vl = NULL;
@@ -449,7 +449,7 @@ inline prog * make_clean_prog()
   p->e = NULL;
   return p;
 }
-inline prog * make_prog(str_list * vl, proc_list * pl)
+prog * make_prog(str_list * vl, proc_list * pl)
 {
   prog * p = make_clean_prog();
   p->vl = vl;
