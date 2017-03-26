@@ -334,6 +334,7 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElemT(
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a, 
   const RTG::regExpTRefPtr & child)
 {
+    relation_t ar = mkRelation(a);
     if (inNewtonLoop) {
         relationpair_t ret;
         
@@ -351,15 +352,14 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElemT(
             }
         }
         
-        //ret = ((evalT___it->second.v))->alphaHatStar(previousValue);
-        ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar(previousValue);
+        ret = ar->alphaHatStar(previousValue);
         
         newStarValT.insert(std::make_pair(lookupKeyForStar, ret->first));
         return mkSemElemWrapper(ret->second);
     } else {
         CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
         relationpair_t ret;
-        ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar();
+        ret = ar->alphaHatStar();
         ans.v = ret->second.get_ptr();
         return ans;
     }
@@ -369,6 +369,7 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElem(
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
   const RTG::regExpRefPtr & child)
 {
+    relation_t ar = mkRelation(a);
     if (inNewtonLoop) {
         relationpair_t ret;
         
@@ -386,8 +387,7 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElem(
             }
         }
         
-        //ret = ((evalRegExp___it->second.v))->alphaHatStar(previousValue);
-        ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar(previousValue);
+        ret = ar->alphaHatStar(previousValue);
         
         newStarVal.insert(std::make_pair(lookupKeyForStar, ret->first));
 
@@ -395,7 +395,7 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElem(
     } else {
         CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
         relationpair_t ret;
-        ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar();
+        ret = ar->alphaHatStar();
         ans.v = ret->second.get_ptr();
         return ans;
     }
