@@ -335,7 +335,7 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElemT(
   const RTG::regExpTRefPtr & child)
 {
     if (inNewtonLoop) {
-        duetrelpair_t ret;
+        relationpair_t ret;
         
         MemoCacheKey1<RTG::regExpTRefPtr > lookupKeyForStar(child);
 
@@ -358,7 +358,7 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElemT(
         return mkSemElemWrapper(ret->second);
     } else {
         CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-        duetrelpair_t ret;
+        relationpair_t ret;
         ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar();
         ans.v = ret->second.get_ptr();
         return ans;
@@ -370,7 +370,7 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElem(
   const RTG::regExpRefPtr & child)
 {
     if (inNewtonLoop) {
-        duetrelpair_t ret;
+        relationpair_t ret;
         
         MemoCacheKey1<RTG::regExpRefPtr > lookupKeyForStar(child);
         
@@ -394,7 +394,7 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElem(
         return mkSemElemWrapper(ret->second);
     } else {
         CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-        duetrelpair_t ret;
+        relationpair_t ret;
         ret = (dynamic_cast<Relation*>(a.v.get_ptr()))->alphaHatStar();
         ans.v = ret->second.get_ptr();
         return ans;
