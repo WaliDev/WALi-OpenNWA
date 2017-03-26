@@ -320,12 +320,21 @@ relation_t mkRelation(CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr s) {
     return d;
 }
 
+relation_t mkRelationFromSemElem(wali::sem_elem_t s) {
+    Relation * r = dynamic_cast<Relation*>(s.get_ptr());
+    if (r == 0) {
+        assert(0 && "Failed to cast a sem_elem_wrapper to a Relation.");
+    }
+    relation_t d(r);
+    return d;
+}
+
 // ----------------------------------------------------------------------------
 // Implementations of LIBTSLRE functions:
 
 // PART I: ORIGINALLY FROM conc_externs.cpp:
 
-// FIXME: In the following functions, consider whether or not:
+// TODO: In the following functions, consider whether or not:
 //    (1) we need a separate case for the final evaluation that occurs outside
 //       of the Newton loop
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElemT(
@@ -1776,7 +1785,7 @@ RTG::regExpRefPtr convertToRegExp(int reID, reg_exp_t exp, std::map<int, reg_exp
                 else if (frame.e->isZero())
                     regExpConversionMap[frame.e] = RTG::Zero::make();
                 else {  //If the expresssion isn't a simple constant, make an external TSL wrapper around the constant and create a TSL weight
-                    relation_t w = dynamic_cast<Relation*>(frame.e->get_weight().get_ptr());
+                    relation_t w = mkRelationFromSemElem(frame.e->get_weight());
                     //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr wt = w;
                     CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr wt = CONC_EXTERN_PHYLA::sem_elem_wrapper(w);
                     //regExpConversionMap[frame.e] = RTG::Weight::make(wt);
@@ -3842,7 +3851,7 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
 
         // Finally, we can print the procedure summary itself:
         if (newtonVerbosity >= NV_SUMMARIES) std::cout << std::endl;
-        relation_t nval = ((Relation*)((*tsit)->weight().get_ptr()));
+        relation_t nval = mkRelationFromSemElem((*tsit)->weight());
         if (foundMain) { mainProcedureSummary = nval; }
         if (newtonVerbosity >= NV_SUMMARIES) {
             nval->print(std::cout);
@@ -3883,14 +3892,14 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
 
             // Check if is_sat ( (it->second) extend (*tsit)->weight() )
 
-            relation_t negatedAssertionWeight = ((Relation*)(it->second.first.get_ptr()));   // Negated assertion condition
+            relation_t negatedAssertionWeight = mkRelationFromSemElem(it->second.first);   // Negated assertion condition
             if (newtonVerbosity >= NV_EVERYTHING) {
                 negatedAssertionWeight->print(std::cout);
                 std::cout << std::endl << std::endl;
             }
             
-            relation_t intraprocWeight = ((Relation*)((*tsit)->weight().get_ptr()));  // Weight from containing procedure's entry to assertion pt
-            relation_t contextWeight = ((Relation*)(outfaNewton.getState((*tsit)->to())->weight().get_ptr()));  // Weight of calling context
+            relation_t intraprocWeight = mkRelationFromSemElem((*tsit)->weight());  // Weight from containing procedure's entry to assertion pt
+            relation_t contextWeight = mkRelationFromSemElem(outfaNewton.getState((*tsit)->to())->weight());  // Weight of calling context
 
             relation_t composedWeight = contextWeight->Compose(intraprocWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
             relation_t finalWeight = composedWeight->Compose(negatedAssertionWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
@@ -3944,8 +3953,8 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
             tsit != print_hull_transitions.end(); 
             tsit++)
         {
-            relation_t intraprocWeight = ((Relation*)((*tsit)->weight().get_ptr()));  // Weight from containing procedure's entry to print-hull pt
-            relation_t contextWeight = ((Relation*)(outfaNewton.getState((*tsit)->to())->weight().get_ptr()));  // Weight of calling context
+            relation_t intraprocWeight = mkRelationFromSemElem((*tsit)->weight());  // Weight from containing procedure's entry to print-hull pt
+            relation_t contextWeight = mkRelationFromSemElem(outfaNewton.getState((*tsit)->to())->weight());  // Weight of calling context
             relation_t composedWeight = contextWeight->Compose(intraprocWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
             
             //std::cout << "Variable Bounds at Line: " << line << std::endl;
