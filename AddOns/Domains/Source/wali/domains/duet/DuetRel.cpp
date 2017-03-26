@@ -498,13 +498,6 @@ bool DuetRel::Equivalent(duetrel_t that) const
         value * eq_func = caml_named_value("abstract_equiv_callback");
         retVal = caml_callback2(*eq_func, dval0, dval1);
     }
-    // WARNING: The following print code causes segfaults.
-    //   I haven't yet debugged the reason for this. -- Jason
-    // std::cout << "Equivalence check of this:" << std::endl;
-    // print(std::cout);
-    // std::cout << std::endl << "against that:" << std::endl;
-    // that->print(std::cout);
-    // std::cout << std::endl << "Test result is:" << Bool_val(retVal) << std::endl;
 
     CAMLreturnT(bool,Bool_val(retVal));
 }
@@ -732,10 +725,7 @@ std::ostream& DuetRel::printIndented( std::ostream& o, unsigned int indent ) con
     else
         o << "Tensored relation: ";
 
-
     dval = this->getValue();
-    //value * norm_func = caml_named_value("normalize_callback");
-    //ival = caml_callback(*norm_func,dval);
     value * simplify_func;
     value * print_func;
 
@@ -745,7 +735,6 @@ std::ostream& DuetRel::printIndented( std::ostream& o, unsigned int indent ) con
     } else {
         simplify_func = caml_named_value("tensorSimplify_callback");
         print_func = caml_named_value("tensor_print_robust_callback");
-
     }
 
     if (simplifyOnPrint) {

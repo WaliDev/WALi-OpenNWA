@@ -328,8 +328,6 @@ relation_t mkRelation(CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr s) {
 // FIXME: In the following functions, consider whether or not:
 //    (1) we need a separate case for the final evaluation that occurs outside
 //       of the Newton loop
-//  and
-//    (2) we need a separate case for evalAt0.
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElemT(
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a, 
   const RTG::regExpTRefPtr & child)
