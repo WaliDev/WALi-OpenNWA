@@ -55,12 +55,12 @@ namespace wali
         public:
           static void reset();
         public:
-          /** @see DuetRel::Compose */
-          friend duetrel_t operator*(duetrel_t a, duetrel_t b);
-          /** @see DuetRel::Union */
-          friend duetrel_t operator|(duetrel_t a, duetrel_t b);
-          /** @see DuetRel::Intersect */
-          friend duetrel_t operator&(duetrel_t a, duetrel_t b);
+          ///** @see DuetRel::Compose */
+          //friend duetrel_t operator*(duetrel_t a, duetrel_t b);
+          ///** @see DuetRel::Union */
+          //friend duetrel_t operator|(duetrel_t a, duetrel_t b);
+          ///** @see DuetRel::Intersect */
+          //friend duetrel_t operator&(duetrel_t a, duetrel_t b);
         public:
           virtual ~DuetRel();
         public:
@@ -72,14 +72,14 @@ namespace wali
           static duetrel_t getTensorZero();
           duetrel_t Compose( duetrel_t that ) const;
           duetrel_t Union( duetrel_t that ) const;
-          duetrel_t Intersect( duetrel_t that ) const;
-          duetrel_t Normalize() const;
+          //duetrel_t Intersect( duetrel_t that ) const;
+          //duetrel_t Normalize() const;
           bool Equal(duetrel_t se) const;
           bool IsSat() const;
           duetrel_t Transpose() const;
           duetrel_t Kronecker( duetrel_t that) const;
           duetrel_t Merge(int c, int v) const;
-          duetrel_t TensorMerge(int c, int v) const;
+          //duetrel_t TensorMerge(int c, int v) const;
         public: 
           // ////////////////////////////////
           // SemElem methods

@@ -3789,8 +3789,6 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
 
     wali::Key acc = wali::getKeySpace()->getKey("accept");
 
-    relation_t mainProcedureSummary = NULL;
-
     Trans t;
 
     bool exitTransitionFound = outfaNewton.find(st1(), exit_key, acc, t);
@@ -3806,6 +3804,8 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
     
     ofstream smtout;
     if (doSmtlibOutput) { smtout.open("smtlib_output.smt2"); }
+
+    relation_t mainProcedureSummary = NULL;
 
     // Set exit_transitions to the set of all transitions in outfaNewton
     // of the form (st1,WALI_EPSILON,<st1,e>), where e is an entry node

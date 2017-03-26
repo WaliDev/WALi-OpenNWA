@@ -67,26 +67,26 @@ void DuetRel::reset()
 
 // ////////////////////////////
 // Friends
-namespace wali{
-  namespace domains{
-    namespace duetrel{
-      duetrel_t operator*(duetrel_t a, duetrel_t b)
-      {
-        return a->Compose(b);    // FIXME: Compose badly named: Compose should be Extend
-      }
-
-      duetrel_t operator|(duetrel_t a, duetrel_t b)
-      {
-        return a->Union(b);
-      }
-
-      duetrel_t operator&(duetrel_t a, duetrel_t b)
-      {
-        return a->Intersect(b);
-      }
-    }
-  }
-}
+//namespace wali{
+//  namespace domains{
+//    namespace duetrel{
+//      duetrel_t operator*(duetrel_t a, duetrel_t b)
+//      {
+//        return a->Compose(b);    // FIXME: Compose badly named: Compose should be Extend
+//      }
+//
+//      duetrel_t operator|(duetrel_t a, duetrel_t b)
+//      {
+//        return a->Union(b);
+//      }
+//
+//      duetrel_t operator&(duetrel_t a, duetrel_t b)
+//      {
+//        return a->Intersect(b);
+//      }
+//    }
+//  }
+//}
 
 int DuetRel::wCnt = 0;
 bool DuetRel::simplify = false;
@@ -209,16 +209,20 @@ duetrel_t DuetRel::Union( duetrel_t that ) const
     CAMLreturnT(duetrel_t,d);
 }
 
-duetrel_t DuetRel::Intersect( duetrel_t that ) const
-{
-  CAMLparam0();
-  std::cout << "INTERSECT!" << std::endl;
-  duetrel_t d = MkDuetRel(that->getValue());
-  CAMLreturnT(duetrel_t, d);
-}
+//duetrel_t DuetRel::Intersect( duetrel_t that ) const
+//{
+//  CAMLparam0();
+//  std::cout << "INTERSECT!" << std::endl;
+//  duetrel_t d = MkDuetRel(that->getValue());
+//  CAMLreturnT(duetrel_t, d);
+//}
 
 bool DuetRel::Equal( duetrel_t that) const
 {
+    // Note: This equivalence check is different from Equivalent;
+    //   * Equal is for weights
+    //   * Equivalent is for iteration domain elements
+    
     CAMLparam0();
     CAMLlocal3(ret_d, dval0, dval1);
 
@@ -280,7 +284,6 @@ duetrel_t DuetRel::Kronecker(duetrel_t that) const
     CAMLreturnT(duetrel_t,d);
 }
 
-
 duetrel_t DuetRel::Merge(int v, int c) const
 {
     CAMLparam0();
@@ -300,32 +303,32 @@ duetrel_t DuetRel::Merge(int v, int c) const
     CAMLreturnT(duetrel_t,d);
 }
 
-duetrel_t DuetRel::Normalize() const
-{
-    CAMLparam0();
-    CAMLlocal2(dval, retval);
-    
-    dval = this->getValue();
+//duetrel_t DuetRel::Normalize() const
+//{
+//    CAMLparam0();
+//    CAMLlocal2(dval, retval);
+//    
+//    dval = this->getValue();
+//
+//    value * normalize_func = caml_named_value("normalize_callback");
+//    retval = caml_callback(*normalize_func, dval);
+//
+//    duetrel_t d = MkDuetRel(retval);
+//    CAMLreturnT(duetrel_t, d);
+//}
 
-    value * normalize_func = caml_named_value("normalize_callback");
-    retval = caml_callback(*normalize_func, dval);
-
-    duetrel_t d = MkDuetRel(retval);
-    CAMLreturnT(duetrel_t, d);
-}
-
-duetrel_t DuetRel::TensorMerge(int v, int c) const
-{
-    CAMLparam0();
-    CAMLlocal2(dval, retval);
-
-    dval = this->getValue();
-    value * tensorMerge_func = caml_named_value("tensorMerge_callback");
-    retval = caml_callback(*tensorMerge_func, dval);
-
-    duetrel_t d = MkDuetRel(retval, true);
-    CAMLreturnT(duetrel_t, d);
-}
+//duetrel_t DuetRel::TensorMerge(int v, int c) const
+//{
+//    CAMLparam0();
+//    CAMLlocal2(dval, retval);
+//
+//    dval = this->getValue();
+//    value * tensorMerge_func = caml_named_value("tensorMerge_callback");
+//    retval = caml_callback(*tensorMerge_func, dval);
+//
+//    duetrel_t d = MkDuetRel(retval, true);
+//    CAMLreturnT(duetrel_t, d);
+//}
 
 // ////////////////////////////
 // SemElem Interface functions
@@ -353,7 +356,6 @@ wali::sem_elem_t DuetRel::star()
     }
     CAMLreturnT(duetrel_t,d);
 }
-
 
 // duetrelpair_t DuetRel::alphaHatStar()
 // {
@@ -406,8 +408,6 @@ duetrelpair_t DuetRel::alphaHatStar(duetrel_t previousAbstractValue)
 {
     CAMLparam0();
     CAMLlocal4(dval, abstract, star_formula, widened); 
-    // FIXME I'm not sure whether oldAbstractValue should appear in the previous
-    //   line or not, since it's a parameter, not a local variable. --JTB
     
     dval = this->getValue();
     duetrel_t d1, d2;
@@ -480,6 +480,10 @@ duetrelpair_t DuetRel::alphaHatStar(duetrel_t previousAbstractValue)
 
 bool DuetRel::Equivalent(duetrel_t that) const
 {
+    // Note: This equivalence check is different from Equal;
+    //   * Equal is for weights
+    //   * Equivalent is for iteration domain elements
+    
     // We assume that a quantifier elimination procedure
     //   has been called on both arguments of the equivalence check.
 
