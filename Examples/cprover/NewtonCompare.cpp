@@ -3901,8 +3901,8 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
             relation_t intraprocWeight = mkRelationFromSemElem((*tsit)->weight());  // Weight from containing procedure's entry to assertion pt
             relation_t contextWeight = mkRelationFromSemElem(outfaNewton.getState((*tsit)->to())->weight());  // Weight of calling context
 
-            relation_t composedWeight = contextWeight->Compose(intraprocWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
-            relation_t finalWeight = composedWeight->Compose(negatedAssertionWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
+            relation_t composedWeight = contextWeight->Compose(intraprocWeight);    // FIXME: Compose badly named: Compose should be Extend
+            relation_t finalWeight = composedWeight->Compose(negatedAssertionWeight);    // FIXME: Compose badly named: Compose should be Extend
 
             if (newtonVerbosity >= NV_EVERYTHING) {
                 std::cout << std::endl << "contextWeight = " << std::endl;
@@ -3955,7 +3955,7 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
         {
             relation_t intraprocWeight = mkRelationFromSemElem((*tsit)->weight());  // Weight from containing procedure's entry to print-hull pt
             relation_t contextWeight = mkRelationFromSemElem(outfaNewton.getState((*tsit)->to())->weight());  // Weight of calling context
-            relation_t composedWeight = contextWeight->Compose(intraprocWeight).get_ptr();    // FIXME: Compose badly named: Compose should be Extend
+            relation_t composedWeight = contextWeight->Compose(intraprocWeight);    // FIXME: Compose badly named: Compose should be Extend
             
             //std::cout << "Variable Bounds at Line: " << line << std::endl;
             std::cout << "Variable bounds";
