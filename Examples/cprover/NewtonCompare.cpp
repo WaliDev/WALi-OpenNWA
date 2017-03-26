@@ -3794,6 +3794,10 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
     Trans t;
 
     bool exitTransitionFound = outfaNewton.find(st1(), exit_key, acc, t);
+    
+    //std::cout << std::endl << "outfaNewton" << std::endl;
+    //outfaNewton.print(std::cout);
+    //std::cout << std::endl << std::endl;
 
     if (newtonVerbosity >= NV_SUMMARIES) {
         std::cout << "================================================" << std::endl;
@@ -3868,10 +3872,6 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
 
     std::cout << "================================================" << std::endl;
     std::cout << "Assertion Checking at Error Points" << std::endl << std::endl;
-    
-    //std::cout << std::endl << "outfaNewton" << std::endl;
-    //outfaNewton.print(std::cout);
-    //std::cout << std::endl << std::endl;
 
     // Check the assertion at each error point
     if (testMode) {
