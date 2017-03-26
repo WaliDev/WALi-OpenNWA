@@ -54,17 +54,18 @@ namespace wali
       {
         public:
           static void reset();
-        public:
+
           ///** @see DuetRel::Compose */
           //friend duetrel_t operator*(duetrel_t a, duetrel_t b);
           ///** @see DuetRel::Union */
           //friend duetrel_t operator|(duetrel_t a, duetrel_t b);
           ///** @see DuetRel::Intersect */
           //friend duetrel_t operator&(duetrel_t a, duetrel_t b);
-        public:
-          virtual ~DuetRel();
-        public:
+          
           static duetrel_t MkDuetRel(value w, bool is_tensored=false);
+
+          // ////////////////////////////////
+          // DuetRel methods
           static duetrel_t getBaseOne();
           static duetrel_t getBaseZero();
           static duetrel_t getBaseTop();
@@ -80,7 +81,18 @@ namespace wali
           duetrel_t Kronecker( duetrel_t that) const;
           duetrel_t Merge(int c, int v) const;
           //duetrel_t TensorMerge(int c, int v) const;
-        public: 
+          
+          duetrelpair_t alphaHatStar(duetrel_t previousAbstractValue = 0);
+          bool Equivalent(duetrel_t that) const;
+
+          // ////////////////////////////////
+          // Printing functions
+          std::ostream& print( std::ostream& o ) const;
+          std::ostream& printIndented( std::ostream& o, unsigned int indent ) const;
+          std::ostream& printHull( std::ostream& o, unsigned int indent, int var ) const;
+          std::ostream& printAbstract( std::ostream& o ) const;
+          std::ostream& printSmtlib( std::ostream& o ) const;
+
           // ////////////////////////////////
           // SemElem methods
           sem_elem_t one() const;
@@ -100,18 +112,10 @@ namespace wali
 
           sem_elem_t star();
 
-          duetrelpair_t alphaHatStar(duetrel_t previousAbstractValue = 0);
-          bool Equivalent(duetrel_t that) const;
-
           /** @return [this]->Equal( cast<DuetRel*>(se) ) */
           bool equal(SemElem* se) const;
 
-          std::ostream& print( std::ostream& o ) const;
-          std::ostream& printIndented( std::ostream& o, unsigned int indent ) const;
-          std::ostream& printHull( std::ostream& o, unsigned int indent, int var ) const;
-          std::ostream& printAbstract( std::ostream& o ) const;
-          std::ostream& printSmtlib( std::ostream& o ) const;
-
+        public:
           // ////////////////////////////////
           // SemElemTensor methods
 
@@ -145,17 +149,23 @@ namespace wali
             isTensored = tens;
           }
 
-          // ////////////////////////////////
-          // Printing functions
           //static void printHandler(FILE *o, int var);
+
           int relId;
+
+        public: 
           static bool simplify;
           static bool simplifyOnPrint;
           static bool printOnAlphaHatStar;
+
         protected:
           bool isTensored;
           static int wCnt;
           static value caml_weights[MAX_WEIGHT_COUNT];
+
+        public:
+          virtual ~DuetRel();
+
         private:
           DuetRel(const DuetRel& that);
           DuetRel(int d, bool is_tensored=false);
