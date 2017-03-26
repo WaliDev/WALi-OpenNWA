@@ -45,15 +45,15 @@ namespace wali
           return dr;
       }
 
-      typedef std::pair< value, bool> StarCacheKey;
-      struct StarCacheHash
-      {
-          size_t operator() (StarCacheKey k) const
-          {
-              return k.first << 1 & (int) k.second;
-          }
-      };
-      std::tr1::unordered_map< StarCacheKey, sem_elem_t, StarCacheHash> star_cache;
+      //typedef std::pair< value, bool> StarCacheKey;
+      //struct StarCacheHash
+      //{
+      //    size_t operator() (StarCacheKey k) const
+      //    {
+      //        return k.first << 1 & (int) k.second;
+      //    }
+      //};
+      //std::tr1::unordered_map< StarCacheKey, sem_elem_t, StarCacheHash> star_cache;
 
     }
   }
