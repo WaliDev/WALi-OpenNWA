@@ -321,7 +321,7 @@ relation_t mkRelation(CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr s) {
 }
 
 // ----------------------------------------------------------------------------
-// Implementations of LIBTSL functions:
+// Implementations of LIBTSLRE functions:
 
 // PART I: ORIGINALLY FROM conc_externs.cpp:
 
