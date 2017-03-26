@@ -85,6 +85,21 @@ namespace wali
           duetrelpair_t alphaHatStar(duetrel_t previousAbstractValue = 0);
           bool Equivalent(duetrel_t that) const;
 
+          virtual size_t hash() const {
+            return static_cast<size_t>(getValue());
+            //return 0;
+          }
+
+          bool isWTensored()
+          {
+            return isTensored;
+          }
+
+          void setTensored(bool tens)
+          {
+            isTensored = tens;
+          }
+
           // ////////////////////////////////
           // Printing functions
           std::ostream& print( std::ostream& o ) const;
@@ -115,7 +130,6 @@ namespace wali
           /** @return [this]->Equal( cast<DuetRel*>(se) ) */
           bool equal(SemElem* se) const;
 
-        public:
           // ////////////////////////////////
           // SemElemTensor methods
 
@@ -133,21 +147,6 @@ namespace wali
           value getValue() const;
 
           virtual bool containerLessThan(SemElem const * other) const;
-
-          virtual size_t hash() const {
-            return static_cast<size_t>(getValue());
-            //return 0;
-          }
-
-          bool isWTensored()
-          {
-            return isTensored;
-          }
-
-          void setTensored(bool tens)
-          {
-            isTensored = tens;
-          }
 
           //static void printHandler(FILE *o, int var);
 
