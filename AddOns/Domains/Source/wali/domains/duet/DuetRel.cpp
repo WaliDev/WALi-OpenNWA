@@ -29,10 +29,10 @@ namespace wali
     namespace duetrel
     {
 
-      duetrelpair_t DuetRelPair::MkDuetRelPair(duetrel_t v1, duetrel_t v2) {
-          duetrelpair_t d = new DuetRelPair(v1, v2);
-          return d;
-      }
+      //duetrelpair_t DuetRelPair::MkDuetRelPair(duetrel_t v1, duetrel_t v2) {
+      //    duetrelpair_t d = new DuetRelPair(v1, v2);
+      //    return d;
+      //}
 
       static duetrel_t convert(wali::SemElem* se)
       {
@@ -99,7 +99,8 @@ value DuetRel::caml_weights[MAX_WEIGHT_COUNT];
 // ////////////////////////////
 // Members and Con/Destructors
 DuetRel::DuetRel(const DuetRel& that):
-  wali::SemElemTensor(that),
+  //wali::SemElemTensor(that),
+  NPARel(that),
   relId(that.relId),
   isTensored(that.isTensored)
 {
@@ -284,7 +285,7 @@ duetrel_t DuetRel::Kronecker(duetrel_t that) const
     CAMLreturnT(duetrel_t,d);
 }
 
-duetrel_t DuetRel::Merge(int v, int c) const
+nparel_t DuetRel::Merge(int v, int c) const
 {
     CAMLparam0();
     CAMLlocal2(dval, retval);
@@ -404,14 +405,14 @@ wali::sem_elem_t DuetRel::star()
 //
 // If you don't want widening, call this with previousAbstractValue = 0, 
 //   which is the default parameter value.
-duetrelpair_t DuetRel::alphaHatStar(duetrel_t previousAbstractValue)
+nparelpair_t DuetRel::alphaHatStar(nparel_t previousAbstractValue)
 {
     CAMLparam0();
     CAMLlocal4(dval, abstract, star_formula, widened); 
     
     dval = this->getValue();
     duetrel_t d1, d2;
-    duetrelpair_t d;
+    nparelpair_t d;
 
     value * print_transition_func;
     value * print_abstract_func;
@@ -451,7 +452,8 @@ duetrelpair_t DuetRel::alphaHatStar(duetrel_t previousAbstractValue)
     }
 
     if (previousAbstractValue != 0) {
-        widened = caml_callback2(*widen_func, previousAbstractValue->getValue(), abstract);
+        duetrel_t previousDuetRel( convert(previousAbstractValue.get_ptr()) );
+        widened = caml_callback2(*widen_func, previousDuetRel->getValue(), abstract);
         star_formula = caml_callback(*abstract_star_func, widened);
     } else {
         widened = abstract; // FIXME is this right?
@@ -463,7 +465,7 @@ duetrelpair_t DuetRel::alphaHatStar(duetrel_t previousAbstractValue)
     d1 = MkDuetRel(widened, isTensored); 
     //d1 = MkDuetRel(abstract, isTensored);
     d2 = MkDuetRel(star_formula, isTensored);
-    d = DuetRelPair::MkDuetRelPair(d1, d2);
+    d = NPARelPair::MkNPARelPair(d1, d2);
 
     if (printOnAlphaHatStar) {
         if (previousAbstractValue != 0) {
@@ -475,10 +477,10 @@ duetrelpair_t DuetRel::alphaHatStar(duetrel_t previousAbstractValue)
         std::cout << "}" << std::endl;
     }
 
-    CAMLreturnT(duetrelpair_t,d);
+    CAMLreturnT(nparelpair_t,d);
 }
 
-bool DuetRel::Equivalent(duetrel_t that) const
+bool DuetRel::Equivalent(nparel_t that) const
 {
     // Note: This equivalence check is different from Equal;
     //   * Equal is for weights
@@ -492,8 +494,9 @@ bool DuetRel::Equivalent(duetrel_t that) const
     CAMLparam0();
     CAMLlocal3(retVal, dval0, dval1);
 
+    duetrel_t d_that( convert( that.get_ptr() ) );
     dval0 = this->getValue();
-    dval1 = that->getValue();
+    dval1 = d_that->getValue();
     
     if (isTensored) {
         value * eq_func = caml_named_value("tensor_abstract_equiv_callback");

@@ -22,8 +22,12 @@ extern "C" {
 #include "wali/SemElemTensor.hpp"
 #include "wali/Key.hpp"
 
+#include "../nparel/NPARel.hpp"
+
 // FIXME Allow weights to be collected
 #define MAX_WEIGHT_COUNT 10000000
+
+using namespace wali::domains::nparel;
 
 namespace wali 
 {
@@ -34,23 +38,23 @@ namespace wali
       class DuetRel;
       typedef wali::ref_ptr<DuetRel> duetrel_t;
 
-      class DuetRelPair;
-      typedef wali::ref_ptr<DuetRelPair> duetrelpair_t;
-      class DuetRelPair : public Countable {
-        public:
-          duetrel_t first;
-          duetrel_t second;
+      //class DuetRelPair;
+      //typedef wali::ref_ptr<DuetRelPair> duetrelpair_t;
+      //class DuetRelPair : public Countable {
+      //  public:
+      //    duetrel_t first;
+      //    duetrel_t second;
 
-          DuetRelPair(duetrel_t v1, duetrel_t v2) : Countable(), 
-                                                    first(v1), 
-                                                    second(v2) {}
+      //    DuetRelPair(duetrel_t v1, duetrel_t v2) : Countable(), 
+      //                                              first(v1), 
+      //                                              second(v2) {}
 
-          ~DuetRelPair() {}
+      //    ~DuetRelPair() {}
 
-          static duetrelpair_t MkDuetRelPair(duetrel_t v1, duetrel_t v2);
-      };
+      //    static duetrelpair_t MkDuetRelPair(duetrel_t v1, duetrel_t v2);
+      //};
       
-      class DuetRel : public wali::SemElemTensor
+      class DuetRel : public NPARel
       {
         public:
           static void reset();
@@ -79,11 +83,13 @@ namespace wali
           bool IsSat() const;
           duetrel_t Transpose() const;
           duetrel_t Kronecker( duetrel_t that) const;
-          duetrel_t Merge(int c, int v) const;
+          nparel_t Merge(int c, int v) const;
           //duetrel_t TensorMerge(int c, int v) const;
           
-          duetrelpair_t alphaHatStar(duetrel_t previousAbstractValue = 0);
-          bool Equivalent(duetrel_t that) const;
+          //duetrelpair_t alphaHatStar(duetrel_t previousAbstractValue = 0);
+          nparelpair_t alphaHatStar(nparel_t previousAbstractValue = 0);
+          //bool Equivalent(duetrel_t that) const;
+          bool Equivalent(nparel_t that) const;
 
           virtual size_t hash() const {
             return static_cast<size_t>(getValue());
