@@ -107,7 +107,7 @@ std::vector<caml_error_rule> errorRuleHolder;
 std::vector<caml_print_hull_rule> printHullRuleHolder;
 wali::Key entry_key;
 wali::Key exit_key;
-relation_t compareWeight; // No longer used
+//relation_t compareWeight; // No longer used
 
 void push_rule(caml_rule rule) {
     ruleHolder.push_back(rule);
@@ -124,8 +124,8 @@ void push_error_rule(caml_error_rule rule) {
 void push_print_hull_rule(caml_print_hull_rule rule) {
     printHullRuleHolder.push_back(rule);
 }
-void set_compare_weight(relation_t compare) {
-    compareWeight = compare;
+void set_compare_weight(relation_t compare) { // no longer used
+    //compareWeight = compare;
 }
 void set_vertices_wfa(wali::Key entry, wali::Key exit) {
     entry_key = entry;

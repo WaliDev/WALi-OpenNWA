@@ -28,8 +28,6 @@ using namespace wali::wpds::fwpds;
 using namespace wali::wpds::ewpds;
 using namespace wali::domains::reach;
 
-//namespace goals {
-
 typedef std::pair<std::pair<wali::Key,wali::Key>, relation_t >  caml_rule;
 typedef std::pair<std::pair<wali::Key,std::pair<wali::Key,wali::Key> >, relation_t > caml_call_rule;
 typedef std::pair<wali::Key, relation_t > caml_epsilon_rule;
@@ -41,8 +39,7 @@ extern void push_error_rule(caml_error_rule);
 extern void push_epsilon_rule(caml_epsilon_rule);
 extern void push_print_hull_rule(caml_print_hull_rule);
 extern void push_rule(caml_rule);
-extern void set_compare_weight(relation_t);
+extern void set_compare_weight(relation_t); // no longer used
 extern void set_vertices_wfa(wali::Key, wali::Key);
-//}
 
 #endif
