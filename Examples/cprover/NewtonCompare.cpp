@@ -311,8 +311,16 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr mkSemElemWrapper(relation_t d) {
     return s;
 }
 
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr mkSemElemWrapperFromSemElem(sem_elem_t d) {
+    wali::sem_elem_tensor_t s(dynamic_cast<wali::SemElemTensor *>(d.get_ptr()));
+    if (s == 0) {
+        assert(0 && "Failed to cast a sem_elem to a sem_elem_tensor.");
+    }
+    return s;
+}
+
 relation_t mkRelation(CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr s) {
-    Relation * r = dynamic_cast<Relation*>(s.v.get_ptr());
+    relation_t r(dynamic_cast<Relation*>(s.v.get_ptr()));
     if (r == 0) {
         assert(0 && "Failed to cast a sem_elem_wrapper to a Relation.");
     }
@@ -321,7 +329,7 @@ relation_t mkRelation(CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr s) {
 }
 
 relation_t mkRelationFromSemElem(wali::sem_elem_t s) {
-    Relation * r = dynamic_cast<Relation*>(s.get_ptr());
+    relation_t r (dynamic_cast<Relation*>(s.get_ptr()));
     if (r == 0) {
         assert(0 && "Failed to cast a sem_elem_wrapper to a Relation.");
     }
@@ -443,11 +451,14 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalTensorTranspose(
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
 {
-    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-    relation_t ar = mkRelation(a);
-    relation_t br = mkRelation(b);
-    relation_t updatedAv = ar->Transpose();
-    ans.v = updatedAv->Kronecker(br);
+    //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+    //relation_t ar = mkRelation(a);
+    //relation_t br = mkRelation(b);
+    //relation_t updatedAv = ar->Transpose();
+    //ans.v = updatedAv->Kronecker(br);
+    //return ans;
+    sem_elem_tensor_t updatedAv = a.v->transpose();
+    sem_elem_tensor_t ans = updatedAv->tensor(b.v.get_ptr());
     return ans;
 }
 
@@ -455,45 +466,48 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalDotSemElemT(
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
 {
-    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-    relation_t ar = mkRelation(a);
-    relation_t br = mkRelation(b);
-    ans.v = ar->Compose(br);
-    return ans;
+    //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+    //relation_t ar = mkRelation(a);
+    //relation_t br = mkRelation(b);
+    //ans.v = ar->Compose(br);
+    //return ans;
+    return mkSemElemWrapperFromSemElem(a.v->extend(b.v.get_ptr()));
 }
 
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalDotSemElem(
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
 {
-    relation_t ar = mkRelation(a);
-    relation_t br = mkRelation(b);
-    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-    ans.v = ar->Compose(br);
-    return ans;
+    //relation_t ar = mkRelation(a);
+    //relation_t br = mkRelation(b);
+    //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+    //ans.v = ar->Compose(br);
+    //return ans;
+    return mkSemElemWrapperFromSemElem(a.v->extend(b.v.get_ptr()));
 }
 
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalPlusSemElemT(
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
 {
-    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-    relation_t ar = mkRelation(a);
-    relation_t br = mkRelation(b);
-
-    ans.v = ar->Union(br);
-    return ans;
+    //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+    //relation_t ar = mkRelation(a);
+    //relation_t br = mkRelation(b);
+    //ans.v = ar->Union(br);
+    //return ans;
+    return mkSemElemWrapperFromSemElem(a.v->combine(b.v.get_ptr()));
 }
 
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalPlusSemElem(
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
 {
-    relation_t ar = mkRelation(a);
-    relation_t br = mkRelation(b);
-    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-    ans.v = ar->Union(br);
-    return ans;
+    //relation_t ar = mkRelation(a);
+    //relation_t br = mkRelation(b);
+    //CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+    //ans.v = ar->Union(br);
+    //return ans;
+    return mkSemElemWrapperFromSemElem(a.v->combine(b.v.get_ptr()));
 }
 
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::getOneWt()
@@ -518,8 +532,9 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::getZeroTWt()
 
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::detensorTranspose(const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a)
 {
-    relation_t ar = mkRelation(a);
-    return ar->detensorTranspose();
+    //relation_t ar = mkRelation(a);
+    //return ar->detensorTranspose();
+    return a.v->detensorTranspose();
 }
 
 // PART II: ORIGINALLY FROM conc_extern_phyla.cpp:
@@ -535,11 +550,11 @@ CONC_EXTERN_PHYLA::sem_elem_wrapper::random()
 bool 
 CONC_EXTERN_PHYLA::sem_elem_wrapper::operator==(const sem_elem_wrapper & a) const
 {
-    relation_t ar = mkRelation(a);
-    relation_t vr = mkRelation(v);
-    bool retVal = vr->Equal(ar);
-
-    return retVal;
+    //relation_t ar = mkRelation(a);
+    //relation_t vr = mkRelation(v);
+    //bool retVal = vr->Equal(ar);
+    //return retVal;
+    return v->equal(a.v);
 }
 
 bool
