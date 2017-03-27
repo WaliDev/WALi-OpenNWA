@@ -408,27 +408,15 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalKleeneSemElem(
     }
 }
 
-CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::evalVarSemElem(const CBTI_INT32 & v)
-{
-    return CIR::getAssignment(v, globalAssignment);
-}
-
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::evalVarSemElemT(const CBTI_INT32 & v)
 {
     assert(false && "Attempted to evaluate a tensored variable.");
     //return CIR::getAssignment(v, globalAssignment);
 }
 
-CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalPlusSemElemT(
-  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
-  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::evalVarSemElem(const CBTI_INT32 & v)
 {
-    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-    relation_t ar = mkRelation(a);
-    relation_t br = mkRelation(b);
-
-    ans.v = ar->Union(br);
-    return ans;
+    return CIR::getAssignment(v, globalAssignment);
 }
 
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr CONC_EXTERNS::evalProjectSemElemT(
@@ -474,17 +462,6 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalDotSemElemT(
     return ans;
 }
 
-CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalPlusSemElem(
-  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
-  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
-{
-    relation_t ar = mkRelation(a);
-    relation_t br = mkRelation(b);
-    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
-    ans.v = ar->Union(br);
-    return ans;
-}
-
 CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalDotSemElem(
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
   const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
@@ -493,6 +470,29 @@ CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalDotSemElem(
     relation_t br = mkRelation(b);
     CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
     ans.v = ar->Compose(br);
+    return ans;
+}
+
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalPlusSemElemT(
+  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
+  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
+{
+    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+    relation_t ar = mkRelation(a);
+    relation_t br = mkRelation(b);
+
+    ans.v = ar->Union(br);
+    return ans;
+}
+
+CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr  CONC_EXTERNS::evalPlusSemElem(
+  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & a,
+  const CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr & b)
+{
+    relation_t ar = mkRelation(a);
+    relation_t br = mkRelation(b);
+    CONC_EXTERN_PHYLA::sem_elem_wrapperRefPtr ans;
+    ans.v = ar->Union(br);
     return ans;
 }
 
@@ -3901,8 +3901,10 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
             relation_t intraprocWeight = mkRelationFromSemElem((*tsit)->weight());  // Weight from containing procedure's entry to assertion pt
             relation_t contextWeight = mkRelationFromSemElem(outfaNewton.getState((*tsit)->to())->weight());  // Weight of calling context
 
-            relation_t composedWeight = contextWeight->Compose(intraprocWeight);    // FIXME: Compose badly named: Compose should be Extend
-            relation_t finalWeight = composedWeight->Compose(negatedAssertionWeight);    // FIXME: Compose badly named: Compose should be Extend
+            //relation_t composedWeight = contextWeight->Compose(intraprocWeight);    // FIXME: Compose badly named: Compose should be Extend
+            relation_t composedWeight = mkRelationFromSemElem(contextWeight->extend(intraprocWeight.get_ptr()));    
+            //relation_t finalWeight = composedWeight->Compose(negatedAssertionWeight);    // FIXME: Compose badly named: Compose should be Extend
+            relation_t finalWeight = mkRelationFromSemElem(composedWeight->extend(negatedAssertionWeight.get_ptr()));    
 
             if (newtonVerbosity >= NV_EVERYTHING) {
                 std::cout << std::endl << "contextWeight = " << std::endl;
@@ -3955,7 +3957,9 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
         {
             relation_t intraprocWeight = mkRelationFromSemElem((*tsit)->weight());  // Weight from containing procedure's entry to print-hull pt
             relation_t contextWeight = mkRelationFromSemElem(outfaNewton.getState((*tsit)->to())->weight());  // Weight of calling context
-            relation_t composedWeight = contextWeight->Compose(intraprocWeight);    // FIXME: Compose badly named: Compose should be Extend
+
+            //relation_t composedWeight = contextWeight->Compose(intraprocWeight);    // FIXME: Compose badly named: Compose should be Extend
+            relation_t composedWeight = mkRelationFromSemElem(contextWeight->extend(intraprocWeight.get_ptr()));    
             
             //std::cout << "Variable Bounds at Line: " << line << std::endl;
             std::cout << "Variable bounds";
