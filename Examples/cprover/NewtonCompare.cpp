@@ -4002,20 +4002,15 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
     }
     if (newtonVerbosity >= NV_PDS) { pds->print(std::cout); }
     
-    //fstream pds_stream("pds.dot", fstream::out); RuleDotty rd(pds_stream);
-    //pds_stream << "digraph{" << endl; pds->for_each(rd); pds_stream << "}" << endl;
+    //fstream pds_stream("pds.dot",fstream::out);RuleDotty rd(pds_stream);pds_stream<<"digraph{"<<endl;pds->for_each(rd);pds_stream<<"}"<<endl;
 
-    doWideningThisRound = false;
-    inNewtonLoop = false;
-
+    doWideningThisRound = false; inNewtonLoop = false;
     WFA outfaNewton;
     if (aboveBelowMode == NEWTON_FROM_ABOVE || gaussJordanMode == false) {
         doNewtonSteps_NPATP(aboveBelowMode, outfaNewton, entry_key, pds, false);
     } else if (aboveBelowMode == NEWTON_FROM_BELOW) {
         doNewtonSteps_GJ(aboveBelowMode, outfaNewton, entry_key, pds, false);
-    } else {
-        assert(false && "Unrecognized running mode.");
-    }
+    } else { assert(false && "Unrecognized running mode."); }
 
     //std::cout << std::endl << "outfaNewton" << std::endl; outfaNewton.print(std::cout); std::cout << std::endl << std::endl;
     
