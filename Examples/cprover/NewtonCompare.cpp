@@ -3991,7 +3991,6 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
                         //   the various ruleHolder data structures used in the code below.
 
     FWPDS * pds = new FWPDS();
-
     for (std::vector<caml_rule>::iterator it = ruleHolder.begin(); it != ruleHolder.end(); it++) {
         pds->add_rule(st1(), it->first.first, st1(), it->first.second, it->second);
     }
@@ -4001,12 +4000,9 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
     for (std::vector<caml_epsilon_rule>::iterator ite = epsilonRuleHolder.begin(); ite != epsilonRuleHolder.end(); ite++) {
         pds->add_rule(st1(), ite->first, st1(), ite->second);
     }
-    
     if (newtonVerbosity >= NV_PDS) { pds->print(std::cout); }
     
-    // Copied from elsewhere, this is supposed to produce a dotfile of the PDS
-    //fstream pds_stream("pds.dot", fstream::out);
-    //RuleDotty rd(pds_stream);
+    //fstream pds_stream("pds.dot", fstream::out); RuleDotty rd(pds_stream);
     //pds_stream << "digraph{" << endl; pds->for_each(rd); pds_stream << "}" << endl;
 
     doWideningThisRound = false;
