@@ -289,6 +289,8 @@ namespace wali {
   }
 }
 
+int  gaussJordanMode; // 0 means NPA-TP (use "--npa-tp"); 1 means NPA-TP-GJ.
+int  aboveBelowMode;
 bool doWideningThisRound;
 bool inNewtonLoop;
 bool doSmtlibOutput;
@@ -2348,13 +2350,13 @@ void fwpdsFromDifferential(FWPDS * pds, tslDiffMap & differentialMap, std::map<i
 // Default values:
 #define MAX_ROUNDS_FROM_BELOW 50
 #define MAX_ROUNDS_FROM_ABOVE 4
-void newtonLoop_NPATP(RTG::assignmentRefPtr & newVal, tslDiffMap & differentialMap, std::map<int, std::set<int> > & varDependencies, tslRegExpTMap & tensoredRegExpMap, bool linear, int aboveBelowMode)
+void newtonLoop_NPATP(RTG::assignmentRefPtr & newVal, tslRegExpTMap & tensoredRegExpMap)
 {
   int rnd = 0;
-      bool newton = true;
+  bool newton = true;
   // A map of dependencies
-      //RTG::assignmentRefPtr oldVal;
-      tslDiffMap::iterator dIt;
+  //RTG::assignmentRefPtr oldVal;
+  tslDiffMap::iterator dIt;
   int pV = 0;
   tslRegExpTMap::iterator assignIt;
   
@@ -2557,7 +2559,7 @@ NEWROUND:
   inNewtonLoop = false;
 }
 
-void newtonLoop_GJ(RTG::assignmentRefPtr & newVal, tslRegExpMap & regExpsAfterIsolation, int aboveBelowMode)
+void newtonLoop_GJ(RTG::assignmentRefPtr & newVal, tslRegExpMap & regExpsAfterIsolation)
 {
   int rnd = 0;
   tslRegExpMap::iterator assignIt;
@@ -2856,7 +2858,7 @@ NEWROUND:
  *  Author:  Emma Turetsky
  */
 
-double doNewtonSteps_NPATP(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWPDS * originalPds = NULL, bool canPrune = true)
+double doNewtonSteps_NPATP(WFA& outfa, wali::Key entry_key, FWPDS * originalPds = NULL, bool canPrune = true)
 { 
   if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "#################################################" << endl;
   //cout << "[Newton] Goal VIII: end-to-end newton_merge_notensor_fwpds run" << endl;
@@ -3130,7 +3132,7 @@ double doNewtonSteps_NPATP(int aboveBelowMode, WFA& outfa, wali::Key entry_key, 
           if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "Step 6: =========================================================" << endl;
           /* Step 6 - Perform Newton rounds until a fixed-point is reached */
           if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "[Newton] Running Newton" << endl;
-          newtonLoop_NPATP(aList, differentialMap, varDependencies, tensoredRegExpMap,linear,aboveBelowMode);
+          newtonLoop_NPATP(aList, tensoredRegExpMap);
 
           //Using the final weights from Newton, evaluate the tslRegExps to get the final weights
           //evalRegExps(aList);
@@ -3237,7 +3239,7 @@ double doNewtonSteps_NPATP(int aboveBelowMode, WFA& outfa, wali::Key entry_key, 
   }
 }
 
-double doNewtonSteps_GJ(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWPDS * originalPds = NULL, bool canPrune = true)
+double doNewtonSteps_GJ(WFA& outfa, wali::Key entry_key, FWPDS * originalPds = NULL, bool canPrune = true)
 { 
   if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "#################################################" << endl;
 
@@ -3630,7 +3632,7 @@ double doNewtonSteps_GJ(int aboveBelowMode, WFA& outfa, wali::Key entry_key, FWP
       if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "Step 5: =========================================================" << endl;
       /* Step 6 - Perform Newton rounds until a fixed-point is reached */
       if (newtonVerbosity >= NV_NEWTON_STEPS) cout << "[Newton] Running Newton" << endl;
-      newtonLoop_GJ(aList, regExpsAfterIsolation, aboveBelowMode);
+      newtonLoop_GJ(aList, regExpsAfterIsolation);
 
       //assert(false && "The rest of this function is not yet implemented!"); 
 
@@ -3984,7 +3986,7 @@ void printVariableBounds(WFA& outfaNewton, relation_t mainProcedureSummary) {
     std::cout << "================================================" << std::endl;
 }
 
-int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
+int runBasicNewton(char **args)
 {
     caml_startup(args); // This line calls Duet to analyze the program specified on the command
                         //   line and store the analyzed program, represented as PDS rules, into
@@ -4006,10 +4008,10 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
 
     doWideningThisRound = false; inNewtonLoop = false;
     WFA outfaNewton;
-    if (aboveBelowMode == NEWTON_FROM_ABOVE || gaussJordanMode == false) {
-        doNewtonSteps_NPATP(aboveBelowMode, outfaNewton, entry_key, pds, false);
+    if (aboveBelowMode == NEWTON_FROM_ABOVE || gaussJordanMode == 0) {
+        doNewtonSteps_NPATP(outfaNewton, entry_key, pds, false);
     } else if (aboveBelowMode == NEWTON_FROM_BELOW) {
-        doNewtonSteps_GJ(aboveBelowMode, outfaNewton, entry_key, pds, false);
+        doNewtonSteps_GJ(outfaNewton, entry_key, pds, false);
     } else { assert(false && "Unrecognized running mode."); }
 
     //std::cout << std::endl << "outfaNewton" << std::endl; outfaNewton.print(std::cout); std::cout << std::endl << std::endl;
@@ -4049,8 +4051,8 @@ void printHelp() {
 
 int main(int argc, char **argv)
 {
-    int aboveBelowMode = 0;
-    int gaussJordanMode = 1; // 0 means NPA-TP (use "--npa-tp"); 1 means NPA-TP-GJ.
+    gaussJordanMode = 1; // 0 means NPA-TP (use "--npa-tp"); 1 means NPA-TP-GJ.
+    aboveBelowMode = 0;
     doSmtlibOutput = false;
     globalBoundingVarName = NULL; 
     std::vector <char *> unrecognizedArgs;
@@ -4187,13 +4189,13 @@ int main(int argc, char **argv)
                 ocamlArgs[3 + unrecognizedArgs.size() + i] = argv[optind + i + 1];
             }
 
-            if (aboveBelowMode == NEWTON_FROM_BELOW && gaussJordanMode == false) {
+            if (aboveBelowMode == NEWTON_FROM_BELOW && gaussJordanMode == 0) {
                 std::cout << "**************************************************" << std::endl
                           << "Warning: Running NEWTON_FROM_BELOW in NPA-TP mode." << std::endl
                           << "  This mode has not been extensively tested." << std::endl
                           << "**************************************************" << std::endl;
             }
-            runBasicNewton(ocamlArgs, aboveBelowMode, gaussJordanMode);
+            runBasicNewton(ocamlArgs);
         }
         else if (aboveBelowMode == 2) {
             std::cout << "Newton from below, with equivalence checks extracted from Kleene stars" << std::endl;
