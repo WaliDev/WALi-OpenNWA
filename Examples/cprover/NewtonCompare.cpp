@@ -3750,67 +3750,9 @@ void printProcedureNameFromNode(int nodeNumber, ostream& out) {
     CAMLreturn0;
 }
 
-int getGlobalBoundingVarFromName(char * variableName) {
-    CAMLparam0();
-    CAMLlocal2(sval, idval);
-    sval = caml_copy_string(variableName);
-    value * proc_func = caml_named_value("get_global_var");
-    idval = caml_callback(*proc_func, sval);
-    CAMLreturnT(int, Int_val(idval));
-}
-
-int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
-{
-    caml_startup(args);
-    FWPDS * pds = new FWPDS();
-
-    for (std::vector<caml_rule>::iterator it = ruleHolder.begin(); it != ruleHolder.end(); it++)
-    {
-        pds->add_rule(st1(), it->first.first, st1(), it->first.second, it->second);
-    }
-
-    for (std::vector<caml_call_rule>::iterator itc = callRuleHolder.begin(); itc != callRuleHolder.end(); itc++)
-    {
-        pds->add_rule(st1(), itc->first.first, st1(), itc->first.second.first, itc->first.second.second, itc->second);
-    }
-
-    for (std::vector<caml_epsilon_rule>::iterator ite = epsilonRuleHolder.begin(); ite != epsilonRuleHolder.end(); ite++)
-    {
-        pds->add_rule(st1(), ite->first, st1(), ite->second);
-    }
-    
-    if (newtonVerbosity >= NV_PDS) {
-        pds->print(std::cout);
-    }
-    
-    // Copied from elsewhere, this is supposed to produce a dotfile of the PDS
-    //fstream pds_stream("pds.dot", fstream::out);
-    //RuleDotty rd(pds_stream);
-    //pds_stream << "digraph{" << endl;
-    //pds->for_each(rd);
-    //pds_stream << "}" << endl;
-
-    doWideningThisRound = false;
-    inNewtonLoop = false;
-
-    WFA outfaNewton;
-    if (aboveBelowMode == NEWTON_FROM_ABOVE || gaussJordanMode == false) {
-        doNewtonSteps_NPATP(aboveBelowMode, outfaNewton, entry_key, pds, false);
-    } else if (aboveBelowMode == NEWTON_FROM_BELOW) {
-        doNewtonSteps_GJ(aboveBelowMode, outfaNewton, entry_key, pds, false);
-    } else {
-        assert(false && "Unrecognized running mode.");
-    }
-
-    wali::Key acc = wali::getKeySpace()->getKey("accept");
-
-    Trans t;
-
-    bool exitTransitionFound = outfaNewton.find(st1(), exit_key, acc, t);
-    
-    //std::cout << std::endl << "outfaNewton" << std::endl;
-    //outfaNewton.print(std::cout);
-    //std::cout << std::endl << std::endl;
+// Print summaries of all procedures
+//   Return the procedure summary of the main procedure, if we were able to identify it.
+relation_t printProcedureSummaries(WFA& outfaNewton) {
 
     if (newtonVerbosity >= NV_SUMMARIES) {
         std::cout << "================================================" << std::endl;
@@ -3885,6 +3827,11 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
 
     if (doSmtlibOutput) { smtout.close(); }
 
+    return mainProcedureSummary;
+
+}
+
+void checkAssertions(WFA& outfaNewton) {
     std::cout << "================================================" << std::endl;
     std::cout << "Assertion Checking at Error Points" << std::endl << std::endl;
 
@@ -3952,7 +3899,22 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
             std::cout << "---------------------------------------------" << std::endl << std::endl;
         }
     }
+}
 
+int getGlobalBoundingVarFromName(char * variableName) {
+    CAMLparam0();
+    CAMLlocal2(sval, idval);
+    sval = caml_copy_string(variableName);
+    value * proc_func = caml_named_value("get_global_var");
+    idval = caml_callback(*proc_func, sval);
+    CAMLreturnT(int, Int_val(idval));
+}
+
+// Print bounds on program variables as specified by the data structure printHullRuleHolder
+//
+//   If a non-null mainProcedureSummary is supplied, and if we were instructed by the user
+//   to print bounds on some global variable for the main procedure, we will also do thar.
+void printVariableBounds(WFA& outfaNewton, relation_t mainProcedureSummary) {
     std::cout << "================================================" << std::endl;
     std::cout << "Bounds on Variables" << std::endl << std::endl;
     
@@ -4020,8 +3982,52 @@ int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
 
     #undef flush
     std::cout << "================================================" << std::endl;
-    if (newtonVerbosity >= NV_SUMMARIES) { std::cout << "[Newton] Finished " << std::endl << std::flush; }
+}
 
+int runBasicNewton(char **args, int aboveBelowMode, int gaussJordanMode)
+{
+    caml_startup(args); // This line calls Duet to analyze the program specified on the command
+                        //   line and store the analyzed program, represented as PDS rules, into
+                        //   the various ruleHolder data structures used in the code below.
+
+    FWPDS * pds = new FWPDS();
+
+    for (std::vector<caml_rule>::iterator it = ruleHolder.begin(); it != ruleHolder.end(); it++) {
+        pds->add_rule(st1(), it->first.first, st1(), it->first.second, it->second);
+    }
+    for (std::vector<caml_call_rule>::iterator itc = callRuleHolder.begin(); itc != callRuleHolder.end(); itc++) {
+        pds->add_rule(st1(), itc->first.first, st1(), itc->first.second.first, itc->first.second.second, itc->second);
+    }
+    for (std::vector<caml_epsilon_rule>::iterator ite = epsilonRuleHolder.begin(); ite != epsilonRuleHolder.end(); ite++) {
+        pds->add_rule(st1(), ite->first, st1(), ite->second);
+    }
+    
+    if (newtonVerbosity >= NV_PDS) { pds->print(std::cout); }
+    
+    // Copied from elsewhere, this is supposed to produce a dotfile of the PDS
+    //fstream pds_stream("pds.dot", fstream::out);
+    //RuleDotty rd(pds_stream);
+    //pds_stream << "digraph{" << endl; pds->for_each(rd); pds_stream << "}" << endl;
+
+    doWideningThisRound = false;
+    inNewtonLoop = false;
+
+    WFA outfaNewton;
+    if (aboveBelowMode == NEWTON_FROM_ABOVE || gaussJordanMode == false) {
+        doNewtonSteps_NPATP(aboveBelowMode, outfaNewton, entry_key, pds, false);
+    } else if (aboveBelowMode == NEWTON_FROM_BELOW) {
+        doNewtonSteps_GJ(aboveBelowMode, outfaNewton, entry_key, pds, false);
+    } else {
+        assert(false && "Unrecognized running mode.");
+    }
+
+    //std::cout << std::endl << "outfaNewton" << std::endl; outfaNewton.print(std::cout); std::cout << std::endl << std::endl;
+    
+    relation_t mainProcedureSummary = printProcedureSummaries(outfaNewton);
+    checkAssertions(outfaNewton);
+    printVariableBounds(outfaNewton, mainProcedureSummary);
+    
+    if (newtonVerbosity >= NV_SUMMARIES) { std::cout << "Finished!" << std::endl << std::flush; }
     return 0;
 }   
 
@@ -4065,7 +4071,9 @@ int main(int argc, char **argv)
             argv[i][0] =  '-';
             if (warnAboutPlus) {
                 warnAboutPlus = false;
-                std::cerr << "Warning: ICRA is translating '+' command-line arguments to '-'" << std::endl;
+                if (newtonVerbosity >= NV_STANDARD_WARNINGS) {
+                    std::cerr << "Warning: ICRA is translating '+' command-line arguments to '-'" << std::endl;
+                }
             }
         }
     }
