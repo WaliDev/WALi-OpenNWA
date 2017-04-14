@@ -637,6 +637,7 @@ duetrel_t DuetRel::getBaseTop()
     duetrel_t d;
     
     value * top_func = caml_named_value("top_callback");
+    assert(top_func != 0 /* check that top_callback exists */);
     topV = caml_callback(*top_func, Val_unit);
 
     d = MkDuetRel(topV);
