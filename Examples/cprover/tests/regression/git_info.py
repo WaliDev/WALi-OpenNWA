@@ -21,3 +21,14 @@ def getMostRecentCommitDate(path) :
     os.chdir(cwd)
     return date
 
+def getMostRecentCommitMessage(path) :
+    "Get the most recent commit message"
+    cwd = os.getcwd()
+    try :
+        os.chdir(path)
+        date = subprocess.check_output(["git","show","-s","--format=%s"]).strip()
+    except :
+        date = ""
+    os.chdir(cwd)
+    return date
+

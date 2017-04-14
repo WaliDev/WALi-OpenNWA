@@ -1,4 +1,4 @@
-import os, git_info
+import os, git_info, subprocess
 
 NEWTON_BELOW = 1
 NEWTON_ABOVE = 3
@@ -87,12 +87,17 @@ fout.write('<!DOCTYPE html>\n')
 fout.write('<html>\n')
 fout.write('<body>\n')
 
-fout.write('Most recent versions: <br>\n')
+fout.write('<details>')
+fout.write('<summary><font color="blue">[Version Information]</font></summary><br>')
 fout.write('WALi-OpenNWA version: '+git_info.getMostRecentCommitHash("."))
-fout.write(' ('+git_info.getMostRecentCommitDate(".")+')<br>\n')
+fout.write(' ('+git_info.getMostRecentCommitDate(".")+')')
+fout.write(' "'+git_info.getMostRecentCommitMessage(".")+'"<br>\n')
 duetPath = "../../../../../duet"
 fout.write('duet version: '+git_info.getMostRecentCommitHash(duetPath))
-fout.write(' ('+git_info.getMostRecentCommitDate(duetPath)+')<br>\n')
+fout.write(' ('+git_info.getMostRecentCommitDate(duetPath)+')')
+fout.write(' "'+git_info.getMostRecentCommitMessage(duetPath)+'"<br>\n')
+fout.write('<pre>'+subprocess.check_output(['opam','list'])+'</pre><br>')
+fout.write('</details>\n')
 
 fout.write('<table style="width:100%" border="1">\n')
 

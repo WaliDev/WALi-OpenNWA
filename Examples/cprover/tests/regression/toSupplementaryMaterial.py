@@ -7,7 +7,7 @@
 #      
 #   Inputs: 
 #      inputs/*.c, inputs/*.i, outputs/*.out, outputs/*.png
-#      (except outputs/__result.out and outputs/__PHresult.out)
+#      (except outputs/__result.out and outputs/__result_PH.out)
 #      print_hull.html, results.html
 #      (So, please run toHTML.py and toHTML_printHull.py and toPlotsAndSummaryText.py first.)
 #
@@ -21,7 +21,7 @@ import os.path, shutil, re
 destDir = "supplementary"
 sourceDir = "."
 
-excludeList = ["__result.out", "__PHresult.out"]
+excludeList = ["__result.out", "__result_PH.out"]
 binaryCopy = [".*[.]png"]
 
 inDir = os.path.join(destDir, "inputs")

@@ -1,6 +1,6 @@
 import os
 
-fin = open('outputs/__PHresult.out', 'r')
+fin = open('outputs/__result_PH.out', 'r')
 fout = open('print_hull.html', 'w')
 
 fout.write('<!DOCTYPE html>\n')

@@ -1,4 +1,4 @@
-import os, git_info
+import os, git_info, subprocess
 
 #fin = open('c4b_all.out', 'r')
 fin = open('outputs/__result_java.out', 'r')
@@ -9,11 +9,25 @@ fout.write('<html>\n')
 fout.write('<body>\n')
 
 waliPath = "/bat0/stac/Code/WALi-Sandbox/WALi-OpenNWA"
-fout.write('WALi-OpenNWA version: '+git_info.getMostRecentCommitHash(waliPath))
-fout.write(' ('+git_info.getMostRecentCommitDate(waliPath)+')<br>\n')
+fout.write('<details>')
+fout.write('<summary><font color="blue">[Version Information]</font></summary><br>')
+fout.write('Phase2 (IST-Java-ICRA) WALi-OpenNWA version: '+git_info.getMostRecentCommitHash(waliPath))
+fout.write(' ('+git_info.getMostRecentCommitDate(waliPath)+')')
+fout.write(' "'+git_info.getMostRecentCommitMessage(waliPath)+'"<br>\n')
 duetPath = "/bat0/stac/Code/WALi-Sandbox/duet"
-fout.write('duet version: '+git_info.getMostRecentCommitHash(duetPath))
-fout.write(' ('+git_info.getMostRecentCommitDate(duetPath)+')<br>\n')
+fout.write('Phase2 (IST-Java-ICRA) duet version: '+git_info.getMostRecentCommitHash(duetPath))
+fout.write(' ('+git_info.getMostRecentCommitDate(duetPath)+')')
+fout.write(' "'+git_info.getMostRecentCommitMessage(duetPath)+'"<br>\n')
+fout.write('<br>')
+fout.write('Phase3 WALi-OpenNWA version: '+git_info.getMostRecentCommitHash("."))
+fout.write(' ('+git_info.getMostRecentCommitDate(".")+')')
+fout.write(' "'+git_info.getMostRecentCommitMessage(".")+'"<br>\n')
+duetPath = "../../../../../duet"
+fout.write('Phase3 duet version: '+git_info.getMostRecentCommitHash(duetPath))
+fout.write(' ('+git_info.getMostRecentCommitDate(duetPath)+')')
+fout.write(' "'+git_info.getMostRecentCommitMessage(duetPath)+'"<br>\n')
+fout.write('<pre>'+subprocess.check_output(['opam','list'])+'</pre><br>')
+fout.write('</details>\n')
 
 fout.write('<table style="width:100%" border="1">\n')
 
@@ -63,6 +77,7 @@ nameOfOutput = ""
 
 for line in fin:
     words = line.split()
+    if len(words) == 0 : continue
     if (words[0] == "__DIRECTORY"): 
         if firstElem:
             firstElem = False

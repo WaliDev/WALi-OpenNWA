@@ -23,7 +23,7 @@ NEWTON="$NEWTON_DIR/_build64/Examples/cprover/NewtonOcaml"
 OUTDIR="$SUITE/outputs"
 # The input tests are copied here
 INDIR="$SUITE/inputs"
-RESULT="$OUTDIR/__PHresult.out"
+RESULT="$OUTDIR/__result_PH.out"
 SCRIPT="$SUITE/toHTML_printHull.py"
 
 TIMEOUT="10m"
@@ -52,7 +52,8 @@ for directory in ${TESTDIRS[@]}; do
 		
 		start=$(date +%s%N)
 		cd $NEWTON_DIR
-		eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf &> $outfile"
+		#eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf &> $outfile"
+		eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops --test=$RESULT $testf &> $outfile"
 		success=$?
 		if (($success==124)); then
 			echo "__TIMEOUT" >> $RESULT

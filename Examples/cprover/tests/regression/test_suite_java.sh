@@ -10,18 +10,25 @@ trap "exit" INT
 
 shopt -s nullglob
 
-NEWTON_DIR="/bat0/stac/Code/CSFE_JAVA_API/jbreck/WALi-OpenNWA/"
+#NEWTON_DIR="/bat0/stac/Code/CSFE_JAVA_API/jbreck/WALi-OpenNWA/"
+NEWTON_DIR="/bat0/stac/Code/Ark2-Sandbox/WALi-OpenNWA/"
 #NEWTON_DIR="$(readlink -f .)"
 #NEWTON_DIR="$(pwd)"
 #DUET_DIR="$NEWTON_DIR/../duet"
 
 SUITE="$NEWTON_DIR/Examples/cprover/tests/regression"
-#TESTDIRS=( /bat0/stac/Code/CSFE_JAVA_API/java_package/single_example/ )
-#TESTDIRS=( /bat0/stac/Code/CSFE_JAVA_API/java_package/quick_java_examples/ )
-TESTDIRS=( /bat0/stac/Code/CSFE_JAVA_API/java_package/single_example/ /bat0/stac/Code/CSFE_JAVA_API/java_package/quick_java_examples/ /bat0/stac/Code/CSFE_JAVA_API/java_package/simple_java_examples/ /bat0/stac/Code/CSFE_JAVA_API/java_package/selected_canonical/ )
+JAVA_PACKAGE="/bat0/stac/Code/Java-benchmarks/java_package"
+
 #TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/java/quick )
 #TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/STAC/polynomial/assert $NEWTON_DIR/Examples/cprover/tests/STAC/canonical )
 #TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b $NEWTON_DIR/Examples/cprover/tests/misc-recursive $NEWTON_DIR/Examples/cprover/tests/duet $NEWTON_DIR/Examples/cprover/tests $NEWTON_DIR/Examples/cprover/tests/STAC/LESE $NEWTON_DIR/Examples/cprover/tests/STAC/LowerBound $NEWTON_DIR/Examples/cprover/tests/STAC/LZ $NEWTON_DIR/Examples/cprover/tests/sv-benchmarks/* )
+#TESTDIRS=( /bat0/stac/Code/CSFE_JAVA_API/java_package/single_example/ )
+#TESTDIRS=( /bat0/stac/Code/CSFE_JAVA_API/java_package/quick_java_examples/ )
+#TESTDIRS=( /bat0/stac/Code/CSFE_JAVA_API/java_package/single_example/ /bat0/stac/Code/CSFE_JAVA_API/java_package/quick_java_examples/ /bat0/stac/Code/CSFE_JAVA_API/java_package/simple_java_examples/ /bat0/stac/Code/CSFE_JAVA_API/java_package/selected_canonical/ ) # prior to 2017-03-30
+#
+TESTDIRS=( $JAVA_PACKAGE/single_example/ $JAVA_PACKAGE/quick_java_examples/ $JAVA_PACKAGE/simple_java_examples/ $JAVA_PACKAGE/selected_canonical/ $JAVA_PACKAGE/new-canonical-examples/all_canonical_jars/ )
+
+#/Code/Java-benchmarks/java_package/new-canonical-examples/all_canonical_jars
 
 NEWTON="/bat0/stac/Code/CSFE_JAVA_API/params-icra-bytecode.sh"
 #NEWTON="$NEWTON_DIR/_build64/Examples/cprover/NewtonOcaml"
@@ -86,7 +93,8 @@ for directory in ${TESTDIRS[@]}; do
 
         cd $NEWTON_DIR
         sourcefile="${testf%.jar}.java"
-        eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULTJAVA $testf &> $below_outfile"
+        eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops --test=$RESULTJAVA $testf &> $below_outfile"
+        #eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULTJAVA $testf &> $below_outfile"
         # Here was the original version:
         #eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULTJAVA $testf &> $below_outfile"
         success=$?

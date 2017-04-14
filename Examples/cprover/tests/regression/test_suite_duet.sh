@@ -16,6 +16,7 @@ DUET_DIR="$NEWTON_DIR/../duet"
 SUITE="$NEWTON_DIR/Examples/cprover/tests/regression"
 #TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/STAC/LowerBound )
 #TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b $NEWTON_DIR/Examples/cprover/tests/misc-recursive $NEWTON_DIR/Examples/cprover/tests/duet $NEWTON_DIR/Examples/cprover/tests $NEWTON_DIR/Examples/cprover/tests/STAC/LESE $NEWTON_DIR/Examples/cprover/tests/STAC/LowerBound $NEWTON_DIR/Examples/cprover/tests/STAC/LZ $NEWTON_DIR/Examples/cprover/tests/sv-benchmarks/* )
+#TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b )
 TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b $NEWTON_DIR/Examples/cprover/tests/misc-recursive $NEWTON_DIR/Examples/cprover/tests/duet $NEWTON_DIR/Examples/cprover/tests $NEWTON_DIR/Examples/cprover/tests/STAC/polynomial/assert $NEWTON_DIR/Examples/cprover/tests/snlee/snlee_tests $NEWTON_DIR/Examples/cprover/tests/STAC/FiniteDifferencing $NEWTON_DIR/Examples/cprover/tests/STAC/LESE $NEWTON_DIR/Examples/cprover/tests/STAC/LowerBound $NEWTON_DIR/Examples/cprover/tests/STAC/LZ $NEWTON_DIR/Examples/cprover/tests/sv-benchmarks/* )
 
 
@@ -59,7 +60,8 @@ for directory in ${TESTDIRS[@]}; do
 		echo -n " Below ..."
 		start=$(date +%s%N)
 		cd $NEWTON_DIR
-		eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf &> $below_outfile"
+		#eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf &> $below_outfile"
+		eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops --test=$RESULT $testf &> $below_outfile"
 		success=$?
 		if (($success==124)); then
 			echo "__TIMEOUT" >> $RESULT
@@ -89,7 +91,8 @@ for directory in ${TESTDIRS[@]}; do
 		echo -n " Above ..."
 		start=$(date +%s%N)
 		cd $NEWTON_DIR
-		eval "timeout $TIMEOUT $NEWTON -cra_newton_above -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf &> $above_outfile"
+		#eval "timeout $TIMEOUT $NEWTON -cra_newton_above -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf &> $above_outfile"
+		eval "timeout $TIMEOUT $NEWTON -cra_newton_above -cra-forward-inv -cra-split-loops --test=$RESULT $testf &> $above_outfile"
 		success=$?
 		if (($success==124)); then
 			echo "__TIMEOUT" >> $RESULT
