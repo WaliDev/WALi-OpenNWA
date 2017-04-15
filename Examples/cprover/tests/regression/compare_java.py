@@ -25,7 +25,8 @@ def parseRes( fin ):
     for line in fin:
         words = line.split()
         if (words[0] == "__DIRECTORY"):
-            currentDir = os.path.basename(words[1])
+            #currentDir = os.path.basename(words[1])
+            currentDir = words[1]
         if (words[0] == "__NAMEOFINPUT"): 
             nextNameOfInput = words[1]
             #print "Correctly read a past nameOfInput: " + res.nameOfInput
@@ -177,8 +178,10 @@ for line in fin:
             belowTime = 0
             aboveTime = 0
 
-        oldBelowTime = getTotalTime(oldResList, os.path.basename(words[1]), NEWTON_BELOW)
-        oldAboveTime = getTotalTime(oldResList, os.path.basename(words[1]), NEWTON_ABOVE)
+        #oldBelowTime = getTotalTime(oldResList, os.path.basename(words[1]), NEWTON_BELOW)
+        oldBelowTime = getTotalTime(oldResList, words[1], NEWTON_BELOW)
+        #oldAboveTime = getTotalTime(oldResList, os.path.basename(words[1]), NEWTON_ABOVE)
+        oldAboveTime = 0
         
         fout.write('<tr align=\"center\">\n')
         fout.write('<td colspan=\"7\"><font color=\"#00AAAA\">')

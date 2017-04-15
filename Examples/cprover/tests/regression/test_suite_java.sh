@@ -26,7 +26,8 @@ JAVA_PACKAGE="/bat0/stac/Code/Java-benchmarks/java_package"
 #TESTDIRS=( /bat0/stac/Code/CSFE_JAVA_API/java_package/quick_java_examples/ )
 #TESTDIRS=( /bat0/stac/Code/CSFE_JAVA_API/java_package/single_example/ /bat0/stac/Code/CSFE_JAVA_API/java_package/quick_java_examples/ /bat0/stac/Code/CSFE_JAVA_API/java_package/simple_java_examples/ /bat0/stac/Code/CSFE_JAVA_API/java_package/selected_canonical/ ) # prior to 2017-03-30
 #
-TESTDIRS=( $JAVA_PACKAGE/single_example/ $JAVA_PACKAGE/quick_java_examples/ $JAVA_PACKAGE/simple_java_examples/ $JAVA_PACKAGE/selected_canonical/ $JAVA_PACKAGE/new-canonical-examples/all_canonical_jars/ )
+#TESTDIRS=( $JAVA_PACKAGE/single_example/ $JAVA_PACKAGE/quick_java_examples/ $JAVA_PACKAGE/simple_java_examples/ $JAVA_PACKAGE/selected_canonical/ $JAVA_PACKAGE/new-canonical-examples/all_canonical_jars/ )
+TESTDIRS=( $JAVA_PACKAGE/quick_java_examples/ $JAVA_PACKAGE/simple_java_examples/ $JAVA_PACKAGE/selected_canonical/ $JAVA_PACKAGE/new-canonical-examples/all_canonical_jars/ )
 
 #/Code/Java-benchmarks/java_package/new-canonical-examples/all_canonical_jars
 
