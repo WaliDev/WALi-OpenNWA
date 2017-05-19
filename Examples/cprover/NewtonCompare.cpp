@@ -3396,9 +3396,9 @@ double doNewtonSteps_GJ(WFA& outfa, wali::Key entry_key, FWPDS * originalPds = N
           //bool insertProjects = true;
           bool insertProjects = false;
           baseEvalTime += convertToTSLRegExps(rToConvert, outNodeRegExpMap, regExpMap, varDependencies, updateableMap, oMap, mapBack, mergeSrcMap, wl, vl, insertProjects);
-          if (newtonVerbosity >= NV_EVERYTHING) {
-              cout << "  There are " << wl.size() << " regular expressions remaining to be converted." << endl;
-          }
+          //if (newtonVerbosity >= NV_EVERYTHING) {
+          //    cout << "  There are " << wl.size() << " regular expressions remaining to be converted." << endl;
+          //}
       }
       //std::cout << "ESIZE: " << E.size() << std::endl;
       //std::cout << "DSIZE: " << variableIDs.size() << std::endl;
@@ -3807,8 +3807,8 @@ relation_t printProcedureSummaries(WFA& outfaNewton) {
                 if (doSmtlibOutput) { smtout << "an unknown procedure.  This shouldn't happen.  Case 2." << std::endl; }
             }
         } else {
-            if (newtonVerbosity >= NV_SUMMARIES) std::cout << "main (I guess!)" << std::endl;
-            if (doSmtlibOutput) { smtout << "'main' (I guess!)" << std::endl; }
+            if (newtonVerbosity >= NV_SUMMARIES) std::cout << "main (assumed)" << std::endl;
+            if (doSmtlibOutput) { smtout << "'main' (assumed)" << std::endl; }
             foundMain = true;
         }
 
