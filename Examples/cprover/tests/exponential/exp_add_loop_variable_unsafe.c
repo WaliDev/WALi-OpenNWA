@@ -18,5 +18,5 @@ int main()
     int n = __VERIFIER_nondet_int();
     __VERIFIER_assume(n > 0);
     func(n);
-    assert(x  == 2 * icra_pow2(n) - n - 1);
+    assert(x  == 2 * icra_pow2(n) - 1);
 }

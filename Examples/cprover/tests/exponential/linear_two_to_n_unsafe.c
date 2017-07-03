@@ -1,10 +1,10 @@
-//t(n) = 5*t(n-1) + 3, t(0) = 1
-//t(n) = 1/4(7*5^n - 3)
+//t(n) = 2 * t(n-1) t(0) = 1
+//t(n) = 2^n
 
 #include "tick.h"
 #include "pow.h"
 
-DECLARE_POW(5);
+DECLARE_POW(2);
 
 void func(int n)
 { 
@@ -15,16 +15,16 @@ void func(int n)
     }
     func(n-1);
     func(n-1);
-    func(n-1);
-    func(n-1);
-    func(n-1);
-    tick(3);
 }
 
 int main()
 {
     init_tick(0);
     int n = __VERIFIER_nondet_int();
+    __VERIFIER_assume(n > 0);
     func(n);
-    assert(__cost * 4 == 7 * icra_pow5(n) - 3);
+    //func(n);
+    assert(__cost == icra_pow2(n) + 10);
+    //assert(__cost == 1<<n)
+    return 0;
 }

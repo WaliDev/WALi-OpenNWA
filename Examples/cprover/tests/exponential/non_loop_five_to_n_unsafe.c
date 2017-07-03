@@ -26,5 +26,5 @@ int main()
     init_tick(0);
     int n = __VERIFIER_nondet_int();
     func(n);
-    assert(__cost * 4 == 7 * icra_pow5(n) - 3);
+    assert(__cost * 4 == 7 * icra_pow5(n));
 }
