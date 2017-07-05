@@ -1,7 +1,9 @@
+#include "assert.h"
 void main () {
     int i,j,x,y;
     int n = __VERIFIER_nondet_int();
     __VERIFIER_assume(n > 0);
+    __VERIFIER_assume(n < LARGE_INT);
     // variant 1
     x = 0;
     i = 0;

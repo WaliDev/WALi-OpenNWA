@@ -8,7 +8,9 @@ int unknown4();
  * Adapted from ex17.c in NECLA test suite
  */
 
-int main(int flag, int a) {
+int main() {
+    int flag = unknown1();
+    int a = unknown2();
    int b;
    int j = 0;
 

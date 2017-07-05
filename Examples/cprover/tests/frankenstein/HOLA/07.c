@@ -3,6 +3,7 @@ int unknown1();
 int unknown2();
 int unknown3();
 int unknown4();
+int unknown5();
 
 /*
  * From "Path Invariants" PLDI 07 by Beyer et al.
@@ -11,7 +12,9 @@ int unknown4();
 int main(int argc, char* argv[]) {
 
   int i, n, a, b;
+  n = unknown5();
   assume( n >= 0 );
+
   i = 0; a = 0; b = 0;
   while( i < n ) {
     if(unknown1()) {

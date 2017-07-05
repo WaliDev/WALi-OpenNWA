@@ -9,8 +9,10 @@ int unknown4();
  */
 
 
-void main(int n, int m)
+void main()
 {
+    int n = unknown1();
+    int m = unknown2();
   assume(n>=0);
   assume(m>=0);
   assume(m<n);

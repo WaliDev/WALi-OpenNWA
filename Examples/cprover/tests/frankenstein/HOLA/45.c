@@ -4,15 +4,16 @@ int unknown2();
 int unknown3();
 int unknown4();
 
-void main(int flag)
+void main()
 {	
+  int flag = unknown4(); 
   int x = 0;
   int y = 0;
   int j = 0;
   int i = 0;
   int c = 0;
   int d = 1;
-  while(unknown1())
+  while(j < LARGE_INT && unknown1())
   {
     x++;
     y++;
@@ -30,7 +31,7 @@ void main(int flag)
 
   int w = 1;
   int z = 0;
-  while(unknown2()){
+  while(w < LARGE_INT && unknown2()){
     while(unknown3()){
       if(w%2 == 1) 
         x++;

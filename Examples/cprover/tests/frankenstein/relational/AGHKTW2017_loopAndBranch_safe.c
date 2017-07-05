@@ -1,6 +1,9 @@
 /* Source: Timos Antonopoulos, Paul Gazzillo, Michael Hicks, Eric Koskinen,
    Tachio Terauchi, Shiyi Wei: Decomposition Instead of Self-Composition for
    Proving the Absence of Timing Channels.  PLDI 2017 */
+
+#include "assert.h"
+
 int loopAndbranch_safe(int high, int low) {
     int i = high;
     int tick = 0;

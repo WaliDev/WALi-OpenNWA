@@ -9,7 +9,7 @@ int main(int flag)
   int s = 0;
   int a = 0;
   int b = 0;
-  while(unknown1()){
+  while(t < LARGE_INT && unknown1()){
     a++;
     b++;
     s+=a;

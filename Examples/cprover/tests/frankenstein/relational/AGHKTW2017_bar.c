@@ -1,3 +1,5 @@
+#include "assert.h"
+
 /* Source: Timos Antonopoulos, Paul Gazzillo, Michael Hicks, Eric Koskinen,
    Tachio Terauchi, Shiyi Wei: Decomposition Instead of Self-Composition for
    Proving the Absence of Timing Channels.  PLDI 2017 */
@@ -22,6 +24,7 @@ int bar (int high, int low) {
 	    i++;
 	}
     }
+    return tick;
 }
 
 void main() {

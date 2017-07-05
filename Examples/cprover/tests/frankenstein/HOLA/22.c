@@ -11,7 +11,7 @@ void main()
   int z = 0;
   int k = 0;
 
-  while(unknown1())
+  while(y <= LARGE_INT && unknown1())
   {
      if(k%3 == 0)
        x++;

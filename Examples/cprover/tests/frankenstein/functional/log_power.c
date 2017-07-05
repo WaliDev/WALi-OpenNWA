@@ -1,3 +1,4 @@
+#include "assert.h"
 int pow2(int n) {
     int i;
     int r = 1;

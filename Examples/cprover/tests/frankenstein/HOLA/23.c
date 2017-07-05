@@ -9,9 +9,11 @@ int unknown4();
  */
 
 
-int main( int n){
+int main(){
+    int n = unknown1();
    int i, sum=0;
    assume( n >= 0);
+   assume( n < LARGE_INT);
 
    for (i=0; i < n; ++i)
       sum = sum +i;

@@ -1,4 +1,5 @@
 /* E. Cohen, Programming in the 1990s: an introduction to the calculation of programs. Springer-Verlag, 1990 */
+#include "assert.h"
 int cohendiv(int x, int y){
  int q = 0; // quotient
  int r = x; // remainder

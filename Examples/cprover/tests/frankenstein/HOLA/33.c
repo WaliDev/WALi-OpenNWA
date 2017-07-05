@@ -2,9 +2,11 @@
 int unknown1();
 int unknown2();
 int unknown3();
+int unknown4();
 
-int main(int k)
+int main()
 {
+  int k = unknown4();
   int z = k;
   int x = 0;
   int y = 0;

@@ -2,6 +2,7 @@
 int __BLAST_NONDET;
 int MAXPATHLEN;
 int unknown();
+int unknown1();
 
 
 /*
@@ -29,6 +30,7 @@ int main()
   int glob3_pathlim_off;
   int glob3_pattern_off;
   int glob3_dc;
+  MAXPATHLEN = unknown1();
 
   if(MAXPATHLEN > 0); else goto END;
 
@@ -55,7 +57,7 @@ int main()
       glob3_dc++;
       /* OK */
       static_assert(0 <= glob3_dc);
-      static_assert (glob3_dc < MAXPATHLEN + 1);
+      static_assert (glob3_dc  < MAXPATHLEN + 1);
       if (unknown()) goto END;
     }
  END:  return 0;

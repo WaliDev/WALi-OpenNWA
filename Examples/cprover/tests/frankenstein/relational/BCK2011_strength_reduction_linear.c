@@ -5,11 +5,17 @@
      verification using product programs,
  */
 
+#include "assert.h"
 #define B 2
 #define C 3
+int nondet();
 
 void main() {
     int i1,j1,x1,i2,j2,x2,N;
+    N = nondet();
+    x1 = nondet();
+    x2 = nondet();
+    __VERIFIER_assume(N < LARGE_INT);
     __VERIFIER_assume(x1 == x2);
 
     // before strength reduction

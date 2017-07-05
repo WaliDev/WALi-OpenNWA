@@ -1,14 +1,18 @@
 
 #include "assert.h"
 int unknown1();
+int unknown2();
+int unknown3();
 
 /*
  * "nest-if8" from InvGen benchmark suite
  */
 
 
-int main() {
+void main() {
   int i,j,k,n,m;
+  n = unknown2();
+  m = unknown3();
   if( m+1 < n ); else return;
   for ( i=0; i<n; i+=4 ) {
     for ( j=i; j<m; ) {

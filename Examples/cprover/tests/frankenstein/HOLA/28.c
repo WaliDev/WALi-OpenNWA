@@ -13,7 +13,7 @@ void main() {
   int x=0;
   int y=0;
   int n = 0;
-  while(unknown()) {
+  while(x < LARGE_INT && unknown()) {
       x++;
       y++;
   }

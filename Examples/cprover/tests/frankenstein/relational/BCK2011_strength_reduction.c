@@ -4,10 +4,20 @@
    Source: Gilles Barthe, Juan Manuel Crespo, and Cesar Kunz: Relational
      verification using product programs,
  */
-
+#include "assert.h"
 
 void main() {
     int i1,j1,x1,i2,j2,x2,N,B,C;
+    N = nondet();
+    x1 = nondet();
+    x2 = nondet();
+    B = nondet();
+    C = nondet();
+
+    __VERIFIER_assume(-LARGE_INT < B < LARGE_INT);
+    __VERIFIER_assume(-LARGE_INT < C < LARGE_INT);
+    __VERIFIER_assume(N < LARGE_INT);
+
     __VERIFIER_assume(x1 == x2);
 
     // before strength reduction

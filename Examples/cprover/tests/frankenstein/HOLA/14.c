@@ -13,6 +13,7 @@ int main() {
   int j;
   int m;
   int __BLAST_NONDET;
+  m = unknown2();
   if(m<=0)
     return 0;
   for(j = 1; j <= m ; j++){

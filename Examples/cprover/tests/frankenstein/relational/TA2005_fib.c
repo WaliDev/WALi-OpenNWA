@@ -1,8 +1,21 @@
 /* Source: Tachio Terauchi and Alex Aiken: Secure Information Flow as a Safety
    Problem, SAS 2005.  Figure 5. */
+
+#include "assert.h"
+
 void main() {
     int f11, f12, n1, k1, l1;
     int f21, f22, n2, k2, l2;
+    f11 = __VERIFIER_nondet_int();
+    f12 = __VERIFIER_nondet_int();
+    f21 = __VERIFIER_nondet_int();
+    f22 = __VERIFIER_nondet_int();
+    k1 = __VERIFIER_nondet_int();
+    k2 = __VERIFIER_nondet_int();
+    l1 = __VERIFIER_nondet_int();
+    l2 = __VERIFIER_nondet_int();
+    n1 = __VERIFIER_nondet_int();
+    n2 = __VERIFIER_nondet_int();
     __VERIFIER_assume(f11 == f21);
     __VERIFIER_assume(f12 == f22);
     __VERIFIER_assume(n1 == n2);

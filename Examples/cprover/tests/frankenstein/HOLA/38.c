@@ -4,8 +4,9 @@ int unknown2();
 int unknown3();
 int unknown4();
 
-void main(int n)
+void main()
 {
+  int n = unknown1();
   int x=0;
   int y=0;
   int i=0;

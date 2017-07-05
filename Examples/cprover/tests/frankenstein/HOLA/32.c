@@ -3,7 +3,7 @@
 /*
  * "split.c" from InvGen benchmark suite
  */
-
+int nondet1();
 
 void main() {
   int k = 100;
@@ -11,6 +11,8 @@ void main() {
   int i;
   int j;
   int n;
+  j = nondet();
+  b = nondet();
   i = j;
   for( n = 0 ; n < 2*k ; n++ ) {
     if(b) {

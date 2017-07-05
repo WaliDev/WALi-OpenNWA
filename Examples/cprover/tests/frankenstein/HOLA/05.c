@@ -13,8 +13,7 @@ void main(int flag)
 	int j = 0;
 	int i = 0;
 
-
-	while(unknown1())
+	while(x < LARGE_INT && unknown1())
 	{
 	  x++;
 	  y++;

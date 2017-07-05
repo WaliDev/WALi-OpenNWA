@@ -9,8 +9,9 @@ int unknown4();
  * From "A Practical and Complete Approach to Predicate Refinement" by McMillan TACAS'06
  */
 
-int main(int i, int j) {
-  
+int main() {
+    int i = unknown1();
+    int j = unknown2();
   int x = i;
   int y = j;
  
@@ -21,4 +22,3 @@ int main(int i, int j) {
   if(i==j)
 	static_assert(y==0);
 }
-

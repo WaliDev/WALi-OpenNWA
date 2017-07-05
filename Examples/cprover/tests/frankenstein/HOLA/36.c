@@ -2,9 +2,11 @@
 int unknown1();
 int unknown2();
 int unknown3();
+int unknown4();
 
-void main(int flag)
+void main()
 {
+  int flag = unknown4();
   int a = 0;
   int b = 0;
   int x = 0;

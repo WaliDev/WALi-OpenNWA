@@ -10,7 +10,7 @@ int unknown4();
 
 void main() {
   int i,j,k,n;
-  
+  n = unknown1();
   for (i=0;i<n;i++)
     for (j=i;j<n;j++)
       for (k=j;k<n;k++)

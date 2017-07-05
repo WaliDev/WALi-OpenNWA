@@ -10,7 +10,7 @@ int unknown3();
 
 void main() {
  int x = 0, y = 0;
- while(unknown1()){
+ while(x < LARGE_INT && y < LARGE_INT && y > -LARGE_INT && unknown1()){
    if(unknown2()){ 
       x++; 
       y+=100; 

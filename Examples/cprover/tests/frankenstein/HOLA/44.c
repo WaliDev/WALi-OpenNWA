@@ -9,8 +9,10 @@ int unknown4();
  */
 
 
-int main(int k, int flag)
+int main()
 {
+  int k = unknown1();
+  int flag = unknown1();
   int i=0;
   int j=0;
   int n;

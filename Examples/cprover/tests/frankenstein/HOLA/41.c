@@ -8,8 +8,11 @@ int unknown4();
  * Adapted from "Automated Error Diagnosis Using Abductive Inference" by Dillig et al.
  */
 
-int main(int n, int flag) {
+int main() {
+   int n = unknown2();
+   int flag = unknown3();
    assume(n>=0);
+   assume(n < LARGE_INT);
    int k = 1;
    if(flag) {
 	k = unknown1();

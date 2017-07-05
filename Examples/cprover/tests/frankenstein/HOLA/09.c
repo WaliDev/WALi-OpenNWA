@@ -3,6 +3,7 @@
 int unknown1();
 int unknown2();
 int unknown3();
+int unknown4();
 
 /*
  * "fragtest_simple" from InvGen benchmark suite
@@ -16,8 +17,10 @@ void main(){
   int n;
   i = 0;
 
+  pvlen = unknown4();
+
   //  pkt = pktq->tqh_first;
-  while (unknown1())
+  while (i < LARGE_INT && unknown1())
     i = i + 1;
   if (i > pvlen) {
     pvlen = i;
@@ -26,7 +29,7 @@ void main(){
   }
   i = 0;
 
-  while (unknown2()) {
+  while (k < LARGE_INT && unknown2()) {
     t = i;
     i = i + 1;
     k = k +1;
@@ -45,5 +48,5 @@ void main(){
       break;
     }
     }
-  return 0;
+  return;
 }

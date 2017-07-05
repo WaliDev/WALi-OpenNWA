@@ -1,5 +1,7 @@
 /* Division algorithm from "Z. Manna, Mathematical Theory of Computation, McGraw-Hill, 1974" */
 
+#include "assert.h"
+
 void main () {
     int x1, x2;
     __VERIFIER_assume(x1 >= 0);

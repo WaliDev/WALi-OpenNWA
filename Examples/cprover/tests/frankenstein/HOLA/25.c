@@ -11,7 +11,7 @@ void main()
   int i = 0;
   int j = 0;
 
-  while(unknown1())
+  while(x <= LARGE_INT && y <= LARGE_INT && unknown1())
   {
     while(unknown2())
     {

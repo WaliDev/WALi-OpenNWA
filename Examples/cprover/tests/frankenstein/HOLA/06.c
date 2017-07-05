@@ -13,9 +13,9 @@ void main()
   int x= 0;
   int y=0;
 
-  while(unknown1()){
+  while(z < LARGE_INT && w < LARGE_INT && unknown1()){
 	  
-    while(unknown2()){
+    while(x < LARGE_INT && y < LARGE_INT && unknown2()){
       if(w%2 == 1) x++;
       if(z%2==0) y++;
     }

@@ -15,6 +15,7 @@ int main(int argc, char* argv[]) {
 
 
   n = unknown1();
+  k = unknown2();
   assume(n>0);
 
   assume(k>n);

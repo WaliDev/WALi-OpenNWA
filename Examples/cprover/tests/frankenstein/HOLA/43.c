@@ -9,8 +9,10 @@ int unknown4();
  */
 
 
-int main(int x, int y)
+int main()
 {
+  int x = unknown2();
+  int y = unknown3();
   int i=0;
   int t=y;
    

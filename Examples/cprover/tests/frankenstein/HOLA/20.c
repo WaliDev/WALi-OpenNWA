@@ -3,9 +3,15 @@ int unknown1();
 int unknown2();
 int unknown3();
 int unknown4();
+int unknown5();
 
-void main(int x, int y, int k, int j, int i, int n)
+void main()
 {
+    int x, y, k, j, i, n;
+    n = unknown2();
+    x = unknown3();
+    y = unknown4();
+    k = unknown5();
     assume((x+y)== k);
     int m = 0;
     j = 0;
