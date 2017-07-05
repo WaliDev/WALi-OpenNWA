@@ -43,12 +43,12 @@ for directory in ${TESTDIRS[@]}; do
 
 	i=1
 	for testf in ${TESTS[@]}; do
-		below_outfile="$OUTDIR/$(basename $testf).below.out"
-		duet_outfile="$OUTDIR/$(basename $testf).duet.out"
-		above_outfile="$OUTDIR/$(basename $testf).above.out"
+		below_outfile="$OUTDIR/$(basename $testf).fast.out"
+		#duet_outfile="$OUTDIR/$(basename $testf).duet.out"
+		#above_outfile="$OUTDIR/$(basename $testf).above.out"
 		infile="$INDIR/$(basename $testf)"
 		rm -f $outfile
-		rm -f $duet_outfile
+		#rm -f $duet_outfile
 		rm -f $infile
 		cp $testf $infile
 		
@@ -57,8 +57,16 @@ for directory in ${TESTDIRS[@]}; do
 		echo -n " ICRA "
 		start=$(date +%s%N)
 		cd $NEWTON_DIR
-		eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf &> $below_outfile"
 		#eval "timeout $TIMEOUT sh -c '{ $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf; } &> $below_outfile'"
+        #
+        #
+        rm -f $below_outfile
+        COMMAND="$NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops"
+        echo $COMMAND >> $below_outfile
+        echo "" >> $below_outfile
+		eval "timeout $TIMEOUT $COMMAND --test=$RESULT $testf &>> $below_outfile"
+        #
+		#eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf &> $below_outfile"
 		success=$?
 		if (($success==124)); then
 			echo "__TIMEOUT" >> $RESULT
@@ -91,7 +99,7 @@ for directory in ${TESTDIRS[@]}; do
 		echo -n "__DUET " >> $RESULT
 		#cd $DUET_DIR
 		#eval "timeout $TIMEOUT  $DUET -cra -cra-forward-inv -cra-split-loops $testf &> $duet_outfile"
-                touch $duet_outfile
+                #touch $duet_outfile
 		#if (($?==124)); then
 			echo "TIMEOUT" >> $RESULT
 			#echo -ne "\e[31mTimeout\e[0m"

@@ -126,7 +126,7 @@ for line in fin:
             
             if (runMode == 'below') : # Indented by Jason
                 fout.write('<td>')
-                fout.write('<a href=\"outputs/' + fileName + '.' + runMode + '.out\">' + runMode + '</a>')
+                fout.write('<a href=\"outputs/' + fileName + '.fast.out\">' + runMode + '</a>')
                 fout.write('</td>\n')
             
             #if (runMode == 'below'):
