@@ -14,3 +14,17 @@ void static_assert(int cond) {
 
 #define assume __VERIFIER_assume
 #define LARGE_INT 100000
+
+void __VERIFIER_assert(int cond) {
+  if (!(cond)) {
+    ERROR: __VERIFIER_error();
+  }
+  return;
+}
+void assert(int cond) {
+  if (!(cond)) {
+    ERROR: __VERIFIER_error();
+  }
+  return;
+}
+
