@@ -28,10 +28,10 @@ int main() {
     __VERIFIER_assume( nlen  ==  idBitLength / 32 );
     
   for (j = 0; (j < idBitLength / 8) && (j < material_length); j++) {
-    //__VERIFIER_assert( 0 <= j);
-    //__VERIFIER_assert( j < material_length );
-    //__VERIFIER_assert( 0 <= j/4 );
-    __VERIFIER_assert( j/4 < nlen);
+    __VERIFIER_assert( 0 <= j);
+    __VERIFIER_assert( j < material_length );
+    __VERIFIER_assert( 0 <= j/4 );
+    //__VERIFIER_assert( j/4 < nlen);
   }
   
   return 0;
