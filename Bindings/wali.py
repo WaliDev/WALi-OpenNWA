@@ -2598,6 +2598,53 @@ class TransSetImpl(_object):
 TransSetImpl_swigregister = _wali.TransSetImpl_swigregister
 TransSetImpl_swigregister(TransSetImpl)
 
+class ConstTransPair(_object):
+    """Proxy of C++ std::pair<(q(const).p.ITrans,bool)> class"""
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, ConstTransPair, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, ConstTransPair, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        """
+        __init__(self) -> ConstTransPair
+        __init__(self, first, second) -> ConstTransPair
+
+        Parameters:
+            first: ITrans *const
+            second: bool
+
+        __init__(self, p) -> ConstTransPair
+
+        Parameters:
+            p: std::pair< ITrans *const,bool > const &
+
+        """
+        this = _wali.new_ConstTransPair(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_getmethods__["first"] = _wali.ConstTransPair_first_get
+    if _newclass:first = _swig_property(_wali.ConstTransPair_first_get)
+    __swig_setmethods__["second"] = _wali.ConstTransPair_second_set
+    __swig_getmethods__["second"] = _wali.ConstTransPair_second_get
+    if _newclass:second = _swig_property(_wali.ConstTransPair_second_get, _wali.ConstTransPair_second_set)
+    def __len__(self): return 2
+    def __repr__(self): return str((self.first, self.second))
+    def __getitem__(self, index): 
+      if not (index % 2): 
+        return self.first
+      else:
+        return self.second
+    def __setitem__(self, index, val):
+      if not (index % 2): 
+        self.first = val
+      else:
+        self.second = val
+    __swig_destroy__ = _wali.delete_ConstTransPair
+    __del__ = lambda self : None;
+ConstTransPair_swigregister = _wali.ConstTransPair_swigregister
+ConstTransPair_swigregister(ConstTransPair)
+
 class TransSet(Printable):
     """Proxy of C++ wali::wfa::TransSet class"""
     __swig_setmethods__ = {}

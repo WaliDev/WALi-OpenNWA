@@ -337,6 +337,7 @@ but swig is not cased for - therefore do it here */
 
 %template(TransSetImpl) std::set< ITrans*,ITransLT >;
 /*%template(TransSetIterator) std::set< ITrans*,ITransLT >::iterator;*/
+%template(ConstTransPair) std::pair<ITrans* const, bool>;
 
 %include "../Source/wali/wfa/TransSet.hpp"
 %template(TransVector) std::vector<wali::wfa::Trans*>;

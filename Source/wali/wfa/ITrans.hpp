@@ -83,6 +83,8 @@ namespace wali
         // Methods
         //
       public:
+        virtual ~ITrans() {}
+
         /*!
          * @return a copy of the transition
          */

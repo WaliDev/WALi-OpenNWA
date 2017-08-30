@@ -25,6 +25,8 @@ and access them from Python.
 
 /* WFA Util stuff */
 #include "../Source/wali/wfa/TransFunctor.hpp"
+#include "../Source/wali/wfa/ITrans.hpp"
+
 /* WFA */
 #include "../Source/wali/wfa/WFA.hpp"
 #include "../Source/wali/wfa/State.hpp"
