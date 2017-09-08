@@ -15,7 +15,8 @@ DUET_DIR="$NEWTON_DIR/../duet"
 
 SUITE="$NEWTON_DIR/Examples/cprover/tests/regression"
 
-TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b $NEWTON_DIR/Examples/cprover/tests/sv-benchmarks/* $NEWTON_DIR/Examples/cprover/tests/misc-recursive $NEWTON_DIR/Examples/cprover/tests/rec-loop-lit $NEWTON_DIR/Examples/cprover/tests/rec-loop-new ) # PLDI subset
+#TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b $NEWTON_DIR/Examples/cprover/tests/sv-benchmarks/* $NEWTON_DIR/Examples/cprover/tests/misc-recursive $NEWTON_DIR/Examples/cprover/tests/rec-loop-lit $NEWTON_DIR/Examples/cprover/tests/rec-loop-new ) # PLDI subset
+TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/frankenstein/functional/ $NEWTON_DIR/Examples/cprover/tests/frankenstein/relational/ $NEWTON_DIR/Examples/cprover/tests/frankenstein/HOLA/ ) # frankenstein suite
 
 NEWTON="$NEWTON_DIR/_build64/Examples/cprover/NewtonOcaml"
 DUET="$DUET_DIR/duet.native"
@@ -61,7 +62,8 @@ for directory in ${TESTDIRS[@]}; do
         #
         #
         rm -f $below_outfile
-        COMMAND="$NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops"
+	#eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-matrix -use-ocrs --test=$RESULT $testf &> $below_outfile"
+        COMMAND="$NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-matrix -use-ocrs"
         echo $COMMAND >> $below_outfile
         echo "" >> $below_outfile
 		eval "timeout $TIMEOUT $COMMAND --test=$RESULT $testf &>> $below_outfile"

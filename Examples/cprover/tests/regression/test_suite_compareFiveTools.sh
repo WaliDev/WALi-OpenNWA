@@ -13,13 +13,22 @@ shopt -s nullglob
 NEWTON_DIR="$(pwd)"
 DUET_DIR="$NEWTON_DIR/../duet"
 UA_DIR="$NEWTON_DIR/../UAutomizer"
-CPA_DIR="$NEWTON_DIR/../CPAchecker"
-LPI_DIR="$NEWTON_DIR/../lpi-svcomp16"
-SEA_DIR="$NEWTON_DIR/../SeaHorn-0.1.0-Linux-x86_64"
+#UA_DIR="/home/turetsky/uAutomizer/uAutomizer/UAutomizer-linux"
+CPA_DIR="/home/turetsky/cpaChecker/CPAchecker-1.6.12-svcomp17-unix"
+#CPA_DIR="$NEWTON_DIR/../CPAchecker"
+#LPI_DIR="$NEWTON_DIR/../lpi-svcomp16"
+#SEA_DIR="$NEWTON_DIR/../SeaHorn-0.1.0-Linux-x86_64"
+SEA_DIR="/home/turetsky/seahorn/SeaHorn-0.1.0-Linux-x86_64/"
 
 SUITE="$NEWTON_DIR/Examples/cprover/tests/regression"
 
-TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b $NEWTON_DIR/Examples/cprover/tests/sv-benchmarks/* $NEWTON_DIR/Examples/cprover/tests/misc-recursive $NEWTON_DIR/Examples/cprover/tests/rec-loop-lit $NEWTON_DIR/Examples/cprover/tests/rec-loop-new ) # PLDI subset
+#TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/TEMP_FAST ) # temp fast
+
+#TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/frankenstein/functional/exponential ) # frankenstein suite
+
+TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/frankenstein/functional/ $NEWTON_DIR/Examples/cprover/tests/frankenstein/functional/exponential $NEWTON_DIR/Examples/cprover/tests/frankenstein/HOLA/ $NEWTON_DIR/Examples/cprover/tests/frankenstein/relational/ ) # frankenstein suite
+
+#TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b $NEWTON_DIR/Examples/cprover/tests/sv-benchmarks/* $NEWTON_DIR/Examples/cprover/tests/misc-recursive $NEWTON_DIR/Examples/cprover/tests/rec-loop-lit $NEWTON_DIR/Examples/cprover/tests/rec-loop-new ) # PLDI subset
 #TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/rec-new $NEWTON_DIR/Examples/cprover/tests/rec-loop-lit $NEWTON_DIR/Examples/cprover/tests/rec-loop-new )
 #TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b $NEWTON_DIR/Examples/cprover/tests/misc-recursive $NEWTON_DIR/Examples/cprover/tests/sv-benchmarks/* ) # OLD PLDI (POPL) subset
 #TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/misc-recursive ) # quick test
@@ -30,16 +39,18 @@ DUET="$DUET_DIR/duet.native"
 UA="$UA_DIR/Ultimate.py"
 CPA="$CPA_DIR/scripts/cpa.sh"
 LPI="$LPI_DIR/scripts/cpa.sh"
-SEA="$SEA_DIR/bin/sea_svcomp"
+#SEA="$SEA_DIR/bin/sea_svcomp"
+SEA="~/seahorn/SeaHorn-0.1.0-Linux-x86_64/bin/sea_svcomp"
 
 # The outputs are saved here
 OUTDIR="$SUITE/outputs"
 # The input tests are copied here
 INDIR="$SUITE/inputs"
-RESULT="$OUTDIR/__result.out"
+RESULT="$OUTDIR/__result_C4.out"
 SCRIPT="$SUITE/toHTML_compareFiveTools.py"
 
-TIMEOUT="5m"
+TIMEOUT="1m"
+#TIMEOUT="5m"
 
 mkdir -p $OUTDIR
 mkdir -p $INDIR
@@ -72,12 +83,13 @@ for directory in ${TESTDIRS[@]}; do
 		rm -f $infile.i
 		cp $testf $infile
 		
-		echo -n "Running test $i of ${#TESTS[@]} ..."
+		echo -n "Running test $i of ${#TESTS[@]} $(basename $testf) ... "
 		
 		echo -n " Newton ..."
 		start=$(date +%s%N)
 		cd $NEWTON_DIR
-		eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf &> $below_outfile"
+		#eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf &> $below_outfile"
+		eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -use-ocrs -cra-matrix --test=$RESULT $testf &> $below_outfile"
 		success=$?
 		if (($success==124)); then
 			echo "__TIMEOUT" >> $RESULT
@@ -158,7 +170,7 @@ for directory in ${TESTDIRS[@]}; do
 		echo -n "__CPA " >> $RESULT
 		cd $CPA_DIR
 		#cd $UA_DIR
-		eval "timeout $TIMEOUT $CPA -config $CPA_DIR/config/sv-comp16.properties -noout $infile.i &> $cpa_outfile"
+		eval "timeout $TIMEOUT $CPA -config $CPA_DIR/config/sv-comp17.properties -noout -timelimit 900 $infile.i &> $cpa_outfile"
 		if (($?==124)); then
 			echo "TIMEOUT" >> $RESULT
 			echo -ne "\e[31mTimeout\e[0m"
@@ -178,30 +190,30 @@ for directory in ${TESTDIRS[@]}; do
 		len=$(expr $end - $start)
 		echo "__CPATIME $len" >> $RESULT
 		
-		echo -n " LPI ..."
-		start=$(date +%s%N)
-		echo -n "__LPI " >> $RESULT
-		cd $LPI_DIR
-		eval "timeout $TIMEOUT $LPI -config $LPI_DIR/config/lpi-svcomp16.properties -noout $infile.i &> $lpi_outfile"
-		#eval "timeout $TIMEOUT $CPA -config $CPA_DIR/config/sv-comp16.properties -noout $infile.i &> $cpa_outfile"
-		if (($?==124)); then
-			echo "TIMEOUT" >> $RESULT
-			echo -ne "\e[31mTimeout\e[0m"
-		else
-			if grep -Pzoq "result: TRUE" $lpi_outfile; then
-				echo "PASS" >> $RESULT
-			elif grep -Pzoq "result: FALSE" $lpi_outfile; then
-				echo "FAIL" >> $RESULT
-			elif grep -Pzoq "result: UNKNOWN" $lpi_outfile; then
-				echo "UNKNOWN" >> $RESULT
-			else
-				echo "EXCEPTION" >> $RESULT
-				echo -ne "\e[31mException\e[0m"
-			fi
-		fi
-		end=$(date +%s%N)
-		len=$(expr $end - $start)
-		echo "__LPITIME $len" >> $RESULT
+		#echo -n " LPI ..."
+		#start=$(date +%s%N)
+		#echo -n "__LPI " >> $RESULT
+		#cd $LPI_DIR
+		#eval "timeout $TIMEOUT $LPI -config $LPI_DIR/config/lpi-svcomp16.properties -noout $infile.i &> $lpi_outfile"
+		##eval "timeout $TIMEOUT $CPA -config $CPA_DIR/config/sv-comp16.properties -noout $infile.i &> $cpa_outfile"
+		#if (($?==124)); then
+		#	echo "TIMEOUT" >> $RESULT
+		#	echo -ne "\e[31mTimeout\e[0m"
+		#else
+		#	if grep -Pzoq "result: TRUE" $lpi_outfile; then
+		#		echo "PASS" >> $RESULT
+		#	elif grep -Pzoq "result: FALSE" $lpi_outfile; then
+		#		echo "FAIL" >> $RESULT
+		#	elif grep -Pzoq "result: UNKNOWN" $lpi_outfile; then
+		#		echo "UNKNOWN" >> $RESULT
+		#	else
+		#		echo "EXCEPTION" >> $RESULT
+		#		echo -ne "\e[31mException\e[0m"
+		#	fi
+		#fi
+		#end=$(date +%s%N)
+		#len=$(expr $end - $start)
+		#echo "__LPITIME $len" >> $RESULT
 		
 		echo -n " SEA ..."
 		start=$(date +%s%N)
@@ -229,7 +241,7 @@ for directory in ${TESTDIRS[@]}; do
 		
 		echo -n " Done"
                 echo -n " (Cleaning up SeaHorn...)"
-                killall seahorn
+                killall seahorn &> /dev/null
                 echo ""
 			
 		let i+=1
@@ -239,4 +251,4 @@ done
 echo -n "Generating HTML ... "
 cd $SUITE
 python $SCRIPT || exit 1
-echo "Done. Please see result.html"
+echo "Done. Please see result_C5.html"

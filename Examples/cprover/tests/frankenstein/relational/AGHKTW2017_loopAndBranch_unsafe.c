@@ -2,12 +2,14 @@
    Tachio Terauchi, Shiyi Wei: Decomposition Instead of Self-Composition for
    Proving the Absence of Timing Channels.  PLDI 2017 */
 
-/* Modified version of a program in the above paper. This one is for sure safe */
+
+/* This is actually the original from the above paper. They mark the program
+   safe, but we believe it is unsafe. */
 
 #include "assert.h"
 
 int loopAndbranch_safe(int high, int low) {
-    int i = low;
+    int i = high;
     int tick = 0;
     if (low < 0) {
 	while (i > 0) {
@@ -17,14 +19,14 @@ int loopAndbranch_safe(int high, int low) {
     } else {
 	low = low + 10; // low is above 0
 	if (low >= 10) {
-	    int j = low;
+	    int j = high;
 	    while (j > 0) {
 		j--;
 		tick++;
 	    }
 	} else {
-	    if (high < 0) { //this branch would reveal info, but it is infeasible
-		int k = low;
+	    if (high < 0) {
+		int k = high;
 		while (k>0) {
 		    k--;
 		    tick++;
@@ -32,7 +34,7 @@ int loopAndbranch_safe(int high, int low) {
 	    }
 	}
     }
-    return tick; //tick is solely some function of low
+    return tick; //tick == high
 }
 
 void main() {
