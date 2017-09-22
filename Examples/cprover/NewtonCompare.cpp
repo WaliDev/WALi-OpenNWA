@@ -4423,18 +4423,18 @@ int main(int argc, char **argv)
             case 'Q':
             case 'G':
             case 'Z':
-            case 'E': // compensating for a typo; remove this option later
-                if (newtonVerbosity >= NV_STANDARD_WARNINGS) {
-                    std::cout << "Passing command-line option " << "-cra-split-loops" << " to duet." << std::endl;
-                }
-                unrecognizedArgs.push_back("-cra-split-loops");
-                break;  
             case 'L':
                 if (newtonVerbosity >= NV_STANDARD_WARNINGS) {
                     std::cout << "Passing command-line option " <<  argv[optind - 2] << " " << optarg << " to duet." << std::endl;
                 }
                 unrecognizedArgs.push_back(removeDoubleDash(argv[optind - 2]));
                 unrecognizedArgs.push_back(optarg);
+                break;  
+            case 'E': // compensating for a typo; remove this option later
+                if (newtonVerbosity >= NV_STANDARD_WARNINGS) {
+                    std::cout << "Passing command-line option " << "-cra-split-loops" << " to duet." << std::endl;
+                }
+                unrecognizedArgs.push_back("-cra-split-loops");
                 break;  
             // unrecognized option, currently we just pass it to duet
             case '?':                       
