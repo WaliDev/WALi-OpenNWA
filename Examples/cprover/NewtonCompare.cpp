@@ -4310,6 +4310,16 @@ void printHelp() {
     caml_startup(ocamlArgs);
 }
 
+char * removeDoubleDash(char * str) {
+    if (str != NULL && str[0] == '-' && str[1] == '-') {
+        if (newtonVerbosity >= NV_STANDARD_WARNINGS) {
+            std::cout << "Note: sending command-line argument " << (str+1) << " to duet with single '-'" << std::endl;
+        }
+        return str+1;
+    }
+    return str;
+}
+
 int main(int argc, char **argv)
 {
     gaussJordanMode = 1; // 0 means NPA-TP (use "--npa-tp"); 1 means NPA-TP-GJ.
@@ -4325,7 +4335,7 @@ int main(int argc, char **argv)
             if (warnAboutPlus) {
                 warnAboutPlus = false;
                 if (newtonVerbosity >= NV_STANDARD_WARNINGS) {
-                    std::cerr << "Warning: ICRA is translating '+' command-line arguments to '-'" << std::endl;
+                    std::cout << "Note: ICRA is translating '+' command-line arguments to '-'" << std::endl;
                 }
             }
         }
@@ -4335,6 +4345,8 @@ int main(int argc, char **argv)
         {"cra_newton_basic", no_argument,       &aboveBelowMode,  NEWTON_FROM_BELOW  },
         {"cra_newton_star",  no_argument,       &aboveBelowMode,  2  },
         {"cra_newton_above", no_argument,       &aboveBelowMode,  NEWTON_FROM_ABOVE  },
+        {"cra-newton-basic", no_argument,       &aboveBelowMode,  NEWTON_FROM_BELOW  },
+        {"cra-newton-above", no_argument,       &aboveBelowMode,  NEWTON_FROM_ABOVE  },
         {"simplify",         no_argument,       0,            'S' },
         {"no_simplify_on_print",no_argument,    0,            'P' },
         {"help",             no_argument,       0,            'H' },
@@ -4354,6 +4366,7 @@ int main(int argc, char **argv)
         {"bound-entry",      required_argument, 0,            'B' },
         {"bound-all",        required_argument, 0,            'C' },
         {"smtlib-output",    no_argument,       0,            'U' },
+        {"cra-split_loops",  no_argument,       0,            'E' }, // compensating for a typo; remove this later...
         {0,                  0,                 0,             0  }
     };
 
@@ -4410,11 +4423,17 @@ int main(int argc, char **argv)
             case 'Q':
             case 'G':
             case 'Z':
+            case 'E': // compensating for a typo; remove this option later
+                if (newtonVerbosity >= NV_STANDARD_WARNINGS) {
+                    std::cout << "Passing command-line option " << "-cra-split-loops" << " to duet." << std::endl;
+                }
+                unrecognizedArgs.push_back("-cra-split-loops");
+                break;  
             case 'L':
                 if (newtonVerbosity >= NV_STANDARD_WARNINGS) {
                     std::cout << "Passing command-line option " <<  argv[optind - 2] << " " << optarg << " to duet." << std::endl;
                 }
-                unrecognizedArgs.push_back(argv[optind - 2]);
+                unrecognizedArgs.push_back(removeDoubleDash(argv[optind - 2]));
                 unrecognizedArgs.push_back(optarg);
                 break;  
             // unrecognized option, currently we just pass it to duet
@@ -4422,7 +4441,7 @@ int main(int argc, char **argv)
                 if (newtonVerbosity >= NV_STANDARD_WARNINGS) {
                     std::cout << "Passing command-line option " <<  argv[optind - 1] << " to duet." << std::endl;
                 }
-                unrecognizedArgs.push_back(argv[optind - 1]);
+                unrecognizedArgs.push_back(removeDoubleDash(argv[optind - 1]));
                 break;  
         }   
     }
