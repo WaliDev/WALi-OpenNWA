@@ -4358,6 +4358,7 @@ int main(int argc, char **argv)
     };
 
     std::string variableName;
+    opterr = 0;
     int long_index = 0, opt = 0;    
     while ((opt = getopt_long_only(argc, argv, "SPHDR:T:M:V:I:Q:G:", 
                    long_options, &long_index )) != -1) {
@@ -4387,7 +4388,7 @@ int main(int argc, char **argv)
                 newtonVerbosity = atoi(optarg);
                 if (newtonVerbosity < NV_PDS) { wali::wfa::automaticallyPrintOutput = false; }
                 if (newtonVerbosity < NV_ALPHA_HAT_STAR) { Relation::printOnAlphaHatStar = false; }
-                if (newtonVerbosity < NV_STANDARD_WARNINGS) { opterr = 0; }
+                //if (newtonVerbosity < NV_STANDARD_WARNINGS) { opterr = 0; }
                 break;
             case 'U':
                 doSmtlibOutput = true;  
