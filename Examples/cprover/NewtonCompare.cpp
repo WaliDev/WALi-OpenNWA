@@ -294,7 +294,8 @@ int  aboveBelowMode;
 bool doWideningThisRound;
 bool inNewtonLoop;
 bool doSmtlibOutput;
-char *  globalBoundingVarName; // name of program variable for which we want to do a print_hull in main.  NULL if there is none.
+std::vector<std::string> boundingVarAll;   // names of variables for which to print bounds for all procedures...
+std::vector<std::string> boundingVarEntry; // ... and for the main procedure only
 
 short dump = false;
 
@@ -3743,6 +3744,266 @@ double doNewtonSteps_GJ(WFA& outfa, wali::Key entry_key, FWPDS * originalPds = N
   }
 }
 
+
+
+
+int getGlobalBoundingVarFromName(const char * variableName) {
+    CAMLparam0();
+    CAMLlocal2(sval, idval);
+    sval = caml_copy_string(variableName);
+    value * proc_func = caml_named_value("get_global_var");
+    idval = caml_callback(*proc_func, sval);
+    CAMLreturnT(int, Int_val(idval));
+}
+
+// New code for manipulating procedure summaries
+
+class Procedure : public Countable {
+  public:
+    relation_t summary;
+    std::string name;
+
+    Procedure(relation_t _summary, std::string _name) : 
+        Countable(), summary(_summary), name(_name) {}
+};
+typedef wali::ref_ptr<Procedure> ProcedureRefPtr;
+
+class Program : public Countable {
+  public:
+    std::map<std::string,ProcedureRefPtr> proceduresByName;
+    ProcedureRefPtr main;
+
+    Program() : Countable() {} 
+
+    void addProcedure(ProcedureRefPtr p) { proceduresByName[p->name] = p; }
+
+};
+typedef wali::ref_ptr<Program> ProgramRefPtr;
+
+std::string getProcedureNameFromNode(int nodeNumber) {
+    CAMLparam0();
+    CAMLlocal1(sval);
+    value * proc_func = caml_named_value("procedure_of_vertex_callback");
+    sval = caml_callback(*proc_func, Val_int(nodeNumber));
+    CAMLreturnT(std::string, String_val(sval));
+}
+
+// Extract the procedure summaries from outfaNewton and add them to program.
+void extractProcedureSummaries(WFA& outfaNewton, ProgramRefPtr program) {
+
+    static int numberOfUnrecognizedProcedures = 1;
+    
+    // Set exit_transitions to the set of all transitions in outfaNewton
+    // of the form (st1,WALI_EPSILON,<st1,e>), where e is an entry node
+    wali::wfa::TransSet exit_transitions;
+    exit_transitions = outfaNewton.match(st1(), WALI_EPSILON);
+    for(wali::wfa::TransSet::iterator tsit = exit_transitions.begin(); tsit != exit_transitions.end(); tsit++) {
+        bool foundMain = false;
+        std::string name = "";
+        
+        // First, we want to extract the procedure name; for that, we need to find
+        //   the procedure's entry vertex, so we can call printProcedureNameFromNode.
+        // After our various automaton manipulations, the following code seems to be
+        //   what's required to obtain the procedure's entry vertex key from the
+        //   exit transition whose weight is the procedure summary.
+        wali::Key toKey = (*tsit)->to();
+        wali::ref_ptr<wali::KeySource> ks = wali::getKeySource(toKey);
+        wali::ref_ptr<wali::wpds::GenKeySource> gks = dynamic_cast<wali::wpds::GenKeySource *>(ks.get_ptr());
+        if (gks != NULL) {
+            wali::ref_ptr<wali::KeySource> gksks = wali::getKeySource(gks->getKey());
+            wali::ref_ptr<wali::KeyPairSource> kps = dynamic_cast<wali::KeyPairSource *>(gksks.get_ptr());
+            if (kps != NULL) {
+                wali::ref_ptr<wali::KeySource> kpsks = wali::getKeySource(kps->second());
+                wali::ref_ptr<wali::IntSource> is = dynamic_cast<wali::IntSource *>(kpsks.get_ptr());
+                if (is != NULL) {
+                    int entryVertex = is->getInt();
+                    name = getProcedureNameFromNode(entryVertex);
+                } else {
+                    //if (newtonVerbosity >= NV_SUMMARIES) std::cout << "Warning: a procedure could not be identified by name.  (Case 1)." << std::endl;
+                    std::stringstream ss;
+                    ss << "unknown" << numberOfUnrecognizedProcedures++;
+                    name = ss.str();
+                }
+            } else {
+                //if (newtonVerbosity >= NV_SUMMARIES) std::cout << "Warning: a procedure could not be identified by name.  (Case 2)." << std::endl;
+                std::stringstream ss;
+                ss << "unknown" << numberOfUnrecognizedProcedures++;
+                name = ss.str();
+            }
+        } else {
+            foundMain = true;
+            name = "main";
+            // Note: its name may not actually be main, but we have no mechanism to find out the main procedure's actual name
+        }
+
+        // Finally, we can extract the procedure summary itself:
+        relation_t nval = mkRelationFromSemElem((*tsit)->weight());
+
+        ProcedureRefPtr procedure = new Procedure(nval, name);
+
+        if (foundMain) { program->main = procedure; }
+
+        program->addProcedure(procedure);
+    }
+}
+
+void writeSmtlibOutput(ProgramRefPtr program) {
+    ofstream smtout;
+    smtout.open("smtlib_output.smt2");
+    for (std::map<std::string,ProcedureRefPtr>::iterator it=program->proceduresByName.begin(); 
+         it!=program->proceduresByName.end(); ++it) {
+
+        ProcedureRefPtr procedure = (*it).second;
+
+        smtout << "; Procedure summary for " << procedure->name;
+        procedure->summary->printSmtlib(smtout);
+        smtout << std::endl;
+    }
+    smtout.close();
+}
+
+void printProcedureSummaries(ProgramRefPtr program) {
+    std::cout << "================================================" << std::endl;
+    std::cout << "Procedure Summaries" << std::endl << std::endl;
+    for (std::map<std::string,ProcedureRefPtr>::iterator it=program->proceduresByName.begin(); 
+         it!=program->proceduresByName.end(); ++it) {
+
+        std::cout << "------------------------------------------------" << std::endl;
+
+        ProcedureRefPtr procedure = (*it).second;
+
+        std::cout << "Procedure summary for " << procedure->name << std::endl << std::endl;
+        procedure->summary->print(std::cout);
+        std::cout << std::endl << std::endl;
+    }
+}
+
+// Print bounds on program variables as specified by the data structure printHullRuleHolder
+//   If we were instructed by the user to print bounds on some global variable
+//   for the main procedure, we will also do that.
+void printVariableBounds(WFA& outfaNewton, ProgramRefPtr program) {
+    std::cout << "================================================" << std::endl;
+    std::cout << "Bounds on Variables" << std::endl << std::endl;
+    
+    // First, handle variables mentioned in print_hull statements
+    for (std::vector<caml_print_hull_rule>::iterator it = printHullRuleHolder.begin(); 
+         it != printHullRuleHolder.end(); 
+         it++)
+    {
+        wali::Key key = it->first;
+        int line = it->second.first;
+        int variableID = it->second.second;
+        
+        wali::wfa::TransSet print_hull_transitions;
+        print_hull_transitions = outfaNewton.match(st1(), key);
+        for(wali::wfa::TransSet::iterator tsit = print_hull_transitions.begin(); 
+            tsit != print_hull_transitions.end(); 
+            tsit++)
+        {
+            relation_t intraprocWeight = mkRelationFromSemElem((*tsit)->weight());  // Weight from containing procedure's entry to print-hull pt
+            relation_t contextWeight = mkRelationFromSemElem(outfaNewton.getState((*tsit)->to())->weight());  // Weight of calling context
+
+            //relation_t composedWeight = contextWeight->Compose(intraprocWeight);    // FIXME: Compose badly named: Compose should be Extend
+            relation_t composedWeight = mkRelationFromSemElem(contextWeight->extend(intraprocWeight.get_ptr()));    
+            
+            //std::cout << "Variable Bounds at Line: " << line << std::endl;
+            std::cout << "Variable bounds";
+            if (line != -1) {
+                std::cout << " at line " << line << " in ";
+            } else {
+                std::cout << " for procedure ";
+            }
+            wali::ref_ptr<wali::KeySource> ks = wali::getKeySource(key);
+            wali::ref_ptr<wali::IntSource> is = dynamic_cast<wali::IntSource *>(ks.get_ptr());
+            if (is != NULL) {
+                int vertex = is->getInt();
+                std::cout << getProcedureNameFromNode(vertex) << std::endl;
+            } else {
+                std::cout << "unknown procedure" << std::endl;
+            }
+            intraprocWeight->printHull(std::cout, 0, variableID);
+            std::cout << std::endl;
+        }
+    }
+
+    // Second, handle variables mentioned with the --bound-all command-line parameter
+    if (boundingVarAll.size() > 0) {
+        for (std::map<std::string,ProcedureRefPtr>::iterator it=program->proceduresByName.begin(); 
+             it!=program->proceduresByName.end(); ++it) {
+            ProcedureRefPtr procedure = (*it).second;
+            for(std::vector<std::string>::iterator strit = boundingVarAll.begin();
+                    strit != boundingVarAll.end(); ++strit) {
+                std::string variableName = *strit;
+                if (procedure == program->main) { continue; } // skip the main procedure
+                int variableID = getGlobalBoundingVarFromName(variableName.c_str());
+                std::cout << "Variable bounds for procedure '" << procedure->name << "': " << std::endl;
+                procedure->summary->printHull(std::cout, 0, variableID);
+                std::cout << std::endl;
+            }
+        }
+    }
+
+    // Third, handle variables to be printed in main, whether from the --bound-entry or --bound-all parameters 
+    if (program->main != NULL) {
+        for(std::vector<std::string>::iterator strit = boundingVarAll.begin();
+                strit != boundingVarAll.end(); ++strit) {
+            std::string variableName = *strit;
+            if (std::find(boundingVarEntry.begin(), boundingVarEntry.end(), variableName) != boundingVarEntry.end()) {
+                // The user mentioned this variable in both --bound-entry and --bound-all; let's not print it twice.
+                continue;
+            }
+            int variableID = getGlobalBoundingVarFromName(variableName.c_str());
+            std::cout << "Variable bounds for main procedure: " << std::endl;
+            program->main->summary->printHull(std::cout, 0, variableID);
+            std::cout << std::endl;
+        }
+        for(std::vector<std::string>::iterator strit = boundingVarEntry.begin();
+                strit != boundingVarEntry.end(); ++strit) {
+            std::string variableName = *strit;
+            int variableID = getGlobalBoundingVarFromName(variableName.c_str());
+            std::cout << "Variable bounds for main procedure: " << std::endl;
+            program->main->summary->printHull(std::cout, 0, variableID);
+            std::cout << std::endl;
+        }
+    }
+    
+    //if(dump){
+    //    FWPDS * originalPds = new FWPDS();
+    //    con = pds_from_prog(originalPds, pg);
+    //    cout << "[Newton] Dumping PDS to pds.dot..." << endl;
+    //    fstream pds_stream("pds.dot", fstream::out);
+    //    RuleDotty rd(pds_stream);
+    //    pds_stream << "digraph{" << endl;
+    //    originalPds->for_each(rd);
+    //    pds_stream << "}" << endl;
+    //    delete(originalPds);
+    //}
+
+    std::cout << "================================================" << std::endl;
+}
+
+//    if (boundingVarAll.size() > 0 || boundingVarEntry.size() > 0) {
+//        int variableID = getGlobalBoundingVarFromName(globalBoundingVarName);
+//        if (program->main != NULL && generateBoundsInMainOnly) {
+//            // We've been asked to print bounds on a particular global variable
+//            //   for the main procedure.
+//            std::cout << "Variable bounds for main procedure: " << std::endl;
+//            program->main->summary->printHull(std::cout, 0, variableID);
+//            std::cout << std::endl;
+//        } else if (!generateBoundsInMainOnly) {
+//            for (std::map<std::string,ProcedureRefPtr>::iterator it=program->proceduresByName.begin(); 
+//                 it!=program->proceduresByName.end(); ++it) {
+//                ProcedureRefPtr procedure = (*it).second;
+//                std::cout << "Variable bounds for procedure '" << procedure->name << "': " << std::endl;
+//                procedure->summary->printHull(std::cout, 0, variableID);
+//                std::cout << std::endl;
+//            }
+//        }
+//    }
+
+
+// Old code for manipulating procedure summaries
+
 void printProcedureNameFromNode(int nodeNumber, ostream& out) {
     CAMLparam0();
     CAMLlocal1(sval);
@@ -3903,88 +4164,81 @@ void checkAssertions(WFA& outfaNewton) {
     }
 }
 
-int getGlobalBoundingVarFromName(char * variableName) {
-    CAMLparam0();
-    CAMLlocal2(sval, idval);
-    sval = caml_copy_string(variableName);
-    value * proc_func = caml_named_value("get_global_var");
-    idval = caml_callback(*proc_func, sval);
-    CAMLreturnT(int, Int_val(idval));
-}
-
-// Print bounds on program variables as specified by the data structure printHullRuleHolder
+// OLD CODE
+//// Print bounds on program variables as specified by the data structure printHullRuleHolder
+////
+////   If a non-null mainProcedureSummary is supplied, and if we were instructed by the user
+////   to print bounds on some global variable for the main procedure, we will also do thar.
+//void printVariableBounds(WFA& outfaNewton, relation_t mainProcedureSummary) {
+//    std::cout << "================================================" << std::endl;
+//    std::cout << "Bounds on Variables" << std::endl << std::endl;
+//    
+//    for (std::vector<caml_print_hull_rule>::iterator it = printHullRuleHolder.begin(); 
+//         it != printHullRuleHolder.end(); 
+//         it++)
+//    {
+//        wali::Key key = it->first;
+//        int line = it->second.first;
+//        int variableID = it->second.second;
+//        
+//        wali::wfa::TransSet print_hull_transitions;
+//        print_hull_transitions = outfaNewton.match(st1(), key);
+//        for(wali::wfa::TransSet::iterator tsit = print_hull_transitions.begin(); 
+//            tsit != print_hull_transitions.end(); 
+//            tsit++)
+//        {
+//            relation_t intraprocWeight = mkRelationFromSemElem((*tsit)->weight());  // Weight from containing procedure's entry to print-hull pt
+//            relation_t contextWeight = mkRelationFromSemElem(outfaNewton.getState((*tsit)->to())->weight());  // Weight of calling context
 //
-//   If a non-null mainProcedureSummary is supplied, and if we were instructed by the user
-//   to print bounds on some global variable for the main procedure, we will also do thar.
-void printVariableBounds(WFA& outfaNewton, relation_t mainProcedureSummary) {
-    std::cout << "================================================" << std::endl;
-    std::cout << "Bounds on Variables" << std::endl << std::endl;
-    
-    for (std::vector<caml_print_hull_rule>::iterator it = printHullRuleHolder.begin(); 
-         it != printHullRuleHolder.end(); 
-         it++)
-    {
-        wali::Key key = it->first;
-        int line = it->second.first;
-        int variableID = it->second.second;
-        
-        wali::wfa::TransSet print_hull_transitions;
-        print_hull_transitions = outfaNewton.match(st1(), key);
-        for(wali::wfa::TransSet::iterator tsit = print_hull_transitions.begin(); 
-            tsit != print_hull_transitions.end(); 
-            tsit++)
-        {
-            relation_t intraprocWeight = mkRelationFromSemElem((*tsit)->weight());  // Weight from containing procedure's entry to print-hull pt
-            relation_t contextWeight = mkRelationFromSemElem(outfaNewton.getState((*tsit)->to())->weight());  // Weight of calling context
-
-            //relation_t composedWeight = contextWeight->Compose(intraprocWeight);    // FIXME: Compose badly named: Compose should be Extend
-            relation_t composedWeight = mkRelationFromSemElem(contextWeight->extend(intraprocWeight.get_ptr()));    
-            
-            //std::cout << "Variable Bounds at Line: " << line << std::endl;
-            std::cout << "Variable bounds";
-            if (line != -1) {
-                std::cout << " at line " << line << " in ";
-            } else {
-                std::cout << " for procedure ";
-            }
-            wali::ref_ptr<wali::KeySource> ks = wali::getKeySource(key);
-            wali::ref_ptr<wali::IntSource> is = dynamic_cast<wali::IntSource *>(ks.get_ptr());
-            if (is != NULL) {
-                int vertex = is->getInt();
-                printProcedureNameFromNode(vertex, std::cout);
-                std::cout << std::endl;
-            } else {
-                std::cout << "unknown procedure" << std::endl;
-            }
-            intraprocWeight->printHull(std::cout, 0, variableID);
-            std::cout << std::endl;
-        }
-    }
-    
-    if (globalBoundingVarName != NULL && mainProcedureSummary != NULL) {
-        // We've been asked to print bounds on a particular global variable
-        //   for the main procedure.
-        std::cout << "Variable bounds for main procedure: " << std::endl;
-        int variableID = getGlobalBoundingVarFromName(globalBoundingVarName);
-        mainProcedureSummary->printHull(std::cout, 0, variableID);
-        std::cout << std::endl;
-    }
-    
-    //if(dump){
-    //    FWPDS * originalPds = new FWPDS();
-    //    con = pds_from_prog(originalPds, pg);
-    //    cout << "[Newton] Dumping PDS to pds.dot..." << endl;
-    //    fstream pds_stream("pds.dot", fstream::out);
-    //    RuleDotty rd(pds_stream);
-    //    pds_stream << "digraph{" << endl;
-    //    originalPds->for_each(rd);
-    //    pds_stream << "}" << endl;
-    //    delete(originalPds);
-    //}
-
-    #undef flush
-    std::cout << "================================================" << std::endl;
-}
+//            //relation_t composedWeight = contextWeight->Compose(intraprocWeight);    // FIXME: Compose badly named: Compose should be Extend
+//            relation_t composedWeight = mkRelationFromSemElem(contextWeight->extend(intraprocWeight.get_ptr()));    
+//            
+//            //std::cout << "Variable Bounds at Line: " << line << std::endl;
+//            std::cout << "Variable bounds";
+//            if (line != -1) {
+//                std::cout << " at line " << line << " in ";
+//            } else {
+//                std::cout << " for procedure ";
+//            }
+//            wali::ref_ptr<wali::KeySource> ks = wali::getKeySource(key);
+//            wali::ref_ptr<wali::IntSource> is = dynamic_cast<wali::IntSource *>(ks.get_ptr());
+//            if (is != NULL) {
+//                int vertex = is->getInt();
+//                printProcedureNameFromNode(vertex, std::cout);
+//                std::cout << std::endl;
+//            } else {
+//                std::cout << "unknown procedure" << std::endl;
+//            }
+//            intraprocWeight->printHull(std::cout, 0, variableID);
+//            std::cout << std::endl;
+//        }
+//    }
+//    
+//    ////if (globalBoundingVarName != NULL && mainProcedureSummary != NULL && generateBoundsInMainOnly) {
+//    ////    // We've been asked to print bounds on a particular global variable
+//    ////    //   for the main procedure.
+//    ////    std::cout << "Variable bounds for main procedure: " << std::endl;
+//    ////    int variableID = getGlobalBoundingVarFromName(globalBoundingVarName);
+//    ////    mainProcedureSummary->printHull(std::cout, 0, variableID);
+//    ////    std::cout << std::endl;
+//    ////}
+//    
+//    //if(dump){
+//    //    FWPDS * originalPds = new FWPDS();
+//    //    con = pds_from_prog(originalPds, pg);
+//    //    cout << "[Newton] Dumping PDS to pds.dot..." << endl;
+//    //    fstream pds_stream("pds.dot", fstream::out);
+//    //    RuleDotty rd(pds_stream);
+//    //    pds_stream << "digraph{" << endl;
+//    //    originalPds->for_each(rd);
+//    //    pds_stream << "}" << endl;
+//    //    delete(originalPds);
+//    //}
+//
+//    #undef flush
+//    std::cout << "================================================" << std::endl;
+//}
+#undef flush
 
 int runBasicNewton(char **args)
 {
@@ -4016,9 +4270,16 @@ int runBasicNewton(char **args)
 
     //std::cout << std::endl << "outfaNewton" << std::endl; outfaNewton.print(std::cout); std::cout << std::endl << std::endl;
     
-    relation_t mainProcedureSummary = printProcedureSummaries(outfaNewton);
+    //relation_t mainProcedureSummary = printProcedureSummaries(outfaNewton);
+    //checkAssertions(outfaNewton);
+    //printVariableBounds(outfaNewton, mainProcedureSummary);
+    
+    ProgramRefPtr program = new Program();
+    extractProcedureSummaries(outfaNewton, program);
+    if (newtonVerbosity >= NV_SUMMARIES) printProcedureSummaries(program);
+    if (doSmtlibOutput) writeSmtlibOutput(program);
     checkAssertions(outfaNewton);
-    printVariableBounds(outfaNewton, mainProcedureSummary);
+    printVariableBounds(outfaNewton, program);
     
     if (newtonVerbosity >= NV_SUMMARIES) { std::cout << "Finished!" << std::endl << std::flush; }
     return 0;
@@ -4054,7 +4315,6 @@ int main(int argc, char **argv)
     gaussJordanMode = 1; // 0 means NPA-TP (use "--npa-tp"); 1 means NPA-TP-GJ.
     aboveBelowMode = 0;
     doSmtlibOutput = false;
-    globalBoundingVarName = NULL; 
     std::vector <char *> unrecognizedArgs;
 
     // As a temporary measure, allow arguments to be given starting with a plus
@@ -4092,10 +4352,12 @@ int main(int argc, char **argv)
         {"cra-abstract-limit",required_argument,0,            'L' },
         {"cra-abstraction-timeout",required_argument,0,       'A' },
         {"bound-entry",      required_argument, 0,            'B' },
+        {"bound-all",        required_argument, 0,            'C' },
         {"smtlib-output",    no_argument,       0,            'U' },
         {0,                  0,                 0,             0  }
     };
 
+    std::string variableName;
     int long_index = 0, opt = 0;    
     while ((opt = getopt_long_only(argc, argv, "SPHDR:T:M:V:I:Q:G:", 
                    long_options, &long_index )) != -1) {
@@ -4131,8 +4393,14 @@ int main(int argc, char **argv)
                 doSmtlibOutput = true;  
                 break;
             case 'B':
-                globalBoundingVarName = optarg;
-                std::cout << "Printing variable bounds for " << optarg << std::endl;
+                variableName = optarg;
+                boundingVarEntry.push_back(variableName);
+                std::cout << "Printing main procedure variable bounds for " << variableName << std::endl;
+                break;
+            case 'C':
+                variableName = optarg;
+                boundingVarAll.push_back(variableName);
+                std::cout << "Printing variable bounds for " << variableName << " in every procedure" << std::endl;
                 break;
             // duet options with an argument
             case 'M':
