@@ -4355,14 +4355,16 @@ int main(int argc, char **argv)
         {"rounds",           required_argument, 0,            'R' },
         {"newton-verbosity", required_argument, 0,            'N' },
         {"test",             required_argument, 0,            'T' },
-        {"domain",           required_argument, 0,            'M' },
-        {"verbose",          required_argument, 0,            'V' },
-        {"verbosity",        required_argument, 0,            'I' },
-        {"qe",               required_argument, 0,            'Q' },
+
+        {"domain",           required_argument, 0,            'M' }, // ----------------
+        {"verbose",          required_argument, 0,            'V' }, //  Each argument in this group is passed
+        {"verbosity",        required_argument, 0,            'I' }, //    to duet, along with an additional
+        {"qe",               required_argument, 0,            'Q' }, //    argument.
         {"cra-guard",        required_argument, 0,            'G' },
         {"z3-timeout",       required_argument, 0,            'Z' },
-        {"cra-abstract-limit",required_argument,0,            'L' },
         {"cra-abstraction-timeout",required_argument,0,       'A' },
+        {"cra-abstract-limit",required_argument,0,            'L' }, // -----------------
+
         {"bound-entry",      required_argument, 0,            'B' },
         {"bound-all",        required_argument, 0,            'C' },
         {"smtlib-output",    no_argument,       0,            'U' },
@@ -4423,6 +4425,7 @@ int main(int argc, char **argv)
             case 'Q':
             case 'G':
             case 'Z':
+            case 'A':
             case 'L':
                 if (newtonVerbosity >= NV_STANDARD_WARNINGS) {
                     std::cout << "Passing command-line option " <<  argv[optind - 2] << " " << optarg << " to duet." << std::endl;
