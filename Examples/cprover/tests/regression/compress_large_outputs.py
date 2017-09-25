@@ -42,6 +42,12 @@ function not_eof($str) {
 
 $zipfilename = $filename . ".zip";
 
+echo("Note: You are viewing an ICRA output file that has been compressed\\n");
+echo("  for easier storage.  If the decompression process (which uses a\\n");
+echo("  PHP script) causes problems, try replacing '.php' at the end of \\n");
+echo("  the file name with '.zip' to download the compressed version \\n");
+echo("  directly; then, simply decompress the zip file.\\n\\n");
+
 $zip = zip_open($zipfilename);
 
 if ($zip) {

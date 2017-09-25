@@ -13,7 +13,7 @@ shopt -s nullglob
 NEWTON_DIR="$(pwd)"
 
 SUITE="$NEWTON_DIR/Examples/cprover/tests/regression"
-TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b_print_hull $NEWTON_DIR/Examples/cprover/tests/STAC/polynomial/PH $NEWTON_DIR/Examples/cprover/tests/STAC/canonical $NEWTON_DIR/Examples/cprover/tests/STAC/E3Model )
+TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b_print_hull $NEWTON_DIR/Examples/cprover/tests/STAC/polynomial/PH $NEWTON_DIR/Examples/cprover/tests/STAC/canonical $NEWTON_DIR/Examples/cprover/tests/STAC/E3Model $NEWTON_DIR/Examples/cprover/tests/PrintHullRegressions )
 #TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/tmp_single_printhull )
 #TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b_print_hull )
 
@@ -26,7 +26,8 @@ INDIR="$SUITE/inputs"
 RESULT="$OUTDIR/__result_PH.out"
 SCRIPT="$SUITE/toHTML_printHull.py"
 
-TIMEOUT="10m"
+#TIMEOUT="10m"
+TIMEOUT="20m"
 
 mkdir -p $OUTDIR
 mkdir -p $INDIR
@@ -44,7 +45,7 @@ for directory in ${TESTDIRS[@]}; do
 	for testf in ${TESTS[@]}; do
 		outfile="$OUTDIR/$(basename $testf).out"
 		infile="$INDIR/$(basename $testf)"
-		rm -f $outfile
+		#rm -f $outfile
 		rm -f $infile
 		cp $testf $infile
 		
@@ -53,7 +54,14 @@ for directory in ${TESTDIRS[@]}; do
 		start=$(date +%s%N)
 		cd $NEWTON_DIR
 		#eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf &> $outfile"
-		eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops --test=$RESULT $testf &> $outfile"
+        #
+        rm -f $outfile
+        COMMAND="$NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops"
+        echo $COMMAND >> $outfile
+        echo "" >> $outfile
+		eval "timeout $TIMEOUT $COMMAND --test=$RESULT $testf &>> $outfile"
+        #
+		#eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops --test=$RESULT $testf &> $outfile"
 		success=$?
 		if (($success==124)); then
 			echo "__TIMEOUT" >> $RESULT

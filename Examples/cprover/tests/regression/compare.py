@@ -256,15 +256,15 @@ for line in fin:
 					fout.write(words[i+1][2:] + '<br>')
 			elif (flipResult):
 				if ((words[i+1] == "FAIL") and (res != None) and (((asrtCtr < len(res.asrt)) and (res.asrt[asrtCtr] == "PASS")) or (asrtCtr >= len(res.asrt)))):
-					fout.write('<font color=\"#00AA00\">PASS</font><br>')
+					fout.write('<font color=\"#00AA00\">OKAY</font><br>')
 				elif (words[i+1] == "FAIL"):
-					fout.write('PASS<br>')
+					fout.write('OKAY<br>')
 				elif ((words[i+1] == "PASS") and (res != None) and (asrtCtr < len(res.asrt)) and (res.asrt[asrtCtr] == "FAIL")):
-					fout.write('<font color=\"#FF0000\">FAIL</font><br>')
+					fout.write('<b><font color=\"#FF0000\">UNSOUND</font></b><br>')
 				elif ((words[i+1] == "PASS") and (res != None) and (asrtCtr >= len(res.asrt))):
-					fout.write('<font color=\"#00AA00\">FAIL</font><br>')
+					fout.write('<b><font color=\"#00AA00\">UNSOUND</font></b><br>')
 				elif (words[i+1] == "PASS"):
-					fout.write('FAIL<br>')
+					fout.write('<b>UNSOUND</b><br>')
 			else:
 				if ((words[i+1] == "PASS") and (res != None) and (((asrtCtr < len(res.asrt)) and (res.asrt[asrtCtr] == "FAIL")) or (asrtCtr >= len(res.asrt)))):
 					fout.write('<font color=\"#00AA00\">PASS</font><br>')
