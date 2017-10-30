@@ -41,9 +41,9 @@ int main(int g) {
     int guess_char_1 = (guess_binval / (256 * 256      )) % 256;
     int guess_char_2 = (guess_binval / (256            )) % 256;
 
-    __VERIFIER_assert(guess_char_0 == 9);
-    __VERIFIER_assert(guess_char_1 == 8);
-    //__VERIFIER_assert(guess_char_2 == 7); // NOTE: SHOULD FAIL (since we assumed result==2)
+    //__VERIFIER_assert(guess_char_0 == 9);
+    //__VERIFIER_assert(guess_char_1 == 8);
+    __VERIFIER_assert(guess_char_2 == 7); // NOTE: SHOULD FAIL (since we assumed result==2)
 
     //__VERIFIER_print_hull(guess_char_0);
     //__VERIFIER_print_hull(guess_char_1);

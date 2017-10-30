@@ -1,3 +1,6 @@
+// WARNING: The files in this directory have not been extensively tested
+//   and may be incorrect. --JTB
+
 #define max(A,B) ( (A > B) ? A : B )
 
 int x,y;

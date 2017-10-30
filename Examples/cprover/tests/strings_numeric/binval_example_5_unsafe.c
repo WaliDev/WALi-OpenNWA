@@ -34,16 +34,16 @@ void main() {
     //int guess_prefix_1char = guess_binval / (256 * 256);
     int guess_prefix_1char = prefixRemoving(guess_binval,2);
     __VERIFIER_print_hull(guess_prefix_1char);
-    __VERIFIER_assert(guess_prefix_1char == 9); // Should PASS
+    //__VERIFIER_assert(guess_prefix_1char == 9); // Should PASS
 
     //int guess_prefix_2char = guess_binval / (256);
     int guess_prefix_2char = prefixRemoving(guess_binval,1);
     __VERIFIER_print_hull(guess_prefix_2char);
-    __VERIFIER_assert(guess_prefix_2char == 9 * 256 + 8); // Should PASS
+    //__VERIFIER_assert(guess_prefix_2char == 9 * 256 + 8); // Should PASS
 
     //int guess_prefix_3char = guess_binval;
     int guess_prefix_3char = prefixRemoving(guess_binval,0);
     __VERIFIER_print_hull(guess_prefix_3char);
-    //__VERIFIER_assert(guess_prefix_3char == 9 * 256 * 256 + 8 * 256 + 7); // Should FAIL (and does)
-    __VERIFIER_assert(guess_prefix_3char != 9 * 256 * 256 + 8 * 256 + 7); // Should PASS (and does)
+    __VERIFIER_assert(guess_prefix_3char == 9 * 256 * 256 + 8 * 256 + 7); // Should FAIL (and does)
+    //__VERIFIER_assert(guess_prefix_3char != 9 * 256 * 256 + 8 * 256 + 7); // Should PASS (and does)
 }

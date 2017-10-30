@@ -1,3 +1,5 @@
+// WARNING: The files in this directory have not been extensively tested
+//   and may be incorrect. --JTB
 
 int ik_105_x_lb;
 int ik_105_x_ub;

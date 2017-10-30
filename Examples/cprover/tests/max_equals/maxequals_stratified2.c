@@ -1,3 +1,6 @@
+// WARNING: The files in this directory have not been extensively tested
+//   and may be incorrect. --JTB
+
 #include "stdio.h"
 
 #define max(A,B) ( (A > B) ? A : B )
