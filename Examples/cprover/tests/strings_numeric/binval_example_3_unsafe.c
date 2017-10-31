@@ -34,7 +34,10 @@ int main() {
                       (6);
     __VERIFIER_assume(guess_binval    >= 0);
     __VERIFIER_assume(password_binval >= 0);
-    __VERIFIER_assume(guess_binval    <  (256 * 256 * 256 * 256));
+
+    // NOTE: the L suffixes on the following line are needed so that
+    //   CIL does not get confused:
+    __VERIFIER_assume(guess_binval    <  (256L * 256L * 256L * 256L));
 
     // WHOA! big problem with large literal values
 
