@@ -31,7 +31,7 @@ JAVA_PACKAGE="/bat0/stac/Code/Java-benchmarks/java_package"
 
 #TESTDIRS=( $JAVA_PACKAGE/quick_java_examples/ )
 #TESTDIRS=( /bat0/stac/Code/Ark2-Sandbox/WALi-OpenNWA/Category2_E1_E4_unmodified/ ) 
-TESTDIRS=( $JAVA_PACKAGE/quick_java_examples/ $JAVA_PACKAGE/simple_java_examples/ $JAVA_PACKAGE/selected_canonical/ $JAVA_PACKAGE/new-canonical-examples/all_canonical_jars/ $NEWTON_DIR/Examples/cprover/tests/java/abstraction_ladder_1/ ) # current as of 2017-04-29
+TESTDIRS=( $JAVA_PACKAGE/quick_java_examples/ $JAVA_PACKAGE/simple_java_examples/ $JAVA_PACKAGE/selected_canonical/ $JAVA_PACKAGE/new-canonical-examples/all_canonical_jars/ $NEWTON_DIR/Examples/cprover/tests/java/abstraction_ladder_1/ $NEWTON_DIR/Examples/cprover/tests/java_examples/Aymeric_progs/ ) # current as of 2017-04-29
 
 #/Code/Java-benchmarks/java_package/new-canonical-examples/all_canonical_jars
 
