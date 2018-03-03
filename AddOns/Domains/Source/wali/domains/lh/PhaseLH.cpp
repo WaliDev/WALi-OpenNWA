@@ -1115,6 +1115,7 @@ void PhaseLH::print_r_compat(char* v, int size)
           switch(v[offset]) {
             case -1:
               ss << "*";
+	      // intentional fall-through
             case 1:
               ss << (char)('a'+l);
               break;
@@ -1479,6 +1480,7 @@ void PhaseLH::print_sum(char* v, int size)
           switch(v[offset]) {
             case -1:
               ss << "*";
+	      // intentional fall-through
             case 1:
               ss << (char)('a'+l);
               break;

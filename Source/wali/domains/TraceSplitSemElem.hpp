@@ -87,7 +87,7 @@ namespace wali
 
       virtual bool isFalse() const {
         assert (!_special || *_special == SpecialFalse);
-        return _special;
+        return static_cast<bool>(_special);
       }
 
       virtual std::ostream& print(std::ostream & os) const {
@@ -368,7 +368,7 @@ namespace wali
         }
         else {
           os << "(some guard) -> ";
-          os << begin()->second->print_typename(os);
+          begin()->second->print_typename(os);
         }
         return os << ">";
       }
