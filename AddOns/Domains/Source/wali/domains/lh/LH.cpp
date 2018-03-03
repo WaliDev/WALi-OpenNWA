@@ -941,6 +941,7 @@ void LH::printPly(char* v, int size, int ply)
         switch(v[offset]) {
           case -1:
             ss << "*";
+	    // intentional fall-through
           case 1:
             ss << (char)('a'+l);
             break;
