@@ -6,6 +6,6 @@ addons:
       - libboost-dev
       - libboost-serialization-dev
 script:
-  - scons --keep-going checking=slow tests
+  - scons --keep-going checking=slow tests -j2
   - Tests/harness/unit-tests/unit-tests
   
