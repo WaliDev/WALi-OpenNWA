@@ -30,6 +30,11 @@ namespace wali {
         EXPECT_EQ(keys.set_key, keys.string_key + 3);
         EXPECT_EQ(keys.pair_key, keys.string_key + 4);
     }
+    
+    TEST(testTravisCiIntegration)
+    {
+        EXPECT_EQ(1, 2);
+    }
 
     TEST(wali$getKey, sameValueGivesSameKey)
     {
