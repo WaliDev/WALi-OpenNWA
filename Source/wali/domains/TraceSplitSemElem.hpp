@@ -368,7 +368,7 @@ namespace wali
         }
         else {
           os << "(some guard) -> ";
-          os << begin()->second->print_typename(os);
+          begin()->second->print_typename(os);
         }
         return os << ">";
       }
