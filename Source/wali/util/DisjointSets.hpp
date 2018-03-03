@@ -1,6 +1,7 @@
 #ifndef WALI_UTIL_DISJOINT_SETS_HPP
 #define WALI_UTIL_DISJOINT_SETS_HPP
 
+#include "wali/Common.hpp"
 #include "wali/util/details/Partition.hpp"
 #include "wali/util/map_at.hpp"
 
