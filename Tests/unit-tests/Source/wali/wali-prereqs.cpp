@@ -31,7 +31,7 @@ namespace wali {
         EXPECT_EQ(keys.pair_key, keys.string_key + 4);
     }
     
-    TEST(testTravisCiIntegration)
+    TEST(testTravisCiIntegration,shouldFail)
     {
         EXPECT_EQ(1, 2);
     }
