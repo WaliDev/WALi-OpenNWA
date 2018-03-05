@@ -210,13 +210,55 @@ namespace wali
     }
 
     void
-    WFA::path_summary_tarjan_fwpds()
+    WFA::path_summary_tarjan_fwpds(bool suppress_initial_state)
     {
-      path_summary_tarjan_fwpds(defaultPathSummaryFwpdsTopDown);
-    }
+      path_summary_tarjan_fwpds(defaultPathSummaryFwpdsTopDown, suppress_initial_state);
+	}
     
     void
-    WFA::path_summary_tarjan_fwpds(bool top_down)
+		WFA::path_summary_tarjan_fwpds(bool top_down, WFA & interfa, bool suppress_initial_state)
+	{
+#if defined(REGEXP_CACHING) // TODO: && CHECKED_LEVEL >= 2
+		// If REGEXP_CACHING is on, there is a gotcha while using the
+		// FWPDS-based path_summary. If your weights have the property
+		// that you can have two weights W1 and W2 that compare equal
+		// (in the sense that W1->equal(W2) is true) but are not
+		// *really* equal, then regexp node caching can cause WALi to
+		// conflate two sort-of-the-same-but-sort-of-different weights
+		// and produce the wrong answer.
+		//
+		// Witnesse weights have this property, but they are the only
+		// ones I know about currently. (Witness weights are
+		// conceptually a pair <weight, witness>, and two witness
+		// weights compare equal if the underlying 'weight' portions are
+		// the same. However, the witnesses can differ, and this can
+		// lead to incorrect witnesses.)
+		//
+		// As a result, here we check that the user is not performing
+		// path_summary on a WFA that has witness weights using FWPDS
+		// while REGEXP_CACHING is on.
+		//
+		// This test is not complete -- there could be other weights
+		// that have the poorly-behaved property described above -- but
+		// I don't know what they are so can't check for them. At the
+		// same time, turning off REGEXP_CACHING really hurts the
+		// performance of FWPDS, but FWPDS-based path_summary could
+		// really be useful, so we want to keep the option around to
+		// allow path_summary_tarjan_fwpds() with REGEXP_CACHING on for
+		// the common case where weights behave "properly."
+		details::WitnessChecker checker;
+		for_each(checker);
+		fast_assert(!checker.foundAny());
+#endif
+
+		fwpds::FWPDS pds;
+		pds.topDownEval(top_down);
+		pds.useNewton(false);
+		path_summary_via_wpds(pds, interfa, suppress_initial_state);
+	}
+
+    void
+    WFA::path_summary_tarjan_fwpds(bool top_down, bool suppress_initial_state)
     {
 #if defined(REGEXP_CACHING) // TODO: && CHECKED_LEVEL >= 2
       // If REGEXP_CACHING is on, there is a gotcha while using the
@@ -254,8 +296,9 @@ namespace wali
       fwpds::FWPDS pds;
       pds.topDownEval(top_down);
       pds.useNewton(false);
-      path_summary_via_wpds(pds);
+      path_summary_via_wpds(pds, suppress_initial_state);
     }
+
 
     void
     WFA::path_summary_iterative_wpds()
@@ -273,13 +316,13 @@ namespace wali
 
       path_summary_iterative_original();
       copy1.path_summary_iterative_wpds();
-      copy2.path_summary_tarjan_fwpds(true);
-      copy3.path_summary_tarjan_fwpds(false);
+      copy2.path_summary_tarjan_fwpds(true, false);
+      copy3.path_summary_tarjan_fwpds(false, false);
 
       assert(this->equal(copy1)); // TODO: slow_assert
       assert(this->equal(copy2));
       assert(this->equal(copy3));
-    }
+	}
 
     void
     WFA::path_summary()
@@ -295,8 +338,8 @@ namespace wali
         break;
 
       case TarjanFwpds:
-        path_summary_tarjan_fwpds();
-        break;
+        path_summary_tarjan_fwpds(false);
+		break;
 
       case CrosscheckAll:
         path_summary_crosscheck_all();
@@ -305,7 +348,7 @@ namespace wali
     }
 
     void
-    WFA::path_summary_via_wpds(WPDS & pds) {
+    WFA::path_summary_via_wpds(WPDS & pds, bool suppress_initial_state) {
       if (this->getFinalStates().size() == 0u) {
         return;
       }
@@ -313,19 +356,30 @@ namespace wali
       sem_elem_t wt = getSomeWeight()->one();
       Key pkey = getKey("__pstate");
 
+      // Convert the WFA *this into a one-control-location WPDS,
+      //   where the single control location is pkey, and the
+      //   direction of control flow in the WPDS is the opposite of
+      //   the transitions in *this
+      __current_initial_state = getInitialState();
+      boost::function<bool (ITrans const *)> trans_accept = suppress_initial_state
+                                                              ? is_not_transition_from_initial_state
+                                                              : is_any_transition; 
       if (getQuery() == INORDER) {
-          this->toWpds(pkey, &pds, is_any_transition, true, wali::domains::wrapToReversedSemElem);
+          this->toWpds(pkey, &pds, trans_accept, true, wali::domains::wrapToReversedSemElem);
       }
       else {
-          this->toWpds(pkey, &pds, is_any_transition, true);
+          this->toWpds(pkey, &pds, trans_accept, true);
       }
+
+      std::cout << "##### Question automaton as FWPDS" << std::endl;
+      pds.print(std::cout);
 
 #ifdef JAMDEBUG
       std::cerr << "##### FWPDS" << std::endl;
       pds.print(std::cerr);
 #endif
 
-      WFA query(INORDER, progress);
+      WFA query;
       query.addState(pkey, wt->zero());
       query.setInitialState(pkey);
       Key fin = getKey("__done");
@@ -344,13 +398,18 @@ namespace wali
         query.addTrans(pkey, fkey, fin, one);
       }
 
+      std::cout << "##### QUERY2" << std::endl;
+      query.print(std::cout);
 #ifdef JAMDEBUG
       std::cerr << "##### QUERY2" << std::endl;
       query.print(std::cerr);
 #endif
 
-      WFA ans = pds.poststar(query);
+      WFA ans;
+      pds.poststar(query, ans);
 
+      std::cout << "##### ANS" << std::endl;
+      ans.print(std::cout);
 #ifdef JAMDEBUG
       fstream foo;
       foo.open("regexp_prestar.dot", fstream::out);
@@ -371,26 +430,26 @@ namespace wali
 #endif
 
 
+      Key initkey = ans.init_state;
+      Key finkey = *ans.getFinalStates().begin();
+
       for (state_map_t::const_iterator smit=state_map.begin();
            smit!=state_map.end(); smit++)
       {
         Key stkey = smit->first;
 
-        Key initkey = ans.init_state;
-        Key finkey = *ans.getFinalStates().begin();
-
         State *st = smit->second;
+
+        // Optionally avoid computing a weight for the initial state
+        if (suppress_initial_state && st->name() == __current_initial_state) 
+          continue;
+
         ITrans *trans = ans.find(initkey, stkey, finkey);
         sem_elem_t weight;
         if (trans != NULL) {
           weight = trans->weight();
         } else {
-          if (getQuery() == INORDER) {
-            weight = new domains::ReversedSemElem(wt->zero());
-          }
-          else {
-            weight = wt->zero();
-          }
+          weight = wt->zero();
         }
 
         if (getQuery() == INORDER) {
@@ -401,7 +460,117 @@ namespace wali
 
         st->weight() = weight;
       }
-    }
+	}
+	
+	void WFA::path_summary_via_wpds(WPDS & pds, WFA & ans, bool suppress_initial_state) {
+		if (this->getFinalStates().size() == 0u) {
+			return;
+		}
+
+		sem_elem_t wt = getSomeWeight()->one();
+		Key pkey = getKey("__pstate");
+
+        // Convert the WFA *this into a one-control-location WPDS,
+        //   where the single control location is pkey, and the
+        //   direction of control flow in the WPDS is the opposite of
+        //   the transitions in *this
+        __current_initial_state = getInitialState();
+        boost::function<bool (ITrans const *)> trans_accept = suppress_initial_state
+                                                                ? is_not_transition_from_initial_state
+                                                                : is_any_transition; 
+		if (getQuery() == INORDER) {
+			this->toWpds(pkey, &pds, trans_accept, true, wali::domains::wrapToReversedSemElem);
+		}
+		else {
+			this->toWpds(pkey, &pds, trans_accept, true);
+		}
+
+#ifdef JAMDEBUG
+		std::cerr << "##### FWPDS" << std::endl;
+		pds.print(std::cerr);
+#endif
+
+		WFA query;
+		query.addState(pkey, wt->zero());
+		query.setInitialState(pkey);
+		Key fin = getKey("__done");
+		query.addState(fin, wt->zero());
+		query.addFinalState(fin);
+
+		sem_elem_t one = wt->one();
+		if (getQuery() == INORDER) {
+			one = new domains::ReversedSemElem(one);
+		}
+
+		for (std::set<Key>::const_iterator fit = getFinalStates().begin();
+			fit != getFinalStates().end(); fit++)
+		{
+			Key fkey = *fit;
+			query.addTrans(pkey, fkey, fin, one);
+		}
+
+#ifdef JAMDEBUG
+		std::cerr << "##### QUERY2" << std::endl;
+		query.print(std::cerr);
+#endif
+
+		pds.poststar(query, ans);
+
+#ifdef JAMDEBUG
+		fstream foo;
+		foo.open("regexp_prestar.dot", fstream::out);
+		const wali::graph::reg_exp_hash_t& roots = wali::graph::RegExp::getRoots();
+		foo << "digraph {\n";
+		std::set<long> seen;
+		for (wali::graph::reg_exp_hash_t::const_iterator iter = roots.begin();
+			iter != roots.end();
+			++iter)
+		{
+			(iter->second)->toDot(foo, seen, true, true);
+		}
+		foo << "}\n";
+		foo.close();
+
+		std::cerr << "##### ANS" << std::endl;
+		ans.print(std::cerr);
+#endif
+
+		Key initkey = ans.init_state;
+		Key finkey = *ans.getFinalStates().begin();
+
+		for (state_map_t::const_iterator smit = state_map.begin();
+			smit != state_map.end(); smit++)
+		{
+			Key stkey = smit->first;
+			State *st = smit->second;
+
+            // Optionally avoid computing a weight for the initial state
+            if (suppress_initial_state && st->name() == __current_initial_state) 
+                continue;
+
+			ITrans *trans = ans.find(initkey, stkey, finkey);
+			sem_elem_t weight;
+			if (trans != NULL) {
+				weight = trans->weight();
+			}
+			else {
+				weight = wt->zero();
+			}
+
+			if (getQuery() == INORDER) {
+				domains::ReversedSemElem * rw = dynamic_cast<domains::ReversedSemElem*>(weight.get_ptr());
+				assert(rw);
+				weight = rw->backingSemElem();
+			}
+
+			st->weight() = weight;
+		}
+	}
+	
+	
+	
+		
+	
 
 
     std::map<Key, sem_elem_t>
