@@ -281,10 +281,10 @@ namespace wali
 
 
     void
-    WFA::path_summary_iterative_wpds()
+    WFA::path_summary_iterative_wpds(PathSummaryComputeInitialState compute_initial_state)
     {
       WPDS pds;
-      path_summary_via_wpds(ComputeInitialState, pds);
+      path_summary_via_wpds(compute_initial_state, pds);
     }
 
     void
@@ -294,11 +294,27 @@ namespace wali
       WFA copy2 = *this;
       WFA copy3 = *this;
 
+      // Compute path_summary using multiple algorithms
       path_summary_iterative_original();
-      copy1.path_summary_iterative_wpds();
-      copy2.path_summary_tarjan_fwpds(TopDown, ComputeInitialState);
-      copy3.path_summary_tarjan_fwpds(BottomUp, ComputeInitialState);
+      copy1.path_summary_iterative_wpds(SuppressInitialState);
+      copy2.path_summary_tarjan_fwpds(TopDown, SuppressInitialState);
+      copy3.path_summary_tarjan_fwpds(BottomUp, SuppressInitialState);
 
+      // Everything but the original should have had the initial state
+      // computation suppressed. We first check this is true..
+      Key init = getInitialState();
+      sem_elem_t zero = getSomeWeight()->zero();
+      assert(copy1.getState(init)->weight()->equal(zero));
+      assert(copy2.getState(init)->weight()->equal(zero));
+      assert(copy3.getState(init)->weight()->equal(zero));
+
+      // ...and then compensate so we can compare below
+      sem_elem_t init_weight = this->getState(init)->weight();
+      copy1.getState(init)->weight() = init_weight;
+      copy2.getState(init)->weight() = init_weight;
+      copy3.getState(init)->weight() = init_weight;
+
+      // Now, make sure everything is the same
       assert(this->equal(copy1)); // TODO: slow_assert
       assert(this->equal(copy2));
       assert(this->equal(copy3));
@@ -314,11 +330,11 @@ namespace wali
         break;
 
       case IterativeWpds:
-        path_summary_iterative_wpds();
+        path_summary_iterative_wpds(SuppressInitialState);
         break;
 
       case TarjanFwpds:
-        path_summary_tarjan_fwpds(ComputeInitialState);
+        path_summary_tarjan_fwpds(SuppressInitialState);
         break;
 
       case CrosscheckAll:

@@ -470,7 +470,7 @@ namespace wali
          */
         virtual void path_summary_iterative_original(Worklist<State>& wl, sem_elem_t wt);
 
-        virtual void path_summary_iterative_wpds();
+        virtual void path_summary_iterative_wpds(PathSummaryComputeInitialState compute_is);
 
         /**
          * Performs path summary using Tarjan's algorithm. This results
