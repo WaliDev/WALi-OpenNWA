@@ -113,6 +113,16 @@ namespace wali
          */
         enum query_t { INORDER,REVERSE,MAX };
 
+        // This enum is set up to align with the values that were
+        // previously used -- 'bool top_down' -- in case someone is
+        // still calling the function with a bool and doesn't have
+        // warnings on. (Ideally, this'd be an enum class. Maybe some
+        // day, it will be able to be.)
+        enum PathSummaryDirection {
+            BottomUp,
+            TopDown
+        };
+
         enum PathSummaryImplementation {
             IterativeOriginal,
             IterativeWpds,
@@ -121,7 +131,7 @@ namespace wali
         };
 
         static PathSummaryImplementation globalDefaultPathSummaryImplementation;
-        static bool globalDefaultPathSummaryFwpdsTopDown;
+        static PathSummaryDirection globalDefaultPathSummaryFwpdsDirection;
 
         typedef wali::HashMap< KeyPair, TransSet > kp_map_t;
         typedef wali::HashMap< Key , State * > state_map_t;
@@ -466,8 +476,8 @@ namespace wali
         
         
         virtual void path_summary_tarjan_fwpds(bool suppress_initial_state);
-        virtual void path_summary_tarjan_fwpds(bool top_down, bool suppress_initial_state);
-        virtual void path_summary_tarjan_fwpds(bool top_down, WFA & ansFA, bool suppress_initial_state);
+        virtual void path_summary_tarjan_fwpds(PathSummaryDirection direction, bool suppress_initial_state);
+        virtual void path_summary_tarjan_fwpds(PathSummaryDirection direction, WFA & ansFA, bool suppress_initial_state);
 
         virtual void path_summary_crosscheck_all();
 
@@ -715,7 +725,7 @@ namespace wali
         std::set<State*> deleted_states;
 
         PathSummaryImplementation defaultPathSummaryImplementation;
-        bool defaultPathSummaryFwpdsTopDown;
+        PathSummaryDirection defaultPathSummaryFwpdsDirection;
 
       private:
 

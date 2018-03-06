@@ -42,13 +42,13 @@ namespace wali
         ("TarjanFwpds",       WFA::TarjanFwpds)
         ("CrossCheckAll",     WFA::CrosscheckAll);
 
-    bool WFA::globalDefaultPathSummaryFwpdsTopDown
-      = wali::util::ConfigurationVar<bool>(
+    WFA::PathSummaryDirection WFA::globalDefaultPathSummaryFwpdsDirection
+      = wali::util::ConfigurationVar<WFA::PathSummaryDirection>(
           "WALI_WFA_PATH_SUMMARY_FWPDS_EVAL",
-          true
+          WFA::TopDown
         )
-        ("TopDown", true)
-        ("BottomUp", false);
+        ("TopDown",  WFA::TopDown)
+        ("BottomUp", WFA::BottomUp);
 
     //
     // Calls path_summary with default Worklist
@@ -212,11 +212,11 @@ namespace wali
     void
     WFA::path_summary_tarjan_fwpds(bool suppress_initial_state)
     {
-      path_summary_tarjan_fwpds(defaultPathSummaryFwpdsTopDown, suppress_initial_state);
+      path_summary_tarjan_fwpds(defaultPathSummaryFwpdsDirection, suppress_initial_state);
     }
     
     void
-    WFA::path_summary_tarjan_fwpds(bool top_down, WFA & interfa, bool suppress_initial_state)
+    WFA::path_summary_tarjan_fwpds(PathSummaryDirection direction, WFA & interfa, bool suppress_initial_state)
     {
 #if defined(REGEXP_CACHING) // TODO: && CHECKED_LEVEL >= 2
       // If REGEXP_CACHING is on, there is a gotcha while using the
@@ -252,13 +252,13 @@ namespace wali
 #endif
 
       fwpds::FWPDS pds;
-      pds.topDownEval(top_down);
+      pds.topDownEval(direction == TopDown);
       pds.useNewton(false);
       path_summary_via_wpds(pds, interfa, suppress_initial_state);
     }
 
     void
-    WFA::path_summary_tarjan_fwpds(bool top_down, bool suppress_initial_state)
+    WFA::path_summary_tarjan_fwpds(PathSummaryDirection direction, bool suppress_initial_state)
     {
 #if defined(REGEXP_CACHING) // TODO: && CHECKED_LEVEL >= 2
       // If REGEXP_CACHING is on, there is a gotcha while using the
@@ -294,7 +294,7 @@ namespace wali
 #endif
 
       fwpds::FWPDS pds;
-      pds.topDownEval(top_down);
+      pds.topDownEval(direction == TopDown);
       pds.useNewton(false);
       path_summary_via_wpds(pds, suppress_initial_state);
     }
@@ -316,8 +316,8 @@ namespace wali
 
       path_summary_iterative_original();
       copy1.path_summary_iterative_wpds();
-      copy2.path_summary_tarjan_fwpds(true, false);
-      copy3.path_summary_tarjan_fwpds(false, false);
+      copy2.path_summary_tarjan_fwpds(TopDown, false);
+      copy3.path_summary_tarjan_fwpds(BottomUp, false);
 
       assert(this->equal(copy1)); // TODO: slow_assert
       assert(this->equal(copy2));
