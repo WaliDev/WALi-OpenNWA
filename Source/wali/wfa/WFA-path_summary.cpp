@@ -346,10 +346,10 @@ namespace wali
                        ? TransPred(is_any_transition)
                        : TransPred(IsTransitionNotFromState(getInitialState()));
       if (getQuery() == INORDER) {
-          this->toWpds(pkey, &pds, trans_accept, true, wali::domains::wrapToReversedSemElem);
+        this->toWpds(pkey, &pds, trans_accept, true, wali::domains::wrapToReversedSemElem);
       }
       else {
-          this->toWpds(pkey, &pds, trans_accept, true);
+        this->toWpds(pkey, &pds, trans_accept, true);
       }
 
 #ifdef JAMDEBUG
@@ -368,9 +368,9 @@ namespace wali
       if (getQuery() == INORDER) {
         one = new domains::ReversedSemElem(one);
       }
-      
+
       for (std::set<Key>::const_iterator fit = getFinalStates().begin();
-        fit!=getFinalStates().end(); fit++)
+           fit != getFinalStates().end(); fit++)
       {
         Key fkey = *fit;
         query.addTrans(pkey, fkey, fin, one);
@@ -398,20 +398,18 @@ namespace wali
       }
       foo << "}\n";
       foo.close();
-      
+
       std::cerr << "##### ANS" << std::endl;
       ans.print(std::cerr);
 #endif
 
-
       Key initkey = ans.init_state;
       Key finkey = *ans.getFinalStates().begin();
 
-      for (state_map_t::const_iterator smit=state_map.begin();
-           smit!=state_map.end(); smit++)
+      for (state_map_t::const_iterator smit = state_map.begin();
+           smit != state_map.end(); smit++)
       {
         Key stkey = smit->first;
-
         State *st = smit->second;
 
         // Optionally avoid computing a weight for the initial state
@@ -425,7 +423,8 @@ namespace wali
         sem_elem_t weight;
         if (trans != NULL) {
           weight = trans->weight();
-        } else {
+        }
+        else {
           weight = wt->zero();
         }
 
@@ -438,8 +437,9 @@ namespace wali
         st->weight() = weight;
       }
     }
-	
-    void WFA::path_summary_via_wpds(WPDS & pds, WFA & ans, PathSummaryComputeInitialState compute_initial_state) {
+
+    void
+    WFA::path_summary_via_wpds(WPDS & pds, WFA & ans, PathSummaryComputeInitialState compute_initial_state) {
       if (this->getFinalStates().size() == 0u) {
         return;
       }
@@ -452,10 +452,10 @@ namespace wali
       //   direction of control flow in the WPDS is the opposite of
       //   the transitions in *this
       typedef boost::function<bool (ITrans const *)> TransPred;
-      boost::function<bool (ITrans const *)> trans_accept =
-        (compute_initial_state == ComputeInitialState)
-        ? TransPred(is_any_transition)
-        : TransPred(IsTransitionNotFromState(getInitialState()));
+      boost::function<bool (ITrans const *)>
+        trans_accept = (compute_initial_state == ComputeInitialState)
+                       ? TransPred(is_any_transition)
+                       : TransPred(IsTransitionNotFromState(getInitialState()));
       if (getQuery() == INORDER) {
         this->toWpds(pkey, &pds, trans_accept, true, wali::domains::wrapToReversedSemElem);
       }
@@ -464,7 +464,7 @@ namespace wali
       }
 
 #ifdef JAMDEBUG
-      std::cerr << "##### FWPDS" << std::endl;
+      std::cerr << "##### FWPDS [question automaton]" << std::endl;
       pds.print(std::cerr);
 #endif
 
@@ -547,7 +547,6 @@ namespace wali
         st->weight() = weight;
       }
     }
-
 
     std::map<Key, sem_elem_t>
     WFA::readOutCombineOverAllPathsValues() const
