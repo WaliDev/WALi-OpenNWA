@@ -360,10 +360,11 @@ namespace wali
       //   where the single control location is pkey, and the
       //   direction of control flow in the WPDS is the opposite of
       //   the transitions in *this
-      __current_initial_state = getInitialState();
-      boost::function<bool (ITrans const *)> trans_accept = suppress_initial_state
-                                                              ? is_not_transition_from_initial_state
-                                                              : is_any_transition; 
+      typedef boost::function<bool (ITrans const *)> TransPred;
+      boost::function<bool (ITrans const *)>
+        trans_accept = suppress_initial_state
+                       ? TransPred(IsTransitionNotFromState(getInitialState()))
+                       : TransPred(is_any_transition);
       if (getQuery() == INORDER) {
           this->toWpds(pkey, &pds, trans_accept, true, wali::domains::wrapToReversedSemElem);
       }
@@ -441,7 +442,7 @@ namespace wali
         State *st = smit->second;
 
         // Optionally avoid computing a weight for the initial state
-        if (suppress_initial_state && st->name() == __current_initial_state) 
+        if (suppress_initial_state && st->name() == getInitialState())
           continue;
 
         ITrans *trans = ans.find(initkey, stkey, finkey);
@@ -474,10 +475,10 @@ namespace wali
       //   where the single control location is pkey, and the
       //   direction of control flow in the WPDS is the opposite of
       //   the transitions in *this
-      __current_initial_state = getInitialState();
+      typedef boost::function<bool (ITrans const *)> TransPred;
       boost::function<bool (ITrans const *)> trans_accept = suppress_initial_state
-        ? is_not_transition_from_initial_state
-        : is_any_transition; 
+        ? TransPred(IsTransitionNotFromState(getInitialState()))
+        : TransPred(is_any_transition);
       if (getQuery() == INORDER) {
         this->toWpds(pkey, &pds, trans_accept, true, wali::domains::wrapToReversedSemElem);
       }
@@ -545,7 +546,7 @@ namespace wali
         State *st = smit->second;
 
         // Optionally avoid computing a weight for the initial state
-        if (suppress_initial_state && st->name() == __current_initial_state) 
+        if (suppress_initial_state && st->name() == getInitialState())
           continue;
 
         ITrans *trans = ans.find(initkey, stkey, finkey);

@@ -73,12 +73,20 @@ namespace wali
       virtual ~DotAttributePrinter() {}
     };
 
-      bool is_epsilon_transition(ITrans const * trans);
+    bool is_epsilon_transition(ITrans const * trans);
     
     bool is_any_transition(ITrans const * trans);
-    
-    extern Key __current_initial_state;
-    bool is_not_transition_from_initial_state(ITrans const * trans);  
+
+    class IsTransitionNotFromState {
+      Key m_not_from;
+    public:
+      IsTransitionNotFromState (Key not_from)
+        : m_not_from(not_from)
+      {}
+      bool operator() (ITrans const * trans) const {
+        return trans->from() != m_not_from;
+      }
+    };
 
     /** @class WFA
      *
