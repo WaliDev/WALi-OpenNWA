@@ -477,9 +477,6 @@ namespace wali
          * in the dual benefits of lazy witness evaluation and
          * transparent witness propagation.
          */
-        
-        
-        
         virtual void path_summary_tarjan_fwpds(
             PathSummaryComputeInitialState compute_initial_state);
         virtual void path_summary_tarjan_fwpds(

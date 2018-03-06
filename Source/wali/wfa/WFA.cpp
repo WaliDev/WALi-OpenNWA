@@ -58,7 +58,7 @@ namespace wali
       (void) trans;
       return true;
     }
-    
+
     WFA::WFA( query_t q, progress_t prog )
         : init_state( WALI_EPSILON )
         , query(q)
