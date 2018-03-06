@@ -62,8 +62,8 @@ namespace wali
     Key __current_initial_state;
     bool is_not_transition_from_initial_state(ITrans const * trans)
     {
-       return trans->from() != __current_initial_state;
-	}
+      return trans->from() != __current_initial_state;
+    }
     
 
     WFA::WFA( query_t q, progress_t prog )
