@@ -222,33 +222,8 @@ namespace wali
       PathSummaryComputeInitialState compute_initial_state)
     {
 #if defined(REGEXP_CACHING) // TODO: && CHECKED_LEVEL >= 2
-      // If REGEXP_CACHING is on, there is a gotcha while using the
-      // FWPDS-based path_summary. If your weights have the property
-      // that you can have two weights W1 and W2 that compare equal
-      // (in the sense that W1->equal(W2) is true) but are not
-      // *really* equal, then regexp node caching can cause WALi to
-      // conflate two sort-of-the-same-but-sort-of-different weights
-      // and produce the wrong answer.
-      //
-      // Witnesse weights have this property, but they are the only
-      // ones I know about currently. (Witness weights are
-      // conceptually a pair <weight, witness>, and two witness
-      // weights compare equal if the underlying 'weight' portions are
-      // the same. However, the witnesses can differ, and this can
-      // lead to incorrect witnesses.)
-      //
-      // As a result, here we check that the user is not performing
-      // path_summary on a WFA that has witness weights using FWPDS
-      // while REGEXP_CACHING is on.
-      //
-      // This test is not complete -- there could be other weights
-      // that have the poorly-behaved property described above -- but
-      // I don't know what they are so can't check for them. At the
-      // same time, turning off REGEXP_CACHING really hurts the
-      // performance of FWPDS, but FWPDS-based path_summary could
-      // really be useful, so we want to keep the option around to
-      // allow path_summary_tarjan_fwpds() with REGEXP_CACHING on for
-      // the common case where weights behave "properly."
+      // See the big comment bellow in the next overload of this
+      // function.
       details::WitnessChecker checker;
       for_each(checker);
       fast_assert(!checker.foundAny());
