@@ -352,11 +352,8 @@ namespace wali
           this->toWpds(pkey, &pds, trans_accept, true);
       }
 
-      std::cout << "##### Question automaton as FWPDS" << std::endl;
-      pds.print(std::cout);
-
 #ifdef JAMDEBUG
-      std::cerr << "##### FWPDS" << std::endl;
+      std::cerr << "##### FWPDS [question automaton]" << std::endl;
       pds.print(std::cerr);
 #endif
 
@@ -379,8 +376,6 @@ namespace wali
         query.addTrans(pkey, fkey, fin, one);
       }
 
-      std::cout << "##### QUERY2" << std::endl;
-      query.print(std::cout);
 #ifdef JAMDEBUG
       std::cerr << "##### QUERY2" << std::endl;
       query.print(std::cerr);
@@ -389,8 +384,6 @@ namespace wali
       WFA ans;
       pds.poststar(query, ans);
 
-      std::cout << "##### ANS" << std::endl;
-      ans.print(std::cout);
 #ifdef JAMDEBUG
       fstream foo;
       foo.open("regexp_prestar.dot", fstream::out);
