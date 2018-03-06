@@ -123,6 +123,11 @@ namespace wali
             TopDown
         };
 
+        enum PathSummaryComputeInitialState {
+            ComputeInitialState,
+            SuppressInitialState
+        };
+
         enum PathSummaryImplementation {
             IterativeOriginal,
             IterativeWpds,
@@ -475,9 +480,15 @@ namespace wali
         
         
         
-        virtual void path_summary_tarjan_fwpds(bool suppress_initial_state);
-        virtual void path_summary_tarjan_fwpds(PathSummaryDirection direction, bool suppress_initial_state);
-        virtual void path_summary_tarjan_fwpds(PathSummaryDirection direction, WFA & ansFA, bool suppress_initial_state);
+        virtual void path_summary_tarjan_fwpds(
+            PathSummaryComputeInitialState compute_initial_state);
+        virtual void path_summary_tarjan_fwpds(
+            PathSummaryDirection direction,
+            PathSummaryComputeInitialState compute_initial_state);
+        virtual void path_summary_tarjan_fwpds(
+            PathSummaryDirection direction,
+            WFA & ansFA,
+            PathSummaryComputeInitialState suppress_initial_state);
 
         virtual void path_summary_crosscheck_all();
 
@@ -486,9 +497,14 @@ namespace wali
          *
          * This is mostly intended to be an internal structure.
          */
-        virtual void path_summary_via_wpds(wpds::WPDS & wpds, bool suppress_initial_state=false);
+        virtual void path_summary_via_wpds(
+            wpds::WPDS & wpds,
+            PathSummaryComputeInitialState compute_initial_state);
         
-        virtual void path_summary_via_wpds(wpds::WPDS & wpds, WFA & ansFA, bool suppress_initial_state=false);
+        virtual void path_summary_via_wpds(
+            wpds::WPDS & wpds,
+            WFA & ansFA,
+            PathSummaryComputeInitialState compute_initial_state);
 
 
         /**

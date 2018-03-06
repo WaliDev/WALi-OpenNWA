@@ -210,13 +210,16 @@ namespace wali
     }
 
     void
-    WFA::path_summary_tarjan_fwpds(bool suppress_initial_state)
+    WFA::path_summary_tarjan_fwpds(PathSummaryComputeInitialState compute_initial_state)
     {
-      path_summary_tarjan_fwpds(defaultPathSummaryFwpdsDirection, suppress_initial_state);
+      path_summary_tarjan_fwpds(defaultPathSummaryFwpdsDirection, compute_initial_state);
     }
     
     void
-    WFA::path_summary_tarjan_fwpds(PathSummaryDirection direction, WFA & interfa, bool suppress_initial_state)
+    WFA::path_summary_tarjan_fwpds(
+      PathSummaryDirection direction,
+      WFA & interfa,
+      PathSummaryComputeInitialState compute_initial_state)
     {
 #if defined(REGEXP_CACHING) // TODO: && CHECKED_LEVEL >= 2
       // If REGEXP_CACHING is on, there is a gotcha while using the
@@ -254,11 +257,13 @@ namespace wali
       fwpds::FWPDS pds;
       pds.topDownEval(direction == TopDown);
       pds.useNewton(false);
-      path_summary_via_wpds(pds, interfa, suppress_initial_state);
+      path_summary_via_wpds(pds, interfa, compute_initial_state);
     }
 
     void
-    WFA::path_summary_tarjan_fwpds(PathSummaryDirection direction, bool suppress_initial_state)
+    WFA::path_summary_tarjan_fwpds(
+      PathSummaryDirection direction,
+      PathSummaryComputeInitialState compute_initial_state)
     {
 #if defined(REGEXP_CACHING) // TODO: && CHECKED_LEVEL >= 2
       // If REGEXP_CACHING is on, there is a gotcha while using the
@@ -296,7 +301,7 @@ namespace wali
       fwpds::FWPDS pds;
       pds.topDownEval(direction == TopDown);
       pds.useNewton(false);
-      path_summary_via_wpds(pds, suppress_initial_state);
+      path_summary_via_wpds(pds, compute_initial_state);
     }
 
 
@@ -304,7 +309,7 @@ namespace wali
     WFA::path_summary_iterative_wpds()
     {
       WPDS pds;
-      path_summary_via_wpds(pds);
+      path_summary_via_wpds(pds, ComputeInitialState);
     }
 
     void
@@ -316,8 +321,8 @@ namespace wali
 
       path_summary_iterative_original();
       copy1.path_summary_iterative_wpds();
-      copy2.path_summary_tarjan_fwpds(TopDown, false);
-      copy3.path_summary_tarjan_fwpds(BottomUp, false);
+      copy2.path_summary_tarjan_fwpds(TopDown, ComputeInitialState);
+      copy3.path_summary_tarjan_fwpds(BottomUp, ComputeInitialState);
 
       assert(this->equal(copy1)); // TODO: slow_assert
       assert(this->equal(copy2));
@@ -338,7 +343,7 @@ namespace wali
         break;
 
       case TarjanFwpds:
-        path_summary_tarjan_fwpds(false);
+        path_summary_tarjan_fwpds(ComputeInitialState);
         break;
 
       case CrosscheckAll:
@@ -348,7 +353,7 @@ namespace wali
     }
 
     void
-    WFA::path_summary_via_wpds(WPDS & pds, bool suppress_initial_state) {
+    WFA::path_summary_via_wpds(WPDS & pds, PathSummaryComputeInitialState compute_initial_state) {
       if (this->getFinalStates().size() == 0u) {
         return;
       }
@@ -362,9 +367,9 @@ namespace wali
       //   the transitions in *this
       typedef boost::function<bool (ITrans const *)> TransPred;
       boost::function<bool (ITrans const *)>
-        trans_accept = suppress_initial_state
-                       ? TransPred(IsTransitionNotFromState(getInitialState()))
-                       : TransPred(is_any_transition);
+        trans_accept = (compute_initial_state == ComputeInitialState)
+                       ? TransPred(is_any_transition)
+                       : TransPred(IsTransitionNotFromState(getInitialState()));
       if (getQuery() == INORDER) {
           this->toWpds(pkey, &pds, trans_accept, true, wali::domains::wrapToReversedSemElem);
       }
@@ -442,8 +447,11 @@ namespace wali
         State *st = smit->second;
 
         // Optionally avoid computing a weight for the initial state
-        if (suppress_initial_state && st->name() == getInitialState())
+        if ((compute_initial_state == SuppressInitialState)
+            && st->name() == getInitialState())
+        {
           continue;
+        }
 
         ITrans *trans = ans.find(initkey, stkey, finkey);
         sem_elem_t weight;
@@ -463,7 +471,7 @@ namespace wali
       }
     }
 	
-    void WFA::path_summary_via_wpds(WPDS & pds, WFA & ans, bool suppress_initial_state) {
+    void WFA::path_summary_via_wpds(WPDS & pds, WFA & ans, PathSummaryComputeInitialState compute_initial_state) {
       if (this->getFinalStates().size() == 0u) {
         return;
       }
@@ -476,9 +484,10 @@ namespace wali
       //   direction of control flow in the WPDS is the opposite of
       //   the transitions in *this
       typedef boost::function<bool (ITrans const *)> TransPred;
-      boost::function<bool (ITrans const *)> trans_accept = suppress_initial_state
-        ? TransPred(IsTransitionNotFromState(getInitialState()))
-        : TransPred(is_any_transition);
+      boost::function<bool (ITrans const *)> trans_accept =
+        (compute_initial_state == ComputeInitialState)
+        ? TransPred(is_any_transition)
+        : TransPred(IsTransitionNotFromState(getInitialState()));
       if (getQuery() == INORDER) {
         this->toWpds(pkey, &pds, trans_accept, true, wali::domains::wrapToReversedSemElem);
       }
@@ -546,8 +555,11 @@ namespace wali
         State *st = smit->second;
 
         // Optionally avoid computing a weight for the initial state
-        if (suppress_initial_state && st->name() == getInitialState())
+        if ((compute_initial_state == SuppressInitialState)
+            && st->name() == getInitialState())
+        {
           continue;
+        }
 
         ITrans *trans = ans.find(initkey, stkey, finkey);
         sem_elem_t weight;
