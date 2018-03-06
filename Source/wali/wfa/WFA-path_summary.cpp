@@ -218,8 +218,8 @@ namespace wali
     void
     WFA::path_summary_tarjan_fwpds(
       PathSummaryDirection direction,
-      WFA & interfa,
-      PathSummaryComputeInitialState compute_initial_state)
+      PathSummaryComputeInitialState compute_initial_state,
+      WFA & interfa)
     {
 #if defined(REGEXP_CACHING) // TODO: && CHECKED_LEVEL >= 2
       // See the big comment bellow in the next overload of this
@@ -232,7 +232,7 @@ namespace wali
       fwpds::FWPDS pds;
       pds.topDownEval(direction == TopDown);
       pds.useNewton(false);
-      path_summary_via_wpds(pds, interfa, compute_initial_state);
+      path_summary_via_wpds(compute_initial_state, pds, interfa);
     }
 
     void
@@ -276,7 +276,7 @@ namespace wali
       fwpds::FWPDS pds;
       pds.topDownEval(direction == TopDown);
       pds.useNewton(false);
-      path_summary_via_wpds(pds, compute_initial_state);
+      path_summary_via_wpds(compute_initial_state, pds);
     }
 
 
@@ -284,7 +284,7 @@ namespace wali
     WFA::path_summary_iterative_wpds()
     {
       WPDS pds;
-      path_summary_via_wpds(pds, ComputeInitialState);
+      path_summary_via_wpds(ComputeInitialState, pds);
     }
 
     void
@@ -328,13 +328,17 @@ namespace wali
     }
 
     void
-    WFA::path_summary_via_wpds(WPDS & pds, PathSummaryComputeInitialState compute_initial_state) {
+    WFA::path_summary_via_wpds(PathSummaryComputeInitialState compute_initial_state, WPDS & pds) {
       WFA ans;
-      path_summary_via_wpds(pds, ans, compute_initial_state);
+      path_summary_via_wpds(compute_initial_state, pds, ans);
     }
 
     void
-    WFA::path_summary_via_wpds(WPDS & pds, WFA & ans, PathSummaryComputeInitialState compute_initial_state) {
+    WFA::path_summary_via_wpds(
+      PathSummaryComputeInitialState compute_initial_state,
+      WPDS & pds,
+      WFA & ans)
+    {
       if (this->getFinalStates().size() == 0u) {
         return;
       }

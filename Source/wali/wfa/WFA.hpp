@@ -487,8 +487,8 @@ namespace wali
             PathSummaryComputeInitialState compute_initial_state);
         virtual void path_summary_tarjan_fwpds(
             PathSummaryDirection direction,
-            WFA & ansFA,
-            PathSummaryComputeInitialState suppress_initial_state);
+            PathSummaryComputeInitialState suppress_initial_state,
+            WFA & ansFA);
 
         virtual void path_summary_crosscheck_all();
 
@@ -498,13 +498,13 @@ namespace wali
          * This is mostly intended to be an internal structure.
          */
         virtual void path_summary_via_wpds(
-            wpds::WPDS & wpds,
-            PathSummaryComputeInitialState compute_initial_state);
+            PathSummaryComputeInitialState compute_initial_state,
+            wpds::WPDS & wpds);
         
         virtual void path_summary_via_wpds(
+            PathSummaryComputeInitialState compute_initial_state,
             wpds::WPDS & wpds,
-            WFA & ansFA,
-            PathSummaryComputeInitialState compute_initial_state);
+            WFA & ansFA);
 
 
         /**
