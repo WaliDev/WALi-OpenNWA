@@ -89,7 +89,8 @@ for directory in ${TESTDIRS[@]}; do
 		start=$(date +%s%N)
 		cd $NEWTON_DIR
 		#eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf &> $below_outfile"
-		eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -use-ocrs -cra-matrix --test=$RESULT $testf &> $below_outfile"
+		#eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -use-ocrs -cra-matrix --test=$RESULT $testf &> $below_outfile"
+		eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-matrix --test=$RESULT $testf &> $below_outfile"
 		success=$?
 		if (($success==124)); then
 			echo "__TIMEOUT" >> $RESULT

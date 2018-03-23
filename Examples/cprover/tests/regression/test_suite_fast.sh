@@ -63,7 +63,8 @@ for directory in ${TESTDIRS[@]}; do
         #
         rm -f $below_outfile
 	#eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-matrix -use-ocrs --test=$RESULT $testf &> $below_outfile"
-        COMMAND="$NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-matrix -use-ocrs"
+        #COMMAND="$NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-matrix -use-ocrs"
+        COMMAND="$NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-matrix "
         echo $COMMAND >> $below_outfile
         echo "" >> $below_outfile
 		eval "timeout $TIMEOUT $COMMAND --test=$RESULT $testf &>> $below_outfile"
