@@ -56,7 +56,7 @@ echo "C BOUNDS GENERATION:"
 #$SUITE/test_suite_printHull.sh || exit 1
 $SUITE/test_suite_printHull.sh
 
-$SUITE/test_suite_ocrs.sh
+#$SUITE/test_suite_ocrs.sh
 
 cd $SUITE
 #python $SUITE/compare.py || exit 1
@@ -65,7 +65,7 @@ python $SUITE/compare.py
 python $SUITE/updateIndex.py "$TODAY" "$DATE_ADBY"
 
 python $SUITE/compare_java.py
-python $SUITE/compare_ocrs.py
+#python $SUITE/compare_ocrs.py
 
 mkdir -p $SERVER/$TODAY
 mkdir -p $SERVER/$TODAY/outputs
@@ -88,8 +88,8 @@ cp -Rf $SUITE/inputs/ $SERVER/$TODAY/
 cp -Rf $SUITE/outputs/ $SERVER/$TODAY/
 cp -f $SUITE/index.html $SERVER/
 
-cp -f $SUITE/result_ocrs.html $SERVER/$TODAY/
-cp -f $SUITE/compare_ocrs.html $SERVER/$TODAY/
+#cp -f $SUITE/result_ocrs.html $SERVER/$TODAY/
+#cp -f $SUITE/compare_ocrs.html $SERVER/$TODAY/
 
 cp -f $SUITE/__result.out.old $SUITE/__result.out.old2
 cp -f $SUITE/__result_java.out.old $SUITE/__result_java.out.old2
@@ -101,8 +101,11 @@ python compress_large_outputs.py $SERVER/$TODAY/
 
 echo "DONE WITH nightly_script.sh"
 
+# Latest version:
+printf "Hello,\n\nThis is to inform you of the results of ICRA's nightly tests.  Running the tests finished on $(date).\n\nThe ICRA/bytecode (Java) results can be accessed from: http://stac.cs.wisc.edu/$TODAY/result_java.html\nThe ICRA/bytecode (Java) comparison results can be accessed from: http://stac.cs.wisc.edu/$TODAY/compare_java.html\n\nThe ICRA/C (Ark2 without OCRS) assertion-checking results can be accessed from: http://stac.cs.wisc.edu/$TODAY/result.html\nThe ICRA/C (Ark2 without OCRS) comparison results can be accessed from: http://stac.cs.wisc.edu/$TODAY/compare.html\nThe ICRA/C (Ark2 without OCRS) bounds-generation results can be accessed from: http://stac.cs.wisc.edu/$TODAY/print_hull.html\n\n\n" | mail -s "ICRA Test Results" jbreck@cs.wisc.edu reps@cs.wisc.edu zkincaid@gmail.com turetsky@grammatech.com jcyphert@cs.wisc.edu
+
 # Version distinguishing OCRS:
-printf "Hello,\n\nThis is to inform you of the results of ICRA's nightly tests.  Running the tests finished on $(date).\n\nThe ICRA/bytecode (Java) results can be accessed from: http://stac.cs.wisc.edu/$TODAY/result_java.html\nThe ICRA/bytecode (Java) comparison results can be accessed from: http://stac.cs.wisc.edu/$TODAY/compare_java.html\n\nThe ICRA/C (Ark2 without OCRS) assertion-checking results can be accessed from: http://stac.cs.wisc.edu/$TODAY/result.html\nThe ICRA/C (Ark2 without OCRS) comparison results can be accessed from: http://stac.cs.wisc.edu/$TODAY/compare.html\nThe ICRA/C (Ark2 without OCRS) bounds-generation results can be accessed from: http://stac.cs.wisc.edu/$TODAY/print_hull.html\n\nThe ICRA/C (Ark2 with OCRS) assertion-checking results can be accessed from: http://stac.cs.wisc.edu/$TODAY/result_ocrs.html\nThe comparison between tonight's ICRA/C results with OCRS and without OCRS can be accessed from: http://stac.cs.wisc.edu/$TODAY/compare_ocrs.html\n" | mail -s "ICRA Test Results" jbreck@cs.wisc.edu reps@cs.wisc.edu zkincaid@gmail.com turetsky@grammatech.com jcyphert@cs.wisc.edu
+#printf "Hello,\n\nThis is to inform you of the results of ICRA's nightly tests.  Running the tests finished on $(date).\n\nThe ICRA/bytecode (Java) results can be accessed from: http://stac.cs.wisc.edu/$TODAY/result_java.html\nThe ICRA/bytecode (Java) comparison results can be accessed from: http://stac.cs.wisc.edu/$TODAY/compare_java.html\n\nThe ICRA/C (Ark2 without OCRS) assertion-checking results can be accessed from: http://stac.cs.wisc.edu/$TODAY/result.html\nThe ICRA/C (Ark2 without OCRS) comparison results can be accessed from: http://stac.cs.wisc.edu/$TODAY/compare.html\nThe ICRA/C (Ark2 without OCRS) bounds-generation results can be accessed from: http://stac.cs.wisc.edu/$TODAY/print_hull.html\n\nThe ICRA/C (Ark2 with OCRS) assertion-checking results can be accessed from: http://stac.cs.wisc.edu/$TODAY/result_ocrs.html\nThe comparison between tonight's ICRA/C results with OCRS and without OCRS can be accessed from: http://stac.cs.wisc.edu/$TODAY/compare_ocrs.html\n" | mail -s "ICRA Test Results" jbreck@cs.wisc.edu reps@cs.wisc.edu zkincaid@gmail.com turetsky@grammatech.com jcyphert@cs.wisc.edu
 
 #Version before distinguishing OCRS: (come back to this later)
 #printf "Hello,\n\nThis is to inform you of the results of ICRA's nightly tests.  Running the tests finished on $(date).\n\nThe ICRA/bytecode (Java) results can be accessed from: http://stac.cs.wisc.edu/$TODAY/result_java.html\nThe ICRA/bytecode (Java) comparison results can be accessed from: http://stac.cs.wisc.edu/$TODAY/compare_java.html\n\nThe ICRA/C (Ark2) assertion-checking results can be accessed from: http://stac.cs.wisc.edu/$TODAY/result.html\nThe ICRA/C (Ark2) comparison results can be accessed from: http://stac.cs.wisc.edu/$TODAY/compare.html\nThe ICRA/C (Ark2) bounds-generation results can be accessed from: http://stac.cs.wisc.edu/$TODAY/print_hull.html\n" | mail -s "ICRA Test Results" jbreck@cs.wisc.edu reps@cs.wisc.edu zkincaid@gmail.com turetsky@grammatech.com jcyphert@cs.wisc.edu

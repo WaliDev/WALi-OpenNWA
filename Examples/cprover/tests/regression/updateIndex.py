@@ -19,8 +19,8 @@ for line in index:
                       " ( <a href=\"" + date_Ymd + "/print_hull.html\">Bounds Generation</a> )" +
                       " ( <a href=\"" + date_Ymd + "/result_java.html\">Java Results</a> )" + 
                       " ( <a href=\"" + date_Ymd + "/compare_java.html\">Java Comparison</a> )" +
-                      " ( <a href=\"" + date_Ymd + "/result_ocrs.html\">OCRS</a> )" +
-                      " ( <a href=\"" + date_Ymd + "/compare_ocrs.html\">OCRS Comparison</a> )" +
+                      #" ( <a href=\"" + date_Ymd + "/result_ocrs.html\">OCRS</a> )" +
+                      #" ( <a href=\"" + date_Ymd + "/compare_ocrs.html\">OCRS Comparison</a> )" +
                       "<br>\n")
 	sys.stdout.write(line)
 	
