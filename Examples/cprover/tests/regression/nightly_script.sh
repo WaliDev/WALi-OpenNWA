@@ -6,8 +6,9 @@ source /bat0/stac/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
 
 shopt -s nullglob
 
-NROOT=/bat0/stac/Code/Ark2-Sandbox
 #NROOT=/bat0/stac/Code/CSFE_JAVA_API/jbreck
+#NROOT=/bat0/stac/Code/Ark2-Sandbox
+NROOT=/bat0/stac/Code/WALi-Sandbox
 #NEWTON=~/Newton/WALi-OpenNWA
 NEWTON=$NROOT/WALi-OpenNWA
 LIBTSLRE=$NEWTON/Examples/cprover/libtslre
@@ -15,8 +16,8 @@ DUET=$NROOT/duet
 SUITE=$NEWTON/Examples/cprover/tests/regression
 #SERVER=/media/sf_stac/public/html
 SERVER=/media/sf_html
-TODAY=$(date +%Y%m%d)
-#TODAY=NT2_$(date +%Y%m%d)
+TODAY=$(date +%Y%m%d) # like 20171102
+DATE_ADBY=$(date +"%a, %d %b %Y") # like Thu, 02 Nov 2017
 
 ##### No longer needed; Ark2 is the default
 ####ARK2NROOT=/bat0/stac/Code/CSFE_JAVA_API/jbreck/Ark2
@@ -61,7 +62,7 @@ cd $SUITE
 #python $SUITE/compare.py || exit 1
 python $SUITE/compare.py
 #python $SUITE/updateIndex.py || exit 1
-python $SUITE/updateIndex.py
+python $SUITE/updateIndex.py "$TODAY" "$DATE_ADBY"
 
 python $SUITE/compare_java.py
 python $SUITE/compare_ocrs.py
