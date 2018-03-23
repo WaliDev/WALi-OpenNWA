@@ -13,7 +13,7 @@ shopt -s nullglob
 NEWTON_DIR="$(pwd)"
 
 SUITE="$NEWTON_DIR/Examples/cprover/tests/regression"
-TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b_print_hull $NEWTON_DIR/Examples/cprover/tests/STAC/polynomial/PH $NEWTON_DIR/Examples/cprover/tests/STAC/canonical $NEWTON_DIR/Examples/cprover/tests/STAC/E3Model $NEWTON_DIR/Examples/cprover/tests/PrintHullRegressions )
+TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b_print_hull $NEWTON_DIR/Examples/cprover/tests/STAC/polynomial/PH $NEWTON_DIR/Examples/cprover/tests/STAC/canonical $NEWTON_DIR/Examples/cprover/tests/STAC/E3Model $NEWTON_DIR/Examples/cprover/tests/PrintHullRegressions  $NEWTON_DIR/Examples/cprover/tests/strings_numeric_PH )
 #TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/tmp_single_printhull )
 #TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b_print_hull )
 
