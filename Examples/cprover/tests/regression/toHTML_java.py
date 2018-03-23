@@ -184,6 +184,26 @@ for line in fin:
             fout.write('</td>\n')
             colCtr += 1
     
+    elif (words[0] == "__DONE"):
+        if (runMode == 'below') :
+            fout.write('<td>')
+            success = True
+            if ((len(words) == 1) or flipResult):
+                success = False
+                
+            for i in range(len(words)-1):
+                if (words[i+1] == "__NORMAL"):
+                    fout.write('<font color=\"#00AA00\">NORMAL</font><br>')
+                    success = True 
+                elif (words[i+1] == "__TIMEOUT"):
+                    fout.write('<font color=\"#800080\">TIMEOUT</font><br>')
+                    success = False
+                elif (words[i+1] == "__EXCEPTION"):
+                    fout.write('<font color=\"#800080\">EXCEPTION</font><br>')
+                    success = False
+            
+            fout.write('</td>\n')
+            colCtr += 1
     
     elif (words[0] == "__ASSERTION"):
         if (runMode == 'below') :
