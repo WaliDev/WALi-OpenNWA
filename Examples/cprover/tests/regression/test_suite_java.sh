@@ -11,14 +11,16 @@ trap "exit" INT
 shopt -s nullglob
 
 #NEWTON_DIR="/bat0/stac/Code/CSFE_JAVA_API/jbreck/WALi-OpenNWA/"
-NEWTON_DIR="/bat0/stac/Code/Ark2-Sandbox/WALi-OpenNWA/"
+#NEWTON_DIR="/bat0/stac/Code/WALi-Sandbox/WALi-OpenNWA/" # had /
+NEWTON_DIR="/bat0/stac/Code/WALi-Sandbox/WALi-OpenNWA"
+#NEWTON_DIR="/bat0/stac/Code/Ark2-Sandbox/WALi-OpenNWA/"
 #NEWTON_DIR="$(readlink -f .)"
 #NEWTON_DIR="$(pwd)"
 #DUET_DIR="$NEWTON_DIR/../duet"
 
 SUITE="$NEWTON_DIR/Examples/cprover/tests/regression"
-JAVA_PACKAGE="/bat0/stac/Code/Java-benchmarks/java_package"
-
+#JAVA_PACKAGE="/bat0/stac/Code/Java-benchmarks/java_package"
+JAVA_MEP_PACKAGE="/bat0/stac/Code/Java-benchmarks/marked_entry_point"
 #TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/java/quick )
 #TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/STAC/polynomial/assert $NEWTON_DIR/Examples/cprover/tests/STAC/canonical )
 #TESTDIRS=( $NEWTON_DIR/Examples/cprover/tests/c4b $NEWTON_DIR/Examples/cprover/tests/misc-recursive $NEWTON_DIR/Examples/cprover/tests/duet $NEWTON_DIR/Examples/cprover/tests $NEWTON_DIR/Examples/cprover/tests/STAC/LESE $NEWTON_DIR/Examples/cprover/tests/STAC/LowerBound $NEWTON_DIR/Examples/cprover/tests/STAC/LZ $NEWTON_DIR/Examples/cprover/tests/sv-benchmarks/* )
@@ -31,11 +33,13 @@ JAVA_PACKAGE="/bat0/stac/Code/Java-benchmarks/java_package"
 
 #TESTDIRS=( $JAVA_PACKAGE/quick_java_examples/ )
 #TESTDIRS=( /bat0/stac/Code/Ark2-Sandbox/WALi-OpenNWA/Category2_E1_E4_unmodified/ ) 
-TESTDIRS=( $JAVA_PACKAGE/quick_java_examples/ $JAVA_PACKAGE/simple_java_examples/ $JAVA_PACKAGE/selected_canonical/ $JAVA_PACKAGE/new-canonical-examples/all_canonical_jars/ $NEWTON_DIR/Examples/cprover/tests/java/abstraction_ladder_1/ $NEWTON_DIR/Examples/cprover/tests/java_examples/Aymeric_progs/ ) # current as of 2017-04-29
+#TESTDIRS=( $JAVA_PACKAGE/quick_java_examples/ $JAVA_PACKAGE/simple_java_examples/ $JAVA_PACKAGE/selected_canonical/ $JAVA_PACKAGE/new-canonical-examples/all_canonical_jars/ $NEWTON_DIR/Examples/cprover/tests/java/abstraction_ladder_1/ ) # current as of 2017-04-29
+TESTDIRS=( $JAVA_MEP_PACKAGE/degree_n_monomial/ $NEWTON_DIR/Examples/cprover/tests/java_examples/Aymeric_progs/ )
 
 #/Code/Java-benchmarks/java_package/new-canonical-examples/all_canonical_jars
 
-NEWTON="/bat0/stac/Code/CSFE_JAVA_API/params-icra-bytecode.sh"
+NEWTON="/bat0/stac/Code/WALi-Sandbox/WALi-OpenNWA/java_icra.sh"
+#NEWTON="/bat0/stac/Code/CSFE_JAVA_API/params-icra-bytecode.sh"
 #NEWTON="$NEWTON_DIR/_build64/Examples/cprover/NewtonOcaml"
 #DUET="$DUET_DIR/duet.native"
 
@@ -50,6 +54,18 @@ SCRIPT="$SUITE/toHTML_java.py"
 
 #TIMEOUT="1m"
 TIMEOUT="5m"
+
+#########################################################################
+# IST SETUP STEPS
+#  (These are required when running test_suite_java from a cron job.)
+echo "Running IST config steps (following test_suite_java.sh); setting:"
+echo "    GRAMMATECH_HOME"
+echo "    PATH"
+echo "  and running IST_settings/config.sh"
+export GRAMMATECH_HOME=/bat0/stac/Code/CSFE_JAVA_API
+export PATH=$GRAMMATECH_HOME/IST/:$PATH
+source $GRAMMATECH_HOME/IST/engagement/IST_settings/config.sh
+#########################################################################
 
 cd $NEWTON_DIR
 
@@ -124,10 +140,12 @@ for directory in ${TESTDIRS[@]}; do
         #
         rm -f $below_outfile
         #COMMAND="$NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops" # until 2017-08-01
-        COMMAND="$NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops --bound-all bytecodecost "
+        #COMMAND="$NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops --bound-all bytecodecost " # until 2017-11-27
+        COMMAND="$NEWTON +cra_newton_basic +cra-forward-inv +cra-split-loops +-bound-all time_cost " 
         echo $COMMAND >> $below_outfile
         echo "" >> $below_outfile
-		eval "timeout $TIMEOUT $COMMAND --test=$RESULTJAVA $testf &>> $below_outfile"
+		#echo "timeout $TIMEOUT $COMMAND +-test=$RESULTJAVA $testf"
+		eval "timeout $TIMEOUT $COMMAND +-test=$RESULTJAVA $testf &>> $below_outfile"
         #
         #eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops --test=$RESULTJAVA $testf &> $below_outfile"
         success=$?
