@@ -141,7 +141,8 @@ for directory in ${TESTDIRS[@]}; do
         rm -f $below_outfile
         #COMMAND="$NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops" # until 2017-08-01
         #COMMAND="$NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops --bound-all bytecodecost " # until 2017-11-27
-        COMMAND="$NEWTON +cra_newton_basic +cra-forward-inv +cra-split-loops +-bound-all time_cost " 
+        #COMMAND="$NEWTON +cra_newton_basic +cra-forward-inv +cra-split-loops +-bound-all time_cost " # until 2018-03-23
+        COMMAND="$NEWTON +cra_newton_basic +cra-split-loops +-bound-all time_cost " 
         echo $COMMAND >> $below_outfile
         echo "" >> $below_outfile
 		#echo "timeout $TIMEOUT $COMMAND +-test=$RESULTJAVA $testf"

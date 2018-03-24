@@ -65,7 +65,8 @@ for directory in ${TESTDIRS[@]}; do
 		cd $NEWTON_DIR
         #
         rm -f $below_outfile
-        COMMAND="$NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops"
+        #COMMAND="$NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops" # until 2018-03-23
+        COMMAND="$NEWTON -cra_newton_basic -cra-split-loops"
         echo $COMMAND >> $below_outfile
         echo "" >> $below_outfile
 		eval "timeout $TIMEOUT $COMMAND --test=$RESULT $testf &>> $below_outfile"

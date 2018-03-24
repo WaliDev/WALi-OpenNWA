@@ -56,7 +56,8 @@ for directory in ${TESTDIRS[@]}; do
 		#eval "timeout $TIMEOUT $NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf &> $outfile"
         #
         rm -f $outfile
-        COMMAND="$NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops"
+        #COMMAND="$NEWTON -cra_newton_basic -cra-forward-inv -cra-split-loops" # until 2018-03-23
+        COMMAND="$NEWTON -cra_newton_basic -cra-split-loops"
         echo $COMMAND >> $outfile
         echo "" >> $outfile
 		eval "timeout $TIMEOUT $COMMAND --test=$RESULT $testf &>> $outfile"
