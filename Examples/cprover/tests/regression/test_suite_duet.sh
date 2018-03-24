@@ -90,7 +90,8 @@ for directory in ${TESTDIRS[@]}; do
 		echo -n " Duet ..."
 		echo -n "__DUET " >> $RESULT
 		cd $DUET_DIR
-		eval "timeout $TIMEOUT $DUET -cra -cra-forward-inv -cra-split-loops -test $RESULT $testf &> $duet_outfile"
+		#eval "timeout $TIMEOUT $DUET -cra -cra-forward-inv -cra-split-loops -test $RESULT $testf &> $duet_outfile" # until 2018-03-24
+		eval "timeout $TIMEOUT $DUET -cra -cra-split-loops -test $RESULT $testf &> $duet_outfile" 
 		if (($?==124)); then
 			echo "TIMEOUT" >> $RESULT
 			echo -ne "\e[31mTimeout\e[0m"
@@ -102,7 +103,8 @@ for directory in ${TESTDIRS[@]}; do
 		start=$(date +%s%N)
 		cd $NEWTON_DIR
 		#eval "timeout $TIMEOUT $NEWTON -cra_newton_above -cra-forward-inv -cra-split-loops -cra-disable-simplify --test=$RESULT $testf &> $above_outfile"
-		eval "timeout $TIMEOUT $NEWTON -cra_newton_above -cra-forward-inv -cra-split-loops --test=$RESULT $testf &> $above_outfile"
+		#eval "timeout $TIMEOUT $NEWTON -cra_newton_above -cra-forward-inv -cra-split-loops --test=$RESULT $testf &> $above_outfile" # until 2018-03-24
+		eval "timeout $TIMEOUT $NEWTON -cra_newton_above -cra-split-loops --test=$RESULT $testf &> $above_outfile"
 		success=$?
 		if (($success==124)); then
 			echo "__TIMEOUT" >> $RESULT
