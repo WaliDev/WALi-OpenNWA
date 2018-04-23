@@ -3832,7 +3832,8 @@ void extractProcedureSummaries(WFA& outfaNewton, ProgramRefPtr program) {
             }
         } else {
             foundMain = true;
-            name = "main";
+            //name = "main";
+            name = "procedure of entry";
             // Note: its name may not actually be main, but we have no mechanism to find out the main procedure's actual name
         }
 
@@ -3953,7 +3954,8 @@ void printVariableBounds(WFA& outfaNewton, ProgramRefPtr program) {
                 continue;
             }
             int variableID = getGlobalBoundingVarFromName(variableName.c_str());
-            std::cout << "Variable bounds for main procedure: " << std::endl;
+            //std::cout << "Variable bounds for main procedure: " << std::endl;
+            std::cout << "Variable bounds for procedure of entry: " << std::endl;
             program->main->summary->printHull(std::cout, 0, variableID);
             std::cout << std::endl;
         }
@@ -3961,7 +3963,8 @@ void printVariableBounds(WFA& outfaNewton, ProgramRefPtr program) {
                 strit != boundingVarEntry.end(); ++strit) {
             std::string variableName = *strit;
             int variableID = getGlobalBoundingVarFromName(variableName.c_str());
-            std::cout << "Variable bounds for main procedure: " << std::endl;
+            //std::cout << "Variable bounds for main procedure: " << std::endl;
+            std::cout << "Variable bounds for procedure of entry: " << std::endl;
             program->main->summary->printHull(std::cout, 0, variableID);
             std::cout << std::endl;
         }
