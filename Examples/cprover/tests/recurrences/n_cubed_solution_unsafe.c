@@ -22,6 +22,6 @@ int main()
     init_tick(0);
     
     func(8);
-    assert(__cost <= n^2);
+    assert(__cost <= 8^2);
     return 0;
 }
