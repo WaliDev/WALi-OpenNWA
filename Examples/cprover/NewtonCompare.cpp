@@ -4243,6 +4243,14 @@ void checkAssertions(WFA& outfaNewton) {
 //}
 #undef flush
 
+void print_stats() {
+    CAMLparam0();
+    cout << "Printing stats" << std::endl;
+    value * stats = caml_named_value("print_stats");
+    caml_callback(*stats, Val_unit);
+    CAMLreturn0;
+}
+
 int runBasicNewton(char **args)
 {
     caml_startup(args); // This line calls Duet to analyze the program specified on the command
@@ -4496,9 +4504,7 @@ int main(int argc, char **argv)
             std::cout << "Not implemented yet." << std::endl;
         }
     }   
-
     //cout << "Printing stats" << std::endl;
-    //value * stats = caml_named_value("print_stats_callback");
-    //caml_callback(*stats, 0);
+    //print_stats();
 }
 
