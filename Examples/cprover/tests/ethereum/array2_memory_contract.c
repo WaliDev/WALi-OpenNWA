@@ -1,5 +1,7 @@
 int gas;
-int test(int addr0, int addr1, int addr2, int addr3, int call_dsize, int call_v, int calldata0, int calldata36, int calldata4, int sha1, int sha2, int sha3, int memory[], int localmem[]) {
+int localmem[];
+int memory[];
+int test(int addr0, int addr1, int addr2, int addr3, int call_dsize, int call_v, int calldata0, int calldata36, int calldata4, int sha1, int sha2, int sha3) {
 	gas = 0;
 	int r1, r10, r12, r13, r14, r15, r18, r19, r20, r26, r27, r30, r33, r35, r36, r37, r5, r50, r51, r52, r53, r54, r6, r60, r65, r7, r8;
 	r1 = r10 = r12 = r13 = r14 = r15 = r18 = r19 = r20 = r26 = r27 = r30 = r33 = r35 = r36 = r37 = r5 = r50 = r51 = r52 = r53 = r54 = r6 = r60 = r65 = r7 = r8 = 0;
@@ -189,8 +191,8 @@ int test(int addr0, int addr1, int addr2, int addr3, int call_dsize, int call_v,
 
 }
 
-void main(int addr0, int addr1, int addr2, int addr3, int call_dsize, int call_v, int calldata0, int calldata36, int calldata4, int sha1, int sha2, int sha3, int memory[], int localmem[]) {
-	test(addr0, addr1, addr2, addr3, call_dsize, call_v, calldata0, calldata36, calldata4, sha1, sha2, sha3, memory, localmem);
+void main(int addr0, int addr1, int addr2, int addr3, int call_dsize, int call_v, int calldata0, int calldata36, int calldata4, int sha1, int sha2, int sha3) {
+	test(addr0, addr1, addr2, addr3, call_dsize, call_v, calldata0, calldata36, calldata4, sha1, sha2, sha3);
 	__VERIFIER_print_hull(gas);
 	return;
 }

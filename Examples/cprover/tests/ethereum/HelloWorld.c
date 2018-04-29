@@ -1,5 +1,7 @@
 int gas;
-int test(int call_v, int memory[], int localmem[]) {
+int memory[];
+int localmem[];
+int test(int call_v) {
 	gas = 0;
 	int r6;
 	r6 = 0;
@@ -23,8 +25,8 @@ int test(int call_v, int memory[], int localmem[]) {
 		return 0;
 }
 
-void main(int call_v, int memory[], int localmem[]) {
-	test(call_v, memory, localmem);
+void main(int call_v) {
+	test(call_v);
 	__VERIFIER_print_hull(gas);
 	return;
 }

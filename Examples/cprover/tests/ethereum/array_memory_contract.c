@@ -1,5 +1,7 @@
 int gas;
-int test(int addr0, int addr1, int addr2, int call_dsize, int call_v, int calldata0, int sha1, int memory[], int localmem[]) {
+int memory[];
+int localmem[];
+int test(int addr0, int addr1, int addr2, int call_dsize, int call_v, int calldata0, int sha1) {
 	gas = 0;
 	int r10, r12, r13, r14, r15, r20, r26, r27, r5, r51, r60, r65, r7, r8;
 	r10 = r12 = r13 = r14 = r15 = r20 = r26 = r27 = r5 = r51 = r60 = r65 = r7 = r8 = 0;
@@ -100,8 +102,8 @@ int test(int addr0, int addr1, int addr2, int call_dsize, int call_v, int callda
 
 }
 
-void main(int addr0, int addr1, int addr2, int call_dsize, int call_v, int calldata0, int sha1, int memory[], int localmem[]) {
-	test(addr0, addr1, addr2, call_dsize, call_v, calldata0, sha1, memory, localmem);
+void main(int addr0, int addr1, int addr2, int call_dsize, int call_v, int calldata0, int sha1) {
+	test(addr0, addr1, addr2, call_dsize, call_v, calldata0, sha1);
 	__VERIFIER_print_hull(gas);
 	return;
 }
