@@ -122,7 +122,7 @@ duetrel_t DuetRel::MkDuetRel(value w, bool tensored){
     }
     if (wCnt >= MAX_WEIGHT_COUNT)
     {
-      ////abort
+      assert(0 && "Too many DuetRel weights were used (increase MAX_WEIGHT_COUNT).");
     }
     caml_register_global_root(&caml_weights[wCnt]);
     caml_weights[wCnt] = w;
