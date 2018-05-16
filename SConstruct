@@ -8,7 +8,7 @@
 ## TODO: move setup code to an include file
 import os, os.path, platform
 
-Debug = True
+Debug = False
 #DefaultEnvironment(MSVC_USE_SCRIPT=False) # for Windows
 
 #(platform_bits,linkage) = platform.architecture()
