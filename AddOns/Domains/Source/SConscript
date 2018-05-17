@@ -16,19 +16,21 @@ if Debug:
 
 
 walidomains_files = Split("""
-./wali/domains/binrel/BinRel.cpp
-./wali/domains/binrel/ProgramBddContext.cpp
-./wali/domains/binrel/BinRel_Interface.cpp
-./wali/domains/binrel/nwa_detensor.cpp
-./wali/domains/binrel/BinRelMergeFns.cpp
-./wali/domains/reach/Reach.cpp
-./wali/domains/lh/LH.cpp
-./wali/domains/lh/PhaseLH.cpp
 ./wali/domains/duet/DuetRel.cpp
 ./wali/domains/nparel/NPARel.cpp
-./wali/domains/name_weight/nameWeight.cpp
 """)
-# removed by Jason Breck, to remove TSL dependency: ./wali/domains/tsl_weight/TSLWeight.cpp
+# removed by Jason Breck:
+#     to remove TSL dependency: ./wali/domains/tsl_weight/TSLWeight.cpp
+#     to reduce the number of dependencies overall:
+#             ./wali/domains/binrel/BinRel.cpp
+#             ./wali/domains/binrel/ProgramBddContext.cpp
+#             ./wali/domains/binrel/BinRel_Interface.cpp
+#             ./wali/domains/binrel/nwa_detensor.cpp
+#             ./wali/domains/binrel/BinRelMergeFns.cpp
+#             ./wali/domains/reach/Reach.cpp
+#             ./wali/domains/lh/LH.cpp
+#             ./wali/domains/lh/PhaseLH.cpp
+#             ./wali/domains/name_weight/nameWeight.cpp
 
 env = BaseEnv.Clone()
 

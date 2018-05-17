@@ -12,8 +12,8 @@ if Debug:
     
 built = []
 
-buddy = SConscript('ThirdParty/SConscript')
-built += buddy
+#buddy = SConscript('ThirdParty/SConscript')
+#built += buddy
 
 domains = SConscript(
     'Source/SConscript', 
@@ -22,7 +22,7 @@ domains = SConscript(
 
 built += domains
 
-BaseEnv.Depends(domains,buddy)
+#BaseEnv.Depends(domains,buddy)
 
 Return('built')
 
