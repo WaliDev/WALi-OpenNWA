@@ -3,7 +3,7 @@ import os,os.path;
 Import('BuildDir')
 
 built = []
-built += SConscript('Parse/SConscript')
+#built += SConscript('Parse/SConscript') # Parser not needed
 built += SConscript('Domains/SConscript')
 built += SConscript('RandomNwa/SConscript')
 built += SConscript('RandomFWPDS/SConscript', variant_dir=os.path.join(BuildDir,'AddOns','RandomFWPDS'), duplicate=0)
