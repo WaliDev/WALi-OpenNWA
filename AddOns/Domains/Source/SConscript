@@ -27,8 +27,8 @@ walidomains_files = Split("""
 ./wali/domains/duet/DuetRel.cpp
 ./wali/domains/nparel/NPARel.cpp
 ./wali/domains/name_weight/nameWeight.cpp
-./wali/domains/tsl_weight/TSLWeight.cpp
 """)
+# removed by Jason Breck, to remove TSL dependency: ./wali/domains/tsl_weight/TSLWeight.cpp
 
 env = BaseEnv.Clone()
 
