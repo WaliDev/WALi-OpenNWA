@@ -65,6 +65,8 @@ namespace wali {
 #if defined(PUSH_EVAL)
         void RegExp::setDirty()
         {
+          if(dirty)
+            return;
           dirty = true;
           for(wali::util::unordered_set<RegExp*>::iterator
                 pit = parents.begin(); pit != parents.end(); ++pit)
