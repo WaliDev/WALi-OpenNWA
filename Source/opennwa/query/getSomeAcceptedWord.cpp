@@ -119,7 +119,7 @@ namespace opennwa {
         return sem_elem_t();
       }
 
-      ipath.path_summary_iterative_wpds();
+      ipath.path_summary_iterative_wpds(wfa::WFA::ComputeInitialState);
 
       return ipath.getState(ipath.getInitialState())->weight();
     }

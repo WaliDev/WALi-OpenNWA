@@ -42,13 +42,13 @@ namespace wali
         ("TarjanFwpds",       WFA::TarjanFwpds)
         ("CrossCheckAll",     WFA::CrosscheckAll);
 
-    bool WFA::globalDefaultPathSummaryFwpdsTopDown
-      = wali::util::ConfigurationVar<bool>(
+    WFA::PathSummaryDirection WFA::globalDefaultPathSummaryFwpdsDirection
+      = wali::util::ConfigurationVar<WFA::PathSummaryDirection>(
           "WALI_WFA_PATH_SUMMARY_FWPDS_EVAL",
-          true
+          WFA::TopDown
         )
-        ("TopDown", true)
-        ("BottomUp", false);
+        ("TopDown",  WFA::TopDown)
+        ("BottomUp", WFA::BottomUp);
 
     //
     // Calls path_summary with default Worklist
@@ -210,13 +210,35 @@ namespace wali
     }
 
     void
-    WFA::path_summary_tarjan_fwpds()
+    WFA::path_summary_tarjan_fwpds(PathSummaryComputeInitialState compute_initial_state)
     {
-      path_summary_tarjan_fwpds(defaultPathSummaryFwpdsTopDown);
+      path_summary_tarjan_fwpds(defaultPathSummaryFwpdsDirection, compute_initial_state);
     }
     
     void
-    WFA::path_summary_tarjan_fwpds(bool top_down)
+    WFA::path_summary_tarjan_fwpds(
+      PathSummaryDirection direction,
+      PathSummaryComputeInitialState compute_initial_state,
+      WFA & interfa)
+    {
+#if defined(REGEXP_CACHING) // TODO: && CHECKED_LEVEL >= 2
+      // See the big comment bellow in the next overload of this
+      // function.
+      details::WitnessChecker checker;
+      for_each(checker);
+      fast_assert(!checker.foundAny());
+#endif
+
+      fwpds::FWPDS pds;
+      pds.topDownEval(direction == TopDown);
+      pds.useNewton(false);
+      path_summary_via_wpds(compute_initial_state, pds, interfa);
+    }
+
+    void
+    WFA::path_summary_tarjan_fwpds(
+      PathSummaryDirection direction,
+      PathSummaryComputeInitialState compute_initial_state)
     {
 #if defined(REGEXP_CACHING) // TODO: && CHECKED_LEVEL >= 2
       // If REGEXP_CACHING is on, there is a gotcha while using the
@@ -252,16 +274,17 @@ namespace wali
 #endif
 
       fwpds::FWPDS pds;
-      pds.topDownEval(top_down);
+      pds.topDownEval(direction == TopDown);
       pds.useNewton(false);
-      path_summary_via_wpds(pds);
+      path_summary_via_wpds(compute_initial_state, pds);
     }
 
+
     void
-    WFA::path_summary_iterative_wpds()
+    WFA::path_summary_iterative_wpds(PathSummaryComputeInitialState compute_initial_state)
     {
       WPDS pds;
-      path_summary_via_wpds(pds);
+      path_summary_via_wpds(compute_initial_state, pds);
     }
 
     void
@@ -271,11 +294,27 @@ namespace wali
       WFA copy2 = *this;
       WFA copy3 = *this;
 
+      // Compute path_summary using multiple algorithms
       path_summary_iterative_original();
-      copy1.path_summary_iterative_wpds();
-      copy2.path_summary_tarjan_fwpds(true);
-      copy3.path_summary_tarjan_fwpds(false);
+      copy1.path_summary_iterative_wpds(SuppressInitialState);
+      copy2.path_summary_tarjan_fwpds(TopDown, SuppressInitialState);
+      copy3.path_summary_tarjan_fwpds(BottomUp, SuppressInitialState);
 
+      // Everything but the original should have had the initial state
+      // computation suppressed. We first check this is true..
+      Key init = getInitialState();
+      sem_elem_t zero = getSomeWeight()->zero();
+      assert(copy1.getState(init)->weight()->equal(zero));
+      assert(copy2.getState(init)->weight()->equal(zero));
+      assert(copy3.getState(init)->weight()->equal(zero));
+
+      // ...and then compensate so we can compare below
+      sem_elem_t init_weight = this->getState(init)->weight();
+      copy1.getState(init)->weight() = init_weight;
+      copy2.getState(init)->weight() = init_weight;
+      copy3.getState(init)->weight() = init_weight;
+
+      // Now, make sure everything is the same
       assert(this->equal(copy1)); // TODO: slow_assert
       assert(this->equal(copy2));
       assert(this->equal(copy3));
@@ -291,11 +330,11 @@ namespace wali
         break;
 
       case IterativeWpds:
-        path_summary_iterative_wpds();
+        path_summary_iterative_wpds(SuppressInitialState);
         break;
 
       case TarjanFwpds:
-        path_summary_tarjan_fwpds();
+        path_summary_tarjan_fwpds(SuppressInitialState);
         break;
 
       case CrosscheckAll:
@@ -305,7 +344,17 @@ namespace wali
     }
 
     void
-    WFA::path_summary_via_wpds(WPDS & pds) {
+    WFA::path_summary_via_wpds(PathSummaryComputeInitialState compute_initial_state, WPDS & pds) {
+      WFA ans;
+      path_summary_via_wpds(compute_initial_state, pds, ans);
+    }
+
+    void
+    WFA::path_summary_via_wpds(
+      PathSummaryComputeInitialState compute_initial_state,
+      WPDS & pds,
+      WFA & ans)
+    {
       if (this->getFinalStates().size() == 0u) {
         return;
       }
@@ -313,19 +362,28 @@ namespace wali
       sem_elem_t wt = getSomeWeight()->one();
       Key pkey = getKey("__pstate");
 
+      // Convert the WFA *this into a one-control-location WPDS,
+      //   where the single control location is pkey, and the
+      //   direction of control flow in the WPDS is the opposite of
+      //   the transitions in *this
+      typedef boost::function<bool (ITrans const *)> TransPred;
+      boost::function<bool (ITrans const *)>
+        trans_accept = (compute_initial_state == ComputeInitialState)
+                       ? TransPred(is_any_transition)
+                       : TransPred(IsTransitionNotFromState(getInitialState()));
       if (getQuery() == INORDER) {
-          this->toWpds(pkey, &pds, is_any_transition, true, wali::domains::wrapToReversedSemElem);
+        this->toWpds(pkey, &pds, trans_accept, true, wali::domains::wrapToReversedSemElem);
       }
       else {
-          this->toWpds(pkey, &pds, is_any_transition, true);
+        this->toWpds(pkey, &pds, trans_accept, true);
       }
 
 #ifdef JAMDEBUG
-      std::cerr << "##### FWPDS" << std::endl;
+      std::cerr << "##### FWPDS [question automaton]" << std::endl;
       pds.print(std::cerr);
 #endif
 
-      WFA query(INORDER, progress);
+      WFA query;
       query.addState(pkey, wt->zero());
       query.setInitialState(pkey);
       Key fin = getKey("__done");
@@ -336,9 +394,9 @@ namespace wali
       if (getQuery() == INORDER) {
         one = new domains::ReversedSemElem(one);
       }
-      
+
       for (std::set<Key>::const_iterator fit = getFinalStates().begin();
-        fit!=getFinalStates().end(); fit++)
+           fit != getFinalStates().end(); fit++)
       {
         Key fkey = *fit;
         query.addTrans(pkey, fkey, fin, one);
@@ -349,7 +407,7 @@ namespace wali
       query.print(std::cerr);
 #endif
 
-      WFA ans = pds.poststar(query);
+      pds.poststar(query, ans);
 
 #ifdef JAMDEBUG
       fstream foo;
@@ -365,32 +423,34 @@ namespace wali
       }
       foo << "}\n";
       foo.close();
-      
+
       std::cerr << "##### ANS" << std::endl;
       ans.print(std::cerr);
 #endif
 
+      Key initkey = ans.init_state;
+      Key finkey = *ans.getFinalStates().begin();
 
-      for (state_map_t::const_iterator smit=state_map.begin();
-           smit!=state_map.end(); smit++)
+      for (state_map_t::const_iterator smit = state_map.begin();
+           smit != state_map.end(); smit++)
       {
         Key stkey = smit->first;
-
-        Key initkey = ans.init_state;
-        Key finkey = *ans.getFinalStates().begin();
-
         State *st = smit->second;
+
+        // Optionally avoid computing a weight for the initial state
+        if ((compute_initial_state == SuppressInitialState)
+            && st->name() == getInitialState())
+        {
+          continue;
+        }
+
         ITrans *trans = ans.find(initkey, stkey, finkey);
         sem_elem_t weight;
         if (trans != NULL) {
           weight = trans->weight();
-        } else {
-          if (getQuery() == INORDER) {
-            weight = new domains::ReversedSemElem(wt->zero());
-          }
-          else {
-            weight = wt->zero();
-          }
+        }
+        else {
+          weight = wt->zero();
         }
 
         if (getQuery() == INORDER) {
@@ -402,7 +462,6 @@ namespace wali
         st->weight() = weight;
       }
     }
-
 
     std::map<Key, sem_elem_t>
     WFA::readOutCombineOverAllPathsValues() const
@@ -462,3 +521,10 @@ namespace wali
 
   }
 }
+
+// Yo emacs!
+// Local Variables:
+//     c-file-style: "ellemtel"
+//     c-basic-offset: 2
+//     indent-tabs-mode: nil
+// End:

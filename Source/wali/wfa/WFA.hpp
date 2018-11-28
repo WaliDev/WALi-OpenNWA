@@ -73,10 +73,20 @@ namespace wali
       virtual ~DotAttributePrinter() {}
     };
 
-      bool is_epsilon_transition(ITrans const * trans);
+    bool is_epsilon_transition(ITrans const * trans);
     
     bool is_any_transition(ITrans const * trans);
-      
+
+    class IsTransitionNotFromState {
+      Key m_not_from;
+    public:
+      IsTransitionNotFromState (Key not_from)
+        : m_not_from(not_from)
+      {}
+      bool operator() (ITrans const * trans) const {
+        return trans->from() != m_not_from;
+      }
+    };
 
     /** @class WFA
      *
@@ -103,6 +113,21 @@ namespace wali
          */
         enum query_t { INORDER,REVERSE,MAX };
 
+        // This enum is set up to align with the values that were
+        // previously used -- 'bool top_down' -- in case someone is
+        // still calling the function with a bool and doesn't have
+        // warnings on. (Ideally, this'd be an enum class. Maybe some
+        // day, it will be able to be.)
+        enum PathSummaryDirection {
+            BottomUp,
+            TopDown
+        };
+
+        enum PathSummaryComputeInitialState {
+            ComputeInitialState,
+            SuppressInitialState
+        };
+
         enum PathSummaryImplementation {
             IterativeOriginal,
             IterativeWpds,
@@ -111,7 +136,7 @@ namespace wali
         };
 
         static PathSummaryImplementation globalDefaultPathSummaryImplementation;
-        static bool globalDefaultPathSummaryFwpdsTopDown;
+        static PathSummaryDirection globalDefaultPathSummaryFwpdsDirection;
 
         typedef wali::HashMap< KeyPair, TransSet > kp_map_t;
         typedef wali::HashMap< Key , State * > state_map_t;
@@ -445,15 +470,22 @@ namespace wali
          */
         virtual void path_summary_iterative_original(Worklist<State>& wl, sem_elem_t wt);
 
-        virtual void path_summary_iterative_wpds();
+        virtual void path_summary_iterative_wpds(PathSummaryComputeInitialState compute_is);
 
         /**
          * Performs path summary using Tarjan's algorithm. This results
          * in the dual benefits of lazy witness evaluation and
          * transparent witness propagation.
          */
-        virtual void path_summary_tarjan_fwpds();
-        virtual void path_summary_tarjan_fwpds(bool top_down);
+        virtual void path_summary_tarjan_fwpds(
+            PathSummaryComputeInitialState compute_initial_state);
+        virtual void path_summary_tarjan_fwpds(
+            PathSummaryDirection direction,
+            PathSummaryComputeInitialState compute_initial_state);
+        virtual void path_summary_tarjan_fwpds(
+            PathSummaryDirection direction,
+            PathSummaryComputeInitialState suppress_initial_state,
+            WFA & ansFA);
 
         virtual void path_summary_crosscheck_all();
 
@@ -462,7 +494,15 @@ namespace wali
          *
          * This is mostly intended to be an internal structure.
          */
-        virtual void path_summary_via_wpds(wpds::WPDS & wpds);
+        virtual void path_summary_via_wpds(
+            PathSummaryComputeInitialState compute_initial_state,
+            wpds::WPDS & wpds);
+        
+        virtual void path_summary_via_wpds(
+            PathSummaryComputeInitialState compute_initial_state,
+            wpds::WPDS & wpds,
+            WFA & ansFA);
+
 
         /**
          * Prunes the WFA. This removes any transitions that are
@@ -698,7 +738,7 @@ namespace wali
         std::set<State*> deleted_states;
 
         PathSummaryImplementation defaultPathSummaryImplementation;
-        bool defaultPathSummaryFwpdsTopDown;
+        PathSummaryDirection defaultPathSummaryFwpdsDirection;
 
       private:
 

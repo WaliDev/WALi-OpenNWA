@@ -65,7 +65,7 @@ namespace wali
         , generation(0)
         , progress(prog)
         , defaultPathSummaryImplementation(globalDefaultPathSummaryImplementation)
-        , defaultPathSummaryFwpdsTopDown(globalDefaultPathSummaryFwpdsTopDown)
+        , defaultPathSummaryFwpdsDirection(globalDefaultPathSummaryFwpdsDirection)
     {
       if( query == MAX ) {
         *waliErr << "[WARNING] Invalid WFA::query. Resetting to INORDER.\n";
@@ -108,7 +108,7 @@ namespace wali
         generation = rhs.generation;
 
         defaultPathSummaryImplementation = rhs.defaultPathSummaryImplementation;
-        defaultPathSummaryFwpdsTopDown = rhs.defaultPathSummaryFwpdsTopDown;
+        defaultPathSummaryFwpdsDirection = rhs.defaultPathSummaryFwpdsDirection;
       }
       return *this;
     }
