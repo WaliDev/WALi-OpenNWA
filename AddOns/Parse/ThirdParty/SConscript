@@ -23,7 +23,7 @@ ThirdParty = os.path.join(WaliDir,'AddOns','Parse','ThirdParty')
 archive = Name + ('.tar.gz','.zip')[IsZip]
 env = Environment(
     archive = File(archive),
-    mirror  = 'http://apache.cs.utah.edu/xerces/c/3/binaries',
+    mirror  = 'https://archive.apache.org/dist/xerces/c/3/binaries/',
     # NAK - `$archive` is not compatible with external invocation of this script
     url     = '$mirror/%s' % archive,
     )
