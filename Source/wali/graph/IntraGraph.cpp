@@ -1575,7 +1575,7 @@ namespace wali {
       std::stringstream ss;
       for(int i = 0; i < nnodes; ++i){
         if(i != 0){
-        const long regexpaddr = (const long) nodes[i].regexp.get_ptr();
+        const long regexpaddr = (long) nodes[i].regexp.get_ptr();
         ss << "node" << i << " [label=\"(" << key2str(nodes[i].trans.src) 
           << ", " << key2str(nodes[i].trans.stack) << ", " 
           << key2str(nodes[i].trans.tgt) << ")\\n" << regexpaddr
