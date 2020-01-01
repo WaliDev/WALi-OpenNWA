@@ -83,6 +83,8 @@ namespace wali
         // Methods
         //
       public:
+        virtual ~ITrans() {}
+
         /*!
          * @return a copy of the transition
          */
@@ -97,12 +99,14 @@ namespace wali
         //
         /*! @return const Key of from state */
         virtual Key from() const throw() = 0;
+        virtual Key from_state() const throw() { return from(); }
 
         /*! @return const Key of stack symbol */
         virtual Key stack() const throw() = 0;
 
         /*! @return const Key of to state */
         virtual Key to() const throw() = 0;
+        virtual Key to_state() const throw() { return to(); }
 
         /*! @return const sem_elem_t of ITrans */
         virtual const sem_elem_t weight() const throw()  = 0;
@@ -122,13 +126,15 @@ namespace wali
         //
         /*! @return Key of from state */
         virtual Key from() throw() = 0;
-
+        virtual Key from_state() throw() { return from(); }
+	
         /*! @return Key of stack symbol */
         virtual Key stack() throw() = 0;
 
         /*! @return Key of to state */
         virtual Key to() throw() = 0;
-
+        virtual Key to_state() throw() { return to(); }
+      
         /*! @return sem_elem_t of ITrans */
         virtual sem_elem_t weight() throw() = 0;
 

@@ -10,6 +10,7 @@
 /AddOns/Parse/ThirdParty/*.pyc
 /coverage
 /wali.info
+/Bindings/build
 
 *.o
 *.os

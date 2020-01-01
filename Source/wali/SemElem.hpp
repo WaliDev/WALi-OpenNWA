@@ -14,6 +14,11 @@
 #include <string>
 #include <typeinfo>
 
+/* forward declaration (for SWIG wrapper)
+ */
+struct _object;
+typedef struct _object PyObject;
+
 namespace wali
 {
   /* forward declaration. class sem_elem_t
@@ -270,6 +275,11 @@ namespace wali
           std::stringstream ss;
           print_typename(ss);
           return ss.str();
+      }
+
+      virtual
+      PyObject* getuserdata() {
+          return NULL;
       }
   };
 

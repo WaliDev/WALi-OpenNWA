@@ -533,6 +533,16 @@ class SemElem(Printable):
         """
         return _wali.SemElem_to_string_typename(self)
 
+    def getuserdata(self):
+        """
+        getuserdata(self) -> PyObject *
+
+        Parameters:
+            self: wali::SemElem *
+
+        """
+        return _wali.SemElem_getuserdata(self)
+
     def __str__(self):
         """
         __str__(self) -> PyObject *
@@ -944,6 +954,16 @@ class SemElemPtr(_object):
 
         """
         return _wali.SemElemPtr_to_string_typename(self)
+
+    def getuserdata(self):
+        """
+        getuserdata(self) -> PyObject *
+
+        Parameters:
+            self: wali::ref_ptr< SemElem > *
+
+        """
+        return _wali.SemElemPtr_getuserdata(self)
 
     def __str__(self):
         """
@@ -2578,6 +2598,53 @@ class TransSetImpl(_object):
 TransSetImpl_swigregister = _wali.TransSetImpl_swigregister
 TransSetImpl_swigregister(TransSetImpl)
 
+class ConstTransPair(_object):
+    """Proxy of C++ std::pair<(q(const).p.ITrans,bool)> class"""
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, ConstTransPair, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, ConstTransPair, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        """
+        __init__(self) -> ConstTransPair
+        __init__(self, first, second) -> ConstTransPair
+
+        Parameters:
+            first: ITrans *const
+            second: bool
+
+        __init__(self, p) -> ConstTransPair
+
+        Parameters:
+            p: std::pair< ITrans *const,bool > const &
+
+        """
+        this = _wali.new_ConstTransPair(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_getmethods__["first"] = _wali.ConstTransPair_first_get
+    if _newclass:first = _swig_property(_wali.ConstTransPair_first_get)
+    __swig_setmethods__["second"] = _wali.ConstTransPair_second_set
+    __swig_getmethods__["second"] = _wali.ConstTransPair_second_get
+    if _newclass:second = _swig_property(_wali.ConstTransPair_second_get, _wali.ConstTransPair_second_set)
+    def __len__(self): return 2
+    def __repr__(self): return str((self.first, self.second))
+    def __getitem__(self, index): 
+      if not (index % 2): 
+        return self.first
+      else:
+        return self.second
+    def __setitem__(self, index, val):
+      if not (index % 2): 
+        self.first = val
+      else:
+        self.second = val
+    __swig_destroy__ = _wali.delete_ConstTransPair
+    __del__ = lambda self : None;
+ConstTransPair_swigregister = _wali.ConstTransPair_swigregister
+ConstTransPair_swigregister(ConstTransPair)
+
 class TransSet(Printable):
     """Proxy of C++ wali::wfa::TransSet class"""
     __swig_setmethods__ = {}
@@ -3079,6 +3146,169 @@ class TransVector(_object):
     __del__ = lambda self : None;
 TransVector_swigregister = _wali.TransVector_swigregister
 TransVector_swigregister(TransVector)
+
+wali_wfa_STATE_GUARD = _wali.wali_wfa_STATE_GUARD
+class State(Printable):
+    """Proxy of C++ wali::wfa::State class"""
+    __swig_setmethods__ = {}
+    for _s in [Printable]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, State, name, value)
+    __swig_getmethods__ = {}
+    for _s in [Printable]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, State, name)
+    __repr__ = _swig_repr
+    __swig_setmethods__["num_states"] = _wali.State_num_states_set
+    __swig_getmethods__["num_states"] = _wali.State_num_states_get
+    if _newclass:num_states = _swig_property(_wali.State_num_states_get, _wali.State_num_states_set)
+    def __init__(self, *args): 
+        """
+        __init__(self) -> State
+        __init__(self, name, W) -> State
+
+        Parameters:
+            name: wali::Key
+            W: wali::sem_elem_t
+
+        __init__(self, st) -> State
+
+        Parameters:
+            st: wali::wfa::State const &
+
+        """
+        this = _wali.new_State(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _wali.delete_State
+    __del__ = lambda self : None;
+    def add_trans(self, *args):
+        """
+        add_trans(self, t)
+
+        Parameters:
+            t: ITrans *
+
+        """
+        return _wali.State_add_trans(self, *args)
+
+    def weight(self, *args):
+        """
+        weight(self) -> SemElemPtr
+        weight(self) -> SemElemPtr
+
+        Parameters:
+            self: wali::wfa::State const *
+
+        """
+        return _wali.State_weight(self, *args)
+
+    def accept_weight(self, *args):
+        """
+        accept_weight(self) -> SemElemPtr
+        accept_weight(self) -> SemElemPtr
+
+        Parameters:
+            self: wali::wfa::State const *
+
+        """
+        return _wali.State_accept_weight(self, *args)
+
+    def delta(self):
+        """
+        delta(self) -> SemElemPtr
+
+        Parameters:
+            self: wali::wfa::State *
+
+        """
+        return _wali.State_delta(self)
+
+    def name(self):
+        """
+        name(self) -> wali::Key
+
+        Parameters:
+            self: wali::wfa::State const *
+
+        """
+        return _wali.State_name(self)
+
+    def begin(self, *args):
+        """
+        begin(self) -> wali::wfa::State::iterator
+        begin(self) -> wali::wfa::State::const_iterator
+
+        Parameters:
+            self: wali::wfa::State const *
+
+        """
+        return _wali.State_begin(self, *args)
+
+    def end(self, *args):
+        """
+        end(self) -> wali::wfa::State::iterator
+        end(self) -> wali::wfa::State::const_iterator
+
+        Parameters:
+            self: wali::wfa::State const *
+
+        """
+        return _wali.State_end(self, *args)
+
+    def erase_trans(self, *args):
+        """
+        erase_trans(self, _from, stack, to) -> bool
+
+        Parameters:
+            from: wali::Key
+            stack: wali::Key
+            to: wali::Key
+
+        erase_trans(self, t) -> bool
+
+        Parameters:
+            t: ITrans *
+
+        """
+        return _wali.State_erase_trans(self, *args)
+
+    def clear_trans_set(self):
+        """
+        clear_trans_set(self)
+
+        Parameters:
+            self: wali::wfa::State *
+
+        """
+        return _wali.State_clear_trans_set(self)
+
+    def __call__(self, *args):
+        """
+        __call__(self, a, b) -> bool
+
+        Parameters:
+            a: wali::wfa::State const *
+            b: wali::wfa::State const *
+
+        """
+        return _wali.State___call__(self, *args)
+
+    def get_trans_set(self, *args):
+        """
+        get_trans_set(self) -> TransSet
+        get_trans_set(self) -> TransSet
+
+        Parameters:
+            self: wali::wfa::State const *
+
+        """
+        return _wali.State_get_trans_set(self, *args)
+
+State_swigregister = _wali.State_swigregister
+State_swigregister(State)
+State.xmltag = _wali.cvar.State_xmltag
+State.xmlinitial_tag = _wali.cvar.State_xmlinitial_tag
+State.xmlfinal_tag = _wali.cvar.State_xmlfinal_tag
+State.xmlname_tag = _wali.cvar.State_xmlname_tag
 
 class DotAttributePrinter(_object):
     """Proxy of C++ wali::wfa::DotAttributePrinter class"""
@@ -3613,12 +3843,12 @@ class WFA(Printable):
 
     def get_state(self, *args):
         """
-        get_state(self, name) -> wali::wfa::State const
+        get_state(self, name) -> State
 
         Parameters:
             name: wali::Key
 
-        get_state(self, name) -> wali::wfa::State *
+        get_state(self, name) -> State
 
         Parameters:
             name: wali::Key

@@ -18,6 +18,7 @@ Wraps all of WALi, and provide means for creating SemElem's in Python
 %feature("nodirector") PySemElem::diff;
 %feature("nodirector") PySemElem::underApproximates;
 %feature("nodirector") PySemElem::extendAndDiff;
+%feature("nodirector") PySemElem::getuserdata;
 
 /* crashes stuff */
 %feature("nodirector") PySemElem::quasi_one;
@@ -336,6 +337,7 @@ but swig is not cased for - therefore do it here */
 
 %template(TransSetImpl) std::set< ITrans*,ITransLT >;
 /*%template(TransSetIterator) std::set< ITrans*,ITransLT >::iterator;*/
+%template(ConstTransPair) std::pair<ITrans* const, bool>;
 
 %include "../Source/wali/wfa/TransSet.hpp"
 %template(TransVector) std::vector<wali::wfa::Trans*>;
@@ -353,6 +355,7 @@ but swig is not cased for - therefore do it here */
     }
 }
 
+%include "../Source/wali/wfa/State.hpp"
 
 %include "../Source/wali/wfa/WFA.hpp"
 %extend wali::wfa::WFA {
